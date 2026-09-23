@@ -1,0 +1,6 @@
+{
+  "name": "Astrology App",
+  "description": "Light-themed Vedic astrology portal providing real-time predictions based on North Indian Kundali charts, date of birth, and current planetary movements (Gochar).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
