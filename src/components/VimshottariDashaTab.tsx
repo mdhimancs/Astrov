@@ -115,6 +115,12 @@ export function VimshottariDashaTab({
   // 2. Calculate Vimshottari Mahadashas
   const vimshottariDasha = calculateVimshottariDasha(natalMoonTotalDeg, birthDate);
 
+  // Expanded Antardasha index for reading
+  const [expandedAntarIndex, setExpandedAntarIndex] = useState<number | null>(null);
+
+  // Expanded Mahadasha index for reading
+  const [expandedMahaIndex, setExpandedMahaIndex] = useState<number | null>(null);
+
   // Default selected Mahadasha to currently active one
   const activeDashaLord = selectedMahadashaPlanet || vimshottariDasha.currentLord;
   const currentMahadashaInfo =
@@ -260,18 +266,22 @@ export function VimshottariDashaTab({
         </div>
 
         {/* Mahadasha Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2.5">
-          {vimshottariDasha.cycle.map((d) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+          {vimshottariDasha.cycle.map((d, idx) => {
             const isCurrentlyActive = d.planet === vimshottariDasha.currentLord;
             const isSelected = (selectedMahadashaPlanet || vimshottariDasha.currentLord) === d.planet;
+            const isExpanded = expandedMahaIndex === idx;
 
             return (
               <div
                 key={`${d.planet}-${d.startMonthYear}`}
-                onClick={() => setSelectedMahadashaPlanet(d.planet)}
-                className={`p-3 rounded-xl border text-xs transition-all duration-150 cursor-pointer shadow-2xs flex flex-col justify-between ${
+                onClick={() => {
+                  setSelectedMahadashaPlanet(d.planet);
+                  setExpandedMahaIndex(isExpanded ? null : idx);
+                }}
+                className={`p-3 rounded-xl border text-xs transition-all duration-200 cursor-pointer shadow-2xs flex flex-col justify-between group ${
                   isSelected
-                    ? 'bg-amber-50/90 border-amber-400 ring-2 ring-amber-300/80 shadow-xs -translate-y-0.5'
+                    ? 'bg-amber-50/90 border-amber-400 ring-2 ring-amber-300/80 shadow-xs'
                     : isCurrentlyActive
                     ? 'bg-purple-50/60 border-purple-300 hover:border-amber-300'
                     : 'bg-[#FCFAF6] border-stone-200/90 hover:bg-white hover:border-stone-300'
@@ -279,35 +289,45 @@ export function VimshottariDashaTab({
               >
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-vedic font-bold text-stone-900 text-sm">
-                      {d.planet} Mahadasha
-                    </span>
-
-                    <div className="flex items-center space-x-1">
-                      {isCurrentlyActive && (
-                        <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-amber-700 text-white tracking-wider">
-                          ACTIVE NOW
-                        </span>
-                      )}
-                      <span className="text-[10px] font-semibold text-stone-400">
-                        {d.durationYears} yrs
+                    <div className="flex flex-col">
+                      <span className="font-vedic font-bold text-stone-900 text-sm">
+                        {d.planet} Mahadasha
+                      </span>
+                      <span className="text-[10px] text-stone-500">
+                        {d.durationYears} yrs • Age {d.startAge}-{d.endAge}
                       </span>
                     </div>
+
+                    {isCurrentlyActive && (
+                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-amber-700 text-white tracking-wider shrink-0">
+                        ACTIVE
+                      </span>
+                    )}
                   </div>
 
-                  {/* Start - End Month-Year */}
-                  <div className="text-[11px] font-bold text-amber-950 bg-amber-100/70 px-2 py-0.5 rounded border border-amber-200/80 text-center tracking-tight mb-1">
+                  {/* Start - End Month-Year (The Timeline) */}
+                  <div className={`text-[11px] font-bold px-2.5 py-1.5 rounded border transition-colors text-center ${
+                    isSelected 
+                      ? 'bg-amber-100/70 border-amber-200/80 text-amber-950' 
+                      : 'bg-stone-100/50 border-stone-200/60 text-stone-600 group-hover:bg-stone-100 group-hover:text-stone-900'
+                  }`}>
                     {d.startMonthYear} – {d.endMonthYear}
-                  </div>
-
-                  <div className="text-[10px] text-stone-500 text-center mb-1">
-                    Age {d.startAge} to {d.endAge}
                   </div>
                 </div>
 
-                <p className="text-[10px] text-stone-600 leading-tight pt-1.5 border-t border-stone-100">
-                  {d.lifeTheme}
-                </p>
+                {isExpanded && (
+                  <div className="mt-2.5 pt-2.5 border-t border-stone-200/60 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <p className="text-[11px] text-stone-700 leading-relaxed italic font-medium">
+                      "{d.lifeTheme}"
+                    </p>
+                  </div>
+                )}
+                
+                {!isExpanded && (
+                  <div className="mt-2 text-[9px] text-center text-stone-400 font-medium group-hover:text-amber-700">
+                    Click to view reading
+                  </div>
+                )}
               </div>
             );
           })}
@@ -335,42 +355,65 @@ export function VimshottariDashaTab({
         </div>
 
         {/* Antardasha Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-9 gap-2">
-          {antardashas.map((antar) => (
-            <div
-              key={`${activeDashaLord}-${antar.planet}-${antar.startMonthYear}`}
-              className={`p-2.5 rounded-lg border text-xs space-y-1 transition-all ${
-                antar.isCurrent
-                  ? 'bg-amber-100/70 border-amber-400 ring-2 ring-amber-300 shadow-2xs font-semibold'
-                  : 'bg-[#FAF8F5] border-stone-200/90'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-stone-900 text-[11px]">
-                  {activeDashaLord} / {antar.planet}
-                </span>
-                {antar.isCurrent && (
-                  <span className="text-[8px] font-bold px-1 rounded bg-amber-700 text-white">
-                    CURRENT
-                  </span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {antardashas.map((antar, idx) => {
+            const isExpanded = expandedAntarIndex === idx;
+            return (
+              <div
+                key={`${activeDashaLord}-${antar.planet}-${antar.startMonthYear}`}
+                onClick={() => setExpandedAntarIndex(isExpanded ? null : idx)}
+                className={`p-3 rounded-xl border text-xs transition-all cursor-pointer group shadow-2xs ${
+                  antar.isCurrent
+                    ? 'bg-amber-50/80 border-amber-400 ring-2 ring-amber-300/60'
+                    : 'bg-[#FAF8F5] border-stone-200/80 hover:bg-white hover:border-amber-300'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex flex-col">
+                    <span className={`font-bold text-stone-900 text-sm ${antar.isCurrent ? 'text-amber-950' : ''}`}>
+                      {activeDashaLord} / {antar.planet} Sub-period
+                    </span>
+                    <span className="text-[10px] text-stone-500 font-medium">
+                      Duration: {antar.durationYearsStr}
+                    </span>
+                  </div>
+                  {antar.isCurrent && (
+                    <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-amber-700 text-white tracking-widest shadow-2xs">
+                      CURRENT
+                    </span>
+                  )}
+                </div>
+
+                {/* Timeline display */}
+                <div className={`flex items-center justify-center space-x-3 py-2 rounded-lg border font-bold text-[11px] ${
+                  antar.isCurrent
+                    ? 'bg-amber-100/50 border-amber-200 text-amber-900'
+                    : 'bg-stone-50 border-stone-200 text-stone-600 group-hover:text-stone-900'
+                }`}>
+                  <span>{antar.startMonthYear}</span>
+                  <ArrowRight className="w-3.5 h-3.5 opacity-50" />
+                  <span>{antar.endMonthYear}</span>
+                </div>
+
+                {isExpanded ? (
+                  <div className="mt-3 pt-3 border-t border-stone-200 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <p className="text-[11px] text-stone-700 leading-relaxed font-medium bg-white/50 p-2 rounded-lg border border-stone-100">
+                      {antar.theme}
+                    </p>
+                    <div className="mt-2 text-[10px] text-amber-800 font-bold flex justify-end items-center space-x-1">
+                      <span>Close Reading</span>
+                      <ChevronDown className="w-3.5 h-3.5 rotate-180" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-2 text-[10px] text-center text-stone-400 font-medium group-hover:text-amber-700 flex items-center justify-center space-x-1">
+                    <span>View Predictive Reading</span>
+                    <ChevronDown className="w-3.5 h-3.5" />
+                  </div>
                 )}
               </div>
-
-              <div className="text-[10px] text-amber-900 font-bold">
-                {antar.startMonthYear}
-              </div>
-              <div className="text-[10px] text-stone-500">
-                to {antar.endMonthYear}
-              </div>
-              <div className="text-[9px] text-stone-400">
-                ({antar.durationYearsStr})
-              </div>
-
-              <p className="text-[9px] text-stone-600 line-clamp-3 pt-1 border-t border-stone-100">
-                {antar.theme}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

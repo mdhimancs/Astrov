@@ -51,6 +51,7 @@ export interface PlanetPosition {
   pada: number;
   house: number; // 1 to 12
   dignity?: 'Exalted' | 'Moolatrikona' | 'Own' | 'Friendly' | 'Neutral' | 'Enemy' | 'Debilitated';
+  d9Position?: { rasiNumber: number; rasiName: VedicRasiName };
 }
 
 export interface HouseInfo {
@@ -273,6 +274,19 @@ export interface DashaMonthlyPlanetaryGuidance {
   favorableDays: string;
   cautionDays: string;
   monthlyRemedy: string;
+}
+
+export interface AshtakavargaPoints {
+  planet: GrahaName;
+  points: number[]; // 12 houses
+  total: number;
+}
+
+export interface DivisionalChart {
+  name: string;
+  vargaCode: string; // D1, D9, D10, etc.
+  planets: PlanetPosition[];
+  houses: HouseInfo[];
 }
 
 export interface VedicAstroPredictionResult {

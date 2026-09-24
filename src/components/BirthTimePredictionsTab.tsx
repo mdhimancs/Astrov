@@ -103,6 +103,7 @@ export function BirthTimePredictionsTab({
   // AI Birth Reading state
   const [isLoadingAi, setIsLoadingAi] = useState(false);
   const [aiReading, setAiReading] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   // Calculated astrological state
   const [natalPlanets, setNatalPlanets] = useState<PlanetPosition[]>([]);
@@ -196,6 +197,7 @@ export function BirthTimePredictionsTab({
   // AI Birth Kundali Deep Synthesis
   const fetchAiBirthPrediction = async () => {
     setIsLoadingAi(true);
+    setAiError(null);
     try {
       const natalLagnaName = VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName || 'Mesha';
       const natalMoonName = VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName || 'Mesha';
@@ -217,12 +219,19 @@ export function BirthTimePredictionsTab({
       });
 
       const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to generate reading');
+      }
+      
       setAiReading(data.reading || 'Birth chart synthesis calculated.');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setAiReading(
-        `Parashari Birth Synthesis for ${name} (Born ${birthDate} at ${birthTime}): With Lagna in ${VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName} and Moon in ${VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName} (${natalNakshatra}), your natal signature emphasizes resolute dharmic purpose, intellectual discernment, and enduring leadership capability.`
-      );
+      if (err.message?.includes('503') || err.message?.includes('demand')) {
+        setAiError('The cosmic channels are currently busy (High API Demand). Please try again in a few moments.');
+      } else {
+        setAiError('The stars are temporarily obscured. Please check your connection and try again.');
+      }
     } finally {
       setIsLoadingAi(false);
     }
@@ -430,6 +439,12 @@ export function BirthTimePredictionsTab({
             )}
           </button>
         </div>
+
+        {aiError && (
+          <div className="bg-rose-50 border border-rose-200 rounded-lg p-3 text-[11px] text-rose-700 animate-in fade-in slide-in-from-top-1">
+            {aiError}
+          </div>
+        )}
 
         {aiReading && (
           <div className="bg-[#FAF8F5] rounded-xl border border-amber-300/80 p-4 text-stone-800 text-xs sm:text-sm sm:leading-relaxed space-y-2.5">

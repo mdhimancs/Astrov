@@ -1,5 +1,6 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
@@ -25,6 +26,24 @@ async function startServer() {
         },
       },
     });
+  };
+
+  const callWithRetry = async (fn: () => Promise<any>, maxRetries = 3, initialDelay = 1000) => {
+    let lastError: any;
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        return await fn();
+      } catch (err: any) {
+        lastError = err;
+        const isTransient = err.message?.includes('503') || err.message?.includes('429') || err.message?.includes('high demand') || err.message?.includes('UNAVAILABLE');
+        if (!isTransient || i === maxRetries - 1) throw err;
+        
+        const delay = initialDelay * Math.pow(2, i);
+        console.warn(`Gemini API busy (503/429). Retrying in ${delay}ms... (Attempt ${i + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+    throw lastError;
   };
 
   // API endpoint for Real-Time Vedic Astrological Prediction based on North Indian Kundali & Current Planetary Transits
@@ -96,14 +115,14 @@ Structure your response with these clean sections:
 5. ⚖️ Strategic Do's and Don'ts (2 punchy green DO's, 2 sharp red DON'Ts)
 6. 🪔 Vedic Upayas (Prescribed mantra japa, gem/color vibration, and karmic remedy)`;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+      const response = await callWithRetry(() => ai.models.generateContent({
+        model: "gemini-3.8-flash",
         contents: prompt,
         config: {
           systemInstruction: "You are a world-renowned master predictive astrologer in the tradition of Cheiro, Dr. B.V. Raman, and K.N. Rao. Your style is concise, authoritative, definitive, and strictly formatted in short predictive bullet points with high accuracy and zero fluff.",
           temperature: 0.6,
         }
-      });
+      }));
 
       res.json({ reading: response.text || "The divine cosmos reveals auspicious alignments for your journey." });
     } catch (err: any) {
@@ -140,14 +159,14 @@ Structure the reading into 3 elegant paragraphs:
 3. Cosmic Purpose & Current Astrological Guidance
 Keep the tone inspiring, professional, and evocative.`;
 
-      const response = await ai.models.generateContent({
+      const response = await callWithRetry(() => ai.models.generateContent({
         model: "gemini-3.8-flash",
         contents: prompt,
         config: {
           systemInstruction: "You are an expert master astrologer with deep wisdom in celestial alignment, synastry, and soulful guidance.",
           temperature: 0.7,
         }
-      });
+      }));
 
       res.json({ reading: response.text || "The stars are whispering profound insights for your journey." });
     } catch (err: any) {
@@ -170,10 +189,10 @@ Keep the tone inspiring, professional, and evocative.`;
 
       const prompt = `Provide a detailed astrological synastry and compatibility analysis between ${sign1} and ${sign2}. Cover love, communication, and shared growth in 2 insightful paragraphs.`;
 
-      const response = await ai.models.generateContent({
+      const response = await callWithRetry(() => ai.models.generateContent({
         model: "gemini-3.8-flash",
         contents: prompt,
-      });
+      }));
 
       res.json({ analysis: response.text || "A harmonious blend of celestial vibrations." });
     } catch (err: any) {
@@ -270,13 +289,13 @@ Return strictly valid JSON with this format:
 ]
 If the place is in India, tz is 5.5. Only output the JSON array, no commentary.`;
 
-          const aiRes = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+          const aiRes = await callWithRetry(() => ai.models.generateContent({
+            model: "gemini-flash-latest",
             contents: prompt,
             config: {
               temperature: 0.1,
             },
-          });
+          }));
 
           const rawText = aiRes.text || '';
           const cleaned = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
@@ -309,9 +328,12 @@ If the place is in India, tz is 5.5. Only output the JSON array, no commentary.`
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(__dirname, 'dist');
+    // In production, server.cjs is in the dist folder along with static files
+    const possibleDistPath = path.join(__dirname, 'dist');
+    const distPath = fs.existsSync(possibleDistPath) ? possibleDistPath : __dirname;
+    
     app.use(express.static(distPath));
-    app.get('*all', (req, res) => {
+    app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }

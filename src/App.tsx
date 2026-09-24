@@ -8,8 +8,10 @@ import { TransitsLiveTab } from './components/TransitsLiveTab';
 import { SadeSatiTab } from './components/SadeSatiTab';
 import { PanchangTab } from './components/PanchangTab';
 import { KundaliMatchingTab } from './components/KundaliMatchingTab';
+import { DivisionalChartsTab } from './components/DivisionalChartsTab';
 import { UserProfile } from './types';
 import { getSavedProfiles, getActiveProfileId, setActiveProfileId as saveActiveId } from './utils/profileStorage';
+import { calculatePlanetaryPositions, buildHouseStructure, calculateYogas, calculateAshtakavarga } from './vedicMath';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('birth-predictions');
@@ -18,6 +20,19 @@ export default function App() {
   // Global Profile State
   const [profiles, setProfiles] = useState<UserProfile[]>(() => getSavedProfiles());
   const [activeProfileId, setActiveProfileId] = useState<string>(() => getActiveProfileId());
+
+  const currentProfile = profiles.find((p) => p.id === activeProfileId) || profiles[0];
+
+  // Calculate Data for the current profile
+  const birthDateTime = currentProfile ? new Date(`${currentProfile.birthDate}T${currentProfile.birthTime}:00`) : new Date();
+  const natalCalc = calculatePlanetaryPositions(
+    birthDateTime,
+    currentProfile?.latitude || 28.61,
+    currentProfile?.longitude || 77.20
+  );
+  const natalHouses = buildHouseStructure(natalCalc.lagnaRasi, natalCalc.planets);
+  const yogas = calculateYogas(natalCalc.planets, natalCalc.lagnaRasi);
+  const ashtakavarga = calculateAshtakavarga(natalCalc.planets);
 
   const handleProfileChange = (id: string) => {
     setActiveProfileId(id);
@@ -89,6 +104,16 @@ export default function App() {
             profiles={profiles}
             onNavigateToDasha={() => setActiveTab('vimshottari-dasha')}
             onNavigateToMonthWise={() => setActiveTab('monthly-predictions')}
+          />
+        )}
+        {activeTab === 'divisional-charts' && (
+          <DivisionalChartsTab
+            natalHouses={natalHouses}
+            natalPlanets={natalCalc.planets}
+            yogas={yogas}
+            ashtakavarga={ashtakavarga}
+            lagnaRasi={natalCalc.lagnaRasi}
+            activeProfile={currentProfile}
           />
         )}
         {activeTab === 'transits' && <TransitsLiveTab />}

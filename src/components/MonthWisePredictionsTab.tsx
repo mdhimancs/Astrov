@@ -93,6 +93,7 @@ export function MonthWisePredictionsTab({
   // AI Prediction state
   const [isLoadingAi, setIsLoadingAi] = useState(false);
   const [aiReading, setAiReading] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   // Astrological State
   const [natalLagnaRasi, setNatalLagnaRasi] = useState<number>(5);
@@ -175,6 +176,7 @@ export function MonthWisePredictionsTab({
   // AI Transit Prediction
   const fetchRealTimeAiPrediction = async () => {
     setIsLoadingAi(true);
+    setAiError(null);
     try {
       const natalLagnaName = VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName || 'Mesha';
       const natalMoonName = VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName || 'Mesha';
@@ -206,12 +208,19 @@ export function MonthWisePredictionsTab({
       });
 
       const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to generate reading');
+      }
+      
       setAiReading(data.reading || 'Month-wise Vedic transit reading synthesized.');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setAiReading(
-        `Monthly Transit Forecast for ${name} (${selectedMonthKey}): With your natal Moon in ${VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName} and Lagna in ${VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName}, the month's key planetary movements emphasize professional consolidation and prudent health management.`
-      );
+      if (err.message?.includes('503') || err.message?.includes('demand')) {
+        setAiError('The cosmic channels are currently busy (High API Demand). Please try again in a few moments.');
+      } else {
+        setAiError('The stars are temporarily obscured. Please check your connection and try again.');
+      }
     } finally {
       setIsLoadingAi(false);
     }
@@ -328,6 +337,12 @@ export function MonthWisePredictionsTab({
             )}
           </button>
         </div>
+
+        {aiError && (
+          <div className="bg-rose-50 border border-rose-200 rounded-lg p-3 text-[11px] text-rose-700 animate-in fade-in slide-in-from-top-1">
+            {aiError}
+          </div>
+        )}
 
         {aiReading && (
           <div className="bg-[#FAF8F5] rounded-lg border border-amber-300/80 p-3 text-stone-800 text-xs leading-relaxed space-y-2">

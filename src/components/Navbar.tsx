@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, Clock, Shield, Calendar, HeartHandshake, Sparkles, Orbit, Layers, Award } from 'lucide-react';
+import { Compass, Clock, Shield, Calendar, HeartHandshake, Sparkles, Orbit, Layers, Award, Brain } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: string;
@@ -13,6 +13,7 @@ export function Navbar({ activeTab, setActiveTab, currentTransitTime }: NavbarPr
     { id: 'monthly-predictions', label: 'Month-Wise Predictions', icon: Calendar },
     { id: 'vimshottari-dasha', label: 'Vimshottari Dasha', icon: Layers },
     { id: 'critical-transits', label: 'Life Milestones & Transits', icon: Award },
+    { id: 'divisional-charts', label: 'Advanced Analysis', icon: Brain },
     { id: 'transits', label: 'Live Gochar Transits', icon: Orbit },
     { id: 'sadesati', label: 'Shani Sade Sati', icon: Shield },
     { id: 'panchang', label: 'Daily Panchang', icon: Clock },
@@ -74,7 +75,7 @@ export function Navbar({ activeTab, setActiveTab, currentTransitTime }: NavbarPr
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`group relative flex items-center space-x-1.5 px-3 py-2 rounded-t-xl text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer border-t border-x ${
+                className={`group relative flex items-center space-x-1.5 px-2.5 py-1.5 rounded-t-xl text-[11px] sm:text-xs font-medium transition-all duration-200 cursor-pointer border-t border-x ${
                   isActive
                     ? 'bg-white text-stone-950 font-bold border-amber-400 border-b-2 border-b-amber-600 shadow-sm -translate-y-1 z-10'
                     : 'bg-[#F9F6F0] text-stone-600 border-stone-200/80 hover:bg-white hover:text-stone-900 hover:-translate-y-0.5 shadow-2xs'
@@ -86,11 +87,11 @@ export function Navbar({ activeTab, setActiveTab, currentTransitTime }: NavbarPr
                 }}
               >
                 <span
-                  className={`w-1.5 h-1.5 rounded-full ${
+                  className={`w-1 h-1 rounded-full ${
                     isActive ? 'bg-amber-600 ring-2 ring-amber-200' : 'bg-stone-300 group-hover:bg-amber-400'
                   }`}
                 />
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-700' : 'text-stone-500 group-hover:text-amber-700'}`} />
+                <Icon className={`w-3 h-3 ${isActive ? 'text-amber-700' : 'text-stone-500 group-hover:text-amber-700'}`} />
                 <span className="whitespace-nowrap">{tab.label}</span>
               </button>
             );
@@ -107,13 +108,13 @@ export function Navbar({ activeTab, setActiveTab, currentTransitTime }: NavbarPr
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm whitespace-nowrap transition-all duration-150 cursor-pointer border ${
+              className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-lg text-[11px] sm:text-xs whitespace-nowrap transition-all duration-150 cursor-pointer border ${
                 isActive
                   ? 'bg-white text-stone-900 font-bold border-amber-400 shadow-2xs ring-1 ring-amber-300/70 -translate-y-0.5'
                   : 'bg-[#FCFAF6] text-stone-600 border-stone-200 hover:bg-white'
               }`}
             >
-              <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-700' : 'text-stone-500'}`} />
+              <Icon className={`w-3 h-3 ${isActive ? 'text-amber-700' : 'text-stone-500'}`} />
               <span>{tab.label}</span>
             </button>
           );
