@@ -58,10 +58,9 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-stone-900 flex flex-col relative overflow-x-hidden selection:bg-amber-200 selection:text-amber-950">
-      {/* Subtle warm atmospheric light gradients */}
-      <div className="absolute top-0 right-1/4 w-[36rem] h-[36rem] bg-amber-200/20 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/5 w-[30rem] h-[30rem] bg-orange-100/30 rounded-full blur-[160px] pointer-events-none" />
+    <div className="min-h-screen text-stone-900 flex flex-col relative overflow-x-hidden selection:bg-amber-200 selection:text-amber-950">
+      {/* Subtle atmospheric depth layer */}
+      <div className="fixed inset-0 bg-white/40 pointer-events-none" />
 
       {/* Navigation Header */}
       <Navbar
@@ -71,7 +70,7 @@ export default function App() {
       />
 
       {/* Main Vedic Content Area */}
-      <main className="flex-1 pb-16">
+      <main className="flex-1 pb-1.5 w-full px-0.5 sm:px-1">
         {(activeTab === 'birth-predictions' || activeTab === 'kundali') && (
           <BirthTimePredictionsTab
             profiles={profiles}
@@ -133,23 +132,23 @@ export default function App() {
       </main>
 
       {/* Light Portal Footer */}
-      <footer className="border-t border-[#E8DEC8] bg-[#F7F2E7] py-8 text-xs text-stone-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center font-vedic font-bold text-sm">
+      <footer className="border-t border-[#E8DEC8] bg-[#F7F2E7] py-1 text-[10px] text-stone-600">
+        <div className="w-full px-1 sm:px-2 flex flex-col md:flex-row items-center justify-between gap-1.5">
+          <div className="flex items-center space-x-1.5">
+            <div className="w-5 h-5 rounded bg-amber-600 text-white flex items-center justify-center font-vedic font-bold text-xs">
               ॐ
             </div>
             <div>
-              <span className="font-vedic font-bold text-stone-900 text-sm">
+              <span className="font-vedic font-bold text-stone-900 text-[11px]">
                 JyotishVeda • Vedic Astrology Portal
               </span>
-              <p className="text-[11px] text-stone-500">
+              <p className="text-[9px] text-stone-500">
                 Traditional Parashari Jyotish • North Indian Kundali & Real-Time Planetary Movement
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-stone-600">
+          <div className="flex flex-wrap items-center justify-center gap-2 text-[10px] text-stone-600">
             <span>Chitra Paksha Ayanamsha</span>
             <span>•</span>
             <span>Real-Time Gochar Synced</span>
@@ -157,7 +156,7 @@ export default function App() {
             <span>Parashari Hora Shastra</span>
           </div>
 
-          <p className="text-stone-500 text-center md:text-right text-[11px]">
+          <p className="text-stone-500 text-center md:text-right text-[9px]">
             Astrological insights provided for spiritual contemplation and dharmic guidance.
           </p>
         </div>

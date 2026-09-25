@@ -265,26 +265,23 @@ export function HouseCardDeck({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2">
       {/* THE 12 HOUSES DECK CONTAINER */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+      <div className="bg-white/90 backdrop-blur-sm rounded-xl border border-stone-200 shadow-2xs overflow-hidden">
         {/* DECK HEADER & FILTERS */}
-        <div className="p-5 sm:p-8 border-b border-stone-100 space-y-6 bg-[#FAF9F6]/30">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="px-2 sm:px-2.5 py-1.5 border-b border-stone-100 bg-[#FAF9F6]/40">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-1.5">
             <div>
-              <h3 className="font-vedic font-bold text-stone-900 text-lg sm:text-xl flex items-center space-x-2.5 tracking-tight">
-                <Layers className="w-5 h-5 text-amber-700" />
-                <span>Bhava Deck (All 12 Houses)</span>
+              <h3 className="font-vedic font-bold text-stone-900 text-xs sm:text-sm flex items-center space-x-1.5 tracking-tight">
+                <Layers className="w-3 h-3 text-amber-700" />
+                <span>Bhava Deck</span>
               </h3>
-              <p className="text-xs sm:text-sm text-stone-600 mt-1 leading-relaxed max-w-2xl">
-                Explore the 12 Bhavas of your natal chart. Select a house card below to reveal its complete Parashari analysis, planetary influences, and aspects.
-              </p>
             </div>
 
-            {/* Category Filter Pills */}
-            <div className="flex flex-wrap items-center gap-1.5 pt-1 sm:pt-0">
+            {/* Category Filter - Zero Pill Style */}
+            <div className="flex flex-wrap items-center gap-2">
               {[
-                { id: 'ALL', label: 'All 12' },
+                { id: 'ALL', label: 'All' },
                 { id: 'KENDRA', label: 'Kendra' },
                 { id: 'TRIKONA', label: 'Trikona' },
                 { id: 'DHANA', label: 'Wealth' },
@@ -295,10 +292,10 @@ export function HouseCardDeck({
                   key={cat.id}
                   type="button"
                   onClick={() => setFilterCategory(cat.id as any)}
-                  className={`px-3.5 py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 cursor-pointer border ${
+                  className={`text-[10px] font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer pb-0.5 border-b-2 ${
                     filterCategory === cat.id
-                      ? 'bg-amber-700 text-white border-amber-800 shadow-sm'
-                      : 'bg-white text-stone-600 border-stone-200 hover:border-amber-300 hover:text-stone-900 hover:bg-stone-50'
+                      ? 'text-amber-800 border-amber-600'
+                      : 'text-stone-400 border-transparent hover:text-stone-600'
                   }`}
                 >
                   {cat.label}
@@ -308,17 +305,17 @@ export function HouseCardDeck({
           </div>
 
           {/* THE 12 HOUSES NAVIGATION CARDS (H1, H2, etc.) */}
-          <div className="grid grid-cols-6 sm:flex sm:flex-wrap gap-2.5 pt-1">
+          <div className="grid grid-cols-6 sm:flex sm:flex-wrap gap-1 mt-2">
             {displayedHouses.map((h) => {
               const isSelected = h.houseNumber === selectedHouseNumber;
               return (
                 <button
                   key={h.houseNumber}
                   onClick={() => onSelectHouseNumber(h.houseNumber)}
-                  className={`aspect-square sm:w-12 sm:h-12 rounded-xl font-vedic font-bold text-sm sm:text-base flex items-center justify-center transition-all duration-300 border-2 ${
+                  className={`aspect-square sm:w-8 sm:h-8 rounded-md font-vedic font-bold text-[10px] sm:text-xs flex items-center justify-center transition-all duration-150 border ${
                     isSelected
-                      ? 'bg-amber-700 text-white border-amber-600 shadow-md -translate-y-1 ring-4 ring-amber-100'
-                      : 'bg-white border-stone-100 text-stone-400 hover:border-amber-400 hover:text-amber-800 hover:shadow-sm hover:-translate-y-0.5'
+                      ? 'bg-amber-700 text-white border-amber-600 shadow-2xs ring-1 ring-amber-100'
+                      : 'bg-white border-stone-100 text-stone-500 hover:border-amber-300 hover:text-amber-800'
                   }`}
                 >
                   H{h.houseNumber}
@@ -328,290 +325,159 @@ export function HouseCardDeck({
           </div>
         </div>
 
-        {/* SELECTED HOUSE COMPREHENSIVE DOSSIER (INSIDE THE DECK) */}
-        <div className="p-5 sm:p-10 bg-gradient-to-b from-white to-[#FAF8F5]/40 space-y-10 animate-in fade-in slide-in-from-top-2 duration-300">
+        {/* SELECTED HOUSE COMPREHENSIVE DOSSIER */}
+        <div className="px-2 sm:px-2.5 py-2 bg-gradient-to-b from-white to-[#FAF8F5]/30 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
           {/* Top Navigation & House Title */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 border-b border-stone-100 pb-8">
-            <div className="flex items-center space-x-4 sm:space-x-6">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-600 via-amber-700 to-stone-800 text-white font-vedic font-bold text-2xl flex items-center justify-center shadow-md shrink-0">
+          <div className="flex items-center justify-between gap-2 border-b border-stone-100 pb-1.5">
+            <div className="flex items-center space-x-2">
+              <div className="text-amber-700 font-vedic font-bold text-lg sm:text-xl">
                 H{activeHouse.houseNumber}
               </div>
 
-              <div className="space-y-1.5">
-                <div className="flex flex-wrap items-center gap-3">
-                  <h3 className="font-vedic font-bold text-stone-900 text-2xl sm:text-3xl tracking-tight leading-none">
+              <div className="space-y-0">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <h3 className="font-vedic font-bold text-stone-900 text-sm sm:text-base tracking-tight leading-tight">
                     {activeHouse.vedicName} — {activePrediction.lifeDomain}
                   </h3>
-                  <span className={`text-[10px] font-extrabold px-3 py-1.5 rounded-full border uppercase tracking-widest ${classification.badgeClass}`}>
+                  <span className={`text-[8px] font-black uppercase tracking-widest ${classification.badgeClass.replace('bg-', 'text-').replace('text-', 'border-').split(' ')[1]}`}>
                     {classification.type}
                   </span>
                 </div>
-                <p className="text-sm sm:text-base text-stone-500 font-medium leading-relaxed">
+                <p className="text-[10px] text-stone-400 font-medium leading-tight">
                   {classification.description}
                 </p>
               </div>
             </div>
 
             {/* Quick Prev / Next House Flipping Buttons */}
-            <div className="flex items-center space-x-3 shrink-0 self-end sm:self-auto">
+            <div className="flex items-center space-x-1 shrink-0">
               <button
                 type="button"
                 onClick={handlePrevHouse}
-                className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-white hover:bg-stone-50 text-stone-700 text-sm font-bold border border-stone-200 shadow-2xs transition-all cursor-pointer hover:border-amber-300"
+                className="p-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-400 hover:text-amber-700 transition-colors border border-stone-100"
                 title="Previous House"
               >
-                <ChevronLeft className="w-5 h-5 text-amber-700" />
-                <span>H{activeHouse.houseNumber === 1 ? 12 : activeHouse.houseNumber - 1}</span>
+                <ChevronLeft className="w-3.5 h-3.5" />
               </button>
 
               <button
                 type="button"
                 onClick={handleNextHouse}
-                className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-white hover:bg-stone-50 text-stone-700 text-sm font-bold border border-stone-200 shadow-2xs transition-all cursor-pointer hover:border-amber-300"
+                className="p-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-400 hover:text-amber-700 transition-colors border border-stone-100"
                 title="Next House"
               >
-                <span>H{activeHouse.houseNumber === 12 ? 1 : activeHouse.houseNumber + 1}</span>
-                <ChevronRight className="w-5 h-5 text-amber-700" />
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
 
           {/* CORE BHAVA ASTROLOGICAL VITALS GRID */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 bg-[#FAF9F6] rounded-2xl p-6 sm:p-8 border border-stone-200/60 shadow-inner">
-            <div className="space-y-1.5">
-              <span className="text-[10px] font-extrabold text-amber-800 uppercase tracking-widest block opacity-80">
-                Zodiac Sign (Rasi)
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-stone-50/50 rounded-lg px-2 py-1.5 border border-stone-100">
+            <div className="space-y-0">
+              <span className="text-[8px] font-bold text-stone-400 uppercase tracking-widest block">
+                Zodiac Sign
               </span>
-              <span className="text-lg sm:text-xl font-vedic font-bold text-stone-900 block leading-tight">
+              <span className="text-xs sm:text-sm font-vedic font-bold text-stone-800 block">
                 {activeHouse.rasiName}
               </span>
-              <span className="text-xs font-medium text-stone-500">
-                Sign #{activeHouse.rasiNumber}
-              </span>
             </div>
 
-            <div className="space-y-1.5 border-l border-stone-200/60 pl-6 sm:pl-0 sm:border-l-0 sm:text-center sm:px-6">
-              <span className="text-[10px] font-extrabold text-amber-800 uppercase tracking-widest block opacity-80">
-                Sign Lord (Dispositor)
+            <div className="space-y-0 border-l border-stone-200/40 pl-2">
+              <span className="text-[8px] font-bold text-stone-400 uppercase tracking-widest block">
+                Sign Lord
               </span>
-              <span className="text-lg sm:text-xl font-vedic font-bold text-stone-900 block leading-tight">
+              <span className="text-xs sm:text-sm font-vedic font-bold text-stone-800 block">
                 {activeHouse.signLord}
               </span>
-              <span className="text-xs font-medium text-stone-500">
-                Rules Bhava Outcomes
-              </span>
             </div>
 
-            <div className="space-y-1.5 pt-4 sm:pt-0 sm:border-l border-stone-200/60 sm:text-center sm:px-6">
-              <span className="text-[10px] font-extrabold text-amber-800 uppercase tracking-widest block opacity-80">
+            <div className="space-y-0 border-l border-stone-200/40 pl-2">
+              <span className="text-[8px] font-bold text-stone-400 uppercase tracking-widest block">
                 Natural Karaka
               </span>
-              <span className="text-lg sm:text-xl font-vedic font-bold text-stone-900 block leading-tight">
+              <span className="text-xs sm:text-sm font-vedic font-bold text-stone-800 block">
                 {activeHouse.karaka}
               </span>
-              <span className="text-xs font-medium text-stone-500">
-                Universal Significator
-              </span>
             </div>
 
-            <div className="space-y-1.5 pt-4 sm:pt-0 border-l border-stone-200/60 pl-6 sm:pl-0 sm:border-l sm:text-right">
-              <span className="text-[10px] font-extrabold text-amber-800 uppercase tracking-widest block opacity-80">
-                Bhava Occupancy
+            <div className="space-y-0 border-l border-stone-200/40 pl-2">
+              <span className="text-[8px] font-bold text-stone-400 uppercase tracking-widest block">
+                Occupancy
               </span>
-              <span className="text-lg sm:text-xl font-vedic font-bold text-stone-900 block leading-tight truncate">
-                {activeHouse.planets.length === 0 ? 'Lord Governed' : `${activeHouse.planets.length} Natal Grahas`}
-              </span>
-              <span className="text-xs font-medium text-stone-500 truncate block">
-                {activeHouse.planets.length === 0 ? 'Unoccupied (Pure)' : activeHouse.planets.map((p) => p.name).join(', ')}
+              <span className="text-xs sm:text-sm font-vedic font-bold text-stone-800 block truncate">
+                {activeHouse.planets.length === 0 ? 'Empty' : `${activeHouse.planets.length} Grahas`}
               </span>
             </div>
           </div>
 
-          {/* GRAHAS POSITED IN THIS BHAVA */}
-          <div className="space-y-6">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-amber-700" />
-              </div>
-              <h4 className="font-vedic font-bold text-stone-900 text-lg sm:text-xl tracking-tight">
-                Natal Grahas Posited in House {activeHouse.houseNumber}
+          {/* GRAHAS POSITED & ASPECTS - TIGHTER INTEGRATION */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            {/* Occupants */}
+            <div className="space-y-1.5">
+              <h4 className="text-[10px] font-black text-stone-400 uppercase tracking-widest flex items-center space-x-1">
+                <Sparkles className="w-2.5 h-2.5" />
+                <span>Natal Occupants</span>
               </h4>
-            </div>
-
-            {activeHouse.planets.length === 0 ? (
-              <div className="bg-[#FCFAF6] rounded-2xl border border-stone-200/80 p-6 sm:p-8 text-stone-700 text-sm leading-relaxed flex items-start space-x-4">
-                <Compass className="w-6 h-6 text-stone-400 shrink-0 mt-0.5" />
-                <div className="space-y-2">
-                  <p className="font-bold text-stone-900 text-base sm:text-lg">
-                    Unoccupied Bhava (Pure Dispositor Influence)
-                  </p>
-                  <p className="text-stone-600 leading-relaxed max-w-3xl">
-                    No natal planets directly occupy this house. In classical Parashari Jyotish, an unoccupied house expresses its themes in an unobstructed manner, directed purely by its sign lord <strong className="text-amber-900 font-bold">{activeHouse.signLord}</strong> and natural karaka <strong className="text-amber-900 font-bold">{activeHouse.karaka}</strong>.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {activeHouse.planets.map((planet) => (
-                  <div
-                    key={planet.name}
-                    className="bg-white rounded-2xl border border-amber-200/60 p-6 space-y-4 shadow-2xs hover:shadow-md transition-all duration-300"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-900 border border-amber-100 font-bold flex items-center justify-center text-xl shadow-sm">
-                          {planet.symbol}
-                        </div>
-                        <div>
-                          <span className="font-vedic font-bold text-stone-900 text-lg sm:text-xl block leading-none">
-                            {planet.englishName} ({planet.name})
-                          </span>
-                          <span className="text-xs font-medium text-stone-500 mt-1.5 block">
-                            {planet.degree}°{planet.minute}' in {activeHouse.rasiName}
-                          </span>
-                        </div>
+              {activeHouse.planets.length === 0 ? (
+                <p className="text-[10px] text-stone-400 italic">Unoccupied; purely lord governed.</p>
+              ) : (
+                <div className="space-y-1">
+                  {activeHouse.planets.map((planet) => (
+                    <div key={planet.name} className="flex items-center justify-between p-1.5 rounded bg-white border border-stone-100 shadow-3xs">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm font-bold text-amber-700">{planet.symbol}</span>
+                        <span className="text-[11px] font-bold text-stone-700">{planet.englishName}</span>
                       </div>
-
-                      <div className="text-right">
-                        {planet.isRetrograde && (
-                          <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-200 block mb-1.5">
-                            VAKRI (®)
-                          </span>
-                        )}
-                        <span className="text-xs font-bold text-stone-400 uppercase tracking-widest">
-                          PADA {planet.pada}
-                        </span>
-                      </div>
+                      <span className="text-[9px] text-stone-400">{planet.degree}° in {planet.nakshatra}</span>
                     </div>
-
-                    <div className="text-sm sm:text-base text-stone-700 pt-4 border-t border-stone-100 leading-relaxed">
-                      Occupies <strong>{planet.nakshatra}</strong> nakshatra. Intensifies the native's active focus on {activePrediction.lifeDomain.toLowerCase()}, bestowing notable willpower and personal karmic emphasis here.
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* PLANETARY ASPECTS (DRISHTI) ON THIS HOUSE */}
-          <div className="space-y-6">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-stone-100 flex items-center justify-center">
-                <Eye className="w-5 h-5 text-stone-700" />
-              </div>
-              <h4 className="font-vedic font-bold text-stone-900 text-lg sm:text-xl tracking-tight">
-                Planetary Aspects (Drishti) on House {activeHouse.houseNumber}
-              </h4>
-            </div>
-
-            {aspectingPlanets.length === 0 ? (
-              <div className="bg-[#FAF8F5] rounded-2xl border border-stone-200/70 p-6 text-stone-600 text-sm italic leading-relaxed">
-                No major classical full aspects converge on this house, keeping its energy shielded from external planetary cross-currents.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {aspectingPlanets.map((asp, idx) => (
-                  <div
-                    key={`${asp.planet.name}-${idx}`}
-                    className={`rounded-2xl border p-5 transition-all duration-300 shadow-2xs hover:shadow-sm ${
-                      asp.isBenefic
-                        ? 'bg-emerald-50/40 border-emerald-200/60 text-emerald-950'
-                        : 'bg-stone-50 border-stone-200/80 text-stone-900'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-bold text-base sm:text-lg">{asp.planet.englishName}</span>
-                      <span className="text-[10px] font-extrabold px-2 py-1 rounded-lg bg-white/60 border border-stone-200/30 uppercase tracking-tighter shadow-3xs">
-                        From H{asp.planet.house}
-                      </span>
-                    </div>
-                    <p className="text-sm font-medium text-stone-600 leading-relaxed">
-                      {asp.aspectType}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* DEEP MASTER PREDICTIVE READING FOR THIS SPECIFIC HOUSE */}
-          <div className="bg-gradient-to-br from-amber-50/80 via-white to-amber-50/40 rounded-3xl border border-amber-300 p-8 sm:p-12 space-y-8 shadow-sm">
-            <div className="flex items-center space-x-4 border-b border-amber-200/60 pb-6">
-              <div className="w-12 h-12 rounded-2xl bg-amber-700 flex items-center justify-center shadow-md">
-                <Award className="w-6 h-6 text-white" />
-              </div>
-              <h4 className="font-vedic font-bold text-stone-900 text-xl sm:text-2xl tracking-tight">
-                Parashari & Cheiro Predictive Reading
-              </h4>
-            </div>
-
-            <div className="space-y-8">
-              <p className="font-serif italic text-stone-900 text-lg sm:text-xl leading-relaxed antialiased border-l-4 border-amber-200 pl-6 py-1">
-                "{activePrediction.prediction}"
-              </p>
-
-              {/* Strategic Pillars of this House */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                <div className="bg-white/80 rounded-2xl p-6 border border-amber-200/40 space-y-3 shadow-3xs">
-                  <span className="font-extrabold text-amber-900 text-xs sm:text-sm flex items-center space-x-2.5 uppercase tracking-widest">
-                    <Flame className="w-5 h-5 text-amber-600" />
-                    <span>Primary Manifestation</span>
-                  </span>
-                  <p className="text-sm sm:text-base text-stone-700 leading-relaxed font-medium">
-                    With <strong className="text-stone-900 font-bold">{activeHouse.rasiName}</strong> ruling this bhava, the native naturally applies structured discernment toward {activePrediction.lifeDomain.toLowerCase()}. Growth is steady and reinforced when aligned with personal values.
-                  </p>
+                  ))}
                 </div>
+              )}
+            </div>
 
-                <div className="bg-white/80 rounded-2xl p-6 border border-amber-200/40 space-y-3 shadow-3xs">
-                  <span className="font-extrabold text-amber-900 text-xs sm:text-sm flex items-center space-x-2.5 uppercase tracking-widest">
-                    <Shield className="w-5 h-5 text-amber-600" />
-                    <span>Karmic Guardrails</span>
-                  </span>
-                  <p className="text-sm sm:text-base text-stone-700 leading-relaxed font-medium">
-                    Guard against impatience or impulsive shifts in {activePrediction.lifeDomain.toLowerCase()}. Sustained focus during favorable transits will yield lasting rewards.
-                  </p>
+            {/* Aspects */}
+            <div className="space-y-1.5">
+              <h4 className="text-[10px] font-black text-stone-400 uppercase tracking-widest flex items-center space-x-1">
+                <Eye className="w-2.5 h-2.5" />
+                <span>Drishti (Aspects)</span>
+              </h4>
+              {aspectingPlanets.length === 0 ? (
+                <p className="text-[10px] text-stone-400 italic">No major aspects converge here.</p>
+              ) : (
+                <div className="flex flex-wrap gap-1">
+                  {aspectingPlanets.map((asp, idx) => (
+                    <div key={`${asp.planet.name}-${idx}`} className={`px-1.5 py-0.5 rounded text-[10px] font-bold border ${asp.isBenefic ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-stone-50 text-stone-600 border-stone-100'}`}>
+                      {asp.planet.englishName} (H{asp.planet.house})
+                    </div>
+                  ))}
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
-          {/* VEDIC REMEDIAL HARMONIZATION (UPAYA) */}
-          <div className="bg-[#FAF9F6] rounded-3xl border border-stone-200/80 p-8 sm:p-12 space-y-8">
-            <div className="flex items-center space-x-4 border-b border-stone-200 pb-6">
-              <div className="w-12 h-12 rounded-2xl bg-stone-900 flex items-center justify-center shadow-sm">
-                <BookOpen className="w-6 h-6 text-white" />
-              </div>
-              <h4 className="font-vedic font-bold text-stone-900 text-xl tracking-tight">
-                Vedic Upaya (Remedial Practice)
-              </h4>
-            </div>
+          {/* PREDICTIVE READING - ELEGANT BLOCK */}
+          <div className="bg-amber-50/30 rounded-lg p-2.5 border-l-2 border-amber-300">
+            <h4 className="text-[9px] font-black text-amber-800 uppercase tracking-widest mb-1">Sage Parashari Reading</h4>
+            <p className="font-serif italic text-stone-800 text-xs sm:text-sm leading-relaxed antialiased">
+              "{activePrediction.prediction}"
+            </p>
+          </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-2xl border border-stone-100 shadow-2xs space-y-2">
-                <span className="font-extrabold text-stone-400 uppercase text-[10px] tracking-widest block">
-                  Vedic Chanting
-                </span>
-                <span className="font-bold text-amber-900 text-base sm:text-lg block leading-tight">
-                  {upaya.mantra}
-                </span>
+          {/* REMEDIES - ZERO CARD LOOK */}
+          <div className="pt-1 border-t border-stone-100">
+            <h4 className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1.5">Bhava Harmonization</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px]">
+              <div>
+                <span className="text-stone-400 font-bold block">Mantra</span>
+                <span className="text-amber-900 font-bold">{upaya.mantra}</span>
               </div>
-
-              <div className="bg-white p-6 rounded-2xl border border-stone-100 shadow-2xs space-y-2">
-                <span className="font-extrabold text-stone-400 uppercase text-[10px] tracking-widest block">
-                  Tones & Deity
-                </span>
-                <span className="font-bold text-stone-800 text-base sm:text-lg block leading-tight">
-                  {upaya.auspiciousColor} • {upaya.deity}
-                </span>
+              <div>
+                <span className="text-stone-400 font-bold block">Deity</span>
+                <span className="text-stone-700 font-medium">{upaya.deity}</span>
               </div>
-
-              <div className="bg-white p-6 rounded-2xl border border-stone-100 shadow-2xs space-y-2">
-                <span className="font-extrabold text-stone-400 uppercase text-[10px] tracking-widest block">
-                  Harmonizing Action
-                </span>
-                <p className="text-stone-700 text-sm sm:text-base leading-relaxed font-medium">
-                  {upaya.remedyAction}
-                </p>
+              <div className="sm:col-span-1">
+                <span className="text-stone-400 font-bold block">Action</span>
+                <span className="text-stone-600 leading-tight">{upaya.remedyAction}</span>
               </div>
             </div>
           </div>

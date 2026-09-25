@@ -73,58 +73,51 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
   const results = calculateGunas();
 
   return (
-    <div className="max-w-5xl sm:max-w-6xl mx-auto px-3 sm:px-4 py-4 space-y-4">
+    <div className="w-full px-0.5 sm:px-1 py-1.5 space-y-2">
       {/* Intro Header */}
-      <div className="bg-amber-50/70 border border-amber-200/80 rounded-xl p-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xs">
-        <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-lg bg-amber-700 text-white flex items-center justify-center font-bold text-xs shrink-0">
-            <HeartHandshake className="w-4 h-4" />
-          </div>
-          <div>
-            <h1 className="text-sm sm:text-base font-vedic font-bold text-stone-900">
-              Vedic Kundali Matching (Ashtakoot Guna Milan)
-            </h1>
-            <p className="text-[11px] text-stone-600">
-              Traditional 36-Guna assessment analyzing mental, temperamental, physical, and karmic compatibility
-            </p>
-          </div>
+      <div className="bg-amber-50/40 border border-amber-100 rounded-xl px-2.5 py-1.5 flex flex-col sm:flex-row items-center justify-between gap-1 shadow-3xs">
+        <div className="flex items-center space-x-2">
+          <HeartHandshake className="w-4 h-4 text-amber-700" />
+          <h1 className="text-xs font-black text-stone-800 uppercase tracking-widest font-vedic leading-tight">
+            Guna Milan
+          </h1>
         </div>
 
-        <div className="text-[11px] text-stone-700 font-semibold bg-white/80 px-2.5 py-1 rounded-lg border border-amber-200 shrink-0">
-          Max Score: <strong>36 Gunas</strong>
+        <div className="text-[10px] font-black uppercase tracking-widest text-stone-400 shrink-0">
+          Max: <span className="text-amber-800">36 Gunas</span>
         </div>
       </div>
 
       {/* Input Columns */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         {/* Partner 1 */}
-        <div className="bg-white rounded-xl border border-stone-200 p-3.5 sm:p-4 shadow-2xs space-y-2.5">
-          <h3 className="font-vedic font-bold text-sm text-stone-900 flex items-center space-x-1.5">
-            <Users className="w-4 h-4 text-amber-600" />
+        <div className="bg-white rounded-xl border border-stone-200 p-2.5 sm:p-3 shadow-2xs space-y-1.5">
+          <h3 className="font-vedic font-bold text-xs sm:text-sm text-stone-900 flex items-center space-x-1.5">
+            <Users className="w-3.5 h-3.5 text-amber-600" />
             <span>First Partner Details</span>
           </h3>
 
           <div>
-            <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-1">
+            <label className="block text-[10px] sm:text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
               Full Name
             </label>
             <input
               type="text"
               value={person1.name}
               onChange={(e) => setPerson1({ ...person1, name: e.target.value })}
-              className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg px-3 py-1.5 text-stone-900 text-xs focus:outline-none focus:border-amber-600 focus:bg-white"
+              className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg px-2.5 py-1 text-stone-900 text-xs focus:outline-none focus:border-amber-600 focus:bg-white"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-1">
+              <label className="block text-[10px] sm:text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
                 Janma Rasi (Moon)
               </label>
               <select
                 value={person1.rasi}
                 onChange={(e) => setPerson1({ ...person1, rasi: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg px-2.5 py-1.5 text-stone-900 text-xs focus:outline-none focus:border-amber-600 focus:bg-white"
+                className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg px-2 py-1 text-stone-900 text-xs focus:outline-none focus:border-amber-600 focus:bg-white"
               >
                 {VEDIC_RASIS.map((r) => (
                   <option key={r.sanskritName} value={r.sanskritName}>
@@ -135,13 +128,13 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-1">
+              <label className="block text-[10px] sm:text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
                 Janma Nakshatra
               </label>
               <select
                 value={person1.nakshatra}
                 onChange={(e) => setPerson1({ ...person1, nakshatra: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg px-2.5 py-1.5 text-stone-900 text-xs focus:outline-none focus:border-amber-600 focus:bg-white"
+                className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg px-2 py-1 text-stone-900 text-xs focus:outline-none focus:border-amber-600 focus:bg-white"
               >
                 {NAKSHATRAS.map((n) => (
                   <option key={n.name} value={n.name}>
@@ -154,33 +147,33 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
         </div>
 
         {/* Partner 2 */}
-        <div className="bg-white rounded-xl border border-stone-200 p-3.5 sm:p-4 shadow-2xs space-y-2.5">
-          <h3 className="font-vedic font-bold text-sm text-stone-900 flex items-center space-x-1.5">
-            <Users className="w-4 h-4 text-amber-600" />
+        <div className="bg-white rounded-xl border border-stone-200 p-2.5 sm:p-3 shadow-2xs space-y-1.5">
+          <h3 className="font-vedic font-bold text-xs sm:text-sm text-stone-900 flex items-center space-x-1.5">
+            <Users className="w-3.5 h-3.5 text-amber-600" />
             <span>Second Partner Details</span>
           </h3>
 
           <div>
-            <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-1">
+            <label className="block text-[10px] sm:text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
               Full Name
             </label>
             <input
               type="text"
               value={person2.name}
               onChange={(e) => setPerson2({ ...person2, name: e.target.value })}
-              className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg px-3 py-1.5 text-stone-900 text-xs focus:outline-none focus:border-amber-600 focus:bg-white"
+              className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg px-2.5 py-1 text-stone-900 text-xs focus:outline-none focus:border-amber-600 focus:bg-white"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-1">
+              <label className="block text-[10px] sm:text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
                 Janma Rasi (Moon)
               </label>
               <select
                 value={person2.rasi}
                 onChange={(e) => setPerson2({ ...person2, rasi: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg px-2.5 py-1.5 text-stone-900 text-xs focus:outline-none focus:border-amber-600 focus:bg-white"
+                className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg px-2 py-1 text-stone-900 text-xs focus:outline-none focus:border-amber-600 focus:bg-white"
               >
                 {VEDIC_RASIS.map((r) => (
                   <option key={r.sanskritName} value={r.sanskritName}>
@@ -191,13 +184,13 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-1">
+              <label className="block text-[10px] sm:text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
                 Janma Nakshatra
               </label>
               <select
                 value={person2.nakshatra}
                 onChange={(e) => setPerson2({ ...person2, nakshatra: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg px-2.5 py-1.5 text-stone-900 text-xs focus:outline-none focus:border-amber-600 focus:bg-white"
+                className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg px-2 py-1 text-stone-900 text-xs focus:outline-none focus:border-amber-600 focus:bg-white"
               >
                 {NAKSHATRAS.map((n) => (
                   <option key={n.name} value={n.name}>
@@ -211,33 +204,33 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
       </div>
 
       {/* Results Score Box */}
-      <div className="bg-white rounded-xl border border-stone-200 p-4 sm:p-5 shadow-2xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-stone-100 gap-2">
+      <div className="bg-white rounded-xl border border-stone-200 p-2.5 sm:p-3 shadow-2xs space-y-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-1.5 border-b border-stone-100 gap-1.5">
           <div>
-            <span className="text-[11px] text-stone-500 font-semibold uppercase tracking-wider block">
+            <span className="text-[10px] text-stone-500 font-semibold uppercase tracking-wider block">
               Ashtakoot Guna Milan Result:
             </span>
-            <div className="flex items-baseline space-x-2.5 mt-0.5">
-              <span className="text-2xl sm:text-3xl font-vedic font-bold text-amber-700">
+            <div className="flex items-baseline space-x-2 mt-0.5">
+              <span className="text-xl sm:text-2xl font-vedic font-bold text-amber-700">
                 {results.total} / {results.max} Gunas
               </span>
-              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+              <span className="text-xs font-semibold px-2 py-0.2 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                 {results.verdict}
               </span>
             </div>
           </div>
 
-          <div className="text-[11px] text-stone-500 max-w-xs sm:text-right">
+          <div className="text-[10px] sm:text-[11px] text-stone-500 max-w-xs sm:text-right">
             Traditional minimum threshold is 18 gunas with non-conflicting Nadi and Bhakoot.
           </div>
         </div>
 
         {/* 8 Koot Breakdown */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
           {results.koots.map((koot) => (
             <div
               key={koot.name}
-              className="bg-[#FAF8F5] p-2.5 rounded-lg border border-stone-200/80 space-y-0.5"
+              className="bg-[#FAF8F5] p-2 rounded-lg border border-stone-200/80 space-y-0.5"
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-stone-900">{koot.name.split(' (')[0]}</span>
@@ -245,7 +238,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
                   {koot.points} / {koot.max}
                 </span>
               </div>
-              <p className="text-[10px] text-stone-500 truncate">{koot.name.split(' (')[1]?.replace(')', '')}</p>
+              <p className="text-[9px] text-stone-500 truncate">{koot.name.split(' (')[1]?.replace(')', '')}</p>
             </div>
           ))}
         </div>

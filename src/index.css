@@ -11,6 +11,10 @@
     font-size: 0.95rem;
     line-height: 1.55;
     background-color: #FAF8F5;
+    background-image: url('/celestial_bg.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
     color: #1C1917;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;

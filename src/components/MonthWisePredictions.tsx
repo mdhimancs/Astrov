@@ -10,6 +10,9 @@ import {
   ChevronRight,
   Star,
   Compass,
+  Briefcase,
+  Heart,
+  Activity,
 } from 'lucide-react';
 import { MonthWiseTransitPrediction, PlanetaryMovementDetail, TransitDosAndDonts } from '../types';
 
@@ -65,32 +68,24 @@ export function MonthWisePredictions({
     }
   };
 
-  if (!currentMonth) return null;
-
   return (
-    <div className="bg-white rounded-xl border border-stone-200 shadow-2xs overflow-hidden">
+    <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-stone-200 shadow-2xs overflow-hidden">
       {/* Month-Wise Dropdown Header Bar */}
-      <div className="p-3.5 sm:p-4 bg-[#FAF8F5] border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="px-2.5 py-2 bg-stone-50/50 border-b border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div className="flex items-center space-x-2">
-          <Calendar className="w-4 h-4 text-amber-700 shrink-0" />
-          <div>
-            <h3 className="font-vedic font-bold text-stone-900 text-sm sm:text-base">
-              Month-Wise Astrological Transit Predictions
-            </h3>
-            <p className="text-[11px] text-stone-500">
-              Select any month from July 2025 through December 2027 to view targeted Gochar transits
-            </p>
-          </div>
+          <Calendar className="w-4 h-4 text-amber-700" />
+          <h3 className="font-vedic font-black text-stone-900 text-[10px] uppercase tracking-widest leading-tight">
+            Transit Calendar
+          </h3>
         </div>
 
-        {/* DROPDOWN MENU FOR MONTHWISE PREDICTIONS WITH QUICK PREV / NEXT NAVIGATION */}
-        <div className="flex items-center space-x-1.5 shrink-0">
+        {/* DROPDOWN MENU - ZERO PILL STYLE */}
+        <div className="flex items-center space-x-1 shrink-0">
           <button
             type="button"
             onClick={handlePrevMonth}
             disabled={currentIndex === 0}
-            title="Previous Month"
-            className="p-1.5 rounded-lg border border-stone-300 bg-white text-stone-700 hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-2xs cursor-pointer"
+            className="p-1 rounded bg-white border border-stone-100 text-stone-400 hover:text-amber-700 disabled:opacity-30 transition-colors cursor-pointer"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
@@ -100,199 +95,132 @@ export function MonthWisePredictions({
               id="month-select-dropdown"
               value={currentIndex}
               onChange={handleMonthChange}
-              className="appearance-none bg-white border border-stone-300 text-stone-900 text-xs font-semibold rounded-lg pl-3 pr-8 py-1.5 focus:outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-500 shadow-2xs cursor-pointer"
+              className="appearance-none bg-white border border-stone-200 text-stone-800 text-[10px] font-black uppercase tracking-widest rounded px-2 pr-6 py-1 focus:outline-none focus:border-amber-400 shadow-3xs cursor-pointer"
             >
               {/* Year 2025 */}
-              <optgroup label="2025 (Jul – Dec)">
+              <optgroup label="2025">
                 {monthlyPredictions
                   .map((m, idx) => ({ m, idx }))
                   .filter(({ m }) => m.monthKey.startsWith('2025'))
                   .map(({ m, idx }) => (
                     <option key={m.monthKey} value={idx}>
-                      {m.monthName} ({'★'.repeat(m.overallRating)})
+                      {m.monthName}
                     </option>
                   ))}
               </optgroup>
 
               {/* Year 2026 */}
-              <optgroup label="2026 (Full Year)">
+              <optgroup label="2026">
                 {monthlyPredictions
                   .map((m, idx) => ({ m, idx }))
                   .filter(({ m }) => m.monthKey.startsWith('2026'))
                   .map(({ m, idx }) => (
                     <option key={m.monthKey} value={idx}>
-                      {m.monthName} ({'★'.repeat(m.overallRating)})
+                      {m.monthName}
                     </option>
                   ))}
               </optgroup>
 
               {/* Year 2027 */}
-              <optgroup label="2027 (Full Year)">
+              <optgroup label="2027">
                 {monthlyPredictions
                   .map((m, idx) => ({ m, idx }))
                   .filter(({ m }) => m.monthKey.startsWith('2027'))
                   .map(({ m, idx }) => (
                     <option key={m.monthKey} value={idx}>
-                      {m.monthName} ({'★'.repeat(m.overallRating)})
+                      {m.monthName}
                     </option>
                   ))}
               </optgroup>
             </select>
-            <ChevronDown className="w-3.5 h-3.5 text-stone-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="w-3 h-3 text-stone-400 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
 
           <button
             type="button"
             onClick={handleNextMonth}
             disabled={currentIndex === monthlyPredictions.length - 1}
-            title="Next Month"
-            className="p-1.5 rounded-lg border border-stone-300 bg-white text-stone-700 hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-2xs cursor-pointer"
+            className="p-1 rounded bg-white border border-stone-100 text-stone-400 hover:text-amber-700 disabled:opacity-30 transition-colors cursor-pointer"
           >
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      {/* Selected Month Summary (Horizontally Compact) */}
-      <div className="p-4 sm:p-5 space-y-4">
-        {/* Month Headline & Quick Vitals */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-stone-100 gap-2">
+      {/* Selected Month Summary */}
+      <div className="px-2 sm:px-3 py-2.5 space-y-3">
+        {/* Month Headline & Vitals - Zero Pill */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-stone-100 gap-2">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="font-vedic font-bold text-stone-900 text-base sm:text-lg">
+              <span className="font-vedic font-black text-stone-900 text-sm sm:text-base tracking-tight">
                 {currentMonth.monthName}
               </span>
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 border border-amber-300 font-semibold flex items-center space-x-1">
-                <span className="text-amber-500">{'★'.repeat(currentMonth.overallRating)}</span>
-                <span>({currentMonth.overallRating}/5)</span>
-              </span>
+              <div className="h-3 w-px bg-stone-200" />
+              <div className="flex text-amber-400">
+                {'★'.repeat(currentMonth.overallRating)}
+              </div>
             </div>
-            <p className="text-xs text-stone-600 italic mt-0.5">
+            <p className="text-[10px] text-stone-400 font-medium italic mt-0.5">
               "{currentMonth.tagline}"
             </p>
           </div>
 
-          <div className="flex items-center space-x-2 text-[11px]">
-            <span className="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
-              <strong>Favorable:</strong> {currentMonth.favorableDays}
-            </span>
-            <span className="px-2.5 py-1 rounded-md bg-red-50 text-red-800 border border-red-200">
-              <strong>Caution:</strong> {currentMonth.cautionDays}
-            </span>
+          <div className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-widest">
+            <div className="text-emerald-700">
+              Fav: <span className="text-stone-900">{currentMonth.favorableDays}</span>
+            </div>
+            <div className="text-rose-700">
+              Caution: <span className="text-stone-900">{currentMonth.cautionDays}</span>
+            </div>
           </div>
         </div>
 
-        {/* Major Ingresses & Key Planetary Shifts for this Month */}
-        {currentMonth.planetaryMovements && currentMonth.planetaryMovements.length > 0 && (
+        {/* 4 Pillars - Tighter Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            { label: 'Career', text: currentMonth.careerWealthForecast, color: 'amber', icon: Briefcase },
+            { label: 'Love', text: currentMonth.loveFamilyForecast, color: 'rose', icon: Heart },
+            { label: 'Health', text: currentMonth.healthVitalityForecast, color: 'emerald', icon: Activity },
+            { label: 'Spirit', text: currentMonth.spiritualForecast, color: 'purple', icon: Sparkles },
+          ].map((p, i) => (
+            <div key={i} className="space-y-1">
+              <span className={`text-[8px] font-black uppercase tracking-widest text-${p.color}-700 flex items-center space-x-1`}>
+                <p.icon className="w-2.5 h-2.5" />
+                <span>{p.label}</span>
+              </span>
+              <p className="text-[10px] text-stone-600 leading-snug">
+                {p.text}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Do's & Don'ts - Tighter */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1 border-t border-stone-50">
           <div className="space-y-1.5">
-            <span className="text-[11px] font-bold text-stone-700 uppercase tracking-wider block">
-              Key Planetary Shifts in {currentMonth.monthName}:
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {currentMonth.planetaryMovements.map((pm, i) => (
-                <div
-                  key={i}
-                  className="bg-[#FAF8F5] p-2.5 rounded-lg border border-stone-200 text-xs space-y-0.5"
-                >
-                  <div className="flex items-center justify-between font-semibold text-stone-900">
-                    <span className="text-[11px] truncate">{pm.event}</span>
-                    <span className="text-[10px] text-amber-800 font-mono shrink-0 ml-1">
-                      {pm.date}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-stone-600 leading-snug">
-                    {pm.impactSummary}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* 4 Pillars Summary for Selected Month */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs">
-          <div className="p-2.5 rounded-lg border border-stone-200 bg-stone-50/60 space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900 block">
-              💼 Career & Finance
-            </span>
-            <p className="text-[11px] text-stone-700 leading-relaxed">
-              {currentMonth.careerWealthForecast}
-            </p>
-          </div>
-
-          <div className="p-2.5 rounded-lg border border-stone-200 bg-stone-50/60 space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-rose-800 block">
-              🏡 Love & Marriage
-            </span>
-            <p className="text-[11px] text-stone-700 leading-relaxed">
-              {currentMonth.loveFamilyForecast}
-            </p>
-          </div>
-
-          <div className="p-2.5 rounded-lg border border-stone-200 bg-stone-50/60 space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 block">
-              🌿 Health & Vitality
-            </span>
-            <p className="text-[11px] text-stone-700 leading-relaxed">
-              {currentMonth.healthVitalityForecast}
-            </p>
-          </div>
-
-          <div className="p-2.5 rounded-lg border border-stone-200 bg-stone-50/60 space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-800 block">
-              🪔 Sadhana & Spirit
-            </span>
-            <p className="text-[11px] text-stone-700 leading-relaxed">
-              {currentMonth.spiritualForecast}
-            </p>
-          </div>
-        </div>
-
-        {/* Month Vedic Do's, Don'ts & Upaya */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 text-xs">
-          {/* Do's */}
-          <div className="bg-emerald-50/60 rounded-lg border border-emerald-200 p-2.5 space-y-1.5">
-            <div className="flex items-center space-x-1.5 text-emerald-900 font-bold text-[11px] uppercase tracking-wide">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Recommended Shubh Karmas</span>
-            </div>
-            <ul className="space-y-1 text-[11px] text-stone-700">
+            <span className="text-[8px] font-black text-emerald-800 uppercase tracking-widest block">Auspicious Actions</span>
+            <ul className="space-y-1">
               {currentMonth.dos.slice(0, 3).map((d, i) => (
-                <li key={i} className="flex items-start space-x-1.5">
-                  <span className="text-emerald-600 font-bold text-xs">✓</span>
+                <li key={i} className="text-[10px] text-stone-600 flex items-start space-x-2">
+                  <span className="text-emerald-500 font-bold">✓</span>
                   <span>{d}</span>
                 </li>
               ))}
             </ul>
           </div>
-
-          {/* Don'ts */}
-          <div className="bg-red-50/60 rounded-lg border border-red-200 p-2.5 space-y-1.5">
-            <div className="flex items-center space-x-1.5 text-red-900 font-bold text-[11px] uppercase tracking-wide">
-              <XCircle className="w-3.5 h-3.5 text-red-600" />
-              <span>Actions to Avoid (Varjya)</span>
-            </div>
-            <ul className="space-y-1 text-[11px] text-stone-700">
+          <div className="space-y-1.5">
+            <span className="text-[8px] font-black text-rose-800 uppercase tracking-widest block">Avoid Actions</span>
+            <ul className="space-y-1">
               {currentMonth.donts.slice(0, 3).map((d, i) => (
-                <li key={i} className="flex items-start space-x-1.5">
-                  <span className="text-red-600 font-bold text-xs">✗</span>
+                <li key={i} className="text-[10px] text-stone-600 flex items-start space-x-2">
+                  <span className="text-rose-500 font-bold">✕</span>
                   <span>{d}</span>
                 </li>
               ))}
             </ul>
           </div>
         </div>
-
-        {/* Monthly Upaya */}
-        {currentMonth.remedyOfMonth && (
-          <div className="bg-[#FAF5EC] p-2.5 rounded-lg border border-[#E8DEC8] flex items-center space-x-2 text-xs">
-            <Flame className="w-4 h-4 text-amber-700 shrink-0" />
-            <div className="text-[11px] text-stone-800">
-              <strong className="text-stone-900 font-semibold">Remedy of the Month: </strong>
-              <span>{currentMonth.remedyOfMonth}</span>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

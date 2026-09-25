@@ -89,19 +89,19 @@ export function NorthIndianChart({
   };
 
   return (
-    <div className="flex flex-col items-center bg-white rounded-xl border border-stone-200 p-2.5 sm:p-3 shadow-2xs">
+    <div className="flex flex-col items-center bg-gradient-to-b from-[#FDFBF7] to-white rounded-xl border border-[#E8DEC8] p-2 sm:p-2.5 shadow-2xs">
       {title && (
-        <div className="text-center mb-2">
-          <h3 className="text-xs sm:text-sm font-vedic font-bold text-stone-900">{title}</h3>
-          <p className="text-[10px] text-stone-500">{subtitle}</p>
+        <div className="text-center mb-1.5">
+          <h3 className="text-xs sm:text-sm font-vedic font-bold text-stone-900 tracking-tight leading-tight">{title}</h3>
+          <p className="text-[10px] text-stone-500 leading-tight">{subtitle}</p>
         </div>
       )}
 
-      {/* SVG Container: Increased by 20% horizontally and vertically */}
-      <div className="relative w-full max-w-[440px] aspect-square select-none mx-auto">
+      {/* SVG Container: Perfectly centered and proportioned */}
+      <div className="relative w-full max-w-[430px] aspect-square select-none mx-auto">
         <svg
           viewBox={`0 0 ${size} ${size}`}
-          className="w-full h-full drop-shadow-md transition-all"
+          className="w-full h-full drop-shadow-xs transition-all"
         >
           {/* Background Outer Box */}
           <rect
@@ -110,8 +110,8 @@ export function NorthIndianChart({
             width={size}
             height={size}
             fill="#FDFBF7"
-            stroke="#B45309"
-            strokeWidth="3"
+            stroke="#9A3412"
+            strokeWidth="2.5"
             rx="4"
           />
 
@@ -119,14 +119,25 @@ export function NorthIndianChart({
           {houses.map((h) => {
             const isSelected = selectedHouseNumber === h.houseNumber;
             const pathData = housePaths[h.houseNumber];
+            const isKendra = [1, 4, 7, 10].includes(h.houseNumber);
+            const isTrikona = [5, 9].includes(h.houseNumber);
+            
+            const fillColor = isSelected
+              ? '#FEF3C7'
+              : isKendra
+              ? '#FFFDF5'
+              : isTrikona
+              ? '#FAF6EB'
+              : '#FFFFFF';
+
             return (
               <path
                 key={h.houseNumber}
                 d={pathData}
-                fill={isSelected ? '#FEF3C7' : h.houseNumber === 1 ? '#FFFBEB' : '#FFFFFF'}
+                fill={fillColor}
                 stroke="#C27837"
-                strokeWidth={isSelected ? '2.5' : '1.5'}
-                className="cursor-pointer transition-colors duration-150 hover:fill-amber-50"
+                strokeWidth={isSelected ? '2.5' : '1.25'}
+                className="cursor-pointer transition-colors duration-150 hover:fill-amber-100/60"
                 onClick={() => onSelectHouse?.(h)}
               />
             );
@@ -134,15 +145,15 @@ export function NorthIndianChart({
 
           {/* House Inner Dividing Lines */}
           {/* Diagonal 1: (0,0) to (size, size) */}
-          <line x1="0" y1="0" x2={size} y2={size} stroke="#B45309" strokeWidth="1.75" />
+          <line x1="0" y1="0" x2={size} y2={size} stroke="#A14316" strokeWidth="1.5" />
           {/* Diagonal 2: (size, 0) to (0, size) */}
-          <line x1={size} y1="0" x2="0" y2={size} stroke="#B45309" strokeWidth="1.75" />
+          <line x1={size} y1="0" x2="0" y2={size} stroke="#A14316" strokeWidth="1.5" />
           {/* Inner Diamond connecting midpoints */}
           <polygon
             points={`${half},0 ${size},${half} ${half},${size} 0,${half}`}
             fill="none"
-            stroke="#B45309"
-            strokeWidth="2"
+            stroke="#9A3412"
+            strokeWidth="1.75"
           />
 
           {/* House Labels, Rasi numbers, and posited planets */}
@@ -156,30 +167,30 @@ export function NorthIndianChart({
                 <circle
                   cx={pos.rasiX}
                   cy={pos.rasiY}
-                  r="11"
+                  r="10.5"
                   fill="#F5EDE0"
                   stroke="#C27837"
-                  strokeWidth="1"
+                  strokeWidth="0.85"
                 />
                 <text
                   x={pos.rasiX}
-                  y={pos.rasiY + 4}
+                  y={pos.rasiY + 3.5}
                   textAnchor="middle"
-                  fontSize="11"
+                  fontSize="10.5"
                   fontWeight="700"
                   fill="#9A3412"
-                  fontFamily="sans-serif"
+                  fontFamily="'Cinzel', Georgia, serif"
                 >
                   {h.rasiNumber}
                 </text>
 
-                {/* House Number subtle watermarking */}
+                {/* House Number subtle indicator */}
                 <text
                   x={pos.x}
-                  y={pos.y - 18}
+                  y={pos.y - 17}
                   textAnchor="middle"
-                  fontSize="9"
-                  fontWeight="500"
+                  fontSize="8.5"
+                  fontWeight="600"
                   fill="#A8A29E"
                   fontFamily="sans-serif"
                 >
@@ -189,21 +200,23 @@ export function NorthIndianChart({
                 {/* Posited Planets List */}
                 <g>
                   {h.planets.map((planet, idx) => {
-                    const offsetY = pos.y + idx * 14;
+                    const offsetY = pos.y + idx * 13;
                     return (
                       <text
                         key={planet.name}
                         x={pos.x}
                         y={offsetY}
                         textAnchor="middle"
-                        fontSize="11"
+                        fontSize="10.5"
                         fontWeight="700"
                         fill="#1C1917"
                         fontFamily="sans-serif"
                       >
                         {planet.symbol}
-                        {planet.isRetrograde ? '®' : ''}
-                        <tspan fontSize="8" fontWeight="normal" fill="#78716C">
+                        {planet.isRetrograde ? (
+                          <tspan fill="#DC2626" fontWeight="bold">®</tspan>
+                        ) : ''}
+                        <tspan fontSize="8" fontWeight="500" fill="#78716C">
                           {' '}{planet.degree}°
                         </tspan>
                       </text>
@@ -214,7 +227,7 @@ export function NorthIndianChart({
                   {showTransitsTogether &&
                     h.transitPlanets &&
                     h.transitPlanets.map((tp, idx) => {
-                      const offsetY = pos.y + (h.planets.length + idx) * 13;
+                      const offsetY = pos.y + (h.planets.length + idx) * 12;
                       return (
                         <text
                           key={`tr-${tp.name}`}
@@ -238,8 +251,8 @@ export function NorthIndianChart({
       </div>
 
       {/* Legend & Instructions */}
-      <div className="w-full mt-4 flex flex-wrap items-center justify-between text-[11px] text-stone-500 border-t border-stone-200/80 pt-3 gap-2">
-        <div className="flex items-center space-x-3">
+      <div className="w-full mt-1.5 flex flex-wrap items-center justify-between text-[10px] text-stone-500 border-t border-stone-200/80 pt-1.5 gap-1.5">
+        <div className="flex items-center space-x-2.5">
           <span className="flex items-center space-x-1">
             <span className="w-3.5 h-3.5 rounded-full bg-[#F5EDE0] border border-[#C27837] inline-flex items-center justify-center text-[8px] font-bold text-[#9A3412]">
               1

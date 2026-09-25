@@ -280,7 +280,7 @@ export function VedicKundaliTab() {
   };
 
   return (
-    <div className="max-w-5xl sm:max-w-6xl mx-auto px-3 sm:px-4 py-4 space-y-4">
+    <div className="w-full px-0.5 sm:px-1 py-1.5 space-y-2">
       {/* Horizontally Compact Profile Selector Header */}
       <ProfileSelector
         profiles={profiles}
@@ -291,12 +291,12 @@ export function VedicKundaliTab() {
       />
 
       {/* Horizontally Compact Birth Details Form */}
-      <div className="bg-white rounded-xl border border-stone-200 p-3.5 sm:p-4 shadow-2xs">
-        <form onSubmit={handleFormSubmit} className="space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="bg-white rounded-xl border border-stone-200 p-2 sm:p-2.5 shadow-2xs">
+        <form onSubmit={handleFormSubmit} className="space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
             {/* Full Name */}
             <div>
-              <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-1">
+              <label className="block text-[10px] sm:text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
                 Seeker Name
               </label>
               <div className="relative">
@@ -307,7 +307,7 @@ export function VedicKundaliTab() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg pl-8 pr-3 py-1.5 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:bg-white text-xs transition-all"
+                  className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg pl-8 pr-2.5 py-1 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:bg-white text-xs transition-all"
                   placeholder="Enter full name"
                   required
                 />
@@ -316,7 +316,7 @@ export function VedicKundaliTab() {
 
             {/* Date of Birth */}
             <div>
-              <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-1">
+              <label className="block text-[10px] sm:text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
                 Birth Date
               </label>
               <div className="relative">
@@ -327,7 +327,7 @@ export function VedicKundaliTab() {
                   type="date"
                   value={birthDate}
                   onChange={(e) => setBirthDate(e.target.value)}
-                  className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg pl-8 pr-3 py-1.5 text-stone-900 focus:outline-none focus:border-amber-600 focus:bg-white text-xs transition-all"
+                  className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg pl-8 pr-2.5 py-1 text-stone-900 focus:outline-none focus:border-amber-600 focus:bg-white text-xs transition-all"
                   required
                 />
               </div>
@@ -335,7 +335,7 @@ export function VedicKundaliTab() {
 
             {/* Time of Birth */}
             <div>
-              <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-1">
+              <label className="block text-[10px] sm:text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
                 Birth Time (24h)
               </label>
               <div className="relative">
@@ -346,7 +346,7 @@ export function VedicKundaliTab() {
                   type="time"
                   value={birthTime}
                   onChange={(e) => setBirthTime(e.target.value)}
-                  className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg pl-8 pr-3 py-1.5 text-stone-900 focus:outline-none focus:border-amber-600 focus:bg-white text-xs transition-all"
+                  className="w-full bg-[#FAF8F5] border border-stone-300 rounded-lg pl-8 pr-2.5 py-1 text-stone-900 focus:outline-none focus:border-amber-600 focus:bg-white text-xs transition-all"
                   required
                 />
               </div>
@@ -363,39 +363,40 @@ export function VedicKundaliTab() {
                 onChange={(newPlace) => setSelectedCity(newPlace)}
                 label="Place of Birth (Free Form)"
                 placeholder="City, town or coordinates"
+                compact
                 required
               />
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-1 border-t border-stone-100 text-xs">
-            <div className="text-[11px] text-stone-500 truncate">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-1.5 pt-1 border-t border-stone-100 text-xs">
+            <div className="text-[10px] text-stone-500 truncate">
               Coordinates: <strong className="text-stone-800">{selectedCity.name}</strong> ({selectedCity.lat.toFixed(2)}°N, {selectedCity.lng.toFixed(2)}°E, UTC {selectedCity.tz >= 0 ? `+${selectedCity.tz}` : selectedCity.tz})
             </div>
 
             <button
               type="submit"
-              className="w-full sm:w-auto bg-amber-700 hover:bg-amber-800 text-white font-medium py-1.5 px-4 rounded-lg shadow-2xs transition-colors flex items-center justify-center space-x-1.5 text-xs cursor-pointer shrink-0"
+              className="w-full sm:w-auto bg-amber-700 hover:bg-amber-800 text-white font-medium py-1 px-3 rounded-lg shadow-2xs transition-colors flex items-center justify-center space-x-1 text-xs cursor-pointer shrink-0"
             >
               <span>Recalculate Kundali</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3 h-3" />
             </button>
           </div>
         </form>
       </div>
 
       {/* Horizontally Compact Core Vedic Metrics Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
         {/* Lagna */}
-        <div className="bg-white rounded-xl border border-stone-200 p-3 shadow-2xs">
-          <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider block">
+        <div className="bg-white rounded-lg border border-stone-200 px-2 py-1.5 shadow-2xs">
+          <span className="text-[9px] font-bold text-amber-800 uppercase tracking-wider block">
             Lagna (Ascendant)
           </span>
-          <div className="flex items-baseline space-x-1.5 mt-0.5">
-            <span className="text-lg font-vedic font-bold text-stone-900">
+          <div className="flex items-baseline space-x-1 mt-0.5">
+            <span className="text-base sm:text-lg font-vedic font-bold text-stone-900">
               {VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName}
             </span>
-            <span className="text-[11px] text-stone-500">
+            <span className="text-[10px] text-stone-500">
               ({VEDIC_RASIS[natalLagnaRasi - 1]?.englishName})
             </span>
           </div>
@@ -405,15 +406,15 @@ export function VedicKundaliTab() {
         </div>
 
         {/* Janma Rasi */}
-        <div className="bg-white rounded-xl border border-stone-200 p-3 shadow-2xs">
-          <span className="text-[10px] font-bold text-sky-800 uppercase tracking-wider block">
+        <div className="bg-white rounded-lg border border-stone-200 px-2 py-1.5 shadow-2xs">
+          <span className="text-[9px] font-bold text-sky-800 uppercase tracking-wider block">
             Janma Rasi (Moon)
           </span>
-          <div className="flex items-baseline space-x-1.5 mt-0.5">
-            <span className="text-lg font-vedic font-bold text-stone-900">
+          <div className="flex items-baseline space-x-1 mt-0.5">
+            <span className="text-base sm:text-lg font-vedic font-bold text-stone-900">
               {VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName}
             </span>
-            <span className="text-[11px] text-stone-500">
+            <span className="text-[10px] text-stone-500">
               ({VEDIC_RASIS[natalMoonRasi - 1]?.englishName})
             </span>
           </div>
@@ -423,12 +424,12 @@ export function VedicKundaliTab() {
         </div>
 
         {/* Janma Nakshatra */}
-        <div className="bg-white rounded-xl border border-stone-200 p-3 shadow-2xs">
-          <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">
+        <div className="bg-white rounded-lg border border-stone-200 px-2 py-1.5 shadow-2xs">
+          <span className="text-[9px] font-bold text-emerald-800 uppercase tracking-wider block">
             Janma Nakshatra
           </span>
-          <div className="flex items-baseline space-x-1.5 mt-0.5">
-            <span className="text-lg font-vedic font-bold text-stone-900 truncate">
+          <div className="flex items-baseline space-x-1 mt-0.5">
+            <span className="text-base sm:text-lg font-vedic font-bold text-stone-900 truncate">
               {natalNakshatra}
             </span>
           </div>
@@ -438,12 +439,12 @@ export function VedicKundaliTab() {
         </div>
 
         {/* Sade Sati Status */}
-        <div className="bg-white rounded-xl border border-stone-200 p-3 shadow-2xs">
-          <span className="text-[10px] font-bold text-purple-800 uppercase tracking-wider block">
+        <div className="bg-white rounded-lg border border-stone-200 px-2 py-1.5 shadow-2xs">
+          <span className="text-[9px] font-bold text-purple-800 uppercase tracking-wider block">
             Shani Sade Sati
           </span>
-          <div className="flex items-baseline space-x-1.5 mt-0.5">
-            <span className="text-base font-vedic font-bold text-stone-900 truncate">
+          <div className="flex items-baseline space-x-1 mt-0.5">
+            <span className="text-sm sm:text-base font-vedic font-bold text-stone-900 truncate">
               {sadeSati.phase}
             </span>
           </div>
@@ -454,15 +455,15 @@ export function VedicKundaliTab() {
       </div>
 
       {/* Interactive North Indian Chart and Selected House Inspector */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 items-start">
         {/* Left Column: North Indian Chart Visualizer */}
-        <div className="lg:col-span-7 space-y-2.5">
-          <div className="bg-white p-1.5 rounded-xl border border-stone-200 flex items-center justify-between shadow-2xs">
+        <div className="lg:col-span-7 space-y-2">
+          <div className="bg-white p-1 rounded-xl border border-stone-200 flex items-center justify-between shadow-2xs">
             <div className="flex items-center space-x-1">
               <button
                 type="button"
                 onClick={() => setChartViewMode('natal')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`px-2 py-0.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                   chartViewMode === 'natal'
                     ? 'bg-amber-700 text-white shadow-2xs'
                     : 'text-stone-700 hover:bg-stone-100'
@@ -474,7 +475,7 @@ export function VedicKundaliTab() {
               <button
                 type="button"
                 onClick={() => setChartViewMode('transit')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`px-2 py-0.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                   chartViewMode === 'transit'
                     ? 'bg-amber-700 text-white shadow-2xs'
                     : 'text-stone-700 hover:bg-stone-100'
@@ -486,7 +487,7 @@ export function VedicKundaliTab() {
               <button
                 type="button"
                 onClick={() => setChartViewMode('dual')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`px-2 py-0.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                   chartViewMode === 'dual'
                     ? 'bg-amber-700 text-white shadow-2xs'
                     : 'text-stone-700 hover:bg-stone-100'
@@ -496,7 +497,7 @@ export function VedicKundaliTab() {
               </button>
             </div>
 
-            <span className="text-[11px] text-stone-400 font-mono hidden sm:inline mr-1">
+            <span className="text-[10px] text-stone-400 font-mono hidden sm:inline mr-1">
               Lahiri Sidereal
             </span>
           </div>
@@ -524,52 +525,52 @@ export function VedicKundaliTab() {
         </div>
 
         {/* Right Column: Selected House Inspector & Sade Sati */}
-        <div className="lg:col-span-5 space-y-3">
+        <div className="lg:col-span-5 space-y-2">
           {selectedHouse && (
-            <div className="bg-white rounded-xl border border-stone-200 p-3.5 shadow-2xs space-y-2.5">
-              <div className="flex items-center justify-between border-b border-stone-100 pb-2">
-                <div className="flex items-center space-x-2">
-                  <div className="w-7 h-7 rounded-lg bg-amber-50 border border-amber-300 text-amber-800 font-vedic font-bold flex items-center justify-center text-xs">
+            <div className="bg-white rounded-xl border border-stone-200 p-2 sm:p-2.5 shadow-2xs space-y-1.5">
+              <div className="flex items-center justify-between border-b border-stone-100 pb-1.5">
+                <div className="flex items-center space-x-1.5">
+                  <div className="w-6 h-6 rounded-md bg-amber-50 border border-amber-300 text-amber-800 font-vedic font-bold flex items-center justify-center text-xs">
                     H{selectedHouse.houseNumber}
                   </div>
                   <div>
-                    <h3 className="font-vedic font-bold text-stone-900 text-sm">
+                    <h3 className="font-vedic font-bold text-stone-900 text-xs sm:text-sm">
                       {selectedHouse.vedicName}
                     </h3>
-                    <p className="text-[11px] text-stone-500">
+                    <p className="text-[10px] text-stone-500">
                       Sign: <strong className="text-amber-800">{selectedHouse.rasiName}</strong> (#{selectedHouse.rasiNumber}) • Lord: {selectedHouse.signLord}
                     </p>
                   </div>
                 </div>
 
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 font-medium">
+                <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-stone-100 text-stone-600 font-medium">
                   Karaka: {selectedHouse.karaka}
                 </span>
               </div>
 
-              <div className="text-[11px] text-stone-600 leading-snug bg-[#FAF8F5] p-2 rounded-lg border border-stone-200/60">
-                <strong className="text-stone-800 block text-[10px] uppercase font-semibold">Significance:</strong>
+              <div className="text-[10px] sm:text-[11px] text-stone-600 leading-snug bg-[#FAF8F5] p-1.5 rounded-lg border border-stone-200/60">
+                <strong className="text-stone-800 block text-[9px] uppercase font-semibold">Significance:</strong>
                 {selectedHouse.significance}
               </div>
 
               {/* Natal Planets */}
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold text-stone-700 uppercase tracking-wider block">
+              <div className="space-y-0.5">
+                <span className="text-[9px] font-bold text-stone-700 uppercase tracking-wider block">
                   Natal Planets:
                 </span>
                 {selectedHouse.planets.length === 0 ? (
-                  <p className="text-[11px] text-stone-400 italic">No birth planets posited here.</p>
+                  <p className="text-[10px] text-stone-400 italic">No birth planets posited here.</p>
                 ) : (
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     {selectedHouse.planets.map((p) => (
                       <div
                         key={p.name}
-                        className="flex items-center justify-between text-[11px] bg-stone-50 p-1.5 rounded-md border border-stone-200"
+                        className="flex items-center justify-between text-[10px] bg-stone-50 px-1.5 py-1 rounded border border-stone-200"
                       >
                         <span className="font-semibold text-stone-900">
                           {p.englishName} ({p.name}) {p.isRetrograde ? '®' : ''}
                         </span>
-                        <span className="text-stone-500 text-[10px]">
+                        <span className="text-stone-500 text-[9px]">
                           {p.degree}°{p.minute}' • {p.nakshatra}
                         </span>
                       </div>
@@ -579,23 +580,23 @@ export function VedicKundaliTab() {
               </div>
 
               {/* Current Transiting Planets */}
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider block">
+              <div className="space-y-0.5">
+                <span className="text-[9px] font-bold text-amber-800 uppercase tracking-wider block">
                   Current Transits (Gochar):
                 </span>
                 {(!selectedHouse.transitPlanets || selectedHouse.transitPlanets.length === 0) ? (
-                  <p className="text-[11px] text-stone-400 italic">No transiting grahas here today.</p>
+                  <p className="text-[10px] text-stone-400 italic">No transiting grahas here today.</p>
                 ) : (
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     {selectedHouse.transitPlanets.map((tp) => (
                       <div
                         key={`t-${tp.name}`}
-                        className="flex items-center justify-between text-[11px] bg-amber-50/80 p-1.5 rounded-md border border-amber-200"
+                        className="flex items-center justify-between text-[10px] bg-amber-50/80 px-1.5 py-1 rounded border border-amber-200"
                       >
                         <span className="font-semibold text-amber-900">
                           [Transit] {tp.englishName}
                         </span>
-                        <span className="text-amber-800 text-[10px]">
+                        <span className="text-amber-800 text-[9px]">
                           {tp.degree}°{tp.minute}' • {tp.nakshatra}
                         </span>
                       </div>
@@ -607,14 +608,14 @@ export function VedicKundaliTab() {
           )}
 
           {/* Shani Sade Sati Card */}
-          <div className="bg-[#FAF5EC] rounded-xl border border-[#E8DEC8] p-3 shadow-2xs space-y-1">
+          <div className="bg-[#FAF5EC] rounded-xl border border-[#E8DEC8] p-2 sm:p-2.5 shadow-2xs space-y-0.5">
             <div className="flex items-center space-x-1.5">
-              <ShieldAlert className="w-4 h-4 text-amber-700 shrink-0" />
+              <ShieldAlert className="w-3.5 h-3.5 text-amber-700 shrink-0" />
               <h4 className="font-vedic font-bold text-stone-900 text-xs">
                 Shani Sade Sati Assessment
               </h4>
             </div>
-            <p className="text-[11px] text-stone-700 leading-relaxed">
+            <p className="text-[10px] sm:text-[11px] text-stone-700 leading-relaxed">
               {sadeSati.description}
             </p>
           </div>
@@ -637,14 +638,14 @@ export function VedicKundaliTab() {
       />
 
       {/* Optional Real-time AI Synthesis Button & Box */}
-      <div className="bg-white rounded-xl border border-stone-200 p-3.5 sm:p-4 shadow-2xs space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div className="bg-white rounded-xl border border-stone-200 p-2.5 sm:p-3 shadow-2xs space-y-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
           <div>
-            <h3 className="font-vedic font-bold text-stone-900 text-sm flex items-center space-x-1.5">
-              <Sparkles className="w-4 h-4 text-amber-600" />
+            <h3 className="font-vedic font-bold text-stone-900 text-xs sm:text-sm flex items-center space-x-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
               <span>Real-Time Vedic AI Synthesis</span>
             </h3>
-            <p className="text-[11px] text-stone-500">
+            <p className="text-[10px] sm:text-[11px] text-stone-500">
               Generate detailed Parashari synthesis integrating Lagna, Moon sign, and real-time transits
             </p>
           </div>
@@ -653,7 +654,7 @@ export function VedicKundaliTab() {
             type="button"
             onClick={() => fetchRealTimeAiPrediction()}
             disabled={isLoadingAi}
-            className="inline-flex items-center space-x-1.5 bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold py-1.5 px-3.5 rounded-lg shadow-2xs transition-colors cursor-pointer disabled:opacity-50 shrink-0"
+            className="inline-flex items-center space-x-1.5 bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold py-1 px-3 rounded-lg shadow-2xs transition-colors cursor-pointer disabled:opacity-50 shrink-0"
           >
             {isLoadingAi ? (
               <>
@@ -670,7 +671,7 @@ export function VedicKundaliTab() {
         </div>
 
         {aiReading && (
-          <div className="bg-[#FAF8F5] rounded-lg border border-amber-300/80 p-3 text-stone-800 text-xs leading-relaxed space-y-2">
+          <div className="bg-[#FAF8F5] rounded-lg border border-amber-300/80 p-2.5 text-stone-800 text-xs leading-relaxed space-y-1.5">
             {aiReading.split('\n').map((para, idx) =>
               para.trim() ? <p key={idx}>{para}</p> : null
             )}
@@ -679,9 +680,9 @@ export function VedicKundaliTab() {
       </div>
 
       {/* Planetary Coordinates Table (Sidereal Lahiri) */}
-      <div className="bg-white rounded-xl border border-stone-200 p-3.5 sm:p-4 shadow-2xs">
-        <div className="flex items-center space-x-1.5 mb-2.5">
-          <BookOpen className="w-4 h-4 text-amber-700" />
+      <div className="bg-white rounded-xl border border-stone-200 p-2 sm:p-2.5 shadow-2xs">
+        <div className="flex items-center space-x-1.5 mb-1.5">
+          <BookOpen className="w-3.5 h-3.5 text-amber-700" />
           <h3 className="text-xs sm:text-sm font-vedic font-bold text-stone-900">
             Complete Planetary Coordinates (Sidereal Lahiri Positions)
           </h3>
@@ -690,43 +691,43 @@ export function VedicKundaliTab() {
         <div className="overflow-x-auto w-full">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-stone-200 bg-[#FAF8F5] text-stone-600 text-[11px]">
-                <th className="py-2 px-2.5 font-semibold">Graha (Planet)</th>
-                <th className="py-2 px-2.5 font-semibold">Rasi (Sign)</th>
-                <th className="py-2 px-2.5 font-semibold">Degrees</th>
-                <th className="py-2 px-2.5 font-semibold">Nakshatra</th>
-                <th className="py-2 px-2.5 font-semibold">House</th>
-                <th className="py-2 px-2.5 font-semibold">Motion</th>
+              <tr className="border-b border-stone-200 bg-[#FAF8F5] text-stone-600 text-[10px]">
+                <th className="py-1.5 px-2 font-semibold">Graha (Planet)</th>
+                <th className="py-1.5 px-2 font-semibold">Rasi (Sign)</th>
+                <th className="py-1.5 px-2 font-semibold">Degrees</th>
+                <th className="py-1.5 px-2 font-semibold">Nakshatra</th>
+                <th className="py-1.5 px-2 font-semibold">House</th>
+                <th className="py-1.5 px-2 font-semibold">Motion</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
               {natalPlanets.map((planet) => (
                 <tr key={planet.name} className="hover:bg-stone-50/80 transition-colors">
-                  <td className="py-2 px-2.5 font-semibold text-stone-900 flex items-center space-x-1.5">
+                  <td className="py-1.5 px-2 font-semibold text-stone-900 flex items-center space-x-1.5">
                     <span className="w-5 text-center font-bold text-amber-800">{planet.symbol}</span>
                     <span>{planet.englishName} ({planet.name})</span>
                   </td>
-                  <td className="py-2 px-2.5 text-stone-700">
+                  <td className="py-1.5 px-2 text-stone-700">
                     {planet.rasiName} (#{planet.rasiNumber})
                   </td>
-                  <td className="py-2 px-2.5 text-stone-800 font-mono">
+                  <td className="py-1.5 px-2 text-stone-800 font-mono">
                     {planet.degree}° {planet.minute}'
                   </td>
-                  <td className="py-2 px-2.5 text-stone-700">
+                  <td className="py-1.5 px-2 text-stone-700">
                     {planet.nakshatra} (P{planet.pada})
                   </td>
-                  <td className="py-2 px-2.5">
-                    <span className="px-1.5 py-0.5 rounded bg-stone-100 font-semibold text-stone-800 text-[11px]">
+                  <td className="py-1.5 px-2">
+                    <span className="px-1.5 py-0.2 rounded bg-stone-100 font-semibold text-stone-800 text-[10px]">
                       H{planet.house}
                     </span>
                   </td>
-                  <td className="py-2 px-2.5">
+                  <td className="py-1.5 px-2">
                     {planet.isRetrograde ? (
-                      <span className="text-red-700 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded text-[10px] font-semibold">
+                      <span className="text-red-700 bg-red-50 border border-red-200 px-1.5 py-0.2 rounded text-[9px] font-semibold">
                         Vakri (®)
                       </span>
                     ) : (
-                      <span className="text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded text-[10px] font-medium">
+                      <span className="text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded text-[9px] font-medium">
                         Marga (Dir)
                       </span>
                     )}
