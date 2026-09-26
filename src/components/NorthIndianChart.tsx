@@ -89,16 +89,16 @@ export function NorthIndianChart({
   };
 
   return (
-    <div className="flex flex-col items-center bg-gradient-to-b from-[#FDFBF7] to-white rounded-xl border border-[#E8DEC8] p-2 sm:p-2.5 shadow-2xs">
+    <div className="flex flex-col items-center bg-gradient-to-b from-[#FDFBF7] to-white rounded-lg border border-[#E8DEC8] p-1 shadow-2xs">
       {title && (
-        <div className="text-center mb-1.5">
-          <h3 className="text-xs sm:text-sm font-vedic font-bold text-stone-900 tracking-tight leading-tight">{title}</h3>
-          <p className="text-[10px] text-stone-500 leading-tight">{subtitle}</p>
+        <div className="text-center mb-0.5">
+          <h3 className="text-[10px] font-vedic font-bold text-stone-950 tracking-tight leading-tight">{title}</h3>
+          <p className="text-[8px] text-stone-600 leading-tight">{subtitle}</p>
         </div>
       )}
 
       {/* SVG Container: Perfectly centered and proportioned */}
-      <div className="relative w-full max-w-[430px] aspect-square select-none mx-auto">
+      <div className="relative w-full max-w-[320px] aspect-square select-none mx-auto">
         <svg
           viewBox={`0 0 ${size} ${size}`}
           className="w-full h-full drop-shadow-xs transition-all"
@@ -176,7 +176,7 @@ export function NorthIndianChart({
                   x={pos.rasiX}
                   y={pos.rasiY + 3.5}
                   textAnchor="middle"
-                  fontSize="10.5"
+                  fontSize="9"
                   fontWeight="700"
                   fill="#9A3412"
                   fontFamily="'Cinzel', Georgia, serif"
@@ -189,7 +189,7 @@ export function NorthIndianChart({
                   x={pos.x}
                   y={pos.y - 17}
                   textAnchor="middle"
-                  fontSize="8.5"
+                  fontSize="7"
                   fontWeight="600"
                   fill="#A8A29E"
                   fontFamily="sans-serif"
@@ -207,7 +207,7 @@ export function NorthIndianChart({
                         x={pos.x}
                         y={offsetY}
                         textAnchor="middle"
-                        fontSize="10.5"
+                        fontSize="9"
                         fontWeight="700"
                         fill="#1C1917"
                         fontFamily="sans-serif"
@@ -251,7 +251,7 @@ export function NorthIndianChart({
       </div>
 
       {/* Legend & Instructions */}
-      <div className="w-full mt-1.5 flex flex-wrap items-center justify-between text-[10px] text-stone-500 border-t border-stone-200/80 pt-1.5 gap-1.5">
+      <div className="w-full mt-0.5 flex flex-wrap items-center justify-between text-[8px] text-stone-500 border-t border-stone-200/80 pt-0.5 gap-1">
         <div className="flex items-center space-x-2.5">
           <span className="flex items-center space-x-1">
             <span className="w-3.5 h-3.5 rounded-full bg-[#F5EDE0] border border-[#C27837] inline-flex items-center justify-center text-[8px] font-bold text-[#9A3412]">

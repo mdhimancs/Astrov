@@ -154,11 +154,11 @@ export function PlaceOfBirthInput({
   };
 
   return (
-    <div ref={containerRef} className="space-y-1 w-full relative">
+    <div ref={containerRef} className="space-y-0.5 w-full relative">
       {label && (
         <label
           htmlFor={id}
-          className="block text-xs font-semibold text-stone-700 uppercase tracking-wider"
+          className={`block ${compact ? 'text-[8px]' : 'text-xs'} font-semibold text-stone-800 uppercase tracking-wider mb-0.2`}
         >
           {label}
         </label>
@@ -166,8 +166,8 @@ export function PlaceOfBirthInput({
 
       {/* Main Free-Form Input Box */}
       <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-stone-400">
-          <MapPin className="w-3.5 h-3.5 text-amber-600" />
+        <div className={`absolute inset-y-0 left-0 ${compact ? 'pl-2' : 'pl-3'} flex items-center pointer-events-none text-stone-400`}>
+          <MapPin className={`${compact ? 'w-3 h-3' : 'w-3.5 h-3.5'} text-amber-600`} />
         </div>
 
         <input
@@ -197,14 +197,12 @@ export function PlaceOfBirthInput({
           }}
           placeholder={placeholder}
           required={required}
-          className={`w-full bg-[#FAF8F5] border border-stone-300 rounded-lg pl-9 pr-8 ${
-            compact ? 'py-1.5 text-xs' : 'py-2 text-xs'
-          } text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:bg-white transition-all`}
+          className={`w-full bg-[#FAF8F5] border border-stone-300 rounded-lg ${compact ? 'pl-7 pr-6 py-0.5 text-[10px]' : 'pl-9 pr-8 py-1 text-xs'} text-stone-950 placeholder-stone-500 focus:outline-none focus:border-amber-600 focus:bg-white transition-all`}
         />
 
-        <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center space-x-1">
+        <div className={`absolute inset-y-0 right-0 ${compact ? 'pr-1.5' : 'pr-2.5'} flex items-center space-x-1`}>
           {isLoadingGeocode && (
-            <Loader2 className="w-3.5 h-3.5 text-amber-600 animate-spin" />
+            <Loader2 className={`${compact ? 'w-3 h-3' : 'w-3.5 h-3.5'} text-amber-600 animate-spin`} />
           )}
           {inputValue && (
             <button
@@ -213,7 +211,7 @@ export function PlaceOfBirthInput({
               className="text-stone-400 hover:text-stone-600 p-0.5 rounded cursor-pointer"
               title="Clear location"
             >
-              <X className="w-3 h-3" />
+              <X className={`${compact ? 'w-2.5 h-2.5' : 'w-3 h-3'}`} />
             </button>
           )}
         </div>

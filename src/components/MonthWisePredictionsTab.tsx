@@ -102,9 +102,13 @@ export function MonthWisePredictionsTab({
 
   const [transitPlanets, setTransitPlanets] = useState<PlanetPosition[]>([]);
   const [detailedMovements, setDetailedMovements] = useState<PlanetaryMovementDetail[]>([]);
-  const [monthlyPredictions, setMonthlyPredictions] = useState<MonthWiseTransitPrediction[]>([]);
+  const [monthlyPredictions, setMonthlyPredictions] = useState<MonthWiseTransitPrediction[]>(() => 
+    generateMonthWiseTransitPredictions(5, 5, false)
+  );
   const [dosAndDonts, setDosAndDonts] = useState<TransitDosAndDonts[]>([]);
-  const [unifiedImpactRecords, setUnifiedImpactRecords] = useState<PlanetaryImpactRecord[]>([]);
+  const [unifiedImpactRecords, setUnifiedImpactRecords] = useState<PlanetaryImpactRecord[]>(() => 
+    calculateUnifiedPlanetaryTable(5, 5, [])
+  );
 
   const [sadeSati, setSadeSati] = useState<{
     inSadeSati: boolean;
@@ -121,10 +125,13 @@ export function MonthWisePredictionsTab({
     targetDate: string = birthDate,
     targetTime: string = birthTime,
     targetCity = selectedCity,
-    targetMonth = selectedMonthKey
+    targetMonth: string = selectedMonthKey
   ) => {
+    if (!targetDate || !targetTime) return;
+
     const [year, month, day] = targetDate.split('-').map(Number);
     const [hour, minute] = targetTime.split(':').map(Number);
+    if (isNaN(year) || isNaN(month) || isNaN(day)) return;
     const birthDateTime = new Date(year, month - 1, day, hour, minute);
 
     const natalCalc = calculatePlanetaryPositions(
@@ -227,12 +234,12 @@ export function MonthWisePredictionsTab({
   };
 
   return (
-    <div className="w-full px-0.5 sm:px-1 py-1 space-y-1.5">
+    <div className="w-full p-0.5 space-y-0.5">
       {/* Quick Switch Header */}
-      <div className="bg-amber-50/40 border border-amber-100 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-1 shadow-3xs">
-        <div className="flex items-center space-x-2">
-          <Calendar className="w-4 h-4 text-amber-700" />
-          <span className="text-xs font-black text-stone-800 uppercase tracking-widest font-vedic leading-tight">
+      <div className="bg-amber-50/40 border border-amber-100 rounded-lg px-1 py-0.5 flex items-center justify-between gap-1 shadow-3xs">
+        <div className="flex items-center space-x-1">
+          <Calendar className="w-3 h-3 text-amber-700" />
+          <span className="text-[10px] font-black text-stone-800 uppercase tracking-widest font-vedic leading-tight">
             Monthly Predictions
           </span>
         </div>
@@ -241,28 +248,23 @@ export function MonthWisePredictionsTab({
           <button
             type="button"
             onClick={onNavigateToBirthTime}
-            className="text-[10px] font-black uppercase tracking-widest text-amber-800 hover:text-amber-950 flex items-center space-x-1 transition-colors cursor-pointer"
+            className="text-[9px] font-black uppercase tracking-widest text-amber-800 hover:text-amber-950 flex items-center space-x-0.5 transition-colors cursor-pointer"
           >
-            <span>Birth Chart</span>
-            <ArrowRight className="w-3 h-3" />
+            <span>Birth</span>
+            <ArrowRight className="w-2.5 h-2.5" />
           </button>
         )}
       </div>
 
       {/* Minimal Gochar Alignment Badges */}
-      <div className="flex flex-wrap items-center justify-between gap-1 px-1 text-[10px] font-bold uppercase tracking-widest">
-        <div className="flex items-center space-x-3">
+      <div className="flex flex-wrap items-center justify-between gap-0.5 px-0.5 text-[9px] font-bold uppercase tracking-widest">
+        <div className="flex items-center space-x-2">
           <div className="text-amber-800">
-            Lagna <span className="text-stone-900">{VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName}</span>
+            Lagna <span className="text-stone-950">{VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName}</span>
           </div>
           <div className="text-sky-800">
-            Moon <span className="text-stone-900">{VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName}</span>
+            Moon <span className="text-stone-950">{VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName}</span>
           </div>
-          {sadeSati.inSadeSati && (
-            <div className="text-purple-800">
-              Sade Sati <span className="text-stone-900">{sadeSati.phase}</span>
-            </div>
-          )}
         </div>
       </div>
 
@@ -277,64 +279,55 @@ export function MonthWisePredictionsTab({
       {/* THE SINGLE UNIFIED MASTER TABLE: PLANETARY CHANGES & IMPACTS */}
       <UnifiedPlanetaryImpactTable
         records={unifiedImpactRecords}
-        title="Most Important Planetary Changes & Specific Effects"
-        subtitle={`Effects of key planetary transits on Health, Job, Business, Relations, and Marriage for ${name}`}
+        title="Important Changes"
+        subtitle={`Impacts for ${name}`}
       />
 
       {/* Shani Sade Sati Status */}
-      <div className="bg-[#FAF5EC] rounded-xl border border-[#E8DEC8] px-2 py-1.5 shadow-2xs space-y-0.5">
+      <div className="bg-[#FAF5EC] rounded-lg border border-[#E8DEC8] px-1 py-0.5 shadow-3xs space-y-0.5">
         <div className="flex items-center space-x-1">
-          <ShieldAlert className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-          <h4 className="font-vedic font-bold text-stone-900 text-xs">
-            Shani Sade Sati & Dhaiya Status ({selectedMonthKey})
+          <ShieldAlert className="w-3 h-3 text-amber-700 shrink-0" />
+          <h4 className="font-vedic font-bold text-stone-950 text-[10px]">
+            Sade Sati Status
           </h4>
         </div>
-        <p className="text-[10px] text-stone-700 leading-snug">
+        <p className="text-[9px] text-stone-800 leading-tight">
           {sadeSati.description}
         </p>
       </div>
 
       {/* Optional Real-time AI Transit Synthesis Button & Box */}
-      <div className="bg-white rounded-xl border border-stone-200 px-2 py-2 shadow-2xs space-y-1.5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-          <div>
-            <h3 className="font-vedic font-bold text-stone-900 text-xs sm:text-sm flex items-center space-x-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-              <span>Real-Time Vedic AI Transit Synthesis</span>
+      <div className="bg-white rounded-lg border border-stone-200 px-1 py-1 shadow-3xs space-y-1">
+        <div className="flex items-center justify-between gap-1">
+          <div className="flex items-center space-x-1">
+            <Sparkles className="w-3 h-3 text-amber-600" />
+            <h3 className="font-vedic font-bold text-stone-950 text-[10px]">
+              AI Transit Synthesis
             </h3>
-            <p className="text-[10px] text-stone-500 leading-tight">
-              Generate detailed Parashari transit synthesis integrating natal Moon and current planetary transits
-            </p>
           </div>
 
           <button
             type="button"
             onClick={() => fetchRealTimeAiPrediction()}
             disabled={isLoadingAi}
-            className="inline-flex items-center space-x-1 bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold py-1 px-2.5 rounded-lg shadow-2xs transition-colors cursor-pointer disabled:opacity-50 shrink-0"
+            className="inline-flex items-center space-x-1 bg-stone-900 hover:bg-stone-800 text-white text-[9px] font-semibold py-0.5 px-1.5 rounded transition-colors cursor-pointer disabled:opacity-50 shrink-0"
           >
             {isLoadingAi ? (
               <>
-                <Loader2 className="w-3 h-3 animate-spin text-amber-400" />
-                <span>Synthesizing...</span>
+                <Loader2 className="w-2.5 h-2.5 animate-spin text-amber-400" />
+                <span>Analysing...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-3 h-3 text-amber-400" />
-                <span>Generate Deep Reading</span>
+                <Sparkles className="w-2.5 h-2.5 text-amber-400" />
+                <span>Reading</span>
               </>
             )}
           </button>
         </div>
 
-        {aiError && (
-          <div className="bg-rose-50 border border-rose-200 rounded-lg px-2 py-1 text-[11px] text-rose-700 animate-in fade-in slide-in-from-top-1">
-            {aiError}
-          </div>
-        )}
-
         {aiReading && (
-          <div className="bg-[#FAF8F5] rounded-lg border border-amber-300/80 px-2.5 py-1.5 text-stone-800 text-xs leading-relaxed space-y-1">
+          <div className="bg-[#FAF8F5] rounded border border-amber-300/80 px-1.5 py-1 text-stone-950 text-[10px] leading-tight space-y-0.5">
             {aiReading.split('\n').map((para, idx) =>
               para.trim() ? <p key={idx}>{para}</p> : null
             )}

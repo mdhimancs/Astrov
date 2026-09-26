@@ -171,147 +171,80 @@ export function VimshottariDashaTab({
   };
 
   return (
-    <div className="w-full px-0.5 sm:px-1 py-1 space-y-1.5">
+    <div className="w-full p-0.5 space-y-0.5">
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-stone-200/80 pb-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-stone-200/80 pb-0.5">
         <div>
-          <div className="flex items-center space-x-1.5">
-            <span className="p-0.5 rounded-md bg-purple-100 text-purple-900 border border-purple-200 font-bold">
-              <Layers className="w-3 h-3" />
+          <div className="flex items-center space-x-1">
+            <span className="p-0.5 rounded bg-purple-100 text-purple-900 border border-purple-200 font-bold">
+              <Layers className="w-2.5 h-2.5" />
             </span>
-            <h1 className="text-base sm:text-lg font-vedic font-bold text-stone-900 leading-tight">
-              Vimshottari Dasha System
+            <h1 className="text-sm font-vedic font-bold text-stone-900 leading-tight">
+              Vimshottari Dasha
             </h1>
           </div>
-          <p className="text-[10px] text-stone-500 mt-0.5 leading-tight">
-            120-Year Parashari Planetary Periods • Mahadashas, Antardashas & Monthly Planetary Changes
-          </p>
         </div>
 
         {/* Quick Cross-Navigation Links */}
-        <div className="flex items-center space-x-1 shrink-0 text-xs">
+        <div className="flex items-center space-x-1 shrink-0">
           {onNavigateToMilestones && (
             <button
               type="button"
               onClick={onNavigateToMilestones}
-              className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md border border-purple-300 bg-purple-50 hover:bg-purple-100 text-purple-900 font-semibold transition-colors cursor-pointer shadow-2xs text-[10px] sm:text-[11px]"
+              className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded border border-purple-300 bg-purple-50 text-purple-900 font-semibold transition-colors cursor-pointer shadow-3xs text-[9px]"
             >
-              <Award className="w-3 h-3 text-purple-700" />
-              <span>Life Milestones & Best Eras</span>
-            </button>
-          )}
-          {onNavigateToBirthTime && (
-            <button
-              type="button"
-              onClick={onNavigateToBirthTime}
-              className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 font-medium transition-colors cursor-pointer shadow-2xs text-[10px] sm:text-[11px]"
-            >
-              <Compass className="w-3 h-3 text-stone-500" />
-              <span>Janam Kundali</span>
-            </button>
-          )}
-          {onNavigateToMonthWise && (
-            <button
-              type="button"
-              onClick={onNavigateToMonthWise}
-              className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 font-medium transition-colors cursor-pointer shadow-2xs text-[10px] sm:text-[11px]"
-            >
-              <Calendar className="w-3 h-3 text-amber-700" />
-              <span>Full Gochar Transits</span>
+              <Award className="w-2.5 h-2.5" />
+              <span>Eras</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* Minimal Dasha Alignment Badges (No Repetition of Birth Details) */}
-      <div className="flex flex-wrap items-center justify-between gap-1 px-0.5 text-xs">
-        <div className="flex items-center space-x-1 text-[10px]">
-          <span className="px-1.5 py-0.2 rounded bg-white border border-stone-200 text-stone-700 shadow-2xs">
-            Janma Nakshatra: <strong className="text-stone-800">{natalNakshatra}</strong>
+      {/* Minimal Dasha Alignment Badges */}
+      <div className="flex flex-wrap items-center justify-between gap-0.5 px-0.5 text-[9px]">
+        <div className="flex items-center space-x-1">
+          <span className="px-1 py-0 rounded bg-white border border-stone-200 text-stone-900">
+            Nak: <strong className="text-stone-950">{natalNakshatra}</strong>
           </span>
-          <span className="px-1.5 py-0.2 rounded bg-white border border-stone-200 text-stone-700 shadow-2xs">
-            Birth Lord: <strong className="text-purple-800">{vimshottariDasha.birthLord}</strong>
-          </span>
-          <span className="px-1.5 py-0.2 rounded bg-purple-50 text-purple-900 border border-purple-200 font-medium">
-            Active Mahadasha: {vimshottariDasha.currentLord}
+          <span className="px-1 py-0 rounded bg-purple-50 text-purple-950 border border-purple-200 font-medium">
+            Active: {vimshottariDasha.currentLord}
           </span>
         </div>
-
-        <span className="text-[9px] text-stone-500 italic hidden sm:inline">
-          Sidereal 120-Year Vimshottari Dasha Sequence
-        </span>
       </div>
 
       {/* SECTION 1: VIMSHOTTARI MAHADASHAS DECK */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-stone-200 px-2 py-1.5 shadow-2xs space-y-2">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-stone-100 pb-1">
-          <div>
-            <h2 className="font-vedic font-bold text-stone-900 text-xs sm:text-sm flex items-center space-x-1.5 leading-tight">
-              <ShieldCheck className="w-3.5 h-3.5 text-purple-700" />
-              <span>Mahadasha Cycle</span>
-            </h2>
-          </div>
-
-          <div className="flex items-center space-x-2 self-start sm:self-auto text-[10px]">
-            <span className="text-stone-400">Balance at Birth: <strong className="text-stone-600">{vimshottariDasha.yearsRemainingAtBirth} yrs</strong></span>
-          </div>
+      <div className="bg-white/80 backdrop-blur-sm rounded-lg border border-stone-200 px-1 py-1 shadow-3xs space-y-1">
+        <div className="flex items-center justify-between gap-1 border-b border-stone-100 pb-0.5">
+          <h2 className="font-vedic font-bold text-stone-950 text-[10px] flex items-center space-x-1 leading-tight">
+            <ShieldCheck className="w-3 h-3 text-purple-700" />
+            <span>Mahadasha Cycle</span>
+          </h2>
+          <span className="text-[8px] text-stone-600 font-bold uppercase tracking-widest">
+            {vimshottariDasha.yearsRemainingAtBirth}y Balance
+          </span>
         </div>
 
         {/* Mahadasha Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-1.5">
+        <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-0.5">
           {vimshottariDasha.cycle.map((d, idx) => {
             const isCurrentlyActive = d.planet === vimshottariDasha.currentLord;
             const isSelected = (selectedMahadashaPlanet || vimshottariDasha.currentLord) === d.planet;
-            const isExpanded = expandedMahaIndex === idx;
-
+            
             return (
               <div
                 key={`${d.planet}-${d.startMonthYear}`}
-                onClick={() => {
-                  setSelectedMahadashaPlanet(d.planet);
-                  setExpandedMahaIndex(isExpanded ? null : idx);
-                }}
-                className={`p-1.5 rounded-lg border text-xs transition-all duration-150 cursor-pointer shadow-3xs flex flex-col justify-between group ${
+                onClick={() => setSelectedMahadashaPlanet(d.planet)}
+                className={`p-1 rounded border text-[9px] transition-all duration-150 cursor-pointer shadow-3xs flex flex-col items-center justify-center text-center ${
                   isSelected
-                    ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
+                    ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300'
                     : isCurrentlyActive
-                    ? 'bg-purple-50/40 border-purple-200 hover:border-amber-300'
-                    : 'bg-white border-stone-100 hover:bg-stone-50 hover:border-stone-200'
+                    ? 'bg-purple-50/40 border-purple-200'
+                    : 'bg-white border-stone-100 hover:border-stone-200'
                 }`}
               >
-                <div>
-                  <div className="flex items-center justify-between mb-0.5">
-                    <div className="flex flex-col">
-                      <span className="font-vedic font-bold text-stone-900 text-[11px] sm:text-xs">
-                        {d.planet}
-                      </span>
-                      <span className="text-[9px] text-stone-400 font-medium">
-                        {d.durationYears} yrs • Age {d.startAge}-{d.endAge}
-                      </span>
-                    </div>
-
-                    {isCurrentlyActive && (
-                      <span className="text-[8px] font-black text-amber-700 tracking-widest shrink-0">
-                        ACTIVE
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Start - End Month-Year */}
-                  <div className={`text-[9px] font-bold py-0.5 border-t border-stone-100 transition-colors ${
-                    isSelected ? 'text-amber-800' : 'text-stone-400 group-hover:text-stone-600'
-                  }`}>
-                    {d.startMonthYear} – {d.endMonthYear}
-                  </div>
-                </div>
-
-                {isExpanded && (
-                  <div className="mt-1.5 pt-1 border-t border-stone-100 animate-in fade-in slide-in-from-top-1">
-                    <p className="text-[10px] text-stone-700 leading-snug italic">
-                      "{d.lifeTheme}"
-                    </p>
-                  </div>
-                )}
+                <span className="font-bold text-stone-950">{d.planet}</span>
+                <span className="text-[7px] text-stone-600">{d.durationYears}y</span>
+                {isCurrentlyActive && <div className="w-1 h-1 rounded-full bg-amber-500 mt-0.5" />}
               </div>
             );
           })}
@@ -319,52 +252,28 @@ export function VimshottariDashaTab({
       </div>
 
       {/* SECTION 2: ANTARDASHAS (SUB-PERIODS) INSPECTOR */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-stone-200 px-2 py-1.5 shadow-2xs space-y-2">
-        <div className="flex items-center justify-between gap-1 border-b border-stone-100 pb-1">
-          <h3 className="font-vedic font-bold text-stone-900 text-xs sm:text-sm flex items-center space-x-1.5 leading-tight">
-            <Sparkles className="w-3 h-3 text-amber-600" />
+      <div className="bg-white/80 backdrop-blur-sm rounded-lg border border-stone-200 px-1 py-1 shadow-3xs space-y-1">
+        <div className="flex items-center justify-between gap-1 border-b border-stone-100 pb-0.5">
+          <h3 className="font-vedic font-bold text-stone-950 text-[10px] flex items-center space-x-1 leading-tight">
+            <Sparkles className="w-2.5 h-2.5 text-amber-600" />
             <span>{activeDashaLord} Sub-periods</span>
           </h3>
-          <span className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">
-            Timeline
-          </span>
         </div>
 
         {/* Antardasha Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-9 gap-1">
+        <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-0.5">
           {antardashas.map((antar, idx) => {
-            const isExpanded = expandedAntarIndex === idx;
             return (
               <div
                 key={`${activeDashaLord}-${antar.planet}-${antar.startMonthYear}`}
-                onClick={() => setExpandedAntarIndex(isExpanded ? null : idx)}
-                className={`p-1.5 rounded-md border text-xs transition-all cursor-pointer group shadow-3xs ${
+                className={`p-1 rounded border text-[9px] flex flex-col items-center text-center shadow-3xs ${
                   antar.isCurrent
-                    ? 'bg-amber-50/80 border-amber-300 ring-1 ring-amber-200'
-                    : 'bg-white border-stone-100 hover:bg-stone-50 hover:border-amber-200'
+                    ? 'bg-amber-50 border-amber-300'
+                    : 'bg-white border-stone-50'
                 }`}
               >
-                <div className="flex flex-col items-center text-center">
-                  <span className={`font-vedic font-bold text-[10px] sm:text-[11px] ${antar.isCurrent ? 'text-amber-900' : 'text-stone-700'}`}>
-                    {antar.planet}
-                  </span>
-                  <span className="text-[8px] text-stone-400 font-medium leading-none mb-1">
-                    {antar.durationYearsStr}
-                  </span>
-                  {antar.isCurrent && (
-                    <div className="w-1 h-1 rounded-full bg-amber-600 mb-1" />
-                  )}
-                  <div className={`text-[8px] font-bold text-stone-400 group-hover:text-stone-600`}>
-                    {antar.startMonthYear.split('-')[0]}
-                  </div>
-                </div>
-
-                {isExpanded && (
-                  <div className="fixed z-50 left-1/2 -translate-x-1/2 mt-2 w-64 bg-white p-3 rounded-lg border border-stone-200 shadow-xl animate-in zoom-in-95 duration-200 pointer-events-none">
-                    <h5 className="font-vedic font-bold text-xs text-amber-900 mb-1">{activeDashaLord}/{antar.planet}</h5>
-                    <p className="text-[10px] text-stone-600 leading-relaxed italic">"{antar.theme}"</p>
-                  </div>
-                )}
+                <span className="font-bold text-stone-900">{antar.planet}</span>
+                <span className="text-[7px] text-stone-600 leading-none">{antar.durationYearsStr}</span>
               </div>
             );
           })}
@@ -372,253 +281,111 @@ export function VimshottariDashaTab({
       </div>
 
       {/* SECTION 3: MONTHLY PLANETARY CHANGES, GUIDANCE & DO'S AND DON'TS */}
-      <div className="bg-white rounded-xl border border-amber-200/80 p-2 sm:p-2.5 shadow-2xs space-y-2">
+      <div className="bg-white rounded-lg border border-amber-200/80 p-1 shadow-3xs space-y-1">
         {/* Top Header with Month Selector Dropdown */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-stone-200/80 pb-2">
-          <div>
-            <div className="flex items-center space-x-1.5">
-              <span className="p-0.5 rounded-md bg-amber-100 text-amber-900 font-bold">
-                <Calendar className="w-3.5 h-3.5 text-amber-800" />
-              </span>
-              <h2 className="font-vedic font-bold text-stone-900 text-xs sm:text-sm">
-                Monthly Planetary Changes & Dasha Guidance
-              </h2>
-            </div>
-            <p className="text-[10px] text-stone-500 mt-0.5">
-              Select any month (July 2025 – December 2027) to analyze how cosmic Gochar transits impact your active <strong>{vimshottariDasha.currentLord}</strong> Mahadasha.
-            </p>
-          </div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-stone-200/80 pb-0.5">
+          <h2 className="font-vedic font-bold text-stone-950 text-[10px]">
+            Monthly Guidance
+          </h2>
 
-          {/* Month Selector Dropdown with Fast Prev / Next Buttons */}
-          <div className="flex items-center space-x-1 self-start sm:self-auto shrink-0">
+          {/* Month Selector Dropdown */}
+          <div className="flex items-center space-x-0.5 shrink-0">
             <button
               type="button"
               onClick={handlePrevMonth}
               disabled={currentMonthIdx === 0}
-              title="Previous Month"
-              className="p-1 rounded-md border border-stone-300 bg-white text-stone-700 hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-2xs cursor-pointer"
+              className="p-0.5 rounded border border-stone-300 bg-white text-stone-700 disabled:opacity-40 transition-colors shadow-3xs cursor-pointer"
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <ChevronLeft className="w-3 h-3" />
             </button>
 
-            <div className="relative">
-              <select
-                id="dasha-month-dropdown"
-                value={selectedMonthKey}
-                onChange={(e) => setSelectedMonthKey(e.target.value)}
-                className="appearance-none bg-[#FAF8F5] border border-amber-300 text-stone-900 text-xs font-semibold rounded-lg pl-2.5 pr-7 py-1 focus:outline-none focus:border-amber-600 focus:bg-white shadow-2xs cursor-pointer"
-              >
-                <optgroup label="2025 (Jul – Dec)">
-                  {ALL_MONTH_WISE_PREDICTIONS.filter((m) => m.monthKey.startsWith('2025')).map(
-                    (m) => (
-                      <option key={m.monthKey} value={m.monthKey}>
-                        {m.monthName} ({'★'.repeat(m.overallRating)})
-                      </option>
-                    )
-                  )}
-                </optgroup>
-                <optgroup label="2026 (Full Year)">
-                  {ALL_MONTH_WISE_PREDICTIONS.filter((m) => m.monthKey.startsWith('2026')).map(
-                    (m) => (
-                      <option key={m.monthKey} value={m.monthKey}>
-                        {m.monthName} ({'★'.repeat(m.overallRating)})
-                      </option>
-                    )
-                  )}
-                </optgroup>
-                <optgroup label="2027 (Full Year)">
-                  {ALL_MONTH_WISE_PREDICTIONS.filter((m) => m.monthKey.startsWith('2027')).map(
-                    (m) => (
-                      <option key={m.monthKey} value={m.monthKey}>
-                        {m.monthName} ({'★'.repeat(m.overallRating)})
-                      </option>
-                    )
-                  )}
-                </optgroup>
-              </select>
-              <ChevronDown className="w-3.5 h-3.5 text-stone-500 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
+            <select
+              value={selectedMonthKey}
+              onChange={(e) => setSelectedMonthKey(e.target.value)}
+              className="bg-[#FAF8F5] border border-amber-300 text-stone-900 text-[9px] font-semibold rounded px-1 py-0.5 focus:outline-none focus:border-amber-600 focus:bg-white shadow-3xs cursor-pointer"
+            >
+              {ALL_MONTH_WISE_PREDICTIONS.map((m) => (
+                <option key={m.monthKey} value={m.monthKey}>
+                  {m.monthName}
+                </option>
+              ))}
+            </select>
 
             <button
               type="button"
               onClick={handleNextMonth}
               disabled={currentMonthIdx === ALL_MONTH_WISE_PREDICTIONS.length - 1}
-              title="Next Month"
-              className="p-1 rounded-md border border-stone-300 bg-white text-stone-700 hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-2xs cursor-pointer"
+              className="p-0.5 rounded border border-stone-300 bg-white text-stone-700 disabled:opacity-40 transition-colors shadow-3xs cursor-pointer"
             >
-              <ChevronRight className="w-3.5 h-3.5" />
+              <ChevronRight className="w-3 h-3" />
             </button>
           </div>
         </div>
 
-        {/* Dasha Lord Transit Status Banner */}
-        <div className="bg-[#FAF8F5] rounded-lg border border-amber-200/90 px-2 py-1.5 space-y-1">
-          <div className="flex flex-wrap items-center justify-between gap-1">
-            <div className="flex items-center space-x-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-vedic font-bold text-stone-900 text-xs">
-                Active Dasha Lord: {monthlyGuidance.mahadashaLord}
-              </span>
-              <span className="text-[10px] text-stone-400">•</span>
-              <span className="text-[10px] text-amber-900 font-semibold">
-                {monthlyGuidance.dashaLordTransitSign}
-              </span>
+        {/* Guidance across 4 Key Life Areas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+          {/* Career & Finances */}
+          <div className="bg-[#FAF8F5] border border-stone-200 rounded p-1 space-y-0.5">
+            <div className="flex items-center space-x-1 text-amber-950">
+              <Briefcase className="w-2.5 h-2.5 text-amber-700" />
+              <span className="font-vedic font-bold text-[10px]">Career & Wealth</span>
             </div>
-
-            <span
-              className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full border shadow-2xs ${
-                monthlyGuidance.synergyTone === 'Highly Auspicious' ||
-                monthlyGuidance.synergyTone === 'Auspicious'
-                  ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
-                  : monthlyGuidance.synergyTone === 'Caution Required'
-                  ? 'bg-rose-50 text-rose-900 border-rose-300'
-                  : 'bg-amber-50 text-amber-900 border-amber-300'
-              }`}
-            >
-              Synergy: {monthlyGuidance.synergyTone}
-            </span>
+            <p className="text-[9px] text-stone-800 leading-tight">
+              {monthlyGuidance.guidance.careerAndFinances}
+            </p>
           </div>
 
-          <p className="text-[11px] text-stone-700 leading-snug">
-            {monthlyGuidance.dashaLordStatus}
-          </p>
-
-          <div className="flex flex-wrap items-center gap-2 pt-0.5 text-[10px] text-stone-500 border-t border-stone-200/60">
-            <span>
-              Favorable Days: <strong className="text-emerald-800">{monthlyGuidance.favorableDays}</strong>
-            </span>
-            <span>•</span>
-            <span>
-              Caution Days: <strong className="text-rose-800">{monthlyGuidance.cautionDays}</strong>
-            </span>
+          {/* Relationships & Family */}
+          <div className="bg-[#FAF8F5] border border-stone-200 rounded p-1 space-y-0.5">
+            <div className="flex items-center space-x-1 text-rose-950">
+              <Heart className="w-2.5 h-2.5 text-rose-600" />
+              <span className="font-vedic font-bold text-[10px]">Relationships</span>
+            </div>
+            <p className="text-[9px] text-stone-800 leading-tight">
+              {monthlyGuidance.guidance.relationshipsAndFamily}
+            </p>
           </div>
-        </div>
 
-        {/* 1. Monthly Planetary Movements */}
-        <div className="space-y-1">
-          <h3 className="font-vedic font-bold text-stone-900 text-xs flex items-center space-x-1.5">
-            <Flame className="w-3.5 h-3.5 text-amber-700" />
-            <span>Key Planetary Ingresses & Movements in {monthlyGuidance.monthName}</span>
-          </h3>
+          {/* Health & Vitality */}
+          <div className="bg-[#FAF8F5] border border-stone-200 rounded p-1 space-y-0.5">
+            <div className="flex items-center space-x-1 text-emerald-950">
+              <Activity className="w-2.5 h-2.5 text-emerald-700" />
+              <span className="font-vedic font-bold text-[10px]">Health</span>
+            </div>
+            <p className="text-[9px] text-stone-800 leading-tight">
+              {monthlyGuidance.guidance.healthAndVitality}
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
-            {monthlyGuidance.keyPlanetaryChanges.map((event, idx) => (
-              <div
-                key={idx}
-                className="bg-[#FCFAF6] border border-stone-200 rounded-md px-2 py-1 text-xs space-y-0.5 shadow-2xs"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-stone-900 text-[10px] sm:text-[11px] truncate">{event.event}</span>
-                  <span className="text-[9px] font-semibold text-amber-800 bg-amber-50 px-1 py-0.2 rounded border border-amber-200 shrink-0 ml-1">
-                    {event.date}
-                  </span>
-                </div>
-                <p className="text-[10px] text-stone-600 leading-tight">
-                  {event.impactSummary}
-                </p>
-              </div>
-            ))}
+          {/* Spiritual & Karmic Sadhana */}
+          <div className="bg-[#FAF8F5] border border-stone-200 rounded p-1 space-y-0.5">
+            <div className="flex items-center space-x-1 text-purple-950">
+              <Sparkles className="w-2.5 h-2.5 text-purple-700" />
+              <span className="font-vedic font-bold text-[10px]">Spiritual</span>
+            </div>
+            <p className="text-[9px] text-stone-800 leading-tight">
+              {monthlyGuidance.guidance.spiritualAndKarmic}
+            </p>
           </div>
         </div>
 
-        {/* 2. Astrological Guidance (Dasha × Gochar Synergy) across 4 Key Life Areas */}
-        <div className="space-y-1 pt-0.5">
-          <h3 className="font-vedic font-bold text-stone-900 text-xs flex items-center space-x-1.5">
-            <Feather className="w-3.5 h-3.5 text-purple-700" />
-            <span>Astrological Guidance (Dasha & Gochar Synergy for {monthlyGuidance.monthName})</span>
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
-            {/* Career & Finances */}
-            <div className="bg-[#FAF8F5] border border-stone-200 rounded-md px-2 py-1.5 space-y-0.5">
-              <div className="flex items-center space-x-1.5 text-amber-900">
-                <Briefcase className="w-3 h-3 text-amber-700" />
-                <span className="font-vedic font-bold text-[11px]">Career, Business & Wealth Strategy</span>
-              </div>
-              <p className="text-[10px] sm:text-[11px] text-stone-700 leading-relaxed">
-                {monthlyGuidance.guidance.careerAndFinances}
-              </p>
+        {/* Recommended Do's & Don'ts */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-1 pt-0.5 border-t border-stone-100">
+          <div className="bg-emerald-50/50 p-1 space-y-0.5">
+            <div className="flex items-center space-x-1 text-emerald-900 font-bold text-[9px]">
+              <CheckCircle2 className="w-3 h-3 text-emerald-700" />
+              <span>Recommended Do's</span>
             </div>
-
-            {/* Relationships & Family */}
-            <div className="bg-[#FAF8F5] border border-stone-200 rounded-md px-2 py-1.5 space-y-0.5">
-              <div className="flex items-center space-x-1.5 text-rose-900">
-                <Heart className="w-3 h-3 text-rose-600" />
-                <span className="font-vedic font-bold text-[11px]">Relationships, Family & Marriage</span>
-              </div>
-              <p className="text-[10px] sm:text-[11px] text-stone-700 leading-relaxed">
-                {monthlyGuidance.guidance.relationshipsAndFamily}
-              </p>
-            </div>
-
-            {/* Health & Vitality */}
-            <div className="bg-[#FAF8F5] border border-stone-200 rounded-md px-2 py-1.5 space-y-0.5">
-              <div className="flex items-center space-x-1.5 text-emerald-900">
-                <Activity className="w-3 h-3 text-emerald-700" />
-                <span className="font-vedic font-bold text-[11px]">Health, Vitality & Ayurvedic Lifestyle</span>
-              </div>
-              <p className="text-[10px] sm:text-[11px] text-stone-700 leading-relaxed">
-                {monthlyGuidance.guidance.healthAndVitality}
-              </p>
-            </div>
-
-            {/* Spiritual & Karmic Sadhana */}
-            <div className="bg-[#FAF8F5] border border-stone-200 rounded-md px-2 py-1.5 space-y-0.5">
-              <div className="flex items-center space-x-1.5 text-purple-900">
-                <Sparkles className="w-3 h-3 text-purple-700" />
-                <span className="font-vedic font-bold text-[11px]">Spiritual Sadhana & Dharmic Observance</span>
-              </div>
-              <p className="text-[10px] sm:text-[11px] text-stone-700 leading-relaxed">
-                {monthlyGuidance.guidance.spiritualAndKarmic}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* 3. Do's and Don'ts for the Month */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-0.5">
-          {/* Do's */}
-          <div className="bg-emerald-50/50 border border-emerald-200 rounded-lg p-2 space-y-1">
-            <div className="flex items-center space-x-1.5 text-emerald-900 font-bold text-[11px]">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
-              <span>Recommended Do's for {monthlyGuidance.monthName}</span>
-            </div>
-            <ul className="space-y-1 text-[10px] sm:text-[11px] text-stone-800">
-              {monthlyGuidance.dos.map((item, idx) => (
-                <li key={idx} className="flex items-start space-x-1.5">
-                  <span className="text-emerald-600 font-bold shrink-0">✓</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+            <p className="text-[9px] text-stone-800 line-clamp-2">{monthlyGuidance.dos.join(' • ')}</p>
           </div>
 
-          {/* Don'ts */}
-          <div className="bg-rose-50/50 border border-rose-200 rounded-lg p-2 space-y-1">
-            <div className="flex items-center space-x-1.5 text-rose-900 font-bold text-[11px]">
-              <XCircle className="w-3.5 h-3.5 text-rose-700" />
-              <span>Precautions & Don'ts to Avoid Pitfalls</span>
+          <div className="bg-rose-50/50 p-1 space-y-0.5">
+            <div className="flex items-center space-x-1 text-rose-900 font-bold text-[9px]">
+              <XCircle className="w-3 h-3 text-rose-700" />
+              <span>Precautions</span>
             </div>
-            <ul className="space-y-1 text-[10px] sm:text-[11px] text-stone-800">
-              {monthlyGuidance.donts.map((item, idx) => (
-                <li key={idx} className="flex items-start space-x-1.5">
-                  <span className="text-rose-600 font-bold shrink-0">✕</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+            <p className="text-[9px] text-stone-800 line-clamp-2">{monthlyGuidance.donts.join(' • ')}</p>
           </div>
-        </div>
-
-        {/* 4. Vedic Remedy of the Month */}
-        <div className="bg-[#FCFAF6] border border-amber-300 rounded-lg p-2 space-y-0.5 text-xs">
-          <div className="flex items-center space-x-1.5 text-amber-900 font-bold text-[11px]">
-            <Sparkles className="w-3 h-3 text-amber-700" />
-            <span>Vedic Remedy & Planetary Harmonization of the Month</span>
-          </div>
-          <p className="text-[11px] text-stone-700 leading-relaxed">
-            {monthlyGuidance.monthlyRemedy}
-          </p>
         </div>
       </div>
     </div>

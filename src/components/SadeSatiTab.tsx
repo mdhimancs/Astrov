@@ -107,38 +107,35 @@ export function SadeSatiTab({ activeProfileId, profiles }: SadeSatiTabProps) {
   const details = getSadeSatiDetails(selectedRasi);
 
   return (
-    <div className="w-full px-0.5 sm:px-1 py-1.5 space-y-2">
+    <div className="w-full p-0.5 space-y-0.5">
       {/* Intro Header */}
-      <div className="bg-amber-50/40 border border-amber-100 rounded-xl px-2.5 py-1.5 flex flex-col sm:flex-row items-center justify-between gap-1 shadow-3xs">
-        <div className="flex items-center space-x-2">
-          <Shield className="w-4 h-4 text-amber-700" />
-          <h1 className="text-xs font-black text-stone-800 uppercase tracking-widest font-vedic leading-tight">
-            Sade Sati Analysis
+      <div className="bg-amber-50/40 border border-amber-100 rounded-lg px-1 py-0.5 flex flex-col sm:flex-row items-center justify-between gap-1 shadow-3xs">
+        <div className="flex items-center space-x-1">
+          <Shield className="w-3 h-3 text-amber-700" />
+          <h1 className="text-[10px] font-black text-stone-800 uppercase tracking-widest font-vedic leading-tight">
+            Sade Sati
           </h1>
         </div>
 
-        <div className="text-[10px] font-black uppercase tracking-widest text-stone-400 shrink-0">
+        <div className="text-[9px] font-black uppercase tracking-widest text-stone-600 shrink-0">
           Saturn in <span className="text-amber-800">Meena</span>
         </div>
       </div>
 
       {/* Rasi Selection - Zero Pill Grid */}
-      <div className="bg-white/60 backdrop-blur-sm rounded-xl border border-stone-100 px-2 py-1.5 shadow-3xs space-y-1.5">
-        <div className="text-[10px] font-black uppercase tracking-widest text-stone-400 px-1">
-          Janma Rasi
-        </div>
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1">
+      <div className="bg-white/60 backdrop-blur-sm rounded-lg border border-stone-100 px-1 py-0.5 shadow-3xs space-y-0.5">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-0.5">
           {VEDIC_RASIS.map((rasi) => (
             <button
               key={rasi.sanskritName}
               onClick={() => setSelectedRasi(rasi.sanskritName)}
-              className={`py-1 rounded text-center transition-all cursor-pointer border ${
+              className={`py-0.5 rounded text-center transition-all cursor-pointer border ${
                 selectedRasi === rasi.sanskritName
                   ? 'bg-amber-700 border-amber-800 text-white shadow-3xs'
-                  : 'bg-white border-stone-100 text-stone-400 hover:text-stone-700 hover:border-stone-200'
+                  : 'bg-white border-stone-50 text-stone-600 hover:text-stone-800'
               }`}
             >
-              <div className="text-[10px] font-black uppercase tracking-tighter leading-none">
+              <div className="text-[9px] font-black uppercase tracking-tighter leading-none">
                 {rasi.sanskritName.slice(0, 3)}
               </div>
             </button>
@@ -147,59 +144,33 @@ export function SadeSatiTab({ activeProfileId, profiles }: SadeSatiTabProps) {
       </div>
 
       {/* Result Card */}
-      <div className="bg-white rounded-xl border border-stone-200 p-2 sm:p-2.5 shadow-2xs space-y-2">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-1.5 border-b border-stone-100 gap-1.5">
-          <div>
-            <span className="text-[10px] text-stone-500 font-semibold uppercase tracking-wider block">
-              Active Status for {selectedRasi} Moon Sign:
-            </span>
-            <h2 className="text-base sm:text-lg font-vedic font-bold text-stone-900 mt-0.5">
-              {details.status}
-            </h2>
-          </div>
-
-          <span className={`text-xs px-2 py-0.5 rounded-full font-bold border ${details.bg}`}>
-            Impact: {details.severity}
+      <div className="bg-white rounded-lg border border-stone-200 p-1 shadow-3xs space-y-1">
+        <div className="flex items-center justify-between pb-0.5 border-b border-stone-100 gap-1">
+          <h2 className="text-sm font-vedic font-bold text-stone-950">
+            {details.status}
+          </h2>
+          <span className={`text-[8px] px-1 py-0 rounded-full font-bold border ${details.bg}`}>
+            {details.severity}
           </span>
         </div>
 
-        <div className="bg-[#FAF8F5] p-2 rounded-lg border border-stone-200/80 space-y-0.5">
-          <h4 className="font-vedic font-bold text-stone-900 text-xs">
-            Astrological Dynamics & Influence
-          </h4>
-          <p className="text-[11px] text-stone-700 leading-relaxed">
-            {details.description}
-          </p>
-        </div>
+        <p className="text-[10px] text-stone-800 leading-tight">
+          {details.description}
+        </p>
 
         {/* Vedic Remedies (Upayas) */}
-        <div className="space-y-1.5">
-          <h3 className="font-vedic font-bold text-stone-900 text-xs sm:text-sm flex items-center space-x-1.5">
-            <Flame className="w-3.5 h-3.5 text-amber-600" />
-            <span>Recommended Vedic Upayas (Remedies)</span>
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-1.5 text-xs">
-            <div className="bg-stone-50/70 p-2 rounded-lg border border-stone-200 space-y-0.5">
-              <strong className="text-stone-900 font-semibold block text-[11px]">Mantra Sadhana</strong>
-              <p className="text-[10px] text-stone-600 leading-relaxed">
-                Recite the Shani Gayatri or Maha Mrityunjaya Mantra 108 times on Saturdays during dusk.
-              </p>
-            </div>
-
-            <div className="bg-stone-50/70 p-2 rounded-lg border border-stone-200 space-y-0.5">
-              <strong className="text-stone-900 font-semibold block text-[11px]">Charity & Karma</strong>
-              <p className="text-[10px] text-stone-600 leading-relaxed">
-                Donate black sesame seeds, mustard oil, or iron utensils to the needy on Saturday.
-              </p>
-            </div>
-
-            <div className="bg-stone-50/70 p-2 rounded-lg border border-stone-200 space-y-0.5">
-              <strong className="text-stone-900 font-semibold block text-[11px]">Lifestyle Discipline</strong>
-              <p className="text-[10px] text-stone-600 leading-relaxed">
-                Practice punctuality, avoid arrogance, honor domestic help, and cultivate patience.
-              </p>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0.5 text-[9px]">
+          <div className="bg-stone-50/70 p-1 rounded border border-stone-100">
+            <strong className="text-stone-950 font-semibold block">Mantra</strong>
+            <p className="text-stone-700">Shani Gayatri / Mrityunjaya</p>
+          </div>
+          <div className="bg-stone-50/70 p-1 rounded border border-stone-100">
+            <strong className="text-stone-950 font-semibold block">Charity</strong>
+            <p className="text-stone-700">Black sesame / iron</p>
+          </div>
+          <div className="bg-stone-50/70 p-1 rounded border border-stone-100">
+            <strong className="text-stone-950 font-semibold block">Karma</strong>
+            <p className="text-stone-700">Punctuality / patience</p>
           </div>
         </div>
       </div>
