@@ -234,12 +234,12 @@ export function MonthWisePredictionsTab({
   };
 
   return (
-    <div className="w-full p-0.5 space-y-0.5">
+    <div className="w-full space-y-2">
       {/* Quick Switch Header */}
-      <div className="bg-amber-50/40 border border-amber-100 rounded-lg px-1 py-0.5 flex items-center justify-between gap-1 shadow-3xs">
-        <div className="flex items-center space-x-1">
-          <Calendar className="w-3 h-3 text-amber-700" />
-          <span className="text-[10px] font-black text-stone-800 uppercase tracking-widest font-vedic leading-tight">
+      <div className="bg-amber-50/50 border border-amber-200/80 rounded-lg px-2.5 py-1.5 flex items-center justify-between gap-2 shadow-3xs">
+        <div className="flex items-center space-x-1.5">
+          <Calendar className="w-4 h-4 text-amber-700" />
+          <span className="text-[14px] font-black text-stone-800 uppercase tracking-wider font-vedic leading-tight">
             Monthly Predictions
           </span>
         </div>
@@ -248,17 +248,17 @@ export function MonthWisePredictionsTab({
           <button
             type="button"
             onClick={onNavigateToBirthTime}
-            className="text-[9px] font-black uppercase tracking-widest text-amber-800 hover:text-amber-950 flex items-center space-x-0.5 transition-colors cursor-pointer"
+            className="text-[13px] font-black uppercase tracking-wider text-amber-800 hover:text-amber-950 flex items-center space-x-1 transition-colors cursor-pointer"
           >
             <span>Birth</span>
-            <ArrowRight className="w-2.5 h-2.5" />
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         )}
       </div>
 
       {/* Minimal Gochar Alignment Badges */}
-      <div className="flex flex-wrap items-center justify-between gap-0.5 px-0.5 text-[9px] font-bold uppercase tracking-widest">
-        <div className="flex items-center space-x-2">
+      <div className="flex flex-wrap items-center justify-between gap-1.5 px-1 text-[13px] font-bold uppercase tracking-wider">
+        <div className="flex items-center space-x-3">
           <div className="text-amber-800">
             Lagna <span className="text-stone-950">{VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName}</span>
           </div>
@@ -284,24 +284,24 @@ export function MonthWisePredictionsTab({
       />
 
       {/* Shani Sade Sati Status */}
-      <div className="bg-[#FAF5EC] rounded-lg border border-[#E8DEC8] px-1 py-0.5 shadow-3xs space-y-0.5">
-        <div className="flex items-center space-x-1">
-          <ShieldAlert className="w-3 h-3 text-amber-700 shrink-0" />
-          <h4 className="font-vedic font-bold text-stone-950 text-[10px]">
+      <div className="bg-[#FAF5EC] rounded-lg border border-[#E8DEC8] px-2.5 py-1.5 shadow-3xs space-y-1">
+        <div className="flex items-center space-x-1.5">
+          <ShieldAlert className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+          <h4 className="font-vedic font-bold text-stone-950 text-[14px]">
             Sade Sati Status
           </h4>
         </div>
-        <p className="text-[9px] text-stone-800 leading-tight">
+        <p className="text-[13px] text-stone-800 leading-snug">
           {sadeSati.description}
         </p>
       </div>
 
       {/* Optional Real-time AI Transit Synthesis Button & Box */}
-      <div className="bg-white rounded-lg border border-stone-200 px-1 py-1 shadow-3xs space-y-1">
-        <div className="flex items-center justify-between gap-1">
-          <div className="flex items-center space-x-1">
-            <Sparkles className="w-3 h-3 text-amber-600" />
-            <h3 className="font-vedic font-bold text-stone-950 text-[10px]">
+      <div className="bg-white rounded-lg border border-stone-200 px-2.5 py-2 shadow-3xs space-y-1.5">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center space-x-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+            <h3 className="font-vedic font-bold text-stone-950 text-[14px]">
               AI Transit Synthesis
             </h3>
           </div>
@@ -310,16 +310,16 @@ export function MonthWisePredictionsTab({
             type="button"
             onClick={() => fetchRealTimeAiPrediction()}
             disabled={isLoadingAi}
-            className="inline-flex items-center space-x-1 bg-stone-900 hover:bg-stone-800 text-white text-[9px] font-semibold py-0.5 px-1.5 rounded transition-colors cursor-pointer disabled:opacity-50 shrink-0"
+            className="inline-flex items-center space-x-1.5 bg-stone-900 hover:bg-stone-800 text-white text-[13px] font-semibold py-1 px-2.5 rounded transition-colors cursor-pointer disabled:opacity-50 shrink-0"
           >
             {isLoadingAi ? (
               <>
-                <Loader2 className="w-2.5 h-2.5 animate-spin text-amber-400" />
+                <Loader2 className="w-3 h-3 animate-spin text-amber-400" />
                 <span>Analysing...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-2.5 h-2.5 text-amber-400" />
+                <Sparkles className="w-3 h-3 text-amber-400" />
                 <span>Reading</span>
               </>
             )}
@@ -327,7 +327,7 @@ export function MonthWisePredictionsTab({
         </div>
 
         {aiReading && (
-          <div className="bg-[#FAF8F5] rounded border border-amber-300/80 px-1.5 py-1 text-stone-950 text-[10px] leading-tight space-y-0.5">
+          <div className="bg-[#FAF8F5] rounded border border-amber-300/80 px-2.5 py-2 text-stone-950 text-[14px] leading-snug space-y-1">
             {aiReading.split('\n').map((para, idx) =>
               para.trim() ? <p key={idx}>{para}</p> : null
             )}

@@ -59,11 +59,11 @@ export function ProfileSelector({
   };
 
   return (
-    <div className="bg-white/60 backdrop-blur-sm rounded-lg border border-stone-100 px-1 py-0.5 shadow-3xs space-y-1">
-      <div className="flex items-center justify-between border-b border-stone-50 pb-0.5">
-        <div className="flex items-center space-x-1">
-          <User className="w-3 h-3 text-amber-700" />
-          <h3 className="font-vedic font-black text-stone-900 text-[9px] uppercase tracking-widest">
+    <div className="bg-white/75 backdrop-blur-sm rounded-lg border border-stone-200/80 px-2.5 py-1.5 shadow-3xs space-y-1.5">
+      <div className="flex items-center justify-between border-b border-stone-100 pb-1">
+        <div className="flex items-center space-x-1.5">
+          <User className="w-3.5 h-3.5 text-amber-700" />
+          <h3 className="font-vedic font-black text-stone-900 text-[13px] uppercase tracking-wider">
             Seeker Deck
           </h3>
         </div>
@@ -71,37 +71,48 @@ export function ProfileSelector({
         <button
           type="button"
           onClick={handleAddNew}
-          className="text-[8px] font-black uppercase tracking-widest text-amber-800 hover:text-amber-950 flex items-center space-x-1 transition-colors cursor-pointer"
+          className="text-[12px] font-black uppercase tracking-wider text-amber-800 hover:text-amber-950 flex items-center space-x-1 transition-colors cursor-pointer"
         >
-          <Plus className="w-2.5 h-2.5" />
+          <Plus className="w-3 h-3" />
           <span>New</span>
         </button>
       </div>
 
       {/* Profiles Deck of Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-1">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1.5">
         {profiles.map((profile, idx) => {
           const isActive = profile.id === activeProfileId;
           return (
             <div
               key={profile.id}
               onClick={() => onSelectProfile(profile)}
-              className={`group relative rounded-md p-1 transition-all duration-200 cursor-pointer border text-left flex flex-col justify-between ${
+              className={`group relative rounded-md px-2 py-1.5 transition-all duration-200 cursor-pointer border text-left flex flex-col justify-between ${
                 isActive
-                  ? 'bg-amber-50/50 border-amber-300 ring-1 ring-amber-200 shadow-3xs'
+                  ? 'bg-amber-50/70 border-amber-300 ring-1 ring-amber-200 shadow-3xs'
                   : 'bg-white border-stone-100 hover:border-amber-200 hover:shadow-3xs'
               }`}
             >
               <div className="flex items-center justify-between mb-0.5">
-                <span className={`text-[7px] font-black uppercase tracking-widest ${isActive ? 'text-amber-800' : 'text-stone-500'}`}>
+                <span className={`text-[11px] font-black uppercase tracking-wider ${isActive ? 'text-amber-800' : 'text-stone-500'}`}>
                   {isActive ? 'Active' : `Card ${idx + 1}`}
                 </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleStartEdit(profile);
+                  }}
+                  className="opacity-70 group-hover:opacity-100 text-stone-500 hover:text-amber-800 p-0.5 rounded transition-opacity cursor-pointer"
+                  title="Edit profile"
+                >
+                  <Edit2 className="w-2.5 h-2.5" />
+                </button>
               </div>
 
-              <div className="font-vedic font-bold text-stone-800 text-[10px] truncate leading-tight">
+              <div className="font-vedic font-bold text-stone-900 text-[14px] truncate leading-snug">
                 {profile.name}
               </div>
-              <div className="text-[8px] text-stone-600 font-medium truncate">
+              <div className="text-[12px] text-stone-600 font-medium truncate leading-snug">
                 {profile.birthDate.split('-')[0]} • {profile.place.split(',')[0]}
               </div>
             </div>
@@ -113,11 +124,11 @@ export function ProfileSelector({
       {isEditing && editForm && (
         <form
           onSubmit={handleSaveForm}
-          className="p-2 sm:p-2.5 rounded-xl border border-amber-300 bg-amber-50/40 space-y-2 animate-in fade-in"
+          className="p-2.5 sm:p-3 rounded-xl border border-amber-300 bg-amber-50/40 space-y-2.5 animate-in fade-in"
         >
-          <div className="flex items-center justify-between border-b border-amber-200 pb-1">
-            <h4 className="font-vedic font-bold text-stone-900 text-xs sm:text-sm flex items-center space-x-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+          <div className="flex items-center justify-between border-b border-amber-200 pb-1.5">
+            <h4 className="font-vedic font-bold text-stone-900 text-[16px] sm:text-[18px] flex items-center space-x-1.5">
+              <Sparkles className="w-4 h-4 text-amber-700" />
               <span>Save / Edit Birth Profile Details</span>
             </h4>
             <button
@@ -128,60 +139,60 @@ export function ProfileSelector({
               }}
               className="text-stone-600 hover:text-stone-800"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
             <div>
-              <label className="block text-[10px] font-semibold text-stone-800 uppercase mb-0.5">
+              <label className="block text-[14px] font-semibold text-stone-800 uppercase mb-0.5">
                 Profile Label
               </label>
               <input
                 type="text"
                 value={editForm.label}
                 onChange={(e) => setEditForm({ ...editForm, label: e.target.value })}
-                className="w-full bg-white border border-stone-300 rounded-md px-2 py-1 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                className="w-full bg-white border border-stone-300 rounded-md px-2.5 py-1 text-[16px] text-stone-900 focus:outline-none focus:border-amber-500"
                 placeholder="e.g. Profile 1 (Self)"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold text-stone-800 uppercase mb-0.5">
+              <label className="block text-[14px] font-semibold text-stone-800 uppercase mb-0.5">
                 Full Name
               </label>
               <input
                 type="text"
                 value={editForm.name}
                 onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                className="w-full bg-white border border-stone-300 rounded-md px-2 py-1 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                className="w-full bg-white border border-stone-300 rounded-md px-2.5 py-1 text-[16px] text-stone-900 focus:outline-none focus:border-amber-500"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold text-stone-800 uppercase mb-0.5">
+              <label className="block text-[14px] font-semibold text-stone-800 uppercase mb-0.5">
                 Date of Birth
               </label>
               <input
                 type="date"
                 value={editForm.birthDate}
                 onChange={(e) => setEditForm({ ...editForm, birthDate: e.target.value })}
-                className="w-full bg-white border border-stone-300 rounded-md px-2 py-1 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                className="w-full bg-white border border-stone-300 rounded-md px-2.5 py-1 text-[16px] text-stone-900 focus:outline-none focus:border-amber-500"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold text-stone-800 uppercase mb-0.5">
+              <label className="block text-[14px] font-semibold text-stone-800 uppercase mb-0.5">
                 Time of Birth (24h)
               </label>
               <input
                 type="time"
                 value={editForm.birthTime}
                 onChange={(e) => setEditForm({ ...editForm, birthTime: e.target.value })}
-                className="w-full bg-white border border-stone-300 rounded-md px-2 py-1 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                className="w-full bg-white border border-stone-300 rounded-md px-2.5 py-1 text-[16px] text-stone-900 focus:outline-none focus:border-amber-500"
                 required
               />
             </div>
@@ -211,20 +222,20 @@ export function ProfileSelector({
             </div>
 
             <div>
-              <label className="block text-[10px] font-semibold text-stone-800 uppercase mb-0.5">
+              <label className="block text-[14px] font-semibold text-stone-800 uppercase mb-0.5">
                 Profile Notes (Optional)
               </label>
               <input
                 type="text"
                 value={editForm.notes || ''}
                 onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
-                className="w-full bg-white border border-stone-300 rounded-md px-2 py-1 text-xs text-stone-900 focus:outline-none focus:border-amber-500"
+                className="w-full bg-white border border-stone-300 rounded-md px-2.5 py-1 text-[16px] text-stone-900 focus:outline-none focus:border-amber-500"
                 placeholder="e.g. Birth details verified with hospital certificate"
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-1 border-t border-amber-200">
+          <div className="flex items-center justify-between pt-1.5 border-t border-amber-200">
             {profiles.length > 1 ? (
               <button
                 type="button"
@@ -235,31 +246,31 @@ export function ProfileSelector({
                     setEditForm(null);
                   }
                 }}
-                className="inline-flex items-center space-x-1 text-xs text-red-600 hover:text-red-800 font-medium cursor-pointer"
+                className="inline-flex items-center space-x-1 text-[16px] text-red-600 hover:text-red-800 font-medium cursor-pointer"
               >
-                <Trash2 className="w-3 h-3" />
+                <Trash2 className="w-3.5 h-3.5" />
                 <span>Delete Profile</span>
               </button>
             ) : (
               <div />
             )}
 
-            <div className="flex items-center space-x-1.5">
+            <div className="flex items-center space-x-2">
               <button
                 type="button"
                 onClick={() => {
                   setIsEditing(false);
                   setEditForm(null);
                 }}
-                className="px-2.5 py-1 rounded-md border border-stone-300 text-xs text-stone-900 hover:bg-stone-100 cursor-pointer"
+                className="px-3 py-1 rounded-md border border-stone-300 text-[16px] text-stone-900 hover:bg-stone-100 cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="inline-flex items-center space-x-1 px-3 py-1 rounded-md bg-amber-600 hover:bg-amber-700 text-xs font-semibold text-white shadow-xs cursor-pointer"
+                className="inline-flex items-center space-x-1 px-3.5 py-1 rounded-md bg-amber-600 hover:bg-amber-700 text-[16px] font-semibold text-white shadow-xs cursor-pointer"
               >
-                <Check className="w-3 h-3" />
+                <Check className="w-3.5 h-3.5" />
                 <span>Save Profile</span>
               </button>
             </div>

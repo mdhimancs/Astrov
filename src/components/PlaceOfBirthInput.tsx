@@ -158,7 +158,7 @@ export function PlaceOfBirthInput({
       {label && (
         <label
           htmlFor={id}
-          className={`block ${compact ? 'text-[8px]' : 'text-xs'} font-semibold text-stone-800 uppercase tracking-wider mb-0.2`}
+          className={`block ${compact ? 'text-[12px]' : 'text-[16px]'} font-semibold text-stone-800 uppercase tracking-wider mb-0.5`}
         >
           {label}
         </label>
@@ -197,7 +197,7 @@ export function PlaceOfBirthInput({
           }}
           placeholder={placeholder}
           required={required}
-          className={`w-full bg-[#FAF8F5] border border-stone-300 rounded-lg ${compact ? 'pl-7 pr-6 py-0.5 text-[10px]' : 'pl-9 pr-8 py-1 text-xs'} text-stone-950 placeholder-stone-500 focus:outline-none focus:border-amber-600 focus:bg-white transition-all`}
+          className={`w-full bg-[#FAF8F5] border border-stone-300 rounded-lg ${compact ? 'pl-7 pr-6 py-1 text-[14px]' : 'pl-9 pr-8 py-1.5 text-[16px]'} text-stone-950 placeholder-stone-500 focus:outline-none focus:border-amber-600 focus:bg-white transition-all`}
         />
 
         <div className={`absolute inset-y-0 right-0 ${compact ? 'pr-1.5' : 'pr-2.5'} flex items-center space-x-1`}>
@@ -233,10 +233,10 @@ export function PlaceOfBirthInput({
               <div className="flex items-center space-x-2 min-w-0 pr-2">
                 <MapPin className="w-3 h-3 text-stone-400 group-hover:text-amber-600 shrink-0" />
                 <div className="truncate">
-                  <span className="text-xs font-medium text-stone-900 group-hover:text-amber-950 block truncate">
+                  <span className="text-[16px] font-medium text-stone-900 group-hover:text-amber-950 block truncate">
                     {city.name}
                   </span>
-                  <span className="text-[10px] text-stone-500">
+                  <span className="text-[14px] text-stone-500">
                     {city.state ? `${city.state}, ` : ''}{city.country}
                   </span>
                 </div>

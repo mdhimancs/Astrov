@@ -265,21 +265,21 @@ export function HouseCardDeck({
   };
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-2">
       {/* THE 12 HOUSES DECK CONTAINER */}
-      <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-stone-200 shadow-3xs overflow-hidden">
+      <div className="bg-white/95 backdrop-blur-sm rounded-lg border border-stone-200 shadow-3xs overflow-hidden">
         {/* DECK HEADER & FILTERS */}
-        <div className="px-1 py-0.5 border-b border-stone-100 bg-[#FAF9F6]/40">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-1">
+        <div className="px-2.5 py-2 border-b border-stone-100 bg-[#FAF9F6]/60">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
             <div>
-              <h3 className="font-vedic font-bold text-stone-900 text-[10px] flex items-center space-x-1 tracking-tight">
-                <Layers className="w-2.5 h-2.5 text-amber-700" />
+              <h3 className="font-vedic font-bold text-stone-900 text-[14px] flex items-center space-x-1.5 tracking-tight">
+                <Layers className="w-3.5 h-3.5 text-amber-700" />
                 <span>Bhava Deck</span>
               </h3>
             </div>
 
             {/* Category Filter - Zero Pill Style */}
-            <div className="flex flex-wrap items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-2.5">
               {[
                 { id: 'ALL', label: 'All' },
                 { id: 'KENDRA', label: 'Kendra' },
@@ -292,7 +292,7 @@ export function HouseCardDeck({
                   key={cat.id}
                   type="button"
                   onClick={() => setFilterCategory(cat.id as any)}
-                  className={`text-[8px] font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer pb-0 border-b-2 ${
+                  className={`text-[12px] font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer pb-0.5 border-b-2 ${
                     filterCategory === cat.id
                       ? 'text-amber-800 border-amber-600'
                       : 'text-stone-600 border-transparent hover:text-stone-800'
@@ -305,17 +305,17 @@ export function HouseCardDeck({
           </div>
 
           {/* THE 12 HOUSES NAVIGATION CARDS (H1, H2, etc.) */}
-          <div className="grid grid-cols-6 sm:flex sm:flex-wrap gap-0.5 mt-1">
+          <div className="grid grid-cols-6 sm:flex sm:flex-wrap gap-1.5 mt-2">
             {displayedHouses.map((h) => {
               const isSelected = h.houseNumber === selectedHouseNumber;
               return (
                 <button
                   key={h.houseNumber}
                   onClick={() => onSelectHouseNumber(h.houseNumber)}
-                  className={`w-6 h-6 rounded-md font-vedic font-bold text-[9px] flex items-center justify-center transition-all duration-150 border ${
+                  className={`px-2.5 py-1 min-w-[2.25rem] rounded-md font-vedic font-bold text-[13px] flex items-center justify-center transition-all duration-150 border cursor-pointer ${
                     isSelected
                       ? 'bg-amber-700 text-white border-amber-600 shadow-2xs'
-                      : 'bg-white border-stone-100 text-stone-700 hover:border-amber-300 hover:text-amber-800'
+                      : 'bg-white border-stone-200 text-stone-700 hover:border-amber-300 hover:text-amber-800'
                   }`}
                 >
                   H{h.houseNumber}
@@ -326,24 +326,24 @@ export function HouseCardDeck({
         </div>
 
         {/* SELECTED HOUSE COMPREHENSIVE DOSSIER */}
-        <div className="px-1 py-1 bg-gradient-to-b from-white to-[#FAF8F5]/30 space-y-1 animate-in fade-in slide-in-from-top-1 duration-150">
+        <div className="px-2.5 py-2 bg-gradient-to-b from-white to-[#FAF8F5]/30 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
           {/* Top Navigation & House Title */}
-          <div className="flex items-center justify-between gap-1 border-b border-stone-100 pb-1">
-            <div className="flex items-center space-x-1.5">
-              <div className="text-amber-700 font-vedic font-bold text-base">
+          <div className="flex items-center justify-between gap-2 border-b border-stone-100 pb-1.5">
+            <div className="flex items-center space-x-2">
+              <div className="text-amber-700 font-vedic font-bold text-[20px]">
                 H{activeHouse.houseNumber}
               </div>
 
-              <div className="space-y-0">
-                <div className="flex flex-wrap items-center gap-1">
-                  <h3 className="font-vedic font-bold text-stone-950 text-[11px] tracking-tight leading-tight">
+              <div className="space-y-0.5">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <h3 className="font-vedic font-bold text-stone-950 text-[15px] tracking-tight leading-snug">
                     {activeHouse.vedicName} — {activePrediction.lifeDomain}
                   </h3>
-                  <span className={`text-[7px] font-black uppercase tracking-widest ${classification.badgeClass.replace('bg-', 'text-').replace('text-', 'border-').split(' ')[1]}`}>
+                  <span className={`text-[11px] font-black uppercase tracking-wider ${classification.badgeClass.replace('bg-', 'text-').replace('text-', 'border-').split(' ')[1]}`}>
                     {classification.type}
                   </span>
                 </div>
-                <p className="text-[9px] text-stone-600 font-medium leading-tight">
+                <p className="text-[13px] text-stone-600 font-medium leading-snug">
                   {classification.description}
                 </p>
               </div>
@@ -354,57 +354,57 @@ export function HouseCardDeck({
               <button
                 type="button"
                 onClick={handlePrevHouse}
-                className="p-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-600 hover:text-amber-700 transition-colors border border-stone-100"
+                className="p-1.5 rounded bg-stone-50 hover:bg-stone-100 text-stone-600 hover:text-amber-700 transition-colors border border-stone-200 cursor-pointer"
                 title="Previous House"
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
+                <ChevronLeft className="w-4 h-4" />
               </button>
 
               <button
                 type="button"
                 onClick={handleNextHouse}
-                className="p-1 rounded bg-stone-50 hover:bg-stone-100 text-stone-600 hover:text-amber-700 transition-colors border border-stone-100"
+                className="p-1.5 rounded bg-stone-50 hover:bg-stone-100 text-stone-600 hover:text-amber-700 transition-colors border border-stone-200 cursor-pointer"
                 title="Next House"
               >
-                <ChevronRight className="w-3.5 h-3.5" />
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </div>
 
           {/* CORE BHAVA ASTROLOGICAL VITALS GRID */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 bg-stone-50/50 rounded-lg px-1 py-0.5 border border-stone-100">
-            <div className="space-y-0">
-              <span className="text-[8px] font-bold text-stone-600 uppercase tracking-widest block">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-stone-50/60 rounded-lg px-2.5 py-1.5 border border-stone-100">
+            <div className="space-y-0.5">
+              <span className="text-[12px] font-bold text-stone-600 uppercase tracking-wider block">
                 Zodiac Sign
               </span>
-              <span className="text-xs sm:text-sm font-vedic font-bold text-stone-900 block">
+              <span className="text-[16px] sm:text-[18px] font-vedic font-bold text-stone-900 block">
                 {activeHouse.rasiName}
               </span>
             </div>
 
-            <div className="space-y-0 border-l border-stone-200/40 pl-2">
-              <span className="text-[8px] font-bold text-stone-600 uppercase tracking-widest block">
+            <div className="space-y-0.5 border-l border-stone-200/60 pl-2.5">
+              <span className="text-[12px] font-bold text-stone-600 uppercase tracking-wider block">
                 Sign Lord
               </span>
-              <span className="text-xs sm:text-sm font-vedic font-bold text-stone-900 block">
+              <span className="text-[16px] sm:text-[18px] font-vedic font-bold text-stone-900 block">
                 {activeHouse.signLord}
               </span>
             </div>
 
-            <div className="space-y-0 border-l border-stone-200/40 pl-2">
-              <span className="text-[8px] font-bold text-stone-600 uppercase tracking-widest block">
+            <div className="space-y-0.5 border-l border-stone-200/60 pl-2.5">
+              <span className="text-[12px] font-bold text-stone-600 uppercase tracking-wider block">
                 Natural Karaka
               </span>
-              <span className="text-xs sm:text-sm font-vedic font-bold text-stone-900 block">
+              <span className="text-[16px] sm:text-[18px] font-vedic font-bold text-stone-900 block">
                 {activeHouse.karaka}
               </span>
             </div>
 
-            <div className="space-y-0 border-l border-stone-200/40 pl-2">
-              <span className="text-[8px] font-bold text-stone-600 uppercase tracking-widest block">
+            <div className="space-y-0.5 border-l border-stone-200/60 pl-2.5">
+              <span className="text-[12px] font-bold text-stone-600 uppercase tracking-wider block">
                 Occupancy
               </span>
-              <span className="text-xs sm:text-sm font-vedic font-bold text-stone-900 block truncate">
+              <span className="text-[16px] sm:text-[18px] font-vedic font-bold text-stone-900 block truncate">
                 {activeHouse.planets.length === 0 ? 'Empty' : `${activeHouse.planets.length} Grahas`}
               </span>
             </div>
@@ -414,21 +414,21 @@ export function HouseCardDeck({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {/* Occupants */}
             <div className="space-y-1.5">
-              <h4 className="text-[10px] font-black text-stone-600 uppercase tracking-widest flex items-center space-x-1">
-                <Sparkles className="w-2.5 h-2.5" />
+              <h4 className="text-[14px] font-black text-stone-600 uppercase tracking-wider flex items-center space-x-1.5">
+                <Sparkles className="w-3 h-3" />
                 <span>Natal Occupants</span>
               </h4>
               {activeHouse.planets.length === 0 ? (
-                <p className="text-[10px] text-stone-600 italic">Unoccupied; purely lord governed.</p>
+                <p className="text-[14px] text-stone-600 italic">Unoccupied; purely lord governed.</p>
               ) : (
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   {activeHouse.planets.map((planet) => (
-                    <div key={planet.name} className="flex items-center justify-between p-1.5 rounded bg-white border border-stone-100 shadow-3xs">
+                    <div key={planet.name} className="flex items-center justify-between px-2.5 py-1.5 rounded bg-white border border-stone-200/80 shadow-3xs">
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm font-bold text-amber-700">{planet.symbol}</span>
-                        <span className="text-[11px] font-bold text-stone-800">{planet.englishName}</span>
+                        <span className="text-[18px] font-bold text-amber-700">{planet.symbol}</span>
+                        <span className="text-[15px] font-bold text-stone-800">{planet.englishName}</span>
                       </div>
-                      <span className="text-[9px] text-stone-600">{planet.degree}° in {planet.nakshatra}</span>
+                      <span className="text-[13px] text-stone-600">{planet.degree}° in {planet.nakshatra}</span>
                     </div>
                   ))}
                 </div>
@@ -437,16 +437,16 @@ export function HouseCardDeck({
 
             {/* Aspects */}
             <div className="space-y-1.5">
-              <h4 className="text-[10px] font-black text-stone-600 uppercase tracking-widest flex items-center space-x-1">
-                <Eye className="w-2.5 h-2.5" />
+              <h4 className="text-[14px] font-black text-stone-600 uppercase tracking-wider flex items-center space-x-1.5">
+                <Eye className="w-3 h-3" />
                 <span>Drishti (Aspects)</span>
               </h4>
               {aspectingPlanets.length === 0 ? (
-                <p className="text-[10px] text-stone-600 italic">No major aspects converge here.</p>
+                <p className="text-[14px] text-stone-600 italic">No major aspects converge here.</p>
               ) : (
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-1.5">
                   {aspectingPlanets.map((asp, idx) => (
-                    <div key={`${asp.planet.name}-${idx}`} className={`px-1.5 py-0.5 rounded text-[10px] font-bold border ${asp.isBenefic ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-stone-50 text-stone-600 border-stone-100'}`}>
+                    <div key={`${asp.planet.name}-${idx}`} className={`px-2 py-1 rounded text-[14px] font-bold border ${asp.isBenefic ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-stone-50 text-stone-700 border-stone-200'}`}>
                       {asp.planet.englishName} (H{asp.planet.house})
                     </div>
                   ))}
@@ -456,17 +456,17 @@ export function HouseCardDeck({
           </div>
 
           {/* PREDICTIVE READING - ELEGANT BLOCK */}
-          <div className="bg-amber-50/30 rounded-lg p-1.5 border-l-2 border-amber-300">
-            <h4 className="text-[8px] font-black text-amber-800 uppercase tracking-widest mb-0.5">Sage Parashari Reading</h4>
-            <p className="font-serif italic text-stone-800 text-[11px] leading-tight antialiased">
+          <div className="bg-amber-50/40 rounded-lg p-2.5 border-l-2 border-amber-400">
+            <h4 className="text-[12px] font-black text-amber-800 uppercase tracking-wider mb-1">Sage Parashari Reading</h4>
+            <p className="font-serif italic text-stone-800 text-[15px] leading-snug antialiased">
               "{activePrediction.prediction}"
             </p>
           </div>
 
           {/* REMEDIES - ZERO CARD LOOK */}
-          <div className="pt-1 border-t border-stone-100">
-            <h4 className="text-[9px] font-black text-stone-600 uppercase tracking-widest mb-1.5">Bhava Harmonization</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px]">
+          <div className="pt-1.5 border-t border-stone-100">
+            <h4 className="text-[13px] font-black text-stone-600 uppercase tracking-wider mb-1.5">Bhava Harmonization</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[14px]">
               <div>
                 <span className="text-stone-600 font-bold block">Mantra</span>
                 <span className="text-amber-900 font-bold">{upaya.mantra}</span>
@@ -477,7 +477,7 @@ export function HouseCardDeck({
               </div>
               <div className="sm:col-span-1">
                 <span className="text-stone-600 font-bold block">Action</span>
-                <span className="text-stone-800 leading-tight">{upaya.remedyAction}</span>
+                <span className="text-stone-800 leading-snug">{upaya.remedyAction}</span>
               </div>
             </div>
           </div>

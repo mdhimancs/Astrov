@@ -89,16 +89,16 @@ export function NorthIndianChart({
   };
 
   return (
-    <div className="flex flex-col items-center bg-gradient-to-b from-[#FDFBF7] to-white rounded-lg border border-[#E8DEC8] p-1 shadow-2xs">
+    <div className="w-full flex flex-col items-center bg-gradient-to-b from-[#FDFBF7] to-white rounded-lg border border-[#E8DEC8] p-2 shadow-2xs">
       {title && (
-        <div className="text-center mb-0.5">
-          <h3 className="text-[10px] font-vedic font-bold text-stone-950 tracking-tight leading-tight">{title}</h3>
-          <p className="text-[8px] text-stone-600 leading-tight">{subtitle}</p>
+        <div className="text-center mb-1">
+          <h3 className="text-[14px] font-vedic font-bold text-stone-950 tracking-tight leading-snug">{title}</h3>
+          <p className="text-[12px] text-stone-600 leading-snug">{subtitle}</p>
         </div>
       )}
 
       {/* SVG Container: Perfectly centered and proportioned */}
-      <div className="relative w-full max-w-[320px] aspect-square select-none mx-auto">
+      <div className="relative w-full max-w-[360px] aspect-square select-none mx-auto">
         <svg
           viewBox={`0 0 ${size} ${size}`}
           className="w-full h-full drop-shadow-xs transition-all"
@@ -167,16 +167,16 @@ export function NorthIndianChart({
                 <circle
                   cx={pos.rasiX}
                   cy={pos.rasiY}
-                  r="10.5"
+                  r="11.5"
                   fill="#F5EDE0"
                   stroke="#C27837"
                   strokeWidth="0.85"
                 />
                 <text
                   x={pos.rasiX}
-                  y={pos.rasiY + 3.5}
+                  y={pos.rasiY + 4}
                   textAnchor="middle"
-                  fontSize="9"
+                  fontSize="13"
                   fontWeight="700"
                   fill="#9A3412"
                   fontFamily="'Cinzel', Georgia, serif"
@@ -187,9 +187,9 @@ export function NorthIndianChart({
                 {/* House Number subtle indicator */}
                 <text
                   x={pos.x}
-                  y={pos.y - 17}
+                  y={pos.y - 18}
                   textAnchor="middle"
-                  fontSize="7"
+                  fontSize="11"
                   fontWeight="600"
                   fill="#A8A29E"
                   fontFamily="sans-serif"
@@ -200,14 +200,14 @@ export function NorthIndianChart({
                 {/* Posited Planets List */}
                 <g>
                   {h.planets.map((planet, idx) => {
-                    const offsetY = pos.y + idx * 13;
+                    const offsetY = pos.y + idx * 14;
                     return (
                       <text
                         key={planet.name}
                         x={pos.x}
                         y={offsetY}
                         textAnchor="middle"
-                        fontSize="9"
+                        fontSize="13"
                         fontWeight="700"
                         fill="#1C1917"
                         fontFamily="sans-serif"
@@ -216,7 +216,7 @@ export function NorthIndianChart({
                         {planet.isRetrograde ? (
                           <tspan fill="#DC2626" fontWeight="bold">®</tspan>
                         ) : ''}
-                        <tspan fontSize="8" fontWeight="500" fill="#78716C">
+                        <tspan fontSize="12" fontWeight="500" fill="#78716C">
                           {' '}{planet.degree}°
                         </tspan>
                       </text>
@@ -227,14 +227,14 @@ export function NorthIndianChart({
                   {showTransitsTogether &&
                     h.transitPlanets &&
                     h.transitPlanets.map((tp, idx) => {
-                      const offsetY = pos.y + (h.planets.length + idx) * 12;
+                      const offsetY = pos.y + (h.planets.length + idx) * 13;
                       return (
                         <text
                           key={`tr-${tp.name}`}
                           x={pos.x}
                           y={offsetY}
                           textAnchor="middle"
-                          fontSize="9"
+                          fontSize="13"
                           fontWeight="700"
                           fill="#B45309"
                           fontFamily="sans-serif"
@@ -251,10 +251,10 @@ export function NorthIndianChart({
       </div>
 
       {/* Legend & Instructions */}
-      <div className="w-full mt-0.5 flex flex-wrap items-center justify-between text-[8px] text-stone-500 border-t border-stone-200/80 pt-0.5 gap-1">
+      <div className="w-full mt-1.5 flex flex-wrap items-center justify-between text-[12px] text-stone-500 border-t border-stone-200/80 pt-1 gap-1.5">
         <div className="flex items-center space-x-2.5">
           <span className="flex items-center space-x-1">
-            <span className="w-3.5 h-3.5 rounded-full bg-[#F5EDE0] border border-[#C27837] inline-flex items-center justify-center text-[8px] font-bold text-[#9A3412]">
+            <span className="w-4 h-4 rounded-full bg-[#F5EDE0] border border-[#C27837] inline-flex items-center justify-center text-[12px] font-bold text-[#9A3412]">
               1
             </span>
             <span>= Rasi / Zodiac No.</span>

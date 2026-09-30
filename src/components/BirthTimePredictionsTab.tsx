@@ -249,7 +249,7 @@ export function BirthTimePredictionsTab({
       });
 
   return (
-    <div className="w-full p-0.5 space-y-0.5">
+    <div className="w-full space-y-2">
       {/* Saved Profiles Selector */}
       <ProfileSelector
         profiles={profiles}
@@ -260,19 +260,19 @@ export function BirthTimePredictionsTab({
       />
 
       {/* Core Natal Vitals Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-0.5">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
         {[
           { label: 'Ascendant', val: VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName, lord: VEDIC_RASIS[natalLagnaRasi - 1]?.lord, color: 'amber' },
           { label: 'Moon Sign', val: VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName, lord: VEDIC_RASIS[natalMoonRasi - 1]?.lord, color: 'sky' },
           { label: 'Nakshatra', val: natalNakshatra, lord: `Dasha: ${vimshottariDasha?.birthLord}`, color: 'emerald' },
           { label: 'Current Dasha', val: `${vimshottariDasha?.currentLord} Dasha`, lord: 'Active Phase', color: 'purple' },
         ].map((item, idx) => (
-          <div key={idx} className="bg-white/80 backdrop-blur-sm rounded-lg border border-stone-100 px-1 py-0.5 shadow-3xs">
-            <span className={`text-[7px] font-black text-${item.color}-800 uppercase tracking-widest block`}>
+          <div key={idx} className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/80 px-2.5 py-1.5 shadow-3xs">
+            <span className={`text-[11px] font-black text-${item.color}-800 uppercase tracking-wider block`}>
               {item.label}
             </span>
-            <div className="flex items-baseline space-x-1">
-              <span className="text-[10px] font-vedic font-bold text-stone-900 leading-tight">
+            <div className="flex items-baseline space-x-1 mt-0.5">
+              <span className="text-[14px] font-vedic font-bold text-stone-900 leading-snug">
                 {item.val}
               </span>
             </div>
@@ -281,7 +281,7 @@ export function BirthTimePredictionsTab({
       </div>
 
       {/* North Indian Diamond Chart & Kundali Focus Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-1 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 items-start">
         {/* Left Column: D1 Birth Chart */}
         <div className="lg:col-span-5 flex justify-center">
           <NorthIndianChart
@@ -295,19 +295,19 @@ export function BirthTimePredictionsTab({
         </div>
 
         {/* Right Column: Chart Focus & Key Yogas Formed at Birth */}
-        <div className="lg:col-span-7 space-y-0.5">
+        <div className="lg:col-span-7 space-y-2">
           {/* Active House Selection Quick Bar */}
-          <div className="bg-gradient-to-r from-amber-50/40 via-white to-transparent rounded-lg border border-amber-100 px-1 py-0.5 shadow-3xs flex items-center justify-between gap-1">
-            <div className="flex items-center space-x-2">
-              <div className="text-amber-700 font-vedic font-bold text-base leading-none">
+          <div className="bg-gradient-to-r from-amber-50/50 via-white to-transparent rounded-lg border border-amber-200/80 px-2.5 py-1.5 shadow-3xs flex items-center justify-between gap-2">
+            <div className="flex items-center space-x-2.5">
+              <div className="text-amber-700 font-vedic font-bold text-[20px] leading-none">
                 H{selectedHouseNumber}
               </div>
-              <div className="h-4 w-px bg-stone-100" />
+              <div className="h-5 w-px bg-stone-200" />
               <div>
-                <span className="font-vedic font-bold text-stone-800 text-[11px]">
+                <span className="font-vedic font-bold text-stone-900 text-[15px]">
                   {selectedHouse?.vedicName}
                 </span>
-                <p className="text-[8px] text-stone-600 font-bold uppercase tracking-widest">
+                <p className="text-[12px] text-stone-600 font-bold uppercase tracking-wider">
                   {selectedHouse?.rasiName} • Lord: {selectedHouse?.signLord}
                 </p>
               </div>
@@ -315,24 +315,24 @@ export function BirthTimePredictionsTab({
           </div>
 
           {/* Natal Yogas Card */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg border border-stone-100 px-1 py-0.5 shadow-2xs space-y-0.5">
-            <div className="flex items-center justify-between border-b border-stone-50 pb-0.5">
-              <h4 className="font-vedic font-bold text-stone-900 text-[10px] flex items-center space-x-1">
-                <Award className="w-2.5 h-2.5 text-amber-600" />
+          <div className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/80 px-2.5 py-2 shadow-2xs space-y-1.5">
+            <div className="flex items-center justify-between border-b border-stone-100 pb-1">
+              <h4 className="font-vedic font-bold text-stone-900 text-[14px] flex items-center space-x-1.5">
+                <Award className="w-3.5 h-3.5 text-amber-600" />
                 <span>Natal Yogas</span>
               </h4>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               {natalYogas.map((yoga) => (
-                <div key={yoga.name} className="space-y-0">
-                  <div className="flex items-center space-x-1">
-                    <span className="font-bold text-amber-900 text-[10px] uppercase tracking-wide">{yoga.name}</span>
-                    <span className="text-[7px] font-black text-amber-600 uppercase tracking-widest">
+                <div key={yoga.name} className="space-y-0.5">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="font-bold text-amber-900 text-[14px] uppercase tracking-wide">{yoga.name}</span>
+                    <span className="text-[11px] font-black text-amber-600 uppercase tracking-wider">
                       {yoga.auspiciousness}
                     </span>
                   </div>
-                  <p className="text-[9px] text-stone-700 leading-tight">
+                  <p className="text-[13px] text-stone-700 leading-snug">
                     {yoga.effect}
                   </p>
                 </div>
@@ -352,11 +352,11 @@ export function BirthTimePredictionsTab({
       />
 
       {/* Optional Real-time AI Deep Birth Reading */}
-      <div className="bg-white rounded-lg border border-stone-200 px-1.5 py-1 shadow-2xs space-y-1">
-        <div className="flex items-center justify-between gap-1">
+      <div className="bg-white rounded-lg border border-stone-200 px-2.5 py-2 shadow-2xs space-y-1.5">
+        <div className="flex items-center justify-between gap-2">
           <div className="flex items-center space-x-1.5">
-            <Sparkles className="w-3 h-3 text-amber-600" />
-            <h3 className="font-vedic font-bold text-stone-900 text-[10px]">
+            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+            <h3 className="font-vedic font-bold text-stone-900 text-[14px]">
               AI Synthesis
             </h3>
           </div>
@@ -365,16 +365,16 @@ export function BirthTimePredictionsTab({
             type="button"
             onClick={fetchAiBirthPrediction}
             disabled={isLoadingAi}
-            className="inline-flex items-center space-x-1 bg-stone-900 hover:bg-stone-800 text-white text-[9px] font-semibold py-0.5 px-1.5 rounded transition-colors cursor-pointer disabled:opacity-50 shrink-0"
+            className="inline-flex items-center space-x-1.5 bg-stone-900 hover:bg-stone-800 text-white text-[13px] font-semibold py-1 px-2.5 rounded transition-colors cursor-pointer disabled:opacity-50 shrink-0"
           >
             {isLoadingAi ? (
               <>
-                <Loader2 className="w-2.5 h-2.5 animate-spin text-amber-400" />
+                <Loader2 className="w-3 h-3 animate-spin text-amber-400" />
                 <span>Analyzing...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-2.5 h-2.5 text-amber-400" />
+                <Sparkles className="w-3 h-3 text-amber-400" />
                 <span>Generate Reading</span>
               </>
             )}
@@ -382,7 +382,7 @@ export function BirthTimePredictionsTab({
         </div>
 
         {aiReading && (
-          <div className="bg-[#FAF8F5] rounded border border-amber-300/80 px-1.5 py-1 text-stone-800 text-[10px] leading-tight space-y-0.5">
+          <div className="bg-[#FAF8F5] rounded border border-amber-300/80 px-2.5 py-2 text-stone-800 text-[14px] leading-snug space-y-1">
             {aiReading.split('\n').map((para, idx) =>
               para.trim() ? <p key={idx}>{para}</p> : null
             )}
@@ -391,42 +391,42 @@ export function BirthTimePredictionsTab({
       </div>
 
       {/* Planetary Coordinates Table (Sidereal Lahiri) */}
-      <div className="bg-white rounded-lg border border-stone-200 px-1 py-1 shadow-2xs space-y-0.5">
-        <div className="flex items-center space-x-1 mb-0.5">
-          <BookOpen className="w-3 h-3 text-amber-700" />
-          <h3 className="text-[10px] font-vedic font-bold text-stone-900">
+      <div className="bg-white rounded-lg border border-stone-200 px-2.5 py-2 shadow-2xs space-y-1">
+        <div className="flex items-center space-x-1.5 mb-1">
+          <BookOpen className="w-3.5 h-3.5 text-amber-700" />
+          <h3 className="text-[14px] font-vedic font-bold text-stone-900">
             Natal Planetary Coordinates
           </h3>
         </div>
 
         <div className="overflow-x-auto w-full">
-          <table className="w-full text-left text-[9px] border-collapse">
+          <table className="w-full text-left text-[13px] border-collapse">
             <thead>
-              <tr className="border-b border-stone-200 bg-[#FAF8F5] text-stone-900 text-[8px] font-bold">
-                <th className="py-0.5 px-1 uppercase tracking-wider">Graha</th>
-                <th className="py-0.5 px-1 uppercase tracking-wider">Rasi</th>
-                <th className="py-0.5 px-1 uppercase tracking-wider">Deg</th>
-                <th className="py-0.5 px-1 uppercase tracking-wider">Nakshatra</th>
-                <th className="py-0.5 px-1 uppercase tracking-wider">H</th>
+              <tr className="border-b border-stone-200 bg-[#FAF8F5] text-stone-900 text-[12px] font-bold">
+                <th className="py-1 px-2 uppercase tracking-wider">Graha</th>
+                <th className="py-1 px-2 uppercase tracking-wider">Rasi</th>
+                <th className="py-1 px-2 uppercase tracking-wider">Deg</th>
+                <th className="py-1 px-2 uppercase tracking-wider">Nakshatra</th>
+                <th className="py-1 px-2 uppercase tracking-wider">H</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
               {natalPlanets.map((planet) => (
                 <tr key={planet.name} className="hover:bg-stone-50/80 transition-colors">
-                  <td className="py-0.5 px-1 font-semibold text-stone-950">
+                  <td className="py-1 px-2 font-semibold text-stone-950">
                     {planet.symbol} {planet.name}
                   </td>
-                  <td className="py-0.5 px-1 text-stone-900">
+                  <td className="py-1 px-2 text-stone-900">
                     {planet.rasiName}
                   </td>
-                  <td className="py-0.5 px-1 text-stone-950 font-mono">
+                  <td className="py-1 px-2 text-stone-950 font-mono">
                     {planet.degree}° {planet.minute}'
                   </td>
-                  <td className="py-0.5 px-1 text-stone-900">
+                  <td className="py-1 px-2 text-stone-900">
                     {planet.nakshatra}
                   </td>
-                  <td className="py-0.5 px-1">
-                    <span className="px-1 py-0 rounded bg-stone-100 font-semibold text-stone-950">
+                  <td className="py-1 px-2">
+                    <span className="px-1.5 py-0.5 rounded bg-stone-100 font-semibold text-stone-950">
                       H{planet.house}
                     </span>
                   </td>

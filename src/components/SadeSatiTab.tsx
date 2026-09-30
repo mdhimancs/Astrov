@@ -107,35 +107,35 @@ export function SadeSatiTab({ activeProfileId, profiles }: SadeSatiTabProps) {
   const details = getSadeSatiDetails(selectedRasi);
 
   return (
-    <div className="w-full p-0.5 space-y-0.5">
+    <div className="w-full space-y-2">
       {/* Intro Header */}
-      <div className="bg-amber-50/40 border border-amber-100 rounded-lg px-1 py-0.5 flex flex-col sm:flex-row items-center justify-between gap-1 shadow-3xs">
-        <div className="flex items-center space-x-1">
-          <Shield className="w-3 h-3 text-amber-700" />
-          <h1 className="text-[10px] font-black text-stone-800 uppercase tracking-widest font-vedic leading-tight">
+      <div className="bg-amber-50/50 border border-amber-200/80 rounded-lg px-2.5 py-1.5 flex flex-col sm:flex-row items-center justify-between gap-2 shadow-3xs">
+        <div className="flex items-center space-x-1.5">
+          <Shield className="w-4 h-4 text-amber-700" />
+          <h1 className="text-[14px] font-black text-stone-800 uppercase tracking-wider font-vedic leading-tight">
             Sade Sati
           </h1>
         </div>
 
-        <div className="text-[9px] font-black uppercase tracking-widest text-stone-600 shrink-0">
+        <div className="text-[13px] font-black uppercase tracking-wider text-stone-600 shrink-0">
           Saturn in <span className="text-amber-800">Meena</span>
         </div>
       </div>
 
       {/* Rasi Selection - Zero Pill Grid */}
-      <div className="bg-white/60 backdrop-blur-sm rounded-lg border border-stone-100 px-1 py-0.5 shadow-3xs space-y-0.5">
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-0.5">
+      <div className="bg-white/80 backdrop-blur-sm rounded-lg border border-stone-200/80 p-2 shadow-3xs">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1">
           {VEDIC_RASIS.map((rasi) => (
             <button
               key={rasi.sanskritName}
               onClick={() => setSelectedRasi(rasi.sanskritName)}
-              className={`py-0.5 rounded text-center transition-all cursor-pointer border ${
+              className={`py-1.5 px-1 rounded text-center transition-all cursor-pointer border ${
                 selectedRasi === rasi.sanskritName
                   ? 'bg-amber-700 border-amber-800 text-white shadow-3xs'
-                  : 'bg-white border-stone-50 text-stone-600 hover:text-stone-800'
+                  : 'bg-white border-stone-100 text-stone-600 hover:text-stone-800 hover:border-amber-200'
               }`}
             >
-              <div className="text-[9px] font-black uppercase tracking-tighter leading-none">
+              <div className="text-[13px] font-black uppercase tracking-tight leading-none">
                 {rasi.sanskritName.slice(0, 3)}
               </div>
             </button>
@@ -144,32 +144,32 @@ export function SadeSatiTab({ activeProfileId, profiles }: SadeSatiTabProps) {
       </div>
 
       {/* Result Card */}
-      <div className="bg-white rounded-lg border border-stone-200 p-1 shadow-3xs space-y-1">
-        <div className="flex items-center justify-between pb-0.5 border-b border-stone-100 gap-1">
-          <h2 className="text-sm font-vedic font-bold text-stone-950">
+      <div className="bg-white rounded-lg border border-stone-200 p-2.5 shadow-3xs space-y-2">
+        <div className="flex flex-wrap items-center justify-between pb-1.5 border-b border-stone-100 gap-2">
+          <h2 className="text-[18px] font-vedic font-bold text-stone-950">
             {details.status}
           </h2>
-          <span className={`text-[8px] px-1 py-0 rounded-full font-bold border ${details.bg}`}>
+          <span className={`text-[12px] px-2 py-0.5 rounded-full font-bold border ${details.bg}`}>
             {details.severity}
           </span>
         </div>
 
-        <p className="text-[10px] text-stone-800 leading-tight">
+        <p className="text-[14px] text-stone-800 leading-snug">
           {details.description}
         </p>
 
         {/* Vedic Remedies (Upayas) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-0.5 text-[9px]">
-          <div className="bg-stone-50/70 p-1 rounded border border-stone-100">
-            <strong className="text-stone-950 font-semibold block">Mantra</strong>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-1.5 text-[13px]">
+          <div className="bg-stone-50/80 p-2 rounded border border-stone-100">
+            <strong className="text-stone-950 font-semibold block mb-0.5">Mantra</strong>
             <p className="text-stone-700">Shani Gayatri / Mrityunjaya</p>
           </div>
-          <div className="bg-stone-50/70 p-1 rounded border border-stone-100">
-            <strong className="text-stone-950 font-semibold block">Charity</strong>
+          <div className="bg-stone-50/80 p-2 rounded border border-stone-100">
+            <strong className="text-stone-950 font-semibold block mb-0.5">Charity</strong>
             <p className="text-stone-700">Black sesame / iron</p>
           </div>
-          <div className="bg-stone-50/70 p-1 rounded border border-stone-100">
-            <strong className="text-stone-950 font-semibold block">Karma</strong>
+          <div className="bg-stone-50/80 p-2 rounded border border-stone-100">
+            <strong className="text-stone-950 font-semibold block mb-0.5">Karma</strong>
             <p className="text-stone-700">Punctuality / patience</p>
           </div>
         </div>

@@ -70,7 +70,7 @@ export default function App() {
       />
 
       {/* Main Vedic Content Area */}
-      <main className="flex-1 w-full p-0.5">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-2 sm:px-3 py-1.5">
         {(activeTab === 'birth-predictions' || activeTab === 'kundali') && (
           <BirthTimePredictionsTab
             profiles={profiles}
@@ -132,24 +132,24 @@ export default function App() {
       </main>
 
       {/* Light Portal Footer */}
-      <footer className="border-t border-[#E8DEC8] bg-[#F7F2E7] py-0.2 text-[8px] text-stone-700">
-        <div className="w-full px-1 flex flex-col md:flex-row items-center justify-between gap-0">
-          <div className="flex items-center space-x-1">
-            <div className="w-4 h-4 rounded bg-amber-600 text-white flex items-center justify-center font-vedic font-bold text-[10px]">
+      <footer className="border-t border-[#E8DEC8] bg-[#F7F2E7] py-1.5 text-[12px] text-stone-700">
+        <div className="w-full max-w-6xl mx-auto px-2 sm:px-3 flex flex-col md:flex-row items-center justify-between gap-1">
+          <div className="flex items-center space-x-1.5">
+            <div className="w-4.5 h-4.5 rounded bg-amber-600 text-white flex items-center justify-center font-vedic font-bold text-[14px]">
               ॐ
             </div>
-            <span className="font-vedic font-bold text-stone-950 text-[10px]">
+            <span className="font-vedic font-bold text-stone-950 text-[14px]">
               JyotishVeda
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-1.5 text-[8px] text-stone-600">
+          <div className="flex flex-wrap items-center justify-center gap-2 text-[12px] text-stone-600">
             <span>Chitra Paksha Ayanamsha</span>
             <span>•</span>
             <span>Gochar Synced</span>
           </div>
 
-          <p className="text-stone-500 text-center md:text-right text-[8px] truncate">
+          <p className="text-stone-500 text-center md:text-right text-[12px]">
             Astrological insights for spiritual contemplation.
           </p>
         </div>
