@@ -64,7 +64,7 @@ export function ProfileSelector({
         <div className="flex items-center space-x-1.5">
           <User className="w-3.5 h-3.5 text-amber-700" />
           <h3 className="font-vedic font-black text-stone-900 text-[13px] uppercase tracking-wider">
-            Seeker Deck
+            Person&apos;s Profile
           </h3>
         </div>
 
@@ -78,43 +78,44 @@ export function ProfileSelector({
         </button>
       </div>
 
-      {/* Profiles Deck of Cards */}
+      {/* Profiles Deck of Cards — Compact 1-Row Cards without Card Numbers */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1.5">
-        {profiles.map((profile, idx) => {
+        {profiles.map((profile) => {
           const isActive = profile.id === activeProfileId;
           return (
             <div
               key={profile.id}
               onClick={() => onSelectProfile(profile)}
-              className={`group relative rounded-md px-2 py-1.5 transition-all duration-200 cursor-pointer border text-left flex flex-col justify-between ${
+              className={`group relative rounded-md px-2.5 py-1 transition-all duration-150 cursor-pointer border flex items-center justify-between gap-1.5 ${
                 isActive
-                  ? 'bg-amber-50/70 border-amber-300 ring-1 ring-amber-200 shadow-3xs'
-                  : 'bg-white border-stone-100 hover:border-amber-200 hover:shadow-3xs'
+                  ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
+                  : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5] shadow-3xs'
               }`}
             >
-              <div className="flex items-center justify-between mb-0.5">
-                <span className={`text-[11px] font-black uppercase tracking-wider ${isActive ? 'text-amber-800' : 'text-stone-500'}`}>
-                  {isActive ? 'Active' : `Card ${idx + 1}`}
-                </span>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleStartEdit(profile);
-                  }}
-                  className="opacity-70 group-hover:opacity-100 text-stone-500 hover:text-amber-800 p-0.5 rounded transition-opacity cursor-pointer"
-                  title="Edit profile"
+              <div className="flex items-center space-x-1.5 min-w-0">
+                <span
+                  className={`font-vedic font-bold text-[13px] truncate leading-none ${
+                    isActive ? 'text-amber-950' : 'text-stone-900'
+                  }`}
                 >
-                  <Edit2 className="w-2.5 h-2.5" />
-                </button>
+                  {profile.name}
+                </span>
+                <span className="text-[11px] text-stone-500 font-medium shrink-0 leading-none">
+                  ({profile.birthDate.split('-')[0]})
+                </span>
               </div>
 
-              <div className="font-vedic font-bold text-stone-900 text-[14px] truncate leading-snug">
-                {profile.name}
-              </div>
-              <div className="text-[12px] text-stone-600 font-medium truncate leading-snug">
-                {profile.birthDate.split('-')[0]} • {profile.place.split(',')[0]}
-              </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleStartEdit(profile);
+                }}
+                className="opacity-75 group-hover:opacity-100 text-stone-500 hover:text-amber-800 p-0.5 rounded transition-opacity cursor-pointer shrink-0"
+                title="Edit profile"
+              >
+                <Edit2 className="w-3 h-3" />
+              </button>
             </div>
           );
         })}

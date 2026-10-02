@@ -9,6 +9,7 @@ import { SadeSatiTab } from './components/SadeSatiTab';
 import { PanchangTab } from './components/PanchangTab';
 import { KundaliMatchingTab } from './components/KundaliMatchingTab';
 import { DivisionalChartsTab } from './components/DivisionalChartsTab';
+import { UpayRemediesTab } from './components/UpayRemediesTab';
 import { UserProfile } from './types';
 import { getSavedProfiles, getActiveProfileId, setActiveProfileId as saveActiveId } from './utils/profileStorage';
 import { calculatePlanetaryPositions, buildHouseStructure, calculateYogas, calculateAshtakavarga } from './vedicMath';
@@ -97,6 +98,14 @@ export default function App() {
             onNavigateToMilestones={() => setActiveTab('critical-transits')}
           />
         )}
+        {activeTab === 'upay-remedies' && (
+          <UpayRemediesTab
+            activeProfileId={activeProfileId}
+            profiles={profiles}
+            onNavigateToDasha={() => setActiveTab('vimshottari-dasha')}
+            onNavigateToBirthCharts={() => setActiveTab('birth-predictions')}
+          />
+        )}
         {activeTab === 'critical-transits' && (
           <CriticalDashaTransitsTab
             activeProfileId={activeProfileId}
@@ -134,12 +143,12 @@ export default function App() {
       {/* Light Portal Footer */}
       <footer className="border-t border-[#E8DEC8] bg-[#F7F2E7] py-1.5 text-[12px] text-stone-700">
         <div className="w-full max-w-6xl mx-auto px-2 sm:px-3 flex flex-col md:flex-row items-center justify-between gap-1">
-          <div className="flex items-center space-x-1.5">
-            <div className="w-4.5 h-4.5 rounded bg-amber-600 text-white flex items-center justify-center font-vedic font-bold text-[14px]">
+          <div className="flex items-center space-x-2">
+            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-amber-600 via-orange-700 to-red-900 text-amber-100 flex items-center justify-center font-serif font-bold text-[13px] shadow-2xs border border-amber-400/50">
               ॐ
             </div>
-            <span className="font-vedic font-bold text-stone-950 text-[14px]">
-              JyotishVeda
+            <span className="font-vedic font-black bg-gradient-to-r from-amber-900 via-orange-800 to-stone-900 bg-clip-text text-transparent text-[14px] uppercase tracking-wide">
+              Astrov | Jotishveda
             </span>
           </div>
 

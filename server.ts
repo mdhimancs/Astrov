@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 
 const currentDirname = typeof __dirname !== 'undefined' 
   ? __dirname 
@@ -198,6 +198,322 @@ Keep the tone inspiring, professional, and evocative.`;
     } catch (err: any) {
       console.error("Compatibility AI error:", err);
       res.status(500).json({ error: err.message });
+    }
+  });
+
+  // API endpoint for AI-Driven Dasha Interpretation (Spiritual & Practical Summary of Mahadasha + Antardasha)
+  app.post("/api/astrology/dasha-interpretation", async (req, res) => {
+    try {
+      const {
+        name,
+        birthDate,
+        birthTime,
+        birthPlace,
+        lagnaRasi,
+        moonRasi,
+        nakshatra,
+        mahadashaLord,
+        mahadashaPeriod,
+        antardashaLord,
+        antardashaPeriod,
+        mahaNatalPlacement,
+        antarNatalPlacement,
+      } = req.body;
+
+      const ai = getAI();
+
+      if (!ai) {
+        return res.json({
+          headline: `${mahadashaLord} Mahadasha • ${antardashaLord} Antardasha (${antardashaPeriod})`,
+          spiritualSummary: `Under the macro-influence of ${mahadashaLord} (${mahaNatalPlacement}) combined with the sub-period of ${antardashaLord} (${antarNatalPlacement}), your soul is invited to align inner dharma with disciplined detachment. With Janma Nakshatra ${nakshatra} in ${moonRasi} and ${lagnaRasi} Lagna, this period awakens deeper self-inquiry, ancestral grace, and karmic maturation.`,
+          practicalSummary: `Practically, the ${mahadashaLord}–${antardashaLord} window activates the houses governed and occupied by both grahas. Focus on structured execution in career, prudent wealth allocation, transparent communication in key relationships, and consistent daily vitality routines during ${antardashaPeriod}.`,
+          mahadashaCoreTheme: `${mahadashaLord} Mahadasha (${mahadashaPeriod}) establishes your overarching multi-year life direction through ${mahaNatalPlacement}.`,
+          antardashaSubTheme: `${antardashaLord} Antardasha (${antardashaPeriod}) acts as the immediate timing catalyst, delivering tangible events through ${antarNatalPlacement}.`,
+          actionableSteps: [
+            `Align major career and financial milestones with the strengths of ${mahadashaLord} and ${antardashaLord}.`,
+            `Maintain ethical clarity and patience during planetary transition windows within ${antardashaPeriod}.`,
+            `Dedicate morning Brahma Muhurta to mantra japa and dharmic reflection to harmonize both Dasha lords.`,
+          ],
+          vedicRemedy: `Recite the Vedic Beej Mantras of ${mahadashaLord} and ${antardashaLord} daily, and perform charitable seva on the weekdays ruled by these two planets.`,
+        });
+      }
+
+      const prompt = `You are an authoritative Parashari & Bhrigu Vedic Astrologer. Provide a deeply insightful, structured AI-driven Dasha Interpretation covering both the SPIRITUAL and PRACTICAL summary of the seeker's active Vimshottari Mahadasha and Antardasha.
+
+Seeker Context:
+- Name: ${name || "Seeker"}
+- Birth Details: ${birthDate} at ${birthTime} in ${birthPlace}
+- Natal Lagna (Ascendant): ${lagnaRasi}
+- Natal Moon Sign (Janma Rashi): ${moonRasi} (Nakshatra: ${nakshatra})
+- Active Mahadasha: ${mahadashaLord} (${mahadashaPeriod}) — Natal Placement: ${mahaNatalPlacement}
+- Active Antardasha (Sub-period): ${antardashaLord} (${antardashaPeriod}) — Natal Placement: ${antarNatalPlacement}
+
+Provide a clear, high-conviction Vedic synthesis in JSON matching the schema.`;
+
+      const response = await callWithRetry(() =>
+        ai.models.generateContent({
+          model: "gemini-3.8-flash",
+          contents: prompt,
+          config: {
+            systemInstruction:
+              "You are a master Vedic astrologer specializing in Vimshottari Dasha analysis (Brihat Parashara Hora Shastra & Phaladeepika). Deliver precise, inspiring, and actionable spiritual and practical interpretations.",
+            temperature: 0.6,
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                headline: {
+                  type: Type.STRING,
+                  description: "Concise title summarizing the Mahadasha and Antardasha synergy.",
+                },
+                spiritualSummary: {
+                  type: Type.STRING,
+                  description: "3-4 sentences on the spiritual, karmic, inner consciousness, and dharmic evolution during this Mahadasha and Antardasha.",
+                },
+                practicalSummary: {
+                  type: Type.STRING,
+                  description: "3-4 sentences on the practical real-world impact across career, wealth, relationships, and health during this period.",
+                },
+                mahadashaCoreTheme: {
+                  type: Type.STRING,
+                  description: "1-2 sentences on the overarching theme of the Mahadasha lord in its natal house/sign.",
+                },
+                antardashaSubTheme: {
+                  type: Type.STRING,
+                  description: "1-2 sentences on how the Antardasha lord modifies and triggers events in its natal house/sign.",
+                },
+                actionableSteps: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING },
+                  description: "3 concrete practical and spiritual action steps for this period.",
+                },
+                vedicRemedy: {
+                  type: Type.STRING,
+                  description: "Specific Vedic mantra, charity, and karmic upay for the Mahadasha and Antardasha combination.",
+                },
+              },
+              required: [
+                "headline",
+                "spiritualSummary",
+                "practicalSummary",
+                "mahadashaCoreTheme",
+                "antardashaSubTheme",
+                "actionableSteps",
+                "vedicRemedy",
+              ],
+            },
+          },
+        })
+      );
+
+      const rawText = response.text || "{}";
+      const parsed = JSON.parse(rawText);
+      res.json(parsed);
+    } catch (err: any) {
+      console.error("Dasha interpretation AI error:", err);
+      res.status(500).json({ error: err.message || "Failed to generate Dasha interpretation" });
+    }
+  });
+
+  // API endpoint for Comprehensive Yearly Life-Path Forecast (Birth Chart + Annual Transits)
+  app.post("/api/astrology/yearly-lifepath", async (req, res) => {
+    try {
+      const {
+        name,
+        birthDate,
+        birthTime,
+        birthPlace,
+        year,
+        ageInYear,
+        lagnaRasi,
+        moonRasi,
+        nakshatra,
+        munthaRasi,
+        munthaHouse,
+        varsheshwara,
+        progressedHouse,
+        progressedRasi,
+        doubleTransitHouses,
+        natalSummary,
+        annualTransits,
+      } = req.body;
+
+      const ai = getAI();
+
+      if (!ai) {
+        return res.json({
+          destinyHeadline: `${year} Life-Path Synthesis • Age ${ageInYear} (Progressed H${progressedHouse} ${progressedRasi} & Muntha H${munthaHouse} ${munthaRasi})`,
+          lifePathOverview: `In ${year} (Age ${ageInYear}), ${name || "Seeker"}'s natal ${lagnaRasi} Lagna and ${moonRasi} Moon (${nakshatra} Nakshatra) enter a pivotal cycle as Bhrigu/Sudarshana progression activates House ${progressedHouse} (${progressedRasi}) alongside Varshaphal Muntha in House ${munthaHouse} under Varsheshwara ${varsheshwara}. Simultaneous Guru–Shani Double-Transit activation across Houses ${(doubleTransitHouses || [1, 9]).join(", ")} crystallizes long-term dharmic and material milestones.`,
+          careerWealthTrajectory: `Annual Jupiter and Saturn transits interacting with your natal birth chart favor structured career elevation, authoritative leadership roles, and compounding asset growth. Focus on high-conviction execution during your peak auspicious months.`,
+          relationshipsFamilyPath: `Domestic harmony, supportive alliances, and meaningful family milestones are strengthened by benefic trinal aspects to your natal houses. Practice patient, transparent dialogue during retrograde transit windows.`,
+          spiritualKarmicLesson: `Your soul lesson in ${year} centers on balancing external ambition with inner meditative poise, honoring Varsheshwara ${varsheshwara}, and transforming karmic tests into enduring wisdom.`,
+          keyMilestones: [
+            `Activate House ${progressedHouse} (${progressedRasi}) initiatives during the first half of ${year} for maximum natal-transit resonance.`,
+            `Leverage the Guru–Shani Double-Transit in Houses ${(doubleTransitHouses || [1, 9]).join(" & ")} for permanent career and financial agreements.`,
+            `Perform Varshaphal remedies for ${varsheshwara} on Thursdays and birth Nakshatra days to harmonize annual planetary currents.`,
+          ],
+        });
+      }
+
+      const prompt = `You are a master Vedic Astrologer specializing in Tajika Varshaphal, Bhrigu Nandi Nadi, Sudarshana Chakra Progression, and Parashari Double-Transit (Gochar) synthesis.
+Generate a comprehensive Yearly Life-Path Forecast for the year ${year} based on the seeker's Birth Chart data and Annual Planetary Transits.
+
+Seeker & Birth Chart Context:
+- Name: ${name || "Seeker"}
+- Birth Details: ${birthDate} at ${birthTime} in ${birthPlace}
+- Target Forecast Year: ${year} (Age in Year: ${ageInYear})
+- Natal Lagna (Ascendant): ${lagnaRasi}
+- Natal Moon Sign (Janma Rashi): ${moonRasi} (Birth Nakshatra: ${nakshatra})
+- Varshaphal Muntha: ${munthaRasi} in House ${munthaHouse} (Varsheshwara / Year Lord: ${varsheshwara})
+- Bhrigu / Sudarshana Progressed House for Age ${ageInYear}: House ${progressedHouse} (${progressedRasi})
+- Guru–Shani Double-Transit Activated Houses: ${JSON.stringify(doubleTransitHouses || [])}
+- Natal Planetary Placements: ${JSON.stringify(natalSummary || [])}
+- Annual Major Transits (Guru, Shani, Rahu-Ketu): ${JSON.stringify(annualTransits || {})}
+
+Return a structured JSON response matching the schema.`;
+
+      const response = await callWithRetry(() =>
+        ai.models.generateContent({
+          model: "gemini-3.8-flash",
+          contents: prompt,
+          config: {
+            systemInstruction:
+              "You are an authoritative Vedic astrologer combining birth chart (Janam Kundali) placements, Bhrigu age progression, Tajika Muntha, and Guru-Shani Double-Transit rules to deliver deeply accurate, inspiring, and practical yearly life-path predictions.",
+            temperature: 0.6,
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                destinyHeadline: {
+                  type: Type.STRING,
+                  description: "Compelling headline summarizing the seeker's overarching life-path theme for the year.",
+                },
+                lifePathOverview: {
+                  type: Type.STRING,
+                  description: "3-4 sentences synthesizing how annual transits and age progression activate the natal birth chart.",
+                },
+                careerWealthTrajectory: {
+                  type: Type.STRING,
+                  description: "2-3 sentences on career, leadership, wealth, and material trajectory based on natal + transit synergy.",
+                },
+                relationshipsFamilyPath: {
+                  type: Type.STRING,
+                  description: "2-3 sentences on marriage, family, relationships, and domestic life-path developments.",
+                },
+                spiritualKarmicLesson: {
+                  type: Type.STRING,
+                  description: "2-3 sentences on inner spiritual evolution, karmic maturation, and dharmic purpose for the year.",
+                },
+                keyMilestones: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING },
+                  description: "3 concrete, high-impact life-path milestones and strategic actions for the year.",
+                },
+              },
+              required: [
+                "destinyHeadline",
+                "lifePathOverview",
+                "careerWealthTrajectory",
+                "relationshipsFamilyPath",
+                "spiritualKarmicLesson",
+                "keyMilestones",
+              ],
+            },
+          },
+        })
+      );
+
+      const rawText = response.text || "{}";
+      const parsed = JSON.parse(rawText);
+      res.json(parsed);
+    } catch (err: any) {
+      console.error("Yearly life-path AI error:", err);
+      res.status(500).json({ error: err.message || "Failed to generate yearly life-path forecast" });
+    }
+  });
+
+  // API endpoint for Personalized Upay & Remedies based on Natal Chart Challenges & Current Dasha Period
+  app.post("/api/astrology/upay-remedies", async (req, res) => {
+    try {
+      const {
+        name,
+        birthDate,
+        birthTime,
+        birthPlace,
+        lagnaRasi,
+        moonRasi,
+        nakshatra,
+        mahadashaLord,
+        antardashaLord,
+        sadeSatiStatus,
+        natalChallenges,
+      } = req.body;
+
+      const ai = getAI();
+
+      if (!ai) {
+        return res.json({
+          headline: `Personalized Vedic Upay Sankalpa for ${name || "Seeker"} (${mahadashaLord}–${antardashaLord} Dasha)`,
+          diagnosticSummary: `With ${lagnaRasi} Lagna, ${moonRasi} Janma Rashi (${nakshatra} Nakshatra), and active ${mahadashaLord} Mahadasha / ${antardashaLord} Antardasha, your primary remedial priority is harmonizing ${mahadashaLord} and ${antardashaLord} while fortifying your Lagna and Trikona lords against Dusthana (6/8/12) or Shadbala sensitivities.`,
+          mantraSadhana: `Chant the Vedic Beej Mantras of ${mahadashaLord} and ${antardashaLord} 108 times during Brahma Muhurta, followed by Gayatri Mantra and Maha Mrityunjaya Japa for subtle body protection.`,
+          gemstoneGuidance: `Prioritize your Lagna-benefic Ratna (Life Stone or Bhagya Stone) set in its prescribed metal after a 3-day trial. Strictly avoid gemstones of functional malefics (6th, 8th, 12th lords).`,
+          lifestyleAndKarma: `Maintain sattvic Dinacharya: rise before sunrise, offer copper-vessel Arghya to Surya, practice evening Pranayama, and perform targeted Dana (charity) on the weekdays of ${mahadashaLord} and ${antardashaLord}.`,
+          lalKitabSpecialUpay: `Keep a square piece of pure silver with you for Lunar equilibrium, feed green fodder to cows on Wednesdays, and offer mustard/sesame oil lamp under a Peepal tree on Saturday evenings.`,
+        });
+      }
+
+      const prompt = `You are a master Parashari, Ratna-Shastra (Vedic Gemology), and Lal Kitab Remedial Astrologer.
+Generate a deeply personalized, actionable Vedic Upay & Remedies protocol for the seeker based on their specific natal chart challenges and active Vimshottari Dasha period.
+
+Seeker Profile:
+- Name: ${name || "Seeker"}
+- Birth: ${birthDate} at ${birthTime} in ${birthPlace}
+- Natal Lagna (Ascendant): ${lagnaRasi}
+- Natal Moon Sign (Janma Rashi): ${moonRasi} (Nakshatra: ${nakshatra})
+- Current Active Dasha: ${mahadashaLord} Mahadasha / ${antardashaLord} Antardasha
+- Sade Sati Status: ${sadeSatiStatus}
+- Identified Natal Chart Challenges & Weaknesses: ${JSON.stringify(natalChallenges || [])}
+
+Return a structured JSON object matching the schema.`;
+
+      const response = await callWithRetry(() =>
+        ai.models.generateContent({
+          model: "gemini-3-flash-preview",
+          contents: prompt,
+          config: {
+            systemInstruction:
+              "You are an authoritative Vedic astrologer specializing in Brihat Parashara Hora Shastra, Mantra Mahodadhi, Garuda Purana Ratna-Pariksha, and Lal Kitab Upayas. Provide safe, authentic, and actionable remedies.",
+            temperature: 0.6,
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                headline: { type: Type.STRING },
+                diagnosticSummary: { type: Type.STRING },
+                mantraSadhana: { type: Type.STRING },
+                gemstoneGuidance: { type: Type.STRING },
+                lifestyleAndKarma: { type: Type.STRING },
+                lalKitabSpecialUpay: { type: Type.STRING },
+              },
+              required: [
+                "headline",
+                "diagnosticSummary",
+                "mantraSadhana",
+                "gemstoneGuidance",
+                "lifestyleAndKarma",
+                "lalKitabSpecialUpay",
+              ],
+            },
+          },
+        })
+      );
+
+      const rawText = response.text || "{}";
+      const parsed = JSON.parse(rawText);
+      res.json(parsed);
+    } catch (err: any) {
+      console.error("Upay remedies AI error:", err);
+      res.status(500).json({ error: err.message || "Failed to generate Upay remedies" });
     }
   });
 

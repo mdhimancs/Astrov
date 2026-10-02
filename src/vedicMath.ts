@@ -1,4 +1,4 @@
-import { BirthDetails, PlanetPosition, HouseInfo, VedicRasiName, GrahaName, TransitPrediction, PlanetaryMovementDetail, MonthWiseTransitPrediction, TransitDosAndDonts, PlanetaryImpactRecord, BirthTimeHousePrediction, NatalYoga, VimshottariDashaInfo, AntardashaInfo, DashaMonthlyPlanetaryGuidance, AshtakavargaPoints } from './types';
+import { BirthDetails, PlanetPosition, HouseInfo, VedicRasiName, GrahaName, TransitPrediction, PlanetaryMovementDetail, MonthWiseTransitPrediction, YearlyPrediction, TransitDosAndDonts, PlanetaryImpactRecord, BirthTimeHousePrediction, BhriguLalKitabSummary, NatalYoga, VimshottariDashaInfo, AntardashaInfo, DashaMonthlyPlanetaryGuidance, AshtakavargaPoints } from './types';
 import { VEDIC_RASIS, NAKSHATRAS, BHAVA_DETAILS } from './data';
 import { ALL_MONTH_WISE_PREDICTIONS } from './monthlyTransitData';
 export { ALL_MONTH_WISE_PREDICTIONS };
@@ -756,6 +756,8 @@ export function calculateUnifiedPlanetaryTable(
     let businessEffect = '';
     let relationEffect = '';
     let marriageEffect = '';
+    let educationEffect = '';
+    let mentalStateEffect = '';
 
     switch (graha) {
       case 'Shani': {
@@ -795,6 +797,14 @@ export function calculateUnifiedPlanetaryTable(
         marriageEffect = isBenefic
           ? 'Grounded mutual commitment, practical teamwork with spouse on domestic and property goals.'
           : 'Tests of patience in marital harmony. Avoid bringing workplace stress into the home; support spouse’s physical comfort.';
+
+        educationEffect = isBenefic
+          ? 'Deep concentration, mastery in law, engineering, history, or research, and disciplined success in competitive exams.'
+          : 'Requires extra study hours and patient repetition. Avoid procrastination; structured revision schedules overcome academic delays.';
+
+        mentalStateEffect = isBenefic
+          ? 'Grounded emotional maturity, stoic resilience, clear long-term perspective, and freedom from superficial anxieties.'
+          : 'Prone to overthinking, heaviness, or self-doubt. Cultivate daily pranayama, gratitude, and consistent restorative sleep.';
         break;
       }
 
@@ -827,6 +837,14 @@ export function calculateUnifiedPlanetaryTable(
         marriageEffect = isBenefic
           ? 'High marital bliss, mutual veneration, and shared spiritual pilgrimage. Singles find auspicious matchmaking.'
           : 'Constructive marital dialogue. Encourages mutual philosophical alignment and joint charitable contributions.';
+
+        educationEffect = isBenefic
+          ? 'Exceptional academic brilliance, scholarships, higher degree breakthroughs, and blessings from erudite gurus and professors.'
+          : 'Steady intellectual growth; favor deep philosophical understanding and self-study over rote memorization.';
+
+        mentalStateEffect = isBenefic
+          ? 'Optimistic, serene, and dharmic mindset. High emotional wisdom, inner contentment, and spiritual clarity.'
+          : 'Reflective and philosophical mood; guard against complacency or over-idealism in practical matters.';
         break;
       }
 
@@ -855,6 +873,14 @@ export function calculateUnifiedPlanetaryTable(
         marriageEffect = isBenefic
           ? 'Dynamic companionship, shared travels to novel destinations, and creative domestic rejuvenation.'
           : 'Avoid sudden emotional impulsiveness or unrealistic expectations; protect the marital bond from outside interference.';
+
+        educationEffect = isBenefic
+          ? 'Rapid grasp of cutting-edge technology, AI, coding, foreign languages, and unconventional research fields.'
+          : 'Scattered attention or distraction from digital overload. Use strict study timers and verify academic sources.';
+
+        mentalStateEffect = isBenefic
+          ? 'Bold, ambitious, and fiercely innovative mindset capable of thinking outside conventional boundaries.'
+          : 'Restless thoughts, sudden anxieties, or illusionary worries. Ground the mind daily through meditation and nature walks.';
         break;
       }
 
@@ -883,6 +909,14 @@ export function calculateUnifiedPlanetaryTable(
         marriageEffect = isBenefic
           ? 'Spiritual bonding with spouse through shared values, meditation, and quiet understanding.'
           : 'Spouse may feel emotional distance; make a conscious effort to share thoughts and offer loving companionship.';
+
+        educationEffect = isBenefic
+          ? 'Sharp intuitive grasp of mathematics, occult sciences, spiritual scriptures, coding logic, and deep archival research.'
+          : 'Temporary lack of interest in conventional curricula; link studies to deeper meaning and practical application.';
+
+        mentalStateEffect = isBenefic
+          ? 'Detached inner peace, sharp meditative focus, and liberation from ego-driven stress.'
+          : 'Tendency toward mental isolation or over-detachment. Stay connected with supportive peers and uplifting routines.';
         break;
       }
 
@@ -911,6 +945,14 @@ export function calculateUnifiedPlanetaryTable(
         marriageEffect = isBenefic
           ? 'Warm mutual pride and shared social recognition with spouse.'
           : 'Curb ego or stubborn dominance; ensure spouse’s opinions are respected in domestic decisions.';
+
+        educationEffect = isBenefic
+          ? 'High academic distinction, leadership in student bodies, and strong performance in administrative, medical, or political studies.'
+          : 'Avoid intellectual arrogance in exams or debates; review foundational concepts with humility and focus.';
+
+        mentalStateEffect = isBenefic
+          ? 'Radiant self-confidence, strong willpower, decisive clarity, and courageous moral conviction.'
+          : 'Watch for irritability, ego sensitivity, or mental burnout. Practice morning Surya Namaskar and cooling breathwork.';
         break;
       }
 
@@ -939,6 +981,14 @@ export function calculateUnifiedPlanetaryTable(
         marriageEffect = isBenefic
           ? 'Passionate connection, collaborative home improvement projects, and mutual vitality.'
           : 'Avoid sharp arguments or criticism over petty chores; canalize shared vigor into sports or outdoor outings.';
+
+        educationEffect = isBenefic
+          ? 'Sharp competitive edge in entrance exams, engineering, surgery, defense studies, and practical lab work.'
+          : 'Avoid rushing through exam papers or study modules; cultivate patience to prevent careless errors.';
+
+        mentalStateEffect = isBenefic
+          ? 'Fearless drive, high mental stamina, decisive courage, and zero hesitation under pressure.'
+          : 'Heightened impatience, restlessness, or quick frustration. Channel fiery mental energy into structured workouts.';
         break;
       }
 
@@ -967,6 +1017,14 @@ export function calculateUnifiedPlanetaryTable(
         marriageEffect = isBenefic
           ? 'Lighthearted companionship, stimulating conversations, and fun outings with spouse.'
           : 'Keep discussions honest and straightforward; avoid over-analyzing spouse’s passing comments.';
+
+        educationEffect = isBenefic
+          ? 'Peak intellectual agility, eloquence in writing and debate, and excellence in commerce, mathematics, and IT.'
+          : 'Information overload may cause minor confusion; organize notes systematically and focus on one subject at a time.';
+
+        mentalStateEffect = isBenefic
+          ? 'Witty, adaptable, curious, and intellectually stimulated mindset with balanced analytical calm.'
+          : 'Nervous chatter or over-analysis of minor details. Take regular screen breaks and practice silent mindfulness.';
         break;
       }
 
@@ -995,6 +1053,14 @@ export function calculateUnifiedPlanetaryTable(
         marriageEffect = isBenefic
           ? 'Deep affection, conjugal harmony, romantic dates, and supportive spousal understanding.'
           : 'Express sincere appreciation to spouse; avoid expecting perpetual perfection in domestic arrangements.';
+
+        educationEffect = isBenefic
+          ? 'Flowering talent in fine arts, literature, architecture, design, music, media, and diplomatic studies.'
+          : 'Balance social leisure and entertainment with dedicated study blocks to maintain academic momentum.';
+
+        mentalStateEffect = isBenefic
+          ? 'Harmonious, affectionate, artistically inspired, and emotionally joyful state of mind.'
+          : 'Sensory distraction or emotional sentimentality; anchor your daily routine in creative discipline.';
         break;
       }
     }
@@ -1013,6 +1079,8 @@ export function calculateUnifiedPlanetaryTable(
       businessEffect,
       relationEffect,
       marriageEffect,
+      educationEffect,
+      mentalStateEffect,
       tone,
     };
   });
@@ -1521,6 +1589,134 @@ export function calculateBirthTimeHousePredictions(
       prediction += `While no natal planets occupy this house directly, the aspects of ${signLord} and Kendra benefics support steady progress through conscious effort.`;
     }
 
+    // Bhrigu Samhita & Lal Kitab House-specific data
+    const bhriguHouseData: Record<number, { age: string; baseReading: string }> = {
+      1: {
+        age: 'Years 1, 22 & 28 (Self & Sun/Mars Cycle)',
+        baseReading: 'Maharishi Bhrigu declares the 1st Bhava as the seat of Purva-Janma Samskara (past-life character). Dignity and self-reliance rise steadily after your 22nd year through righteous leadership.',
+      },
+      2: {
+        age: 'Years 16, 24 & 36 (Dhana & Kutumba Cycle)',
+        baseReading: 'In Bhrigu Sutras, the 2nd Bhava governs the treasury of speech (Vak-Shakti) and lineage wealth. Financial consolidation accelerates when truth and family harmony are upheld.',
+      },
+      3: {
+        age: 'Years 28 & 32 (Parakrama & Brothers Cycle)',
+        baseReading: 'Bhrigu Samhita highlights the 3rd Bhava as the crucible of personal initiative (Swashraya). Courageous ventures and skill mastery bring self-made recognition after age 28.',
+      },
+      4: {
+        age: 'Years 24 & 34 (Sukha & Bhoomi Cycle)',
+        baseReading: 'According to Bhrigu Nadi, the 4th Bhava holds maternal blessings and landed sanctuary. Emotional contentment and permanent property manifest strongly around the 24th and 34th years.',
+      },
+      5: {
+        age: 'Years 16, 22 & 32 (Purva Punya & Vidya Cycle)',
+        baseReading: 'Bhrigu Samhita venerates the 5th Bhava as the reservoir of past-life merit (Sanchita Punya). Mantra Siddhi, intuitive intelligence, and pride through progeny blossom here.',
+      },
+      6: {
+        age: 'Years 32, 36 & 42 (Shatru-Jaya & Seva Cycle)',
+        baseReading: 'In Bhriguhora, the 6th Bhava transforms obstacles into stepping stones through selfless service (Nishkama Seva). Competitors yield when discipline and ethical conduct are maintained.',
+      },
+      7: {
+        age: 'Years 25 & 33 (Kalatra & Trade Cycle)',
+        baseReading: 'Maharishi Bhrigu states that the 7th Bhava mirrors the soul’s sacred partnership contract.Bhagyodaya (fortune rise) accelerates significantly after marriage or key alliances around age 25.',
+      },
+      8: {
+        age: 'Years 36, 42 & 48 (Ayur & Gupta-Vidya Cycle)',
+        baseReading: 'Bhrigu Samhita reveals the 8th Bhava as the cavern of hidden knowledge, sudden karmic inheritances, and spiritual regeneration. Deep intuition protects you through life transitions.',
+      },
+      9: {
+        age: 'Years 16, 24 & 30 (Bhagya & Guru-Kripa Cycle)',
+        baseReading: 'The 9th Bhava is praised in Bhrigu Samhita as the pillar of Divine Grace (Daiva-Bala). Paternal blessings, dharmic pilgrimages, and guru guidance unlock effortless fortune.',
+      },
+      10: {
+        age: 'Years 22, 32 & 36 (Rajya & Karma Cycle)',
+        baseReading: 'Bhrigu Nadi proclaims the 10th Bhava as the zenith of worldly Karma. Authority, institutional honor, and lasting professional legacy crystallize between ages 32 and 36.',
+      },
+      11: {
+        age: 'Years 32, 36 & 42 (Labha & Siddhi Cycle)',
+        baseReading: 'In Bhrigu Samhita, the 11th Bhava fulfills cherished sankalpas (aspirations) and rewards past generosity with multiple streams of abundance and influential allies.',
+      },
+      12: {
+        age: 'Years 42, 48 & 54 (Moksha & Deshantar Cycle)',
+        baseReading: 'Maharishi Bhrigu describes the 12th Bhava as the threshold of liberation and distant horizons. Charitable giving (Daan) converts potential losses into spiritual protection and foreign gains.',
+      },
+    };
+
+    const lalKitabHouseData: Record<number, { pakkaLord: string; baseReading: string; upay: string }> = {
+      1: {
+        pakkaLord: 'Surya (Sun) — Throne (Singhasan)',
+        baseReading: 'In Lal Kitab, Khana No. 1 is the royal throne of the horoscope. Planets seated here act as the king of the annual & natal chart, directly shaping the 7th house opposite.',
+        upay: 'Offer jaggery (Gud) or wheat at a sacred place on Sundays; apply a saffron (Kesar) tilak on the forehead daily.',
+      },
+      2: {
+        pakkaLord: 'Guru (Jupiter) — Dharam Sthana',
+        baseReading: 'Lal Kitab designates Khana No. 2 as the sacred temple (Dharam Sthana) owned by Jupiter and energized by the Northwest wind. It receives direct drishti from the 8th house.',
+        upay: 'Apply saffron or turmeric tilak on the navel and forehead; offer chana dal at a temple and respect family elders.',
+      },
+      3: {
+        pakkaLord: 'Mangal (Mars) — Valor & Siblings Gate',
+        baseReading: 'In Lal Kitab, Khana No. 3 governs courage, siblings, and the threshold of longevity. Its strength protects the 9th house of fortune and clears ancestral blockages.',
+        upay: 'Distribute sweet rotis to birds/dogs, keep an ivory or silver piece at home, and maintain warm ties with brothers/siblings.',
+      },
+      4: {
+        pakkaLord: 'Chandra (Moon) — Maternal Dariya',
+        baseReading: 'Lal Kitab calls Khana No. 4 the river of peace and motherly blessings (Chandra ka Pakka Ghar). Purity of heart and respect for the mother keep the 10th house of career thriving.',
+        upay: 'Keep a silver vessel filled with pure water or rice in the home; offer milk or kheer to motherly figures on Mondays.',
+      },
+      5: {
+        pakkaLord: 'Guru & Surya — Lineage & Future',
+        baseReading: 'In Lal Kitab, Khana No. 5 is the seat of progeny, solar radiance, and honest wealth. How you nurture children and truth directly determines your peace of mind.',
+        upay: 'Keep the kitchen and East wall clean; feed cows green fodder or jaggery and never break promises made to children.',
+      },
+      6: {
+        pakkaLord: 'Budha & Ketu — Patala / Karmic Ledger',
+        baseReading: 'Lal Kitab views Khana No. 6 as the house of hidden subterranean balance where Mercury and Ketu test alertness. Planets here awaken the 12th house of comfort when appeased.',
+        upay: 'Feed birds soaked green moong and offer rotis to street dogs; gift flowers or stationery to young girls (Kanyas).',
+      },
+      7: {
+        pakkaLord: 'Shukra & Budha —Grihastha Chakki',
+        baseReading: 'In Lal Kitab, Khana No. 7 is the millstone of worldly life where Venus (soil/wealth) and Mercury (rotation) grind together to sustain domestic prosperity.',
+        upay: 'Serve brown/black cows with green fodder on Fridays; keep the bedroom clutter-free and honor your spouse.',
+      },
+      8: {
+        pakkaLord: 'Mangal & Shani — Justice & Longevity',
+        baseReading: 'Lal Kitab describes Khana No. 8 as the chamber of karmic justice looking directly at the 2nd house of wealth. Honesty and charity turn its fiery trials into sudden protection.',
+        upay: 'Offer sweet rotis cooked on a clay/iron tawa to needy people or dogs on Saturdays; avoid taking unjust favors.',
+      },
+      9: {
+        pakkaLord: 'Guru (Jupiter) — Samundar (Ocean of Luck)',
+        baseReading: 'In Lal Kitab, Khana No. 9 is the vast ocean of ancestral Punya and Jupiterian grace. When activated by respect for traditions, it floods the entire chart with fortune.',
+        upay: 'Visit temples regularly, honor ancestral traditions, and float a little rice or turmeric in running water on Thursdays.',
+      },
+      10: {
+        pakkaLord: 'Shani (Saturn) — Karma Maidan',
+        baseReading: 'Lal Kitab crowns Khana No. 10 as Saturn’s field of action. Here shrewdness and hard work rule; its fruit depends on the purity of the 4th house and vigilance of the 2nd.',
+        upay: 'Feed visually impaired or elderly people on Saturdays; keep the West corner of your home organized and well-maintained.',
+      },
+      11: {
+        pakkaLord: 'Guru & Shani — Worldly Court',
+        baseReading: 'In Lal Kitab, Khana No. 11 is the court where income, character, and destiny are weighed between Jupiter’s wisdom and Saturn’s justice.',
+        upay: 'Drop a few drops of mustard oil on the ground before auspicious work on Saturdays; donate yellow fruits at a sanctuary.',
+      },
+      12: {
+        pakkaLord: 'Guru & Rahu — Restful Sanctuary',
+        baseReading: 'Lal Kitab defines Khana No. 12 as the peaceful bedroom where Rahu’s mental waves must bow to Jupiter’s calm wisdom for sound sleep and spiritual bliss.',
+        upay: 'Keep a small square piece of silver or saunf (fennel seeds) under the pillow for restful sleep; feed birds daily.',
+      },
+    };
+
+    const bData = bhriguHouseData[houseNumber] || bhriguHouseData[1];
+    const lkData = lalKitabHouseData[houseNumber] || lalKitabHouseData[1];
+
+    const occupantSuffixBhrigu =
+      planetsInHouse.length > 0
+        ? ` With ${planetsInHouse.map((p) => p.englishName).join(' & ')} seated in ${signName}, Bhrigu Nadi indicates heightened karmic focus and decisive life events during their antardasha and transit over this sign.`
+        : ` As an unoccupied sign (${signName}), Bhrigu Sutras trace its fruits through the placement of ${signLord}, yielding steady, unobstructed results.`;
+
+    const occupantSuffixLalKitab =
+      planetsInHouse.length > 0
+        ? ` Presence of ${planetsInHouse.map((p) => p.englishName).join(' & ')} in Khana No. ${houseNumber} makes this house "Jaagrit" (Awakened), actively broadcasting its energy across the chart.`
+        : ` Khana No. ${houseNumber} is "Khali" (Unoccupied/Peaceful); in Lal Kitab, a sleeping house remains protected and activates harmoniously through its Pakka Ghar lord (${lkData.pakkaLord.split('—')[0].trim()}).`;
+
     return {
       houseNumber,
       vedicName: item.vedicName,
@@ -1530,8 +1726,599 @@ export function calculateBirthTimeHousePredictions(
       planetsHere,
       headline: `${item.headlineTemplate} in ${signName}`,
       prediction,
+      bhriguSamhitaReading: `${bData.baseReading}${occupantSuffixBhrigu}`,
+      bhriguActivationAge: bData.age,
+      lalKitabReading: `${lkData.baseReading}${occupantSuffixLalKitab}`,
+      lalKitabPakkaGharLord: lkData.pakkaLord,
+      lalKitabUpay: lkData.upay,
       lifeDomain: item.domain,
       strengthScore,
+    };
+  });
+}
+
+// Comprehensive Bhrigu Samhita & Lal Kitab Synthesis
+export function calculateBhriguAndLalKitab(
+  natalLagnaRasi: number,
+  natalPlanets: PlanetPosition[]
+): BhriguLalKitabSummary {
+  const moon = natalPlanets.find((p) => p.name === 'Chandra') || natalPlanets[0];
+  const rahu = natalPlanets.find((p) => p.name === 'Rahu') || natalPlanets[0];
+  const jupiter = natalPlanets.find((p) => p.name === 'Guru');
+  const saturn = natalPlanets.find((p) => p.name === 'Shani');
+  const venus = natalPlanets.find((p) => p.name === 'Shukra');
+  const sun = natalPlanets.find((p) => p.name === 'Surya');
+  const ketu = natalPlanets.find((p) => p.name === 'Ketu');
+
+  // 1. Calculate Bhrigu Bindu (Midpoint from Rahu to Moon progressing forward)
+  const moonLon = ((moon?.rasiNumber || 1) - 1) * 30 + (moon?.degree || 0) + (moon?.minute || 0) / 60;
+  const rahuLon = ((rahu?.rasiNumber || 1) - 1) * 30 + (rahu?.degree || 0) + (rahu?.minute || 0) / 60;
+  const arcRahuToMoon = (moonLon - rahuLon + 360) % 360;
+  const binduLon = normalizeDegrees(rahuLon + arcRahuToMoon / 2);
+
+  const binduRasiNumber = Math.floor(binduLon / 30) + 1;
+  const binduRasiName = (VEDIC_RASIS[binduRasiNumber - 1]?.sanskritName || 'Mesha') as VedicRasiName;
+  const binduDegRem = binduLon % 30;
+  const binduDegree = Math.floor(binduDegRem);
+  const binduMinute = Math.round((binduDegRem - binduDegree) * 60);
+  const binduHouseFromLagna = ((binduRasiNumber - natalLagnaRasi + 12) % 12) + 1;
+  const binduHouseFromMoon = ((binduRasiNumber - (moon?.rasiNumber || 1) + 12) % 12) + 1;
+
+  const binduDomainMap: Record<number, string> = {
+    1: 'personal rise, vitality, and new identity milestones',
+    2: 'wealth accumulation, family expansion, and financial security',
+    3: 'bold initiatives, siblings, travel, and communication breakthroughs',
+    4: 'property acquisition, vehicles, and deep domestic peace',
+    5: 'creative recognition, academic success, and blessings of progeny',
+    6: 'triumph over competition, debt resolution, and health recovery',
+    7: 'marriage, sacred partnerships, and public commercial expansion',
+    8: 'sudden financial windfalls, research breakthroughs, and spiritual awakening',
+    9: 'dharmic fortune, long-distance pilgrimage, and mentor blessings',
+    10: 'career elevation, institutional authority, and public honor',
+    11: 'major income surges, network expansion, and fulfillment of desires',
+    12: 'foreign settlement, spiritual retreats, and charitable fulfillment',
+  };
+
+  const bhriguBindu = {
+    rasiName: binduRasiName,
+    rasiNumber: binduRasiNumber,
+    degree: binduDegree,
+    minute: binduMinute,
+    houseFromLagna: binduHouseFromLagna,
+    houseFromMoon: binduHouseFromMoon,
+    interpretation: `Your sensitive Bhrigu Bindu (Rahu–Moon destiny midpoint) falls at ${binduDegree}°${binduMinute}' ${binduRasiName} in House ${binduHouseFromLagna} from Lagna (House ${binduHouseFromMoon} from Moon). Whenever benefic Guru (Jupiter) or Shukra (Venus) transits ${binduRasiName} or aspects it, you experience rapid destiny fulfillment in ${binduDomainMap[binduHouseFromLagna] || 'key life areas'}.`,
+  };
+
+  const lagnaName = VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName || 'Mesha';
+  const karmicBlueprint = `According to Maharishi Bhrigu Samhita, a native born with ${lagnaName} Lagna and Chandra in ${moon?.rasiName || 'Simha'} (${moon?.nakshatra || 'Magha'} Nakshatra) carries the past-life samskara of a dharmic administrator and seeker of truth. With Ketu in House ${ketu?.house || 1} and Guru in House ${jupiter?.house || 5}, you bring innate intuitive wisdom from previous incarnations, destined to uplift your family lineage and achieve self-realization through righteous action (Karma Yoga).`;
+
+  // 2. Bhrigu Chakra Progressive Activation Ages (Naisargika Bhagyodaya Years)
+  const bhagyodayaAges = [
+    {
+      age: 16,
+      planet: 'Guru (Jupiter)',
+      house: jupiter?.house || 5,
+      milestone: `Intellectual awakening, foundational education & dharmic direction via House ${jupiter?.house || 5}.`,
+    },
+    {
+      age: 22,
+      planet: 'Surya (Sun)',
+      house: sun?.house || 1,
+      milestone: `Self-identity, independent authority & career initiation via House ${sun?.house || 1}.`,
+    },
+    {
+      age: 24,
+      planet: 'Chandra (Moon)',
+      house: moon?.house || 4,
+      milestone: `Emotional maturity, domestic shifts & travel opportunities via House ${moon?.house || 4}.`,
+    },
+    {
+      age: 25,
+      planet: 'Shukra (Venus)',
+      house: venus?.house || 7,
+      milestone: `Marriage, partnership harmony, vehicles & aesthetic prosperity via House ${venus?.house || 7}.`,
+    },
+    {
+      age: 28,
+      planet: 'Mangal (Mars)',
+      house: natalPlanets.find((p) => p.name === 'Mangal')?.house || 3,
+      milestone: `Property acquisition, courageous enterprise & decisive rise via House ${natalPlanets.find((p) => p.name === 'Mangal')?.house || 3}.`,
+    },
+    {
+      age: 32,
+      planet: 'Budha (Mercury)',
+      house: natalPlanets.find((p) => p.name === 'Budha')?.house || 10,
+      milestone: `Commercial peak, analytical mastery & financial expansion via House ${natalPlanets.find((p) => p.name === 'Budha')?.house || 10}.`,
+    },
+    {
+      age: 36,
+      planet: 'Shani (Saturn)',
+      house: saturn?.house || 11,
+      milestone: `Enduring career stability, leadership consolidation & karmic rewards via House ${saturn?.house || 11}.`,
+    },
+    {
+      age: 42,
+      planet: 'Rahu (North Node)',
+      house: rahu?.house || 6,
+      milestone: `Sudden elevation, unconventional success & global reach via House ${rahu?.house || 6}.`,
+    },
+    {
+      age: 48,
+      planet: 'Ketu (South Node)',
+      house: ketu?.house || 12,
+      milestone: `Spiritual culmination, intuitive mastery & advisory prestige via House ${ketu?.house || 12}.`,
+    },
+  ];
+
+  // 3. Lal Kitab Rina (Ancestral / Karmic Debts) Evaluation
+  const pitriTrigger = [2, 5, 9, 12].some((h) =>
+    natalPlanets.some((p) => ['Rahu', 'Ketu', 'Shani'].includes(p.name) && p.house === h)
+  );
+  const matriTrigger = natalPlanets.some((p) => ['Rahu', 'Ketu'].includes(p.name) && p.house === 4);
+  const streeTrigger = natalPlanets.some((p) => ['Rahu', 'Ketu', 'Surya'].includes(p.name) && [2, 7].includes(p.house));
+  const swaTrigger = natalPlanets.some((p) => ['Shukra', 'Shani', 'Rahu'].includes(p.name) && p.house === 5);
+
+  const lalKitabRina: BhriguLalKitabSummary['lalKitabRina'] = [
+    {
+      name: 'Pitri Rina (Ancestral & Guru Debt)',
+      status: pitriTrigger ? 'Active Caution' : 'Harmonized',
+      reason: pitriTrigger
+        ? 'Nodes/Saturn influence Jupiter’s domains (Houses 2, 5, 9, or 12), indicating ancestral traditions require conscious honoring.'
+        : 'Jupiter’s dharmic houses are well-supported, conferring strong ancestral blessings.',
+      upay: 'Collect a small coin contribution from all family members and donate to a temple or charitable dharamshala on a Thursday.',
+    },
+    {
+      name: 'Matri Rina (Maternal & Emotional Debt)',
+      status: matriTrigger ? 'Active Caution' : 'Harmonized',
+      reason: matriTrigger
+        ? 'Shadow planet in Khana No. 4 (Moon’s Pakka Ghar) calls for extra care toward mother’s health and domestic peace.'
+        : 'Khana No. 4 is free from nodal affliction, preserving maternal grace and mental tranquility.',
+      upay: 'Keep a small silver coin or square piece of silver in pure water and serve mothers/elder women with respect.',
+    },
+    {
+      name: 'Stree Rina (Spousal & Lakshmi Debt)',
+      status: streeTrigger ? 'Active Caution' : 'Harmonized',
+      reason: streeTrigger
+        ? 'Fiery or shadow influence on Khana No. 2 or 7 highlights the importance of honoring spouse and women in the family.'
+        : 'Venusian houses of wealth and partnership enjoy balanced harmony.',
+      upay: 'Feed green fodder or jaggery to cows on Fridays and maintain harmony and generosity toward your life partner.',
+    },
+    {
+      name: 'Swa-Rina (Self & Purva-Punya Debt)',
+      status: swaTrigger ? 'Active Caution' : 'Harmonized',
+      reason: swaTrigger
+        ? 'Planetary placement in Khana No. 5 reminds you never to neglect daily spiritual sadhana and truthfulness.'
+        : 'Solar 5th Khana radiates clear vitality and unobstructed personal merit.',
+      upay: 'Offer water to the rising Sun daily and feed ruby-colored jaggery or wheat to birds/monkeys on Sundays.',
+    },
+  ];
+
+  // 4. Lal Kitab Planetary Placements (Khana 1-12)
+  const pakkaGharMap: Record<string, string> = {
+    Surya: 'Khana 1 (Sun)',
+    Chandra: 'Khana 4 (Moon)',
+    Mangal: 'Khana 3 & 8 (Mars)',
+    Budha: 'Khana 7 (Mercury)',
+    Guru: 'Khana 2, 5, 9 & 12 (Jupiter)',
+    Shukra: 'Khana 7 (Venus)',
+    Shani: 'Khana 8 & 10 (Saturn)',
+    Rahu: 'Khana 12 (Rahu)',
+    Ketu: 'Khana 6 (Ketu)',
+  };
+
+  const shubhHousesMap: Record<string, number[]> = {
+    Surya: [1, 2, 3, 4, 5, 9, 10, 11],
+    Chandra: [1, 2, 3, 4, 5, 7, 9],
+    Mangal: [1, 2, 3, 5, 6, 9, 10, 11],
+    Budha: [1, 2, 4, 5, 6, 7, 10, 11],
+    Guru: [1, 2, 4, 5, 7, 9, 12],
+    Shukra: [2, 3, 4, 5, 7, 8, 11, 12],
+    Shani: [2, 3, 6, 7, 9, 10, 11, 12],
+    Rahu: [3, 4, 6, 11],
+    Ketu: [1, 2, 6, 9, 11, 12],
+  };
+
+  const planetUpayMap: Record<string, string> = {
+    Surya: 'Drink water after eating a bit of jaggery before starting important work; honor father figures.',
+    Chandra: 'Drink water or milk from a silver glass and seek your mother’s blessings before travel.',
+    Mangal: 'Keep pure honey or a square silver piece at home; offer sweet rotis on Tuesdays.',
+    Budha: 'Clean teeth with alum (Fitkari), wear clean ironed clothes, and feed soaked green moong to birds.',
+    Guru: 'Apply saffron (Kesar) or turmeric tilak on the forehead and water a Peepal or banana tree on Thursdays.',
+    Shukra: 'Apply natural rose/sandalwood itr (fragrance), keep clothing neat, and donate curd or ghee on Fridays.',
+    Shani: 'Offer mustard oil at a Shani temple, walk barefoot on grass, and treat workers with fairness and generosity.',
+    Rahu: 'Keep a small solid silver elephant or square silver piece in your pocket/locker and avoid blue/black bedsheets.',
+    Ketu: 'Apply saffron tilak behind the ears, feed two-colored (black & white) dogs, and donate blankets in winter.',
+  };
+
+  const lalKitabPlanetPlacements: BhriguLalKitabSummary['lalKitabPlanetPlacements'] = natalPlanets.map((p) => {
+    const isShubh = (shubhHousesMap[p.name] || []).includes(p.house);
+    const status: 'Awakened (Shubh)' | 'Mixed (Madhyam)' | 'Caution (Manda)' = isShubh
+      ? 'Awakened (Shubh)'
+      : [6, 8, 12].includes(p.house)
+      ? 'Caution (Manda)'
+      : 'Mixed (Madhyam)';
+
+    const effect = isShubh
+      ? `${p.englishName} in Khana No. ${p.house} acts as a benefic guardian in Lal Kitab, strengthening ${
+          p.house === 1
+            ? 'personal dignity and leadership'
+            : p.house === 2
+            ? 'family wealth and ancestral treasury'
+            : p.house === 4
+            ? 'domestic peace, property, and emotional stability'
+            : p.house === 5
+            ? 'intellect, children, and good fortune'
+            : p.house === 7
+            ? 'marital harmony and commercial partnerships'
+            : p.house === 9
+            ? 'ancestral luck and dharmic elevation'
+            : p.house === 10
+            ? 'career authority and public reputation'
+            : p.house === 11
+            ? 'steady income and social gains'
+            : 'practical courage and resilience'
+        }.`
+      : `${p.englishName} in Khana No. ${p.house} requires conscious discipline and Lal Kitab harmonization so its energy supports constructive growth without restlessness.`;
+
+    return {
+      planet: `${p.englishName} (${p.name})`,
+      khana: p.house,
+      pakkaGhar: pakkaGharMap[p.name] || 'Khana 1',
+      status,
+      effect,
+      remedy: planetUpayMap[p.name] || 'Maintain truthfulness and charitable seva.',
+    };
+  });
+
+  return {
+    bhriguBindu,
+    karmicBlueprint,
+    bhagyodayaAges,
+    lalKitabRina,
+    lalKitabPlanetPlacements,
+  };
+}
+
+// Generate Multi-Year Varshaphal, Annual Transit & Life-Path Predictions (2025 - 2028)
+export function calculateYearlyPredictions(
+  natalLagnaRasi: number,
+  natalMoonRasi: number,
+  birthDateStr: string = '1990-05-18',
+  sadeSatiActive: boolean = false,
+  natalPlanets: PlanetPosition[] = []
+): YearlyPrediction[] {
+  const birthYear = parseInt(birthDateStr.split('-')[0] || '1990', 10) || 1990;
+  const years = [2025, 2026, 2027, 2028];
+
+  // Year-specific major sidereal Rasi positions for Guru, Shani, and Rahu-Ketu
+  const annualSkyConfig: Record<
+    number,
+    {
+      guruRasiNum: number;
+      guruText: string;
+      shaniRasiNum: number;
+      shaniText: string;
+      rahuRasiNum: number;
+      rahuKetuText: string;
+      bestMonths: string;
+      cautionMonths: string;
+    }
+  > = {
+    2025: {
+      guruRasiNum: 3, // Mithuna (Gemini)
+      guruText: 'Guru transits Mithuna (Gemini), expanding intellectual networks, digital enterprise, and skill mastery.',
+      shaniRasiNum: 12, // Meena (Pisces)
+      shaniText: 'Shani enters Meena (Pisces), initiating karmic restructuring, spiritual maturity, and disciplined foundations.',
+      rahuRasiNum: 11, // Kumbha (Aquarius) / Ketu in Simha (Leo)
+      rahuKetuText: 'Rahu in Kumbha (Aquarius) & Ketu in Simha (Leo) accelerate technological leaps and detachment from ego.',
+      bestMonths: 'May, July, September & November 2025',
+      cautionMonths: 'March, August & October 2025',
+    },
+    2026: {
+      guruRasiNum: 4, // Exalted in Karka (Cancer) mid-year
+      guruText: 'Guru enters exalted Karka (Cancer), showering supreme Devaguru grace on domestic peace, wealth, and dharmic protection.',
+      shaniRasiNum: 12, // Meena (Pisces)
+      shaniText: 'Shani steadies in Meena (Pisces), rewarding patient perseverance, ethical leadership, and institutional loyalty.',
+      rahuRasiNum: 11, // Kumbha / Makara transition late year
+      rahuKetuText: 'Rahu–Ketu axis shifts from Kumbha–Simha toward Makara–Karka late in the year, reshaping career and home priorities.',
+      bestMonths: 'February, June, October & December 2026',
+      cautionMonths: 'April, July & September 2026',
+    },
+    2027: {
+      guruRasiNum: 5, // Simha (Leo)
+      guruText: 'Guru progresses into royal Simha (Leo), igniting executive authority, creative brilliance, progeny blessings, and social prestige.',
+      shaniRasiNum: 1, // Enters Mesha (Aries) mid-2027
+      shaniText: 'Shani transitions from Meena into Mesha (Aries), demanding pioneering discipline and self-reliant courage.',
+      rahuRasiNum: 10, // Makara (Capricorn) & Ketu in Karka (Cancer)
+      rahuKetuText: 'Rahu in Makara (Capricorn) & Ketu in Karka (Cancer) drive ambitious professional execution and inner emotional detachment.',
+      bestMonths: 'January, May, August & November 2027',
+      cautionMonths: 'March, June & October 2027',
+    },
+    2028: {
+      guruRasiNum: 6, // Kanya (Virgo) / Tula
+      guruText: 'Guru transits Kanya (Virgo), favoring precision, financial auditing, healthcare, service excellence, and practical wisdom.',
+      shaniRasiNum: 1, // Mesha (Aries)
+      shaniText: 'Shani in Mesha (Aries) consolidates structural reforms, rewarding strategic endurance over impulsive action.',
+      rahuRasiNum: 9, // Dhanu (Sagittarius) & Ketu in Mithuna (Gemini)
+      rahuKetuText: 'Rahu in Dhanu (Sagittarius) & Ketu in Mithuna (Gemini) inspire higher philosophical synthesis and global travel.',
+      bestMonths: 'February, April, September & December 2028',
+      cautionMonths: 'May, July & November 2028',
+    },
+  };
+
+  const munthaHouseEffects: Record<number, string> = {
+    1: 'Muntha in 1st Bhava grants radiant vitality, independent leadership, elevation in status, and personal triumph.',
+    2: 'Muntha in 2nd Bhava favors liquid wealth accumulation, family celebrations, eloquent speech, and savings growth.',
+    3: 'Muntha in 3rd Bhava ignites bold initiatives, skill recognition, fruitful short travels, and support from siblings.',
+    4: 'Muntha in 4th Bhava brings domestic peace, real estate/vehicle upgrades, and maternal blessings.',
+    5: 'Muntha in 5th Bhava bestows academic excellence, creative recognition, joyful news from children, and sharp intuition.',
+    6: 'Muntha in 6th Bhava calls for disciplined health habits and careful financial management while conquering competitors.',
+    7: 'Muntha in 7th Bhava strengthens marital harmony, lucrative commercial partnerships, and public goodwill.',
+    8: 'Muntha in 8th Bhava advises health vigilance and patience during transitions while unlocking deep research insights.',
+    9: 'Muntha in 9th Bhava (Bhagya Sthana) triggers auspicious fortune, pilgrimage, mentor grace, and dharmic elevation.',
+    10: 'Muntha in 10th Bhava crowns the year with career promotions, executive authority, and institutional honor.',
+    11: 'Muntha in 11th Bhava (Labha Sthana) fulfills long-held financial aspirations, expanding income and influential networks.',
+    12: 'Muntha in 12th Bhava favors foreign connections, spiritual retreats, and charitable seeding; budget expenses mindfully.',
+  };
+
+  const houseLifePathThemes: Record<number, string> = {
+    1: 'Self-Reinvention, Physical Vitality & Personal Leadership',
+    2: 'Wealth Consolidation, Family Lineage & Financial Security',
+    3: 'Courageous Enterprise, Communication & Skill Expansion',
+    4: 'Domestic Sanctuary, Property Acquisition & Inner Peace',
+    5: 'Creative Intelligence, Progeny Grace & Purva-Punya Fruition',
+    6: 'Service Mastery, Health Discipline & Overcoming Rivals',
+    7: 'Sacred Partnerships, Marital Harmony & Public Alliances',
+    8: 'Deep Karmic Transformation, Research & Occult Insight',
+    9: 'Bhagyodaya (Rise of Fortune), Higher Dharma & Mentorship',
+    10: 'Karmic Zenith, Executive Authority & Career Legacy',
+    11: 'Fulfillment of Aspirations, Network Gains & Abundance',
+    12: 'Spiritual Liberation, Global Horizons & Conscious Letting Go',
+  };
+
+  return years.map((yr) => {
+    const ageInYear = Math.max(1, yr - birthYear);
+    // In Tajika Varshaphal, Muntha advances 1 sign per year from Natal Lagna
+    const munthaRasiNum = ((natalLagnaRasi - 1 + ageInYear) % 12) + 1;
+    const munthaRasiObj = VEDIC_RASIS[munthaRasiNum - 1] || VEDIC_RASIS[0];
+    const munthaHouse = ((munthaRasiNum - natalLagnaRasi + 12) % 12) + 1;
+    const munthaLord = munthaRasiObj.lord;
+
+    const sky = annualSkyConfig[yr] || annualSkyConfig[2026];
+    const guruHouseFromMoon = ((sky.guruRasiNum - natalMoonRasi + 12) % 12) + 1;
+    const guruHouseFromLagna = ((sky.guruRasiNum - natalLagnaRasi + 12) % 12) + 1;
+    const shaniHouseFromMoon = ((sky.shaniRasiNum - natalMoonRasi + 12) % 12) + 1;
+    const shaniHouseFromLagna = ((sky.shaniRasiNum - natalLagnaRasi + 12) % 12) + 1;
+    const rahuHouseFromMoon = ((sky.rahuRasiNum - natalMoonRasi + 12) % 12) + 1;
+    const rahuHouseFromLagna = ((sky.rahuRasiNum - natalLagnaRasi + 12) % 12) + 1;
+
+    const isGuruBenefic = [2, 5, 7, 9, 11].includes(guruHouseFromMoon);
+    const isMunthaAuspicious = [1, 2, 3, 4, 5, 7, 9, 10, 11].includes(munthaHouse);
+    const overallRating = isGuruBenefic && isMunthaAuspicious ? 5 : isGuruBenefic || isMunthaAuspicious ? 4 : 3;
+
+    const themeTitle =
+      overallRating === 5
+        ? `Year of Dharmic Elevation & Prosperity (Muntha in H${munthaHouse})`
+        : overallRating === 4
+        ? `Year of Strategic Growth & Consolidation (Muntha in H${munthaHouse})`
+        : `Year of Karmic Discipline & Inner Mastery (Muntha in H${munthaHouse})`;
+
+    // --- LIFE-PATH SYNTHESIS (NATAL BIRTH CHART + ANNUAL TRANSITS) ---
+    // 1. Sudarshana / Bhrigu Age Progression House (1-12)
+    const progressedHouse = ((ageInYear - 1) % 12) + 1;
+    const progressedRasiNum = ((natalLagnaRasi + progressedHouse - 2) % 12) + 1;
+    const progressedRasiObj = VEDIC_RASIS[progressedRasiNum - 1] || VEDIC_RASIS[0];
+
+    const natalInProgressed = natalPlanets
+      .filter((p) => p.house === progressedHouse && p.name !== 'Lagna')
+      .map((p) => `${p.name} (${p.englishName})`);
+
+    // 2. Double-Transit Calculation (Houses influenced by both Guru [1, 5, 7, 9] and Shani [1, 3, 7, 10] from Lagna)
+    const guruInfluencedHouses = [
+      guruHouseFromLagna,
+      ((guruHouseFromLagna + 4 - 1) % 12) + 1,
+      ((guruHouseFromLagna + 6 - 1) % 12) + 1,
+      ((guruHouseFromLagna + 8 - 1) % 12) + 1,
+    ];
+    const shaniInfluencedHouses = [
+      shaniHouseFromLagna,
+      ((shaniHouseFromLagna + 2 - 1) % 12) + 1,
+      ((shaniHouseFromLagna + 6 - 1) % 12) + 1,
+      ((shaniHouseFromLagna + 9 - 1) % 12) + 1,
+    ];
+    const doubleTransitHouses = Array.from(
+      new Set(guruInfluencedHouses.filter((h) => shaniInfluencedHouses.includes(h)))
+    ).sort((a, b) => a - b);
+
+    const primaryDoubleHouse = doubleTransitHouses[0] || guruHouseFromLagna;
+    const doubleTransitSummary =
+      doubleTransitHouses.length > 0
+        ? `Guru (H${guruHouseFromLagna}) and Shani (H${shaniHouseFromLagna}) cast a simultaneous Double-Transit blessing upon Natal House${doubleTransitHouses.length > 1 ? 's' : ''} ${doubleTransitHouses.map((h) => `H${h}`).join(', ')} (${houseLifePathThemes[primaryDoubleHouse]}), making ${yr} a landmark year for concrete manifestation in these life domains.`
+        : `Guru in Natal H${guruHouseFromLagna} and Shani in Natal H${shaniHouseFromLagna} work in complementary houses, balancing expansion in ${houseLifePathThemes[guruHouseFromLagna]} with structural discipline in ${houseLifePathThemes[shaniHouseFromLagna]}.`;
+
+    const lifePathHeadline = `Age ${ageInYear} Life-Path Focus: House ${progressedHouse} (${progressedRasiObj.sanskritName}) — ${houseLifePathThemes[progressedHouse]}`;
+
+    const lifePathNarrative = `In ${yr} (Age ${ageInYear}), your Bhrigu/Sudarshana progression activates Natal House ${progressedHouse} (${progressedRasiObj.sanskritName}, ruled by ${progressedRasiObj.lord})${
+      natalInProgressed.length > 0
+        ? `, awakening your natal ${natalInProgressed.join(', ')}`
+        : ''
+    }. Combined with Varshaphal Muntha in H${munthaHouse} (${munthaRasiObj.sanskritName}) and ${doubleTransitSummary}`;
+
+    // 3. Triggered Natal Planets (Natal planets in Guru's transit house, Shani's transit house, or Rahu's transit house, or fallback to Sun, Moon, Lagna Lord)
+    const triggeredList: {
+      planet: string;
+      natalPlacement: string;
+      transitTrigger: string;
+      lifePathImpact: string;
+    }[] = [];
+
+    const validNatal = natalPlanets.filter((p) => p.name !== 'Lagna');
+    validNatal.forEach((np) => {
+      if (np.house === guruHouseFromLagna) {
+        triggeredList.push({
+          planet: `${np.symbol} ${np.name} (${np.englishName})`,
+          natalPlacement: `Natal H${np.house} (${np.rasiName})`,
+          transitTrigger: `Conjoined by Transiting Guru in ${yr}`,
+          lifePathImpact: `Expands wisdom, fortune, and dharmic opportunities linked to Natal ${np.name} in House ${np.house}.`,
+        });
+      } else if (np.house === shaniHouseFromLagna) {
+        triggeredList.push({
+          planet: `${np.symbol} ${np.name} (${np.englishName})`,
+          natalPlacement: `Natal H${np.house} (${np.rasiName})`,
+          transitTrigger: `Tested & Structured by Transiting Shani in ${yr}`,
+          lifePathImpact: `Demands disciplined mastery and delivers permanent karmic rewards in House ${np.house} matters.`,
+        });
+      } else if (np.house === rahuHouseFromLagna) {
+        triggeredList.push({
+          planet: `${np.symbol} ${np.name} (${np.englishName})`,
+          natalPlacement: `Natal H${np.house} (${np.rasiName})`,
+          transitTrigger: `Electrified by Transiting Rahu in ${yr}`,
+          lifePathImpact: `Sparks rapid, unconventional breakthroughs and ambitious shifts in House ${np.house}.`,
+        });
+      } else if (doubleTransitHouses.includes(np.house)) {
+        triggeredList.push({
+          planet: `${np.symbol} ${np.name} (${np.englishName})`,
+          natalPlacement: `Natal H${np.house} (${np.rasiName})`,
+          transitTrigger: `Activated by Guru–Shani Double Transit in ${yr}`,
+          lifePathImpact: `Crystallizes long-awaited life-path milestones connected to Natal ${np.name} in House ${np.house}.`,
+        });
+      }
+    });
+
+    if (triggeredList.length < 3) {
+      const fallbackDefaults = [
+        {
+          planet: '☉ Surya (Sun)',
+          natalPlacement: `Natal Lagna/Atmakaraka Axis`,
+          transitTrigger: `Guru Trinal Aspect in ${yr}`,
+          lifePathImpact: 'Elevates career vitality, self-confidence, and recognition from leadership.',
+        },
+        {
+          planet: '☽ Chandra (Moon)',
+          natalPlacement: `Janma Rashi (${VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName || 'Simha'})`,
+          transitTrigger: `Gochar House ${guruHouseFromMoon} Guru & House ${shaniHouseFromMoon} Shani`,
+          lifePathImpact: 'Shapes emotional resilience, family peace, and intuitive decision-making.',
+        },
+        {
+          planet: '♃ Guru (Jupiter)',
+          natalPlacement: `Dharma & Fortune Axis`,
+          transitTrigger: `Varshaphal Lord ${munthaLord} Synergy`,
+          lifePathImpact: 'Supports higher learning, ethical wealth creation, and spiritual grace.',
+        },
+      ];
+      for (const fb of fallbackDefaults) {
+        if (triggeredList.length < 4) triggeredList.push(fb);
+      }
+    }
+
+    const lifePathScorecard = {
+      dharmaAlignment: isGuruBenefic ? 92 : 78,
+      arthaMomentum: isMunthaAuspicious ? 90 : 75,
+      kamaHarmony: [1, 2, 4, 5, 7, 9, 11].includes(guruHouseFromLagna) ? 88 : 74,
+      mokshaClarity: sadeSatiActive ? 89 : 82,
+    };
+
+    const secondDoubleHouse = doubleTransitHouses[1] || munthaHouse;
+    const karmicTurningPoints = [
+      {
+        window: `Jan – Apr ${yr}`,
+        title: `Sudarshana Age ${ageInYear} Awakening`,
+        activatedHouse: `House ${progressedHouse} (${progressedRasiObj.sanskritName})`,
+        guidance: `Initiate core annual goals aligned with ${houseLifePathThemes[progressedHouse]} under the lordship of ${progressedRasiObj.lord}.`,
+      },
+      {
+        window: `May – Aug ${yr}`,
+        title: `Guru–Shani Double-Transit Manifestation`,
+        activatedHouse: `House ${primaryDoubleHouse} & House ${secondDoubleHouse}`,
+        guidance: `Capitalize on concrete career, educational, and structural breakthroughs where Jupiter's expansion meets Saturn's permanence.`,
+      },
+      {
+        window: `Sep – Dec ${yr}`,
+        title: `Varshaphal Muntha & Nodal Consolidation`,
+        activatedHouse: `House ${munthaHouse} (${munthaRasiObj.sanskritName}) & House ${rahuHouseFromLagna}`,
+        guidance: `Harvest financial and relationship rewards while anchoring spiritual equilibrium through Varsheshwara ${munthaLord}.`,
+      },
+    ];
+
+    return {
+      year: yr,
+      themeTitle,
+      overallRating,
+      ageInYear,
+      munthaRasi: munthaRasiObj.sanskritName,
+      munthaHouse,
+      munthaLord,
+      varsheshwara: `${munthaLord} (Varsha Lagnesha)`,
+      munthaEffect: munthaHouseEffects[munthaHouse] || munthaHouseEffects[1],
+      majorTransitsSummary: {
+        guruTransit: `House ${guruHouseFromMoon} from Moon (H${guruHouseFromLagna} from Lagna) — ${sky.guruText}`,
+        shaniTransit: `House ${shaniHouseFromMoon} from Moon (H${shaniHouseFromLagna} from Lagna) — ${sky.shaniText}`,
+        rahuKetuTransit: `Rahu in House ${rahuHouseFromMoon} from Moon (H${rahuHouseFromLagna} from Lagna) — ${sky.rahuKetuText}`,
+      },
+      pillars: {
+        careerAndJob: isGuruBenefic
+          ? `With Guru energizing House ${guruHouseFromMoon} from Moon and Muntha in House ${munthaHouse}, ${yr} brings prominent leadership opportunities, institutional recognition, and favorable role expansion.`
+          : `Shani in House ${shaniHouseFromMoon} from Moon demands methodical execution and patience with seniors in ${yr}; steady craftsmanship builds unshakeable professional credibility.`,
+        wealthAndBusiness: isMunthaAuspicious
+          ? `Auspicious Muntha in ${munthaRasiObj.sanskritName} (House ${munthaHouse}) supports strong capital accumulation, profitable commercial alliances, and asset appreciation during ${yr}.`
+          : `Prioritize liquid reserves, conservative budgeting, and verified contracts in ${yr}; avoid speculative leverage while Rahu transits House ${rahuHouseFromMoon} from Moon.`,
+        marriageAndFamily: isGuruBenefic
+          ? `Benevolent Jupiterian rays foster warmth in marriage, auspicious family ceremonies, and supportive harmony with elders and children throughout ${yr}.`
+          : `Cultivate patient, empathetic dialogue at home in ${yr}; shared spiritual routines and family travel dissolve domestic stress.`,
+        healthAndVitality: sadeSatiActive
+          ? `Maintain disciplined circadian sleep, warm sattvic nutrition, and joint mobility in ${yr} to keep vitality resilient under Saturn's gaze.`
+          : `Physical stamina and immunity remain supportive in ${yr}; balance active work schedules with regular pranayama and hydration.`,
+        educationAndIntellect: `Guru in House ${guruHouseFromLagna} from Lagna sharpens higher learning, certifications, and research depth in ${yr}, rewarding structured study schedules.`,
+        mentalStateAndSpirit: `Varsheshwara ${munthaLord} guides your inner compass in ${yr}, deepening meditative clarity, intuition, and dharmic resilience across all four quarters.`,
+      },
+      quarterlyBreakdown: [
+        {
+          quarter: 'Q1 (Jan – Mar)',
+          period: `Jan – Mar ${yr}`,
+          tone: isMunthaAuspicious ? 'Progressive' : 'Consolidation',
+          summary: `Sets the annual foundation under Varsheshwara ${munthaLord}; ideal for strategic planning, financial budgeting, and health routines.`,
+        },
+        {
+          quarter: 'Q2 (Apr – Jun)',
+          period: `Apr – Jun ${yr}`,
+          tone: 'Peak Auspicious',
+          summary: `Solar exaltation window activates career visibility, educational milestones, and decisive project execution.`,
+        },
+        {
+          quarter: 'Q3 (Jul – Sep)',
+          period: `Jul – Sep ${yr}`,
+          tone: sadeSatiActive ? 'Caution & Discipline' : 'Consolidation',
+          summary: `Retrograde planetary reviews call for patience in relationships, careful contract audits, and steady inner sadhana.`,
+        },
+        {
+          quarter: 'Q4 (Oct – Dec)',
+          period: `Oct – Dec ${yr}`,
+          tone: isGuruBenefic ? 'Peak Auspicious' : 'Progressive',
+          summary: `Harvest quarter bringing financial gains, festive family harmony, and year-end professional accomplishments.`,
+        },
+      ],
+      bestMonths: sky.bestMonths,
+      cautionMonths: sky.cautionMonths,
+      annualRemedy: `Honor Varsheshwara ${munthaLord} throughout ${yr}: perform Rudrabhishekam or offer saffron/turmeric tilak on Thursdays, and practice charitable anna-daan (food donation) on your birth Nakshatra days.`,
+      lifePathSynthesis: {
+        progressedHouse,
+        progressedRasi: progressedRasiObj.sanskritName,
+        progressedLord: progressedRasiObj.lord,
+        natalPlanetsInProgressedHouse: natalInProgressed,
+        doubleTransitHouses,
+        doubleTransitSummary,
+        lifePathHeadline,
+        lifePathNarrative,
+        lifePathScorecard,
+        purusharthaMatrix: {
+          dharma: `Dharma (H1/H5/H9 Purpose): Progressed age ${ageInYear} and Guru in H${guruHouseFromLagna} align your personal ethics with higher mentorship, authentic self-expression, and Purva-Punya grace.`,
+          artha: `Artha (H2/H6/H10 Wealth & Career): Shani in H${shaniHouseFromLagna} and Muntha in H${munthaHouse} anchor material stability, disciplined enterprise growth, and long-term asset creation.`,
+          kama: `Kama (H3/H7/H11 Relationships & Goals): Rahu in H${rahuHouseFromLagna} and Jupiterian aspects energize strategic alliances, marital teamwork, and fulfillment of key life ambitions.`,
+          moksha: `Moksha (H4/H8/H12 Inner Liberation): Ketu’s spiritual current and Varsheshwara ${munthaLord} foster emotional equanimity, ancestral healing, and meditative depth.`,
+        },
+        triggeredNatalPlanets: triggeredList.slice(0, 4),
+        karmicTurningPoints,
+      },
     };
   });
 }

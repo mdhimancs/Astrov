@@ -133,20 +133,24 @@ export function DivisionalChartsTab({
           </h1>
         </div>
 
-        <div className="flex items-center space-x-4">
-          {(['D1', 'D9'] as const).map((v) => (
-            <button
-              key={v}
-              onClick={() => setSelectedVarga(v)}
-              className={`text-[12px] font-black uppercase tracking-wider transition-all duration-150 cursor-pointer pb-0.5 border-b-2 ${
-                selectedVarga === v
-                  ? 'text-amber-800 border-amber-600'
-                  : 'text-stone-600 border-transparent hover:text-stone-800'
-              }`}
-            >
-              {v === 'D1' ? 'Birth (D1)' : 'Navamsha (D9)'}
-            </button>
-          ))}
+        <div className="flex items-center gap-1.5">
+          {(['D1', 'D9'] as const).map((v) => {
+            const isActive = selectedVarga === v;
+            return (
+              <div
+                key={v}
+                onClick={() => setSelectedVarga(v)}
+                className={`rounded-md px-2.5 py-1 text-[12px] font-vedic font-bold transition-all duration-150 cursor-pointer border flex items-center space-x-1.5 ${
+                  isActive
+                    ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 text-amber-950 shadow-2xs'
+                    : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'
+                }`}
+              >
+                <span>{v === 'D1' ? 'Birth (D1)' : 'Navamsha (D9)'}</span>
+                <Layers className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-amber-700' : 'text-stone-400'}`} />
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -219,77 +223,153 @@ export function DivisionalChartsTab({
               </div>
             )}
           </div>
+
+          {/* SARVASHTAKAVARGA KEY LIFE EFFECTS (MOVED BELOW YOGAS) */}
+          <div className="bg-[#FAF8F5] rounded-lg p-2.5 text-stone-900 border border-amber-200/90 shadow-3xs space-y-1.5">
+            <span className="text-[12px] font-black uppercase tracking-wider text-amber-900 block">
+              Sarvashtakavarga Key Life Effects
+            </span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              <div className="bg-white rounded p-2 border border-amber-200/70">
+                <span className="text-[11px] font-bold uppercase text-emerald-800 block">
+                  Labha vs Vyaya (H11 &gt; H12)
+                </span>
+                <span className="text-[13px] font-bold text-stone-950 block">
+                  Strong Wealth Retention
+                </span>
+                <p className="text-[12px] text-stone-700 leading-snug mt-0.5">
+                  High Bindus in House 11 ensure income outpaces expenses and investments compound steadily.
+                </p>
+              </div>
+              <div className="bg-white rounded p-2 border border-amber-200/70">
+                <span className="text-[11px] font-bold uppercase text-amber-800 block">
+                  Karma vs Dharma (H10 &amp; H9)
+                </span>
+                <span className="text-[13px] font-bold text-stone-950 block">
+                  Career &amp; Fortune Synergy
+                </span>
+                <p className="text-[12px] text-stone-700 leading-snug mt-0.5">
+                  Strong Bindu concentration in Houses 9 and 10 supports executive authority and timely promotions.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* ASHTAKAVARGA & STRENGTHS (RIGHT) */}
+        {/* ASHTAKAVARGA & EFFECTS (RIGHT) - LIGHT THEME */}
         <div className="lg:col-span-5 space-y-2">
-          <div className="bg-stone-900 rounded-lg p-2.5 text-white shadow-sm space-y-2 relative overflow-hidden">
-            <div className="absolute -top-4 -right-4 opacity-10 pointer-events-none">
+          <div className="bg-[#FAF8F5] rounded-lg p-2.5 text-stone-900 border border-amber-200/90 shadow-3xs space-y-2.5 relative overflow-hidden">
+            <div className="absolute -top-4 -right-4 opacity-5 pointer-events-none text-amber-700">
               <Zap className="w-24 h-24" />
             </div>
 
-            <div className="relative z-10 space-y-0.5">
-              <h3 className="text-[16px] font-vedic font-bold flex items-center space-x-1.5">
-                <TrendingUp className="w-4 h-4 text-amber-400" />
-                <span>Ashtakavarga</span>
-              </h3>
-              <p className="text-[12px] text-stone-400 leading-snug">
-                Numerical capacity. High (5+) is excellent.
-              </p>
+            <div className="relative z-10 flex items-center justify-between border-b border-amber-200/70 pb-1.5">
+              <div>
+                <h3 className="text-[16px] font-vedic font-bold text-stone-950 flex items-center space-x-1.5">
+                  <TrendingUp className="w-4 h-4 text-amber-700" />
+                  <span>Ashtakavarga &amp; Effects</span>
+                </h3>
+                <p className="text-[12px] text-stone-600 leading-snug">
+                  Bindu strength across 12 houses (4+ is balanced, 5+ is highly auspicious).
+                </p>
+              </div>
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-100/80 text-amber-900 border border-amber-300">
+                Bhinnashtakavarga
+              </span>
             </div>
 
-            <div className="space-y-2 relative z-10">
+            <div className="space-y-2.5 relative z-10">
               {ashtakavarga.map((item) => {
                 const avg = item.total / 12;
                 const percent = (item.total / 96) * 100;
-                
+                const strongHouses = item.points
+                  .map((pt, idx) => (pt >= 5 ? `H${idx + 1}` : null))
+                  .filter(Boolean)
+                  .join(', ');
+
+                const planetEffectMap: Record<string, { high: string; mod: string }> = {
+                  Surya: {
+                    high: 'Strong vitality, administrative authority, paternal blessings, and career leadership.',
+                    mod: 'Steady willpower; progress comes through diplomatic humility and consistent routine.',
+                  },
+                  Chandra: {
+                    high: 'Emotional serenity, strong intuition, public goodwill, and domestic happiness.',
+                    mod: 'Sensitive mind; mindfulness and nurturing environments enhance peace of mind.',
+                  },
+                  Mangal: {
+                    high: 'High courage, decisive execution, property gains, and victory over competitors.',
+                    mod: 'Channel physical stamina with patience to achieve steady real-estate and technical goals.',
+                  },
+                  Budha: {
+                    high: 'Sharp analytical intellect, commercial success, articulate speech, and scholarly skill.',
+                    mod: 'Methodical planning and clear documentation unlock steady business and learning gains.',
+                  },
+                  Guru: {
+                    high: 'Abundant dharmic fortune, wisdom, financial prosperity, and blessings of mentors/children.',
+                    mod: 'Gradual expansion of wealth and knowledge through ethical perseverance and study.',
+                  },
+                  Shukra: {
+                    high: 'Harmonious relationships, artistic refinement, material comforts, and marital joy.',
+                    mod: 'Balanced domestic life; conscious appreciation nurtures love and financial ease.',
+                  },
+                  Shani: {
+                    high: 'Enduring career longevity, organizational mastery, discipline, and mass support.',
+                    mod: 'Patience and structured hard work steadily neutralize delays and build lasting security.',
+                  },
+                };
+
+                const effectObj = planetEffectMap[item.planet] || {
+                  high: 'Auspicious planetary resilience across life domains.',
+                  mod: 'Balanced planetary output supported by conscious effort.',
+                };
+                const effectText = avg >= 4.0 ? effectObj.high : effectObj.mod;
+
                 return (
-                  <div key={item.planet} className="space-y-1">
+                  <div key={item.planet} className="bg-white rounded-md p-2 border border-amber-200/60 shadow-3xs space-y-1">
                     <div className="flex items-center justify-between text-[13px] font-bold uppercase tracking-wider">
-                      <span className="text-amber-400">{item.planet}</span>
-                      <span className="text-stone-300 text-[12px]">Avg: {avg.toFixed(1)}</span>
+                      <span className="text-amber-900">{item.planet}</span>
+                      <div className="flex items-center space-x-2 text-[12px]">
+                        <span className="text-stone-700">Total: <strong>{item.total}</strong></span>
+                        <span className="text-stone-600">Avg: <strong>{avg.toFixed(1)}</strong></span>
+                      </div>
                     </div>
-                    <div className="h-1.5 bg-stone-800 rounded-full overflow-hidden border border-stone-700">
+                    <div className="h-1.5 bg-stone-200 rounded-full overflow-hidden border border-stone-300/80">
                       <div 
                         className={`h-full transition-all duration-500 ${
-                          avg >= 4.5 ? 'bg-emerald-500' : avg >= 3.5 ? 'bg-amber-500' : 'bg-rose-500'
+                          avg >= 4.5 ? 'bg-emerald-500' : avg >= 3.5 ? 'bg-amber-500' : 'bg-rose-400'
                         }`}
                         style={{ width: `${Math.min(100, percent * 2.5)}%` }}
                       />
                     </div>
-                    {/* Points visual strip */}
-                    <div className="grid grid-cols-12 gap-0.5 mt-0.5">
+                    {/* Points visual strip (H1 to H12) */}
+                    <div className="grid grid-cols-12 gap-0.5 pt-0.5">
                       {item.points.map((pt, i) => (
                         <div 
                           key={i} 
-                          className={`py-0.5 rounded flex items-center justify-center text-[11px] font-black border transition-colors ${
+                          title={`House ${i + 1}: ${pt} Bindus`}
+                          className={`py-0.5 rounded flex flex-col items-center justify-center text-[11px] font-black border transition-colors ${
                             pt >= 5 
-                              ? 'bg-emerald-900/40 border-emerald-500/50 text-emerald-400' 
+                              ? 'bg-emerald-50 border-emerald-300 text-emerald-800' 
                               : pt >= 4 
-                              ? 'bg-stone-800 border-stone-700 text-stone-400' 
-                              : 'bg-rose-900/40 border-rose-500/50 text-rose-400'
+                              ? 'bg-amber-50/70 border-amber-200 text-amber-900' 
+                              : 'bg-rose-50 border-rose-200 text-rose-800'
                           }`}
                         >
-                          {pt}
+                          <span>{pt}</span>
                         </div>
                       ))}
                     </div>
+                    {/* Specific Effect of this Planet's Ashtakavarga */}
+                    <p className="text-[12px] text-stone-700 leading-snug pt-0.5">
+                      <strong className="text-stone-900">Effect: </strong>
+                      {effectText}
+                      {strongHouses && (
+                        <span className="text-emerald-800 font-semibold"> Peak houses: {strongHouses}.</span>
+                      )}
+                    </p>
                   </div>
                 );
               })}
-            </div>
-
-            <div className="pt-1.5 border-t border-stone-800 space-y-1">
-              <div className="grid grid-cols-2 gap-1.5">
-                <div className="bg-stone-800/50 rounded p-1.5 border border-stone-700">
-                  <span className="text-[12px] text-stone-400 block">Max Power</span>
-                  <span className="text-[14px] font-bold text-white">House 11</span>
-                </div>
-                <div className="bg-stone-800/50 rounded p-1.5 border border-stone-700">
-                  <span className="text-[12px] text-stone-400 block">Karmic Focus</span>
-                  <span className="text-[14px] font-bold text-white">House 10</span>
-                </div>
-              </div>
             </div>
           </div>
 

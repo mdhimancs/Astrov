@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Orbit, Activity, Briefcase, TrendingUp, Users, Heart, Sparkles, Filter } from 'lucide-react';
+import { Orbit, Activity, Briefcase, TrendingUp, Users, Heart, Sparkles, Filter, GraduationCap, Brain } from 'lucide-react';
 import { PlanetaryImpactRecord } from '../types';
 
 interface UnifiedPlanetaryImpactTableProps {
@@ -8,12 +8,12 @@ interface UnifiedPlanetaryImpactTableProps {
   subtitle?: string;
 }
 
-type ColumnFilter = 'all' | 'health' | 'job' | 'business' | 'relation' | 'marriage';
+type ColumnFilter = 'all' | 'health' | 'job' | 'business' | 'relation' | 'marriage' | 'education' | 'mentalState';
 
 export function UnifiedPlanetaryImpactTable({
   records,
   title = 'Planetary Transits & Life Impacts Table',
-  subtitle = 'Specific effects of major planetary changes across Health, Job, Business, Relations, and Marriage',
+  subtitle = 'Specific effects of major planetary changes across Health, Job, Relations, Education, and Mental State',
 }: UnifiedPlanetaryImpactTableProps) {
   const [activeFilter, setActiveFilter] = useState<ColumnFilter>('all');
 
@@ -57,26 +57,33 @@ export function UnifiedPlanetaryImpactTable({
           </h3>
         </div>
 
-        <div className="flex items-center space-x-3 overflow-x-auto pb-0.5 scrollbar-none">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
           {[
-            { id: 'all', label: 'All', icon: null },
+            { id: 'all', label: 'All', icon: Orbit },
             { id: 'health', label: 'Health', icon: Activity },
             { id: 'job', label: 'Job', icon: Briefcase },
+            { id: 'business', label: 'Wealth', icon: TrendingUp },
             { id: 'relation', label: 'Relation', icon: Users },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveFilter(tab.id as any)}
-              className={`text-[12px] font-black uppercase tracking-wider transition-all duration-150 cursor-pointer border-b-2 flex items-center space-x-1 whitespace-nowrap ${
-                activeFilter === tab.id
-                  ? 'text-amber-800 border-amber-600'
-                  : 'text-stone-600 border-transparent hover:text-stone-800'
-              }`}
-            >
-              <span>{tab.label}</span>
-            </button>
-          ))}
+            { id: 'education', label: 'Education', icon: GraduationCap },
+            { id: 'mentalState', label: 'Mental State', icon: Brain },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeFilter === tab.id;
+            return (
+              <div
+                key={tab.id}
+                onClick={() => setActiveFilter(tab.id as any)}
+                className={`rounded-md px-2.5 py-1 text-[12px] font-vedic font-bold transition-all duration-150 cursor-pointer border flex items-center space-x-1.5 whitespace-nowrap shrink-0 ${
+                  isActive
+                    ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 text-amber-950 shadow-2xs'
+                    : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'
+                }`}
+              >
+                <span>{tab.label}</span>
+                <Icon className={`w-3 h-3 shrink-0 ${isActive ? 'text-amber-700' : 'text-stone-400'}`} />
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -97,8 +104,20 @@ export function UnifiedPlanetaryImpactTable({
                 <th className="py-1 px-2 min-w-[140px]">Job</th>
               )}
 
+              {(activeFilter === 'all' || activeFilter === 'business') && (
+                <th className="py-1 px-2 min-w-[140px]">Wealth</th>
+              )}
+
               {(activeFilter === 'all' || activeFilter === 'relation') && (
                 <th className="py-1 px-2 min-w-[140px]">Relation</th>
+              )}
+
+              {(activeFilter === 'all' || activeFilter === 'education') && (
+                <th className="py-1 px-2 min-w-[140px]">Education</th>
+              )}
+
+              {(activeFilter === 'all' || activeFilter === 'mentalState') && (
+                <th className="py-1 px-2 min-w-[140px]">Mental State</th>
               )}
 
               {activeFilter === 'all' && (
@@ -130,9 +149,27 @@ export function UnifiedPlanetaryImpactTable({
                   </td>
                 )}
 
+                {(activeFilter === 'all' || activeFilter === 'business') && (
+                  <td className="py-1.5 px-2 align-top text-stone-800 leading-snug border-r border-stone-100">
+                    <p>{rec.businessEffect}</p>
+                  </td>
+                )}
+
                 {(activeFilter === 'all' || activeFilter === 'relation') && (
                   <td className="py-1.5 px-2 align-top text-stone-800 leading-snug border-r border-stone-100">
                     <p>{rec.relationEffect}</p>
+                  </td>
+                )}
+
+                {(activeFilter === 'all' || activeFilter === 'education') && (
+                  <td className="py-1.5 px-2 align-top text-stone-800 leading-snug border-r border-stone-100">
+                    <p>{rec.educationEffect}</p>
+                  </td>
+                )}
+
+                {(activeFilter === 'all' || activeFilter === 'mentalState') && (
+                  <td className="py-1.5 px-2 align-top text-stone-800 leading-snug border-r border-stone-100">
+                    <p>{rec.mentalStateEffect}</p>
                   </td>
                 )}
 

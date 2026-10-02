@@ -252,47 +252,51 @@ export function CriticalDashaTransitsTab({
       {/* FILTER & DOMAIN NAVIGATION BAR */}
       <div className="bg-white rounded-lg border border-stone-200/90 px-2.5 py-2 shadow-3xs space-y-1.5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
-          {/* Domain Segmented Control */}
+          {/* Domain Deck of Cards */}
           <div className="flex flex-wrap items-center gap-1.5">
             {[
-              { id: 'All', label: 'All' },
-              { id: 'Career', label: '💼 Career' },
-              { id: 'Wealth & Property', label: '💰 Wealth' },
-              { id: 'Marriage & Family', label: '💍 Family' },
-            ].map((d) => (
-              <button
-                key={d.id}
-                type="button"
-                onClick={() => setSelectedDomain(d.id as any)}
-                className={`px-2.5 py-1 rounded transition-all text-[13px] font-medium cursor-pointer ${
-                  selectedDomain === d.id
-                    ? 'bg-amber-800 text-white shadow-3xs font-semibold'
-                    : 'bg-[#FAF8F5] border border-stone-200 text-stone-700 hover:bg-stone-100'
-                }`}
-              >
-                {d.label}
-              </button>
-            ))}
+              { id: 'All', label: 'All Domains', icon: Compass },
+              { id: 'Career', label: 'Career', icon: Briefcase },
+              { id: 'Wealth & Property', label: 'Wealth', icon: Coins },
+              { id: 'Marriage & Family', label: 'Family', icon: Heart },
+            ].map((d) => {
+              const Icon = d.icon;
+              const isActive = selectedDomain === d.id;
+              return (
+                <div
+                  key={d.id}
+                  onClick={() => setSelectedDomain(d.id as any)}
+                  className={`rounded-md px-2.5 py-1 text-[12px] font-vedic font-bold transition-all cursor-pointer border flex items-center space-x-1.5 ${
+                    isActive
+                      ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 text-amber-950 shadow-2xs'
+                      : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'
+                  }`}
+                >
+                  <span>{d.label}</span>
+                  <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-amber-700' : 'text-stone-400'}`} />
+                </div>
+              );
+            })}
           </div>
 
-          {/* Timing Segmented Control */}
-          <div className="flex items-center space-x-1">
-            <div className="flex items-center bg-[#FAF8F5] p-1 rounded border border-stone-200">
-              {(['All', 'Past', 'Current', 'Future'] as const).map((timing) => (
-                <button
+          {/* Timing Deck of Cards */}
+          <div className="flex flex-wrap items-center gap-1">
+            {(['All', 'Past', 'Current', 'Future'] as const).map((timing) => {
+              const isActive = selectedTiming === timing;
+              return (
+                <div
                   key={timing}
-                  type="button"
                   onClick={() => setSelectedTiming(timing)}
-                  className={`px-2 py-0.5 rounded text-[12px] font-medium transition-colors cursor-pointer ${
-                    selectedTiming === timing
-                      ? 'bg-white text-stone-900 shadow-3xs font-bold'
-                      : 'text-stone-500 hover:text-stone-800'
+                  className={`rounded-md px-2.5 py-1 text-[12px] font-vedic font-bold transition-all cursor-pointer border ${
+                    isActive
+                      ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 text-amber-950 shadow-2xs'
+                      : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'
                   }`}
                 >
                   {timing}
-                </button>
-              ))}
-            </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 

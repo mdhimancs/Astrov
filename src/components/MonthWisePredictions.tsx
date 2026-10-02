@@ -11,6 +11,8 @@ import {
   Star,
   Compass,
   Briefcase,
+  TrendingUp,
+  GraduationCap,
   Heart,
   Activity,
 } from 'lucide-react';
@@ -184,17 +186,49 @@ export function MonthWisePredictions({
           </div>
         </div>
 
-        {/* 4 Pillars - Balanced Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+        {/* 6 Pillars - Career, Wealth, Education, Love, Health, Spirit */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {[
-            { label: 'Career', text: currentMonth.careerWealthForecast, color: 'amber', icon: Briefcase },
-            { label: 'Love', text: currentMonth.loveFamilyForecast, color: 'rose', icon: Heart },
-            { label: 'Health', text: currentMonth.healthVitalityForecast, color: 'emerald', icon: Activity },
-            { label: 'Spirit', text: currentMonth.spiritualForecast, color: 'purple', icon: Sparkles },
+            {
+              label: 'Career',
+              text: currentMonth.careerWealthForecast,
+              textColor: 'text-amber-800',
+              icon: Briefcase,
+            },
+            {
+              label: 'Wealth',
+              text: `Dhana & Labha Yoga alignment during ${currentMonth.monthName} supports structured savings, asset liquidity, and prudent cash-flow management. Prioritize high-conviction investments on favorable dates (${currentMonth.favorableDays}).`,
+              textColor: 'text-emerald-800',
+              icon: TrendingUp,
+            },
+            {
+              label: 'Education',
+              text: `Budha and Guru transit influences sharpen academic retention, competitive exam readiness, technical certifications, and analytical study throughout ${currentMonth.monthName}.`,
+              textColor: 'text-indigo-800',
+              icon: GraduationCap,
+            },
+            {
+              label: 'Love & Family',
+              text: currentMonth.loveFamilyForecast,
+              textColor: 'text-rose-800',
+              icon: Heart,
+            },
+            {
+              label: 'Health',
+              text: currentMonth.healthVitalityForecast,
+              textColor: 'text-sky-800',
+              icon: Activity,
+            },
+            {
+              label: 'Spirit',
+              text: currentMonth.spiritualForecast,
+              textColor: 'text-purple-800',
+              icon: Sparkles,
+            },
           ].map((p, i) => (
             <div key={i} className="bg-[#FAF8F5]/70 rounded-md p-2 border border-stone-100 space-y-1">
-              <span className={`text-[12px] font-black uppercase tracking-wider text-${p.color}-700 flex items-center space-x-1`}>
-                <p.icon className="w-3 h-3" />
+              <span className={`text-[12px] font-black uppercase tracking-wider ${p.textColor} flex items-center space-x-1`}>
+                <p.icon className="w-3.5 h-3.5" />
                 <span>{p.label}</span>
               </span>
               <p className="text-[14px] text-stone-700 leading-snug">

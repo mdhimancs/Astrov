@@ -162,6 +162,74 @@ export interface MonthWiseTransitPrediction {
   remedyOfMonth: string;
 }
 
+export interface YearlyPrediction {
+  year: number; // e.g. 2025, 2026, 2027, 2028
+  themeTitle: string;
+  overallRating: number; // 1 to 5
+  ageInYear: number;
+  munthaRasi: VedicRasiName;
+  munthaHouse: number;
+  munthaLord: string;
+  varsheshwara: string; // Year Lord
+  munthaEffect: string;
+  majorTransitsSummary: {
+    guruTransit: string;
+    shaniTransit: string;
+    rahuKetuTransit: string;
+  };
+  pillars: {
+    careerAndJob: string;
+    wealthAndBusiness: string;
+    marriageAndFamily: string;
+    healthAndVitality: string;
+    educationAndIntellect: string;
+    mentalStateAndSpirit: string;
+  };
+  quarterlyBreakdown: {
+    quarter: string;
+    period: string;
+    tone: 'Peak Auspicious' | 'Progressive' | 'Consolidation' | 'Caution & Discipline';
+    summary: string;
+  }[];
+  bestMonths: string;
+  cautionMonths: string;
+  annualRemedy: string;
+  lifePathSynthesis: {
+    progressedHouse: number;
+    progressedRasi: VedicRasiName;
+    progressedLord: string;
+    natalPlanetsInProgressedHouse: string[];
+    doubleTransitHouses: number[];
+    doubleTransitSummary: string;
+    lifePathHeadline: string;
+    lifePathNarrative: string;
+    lifePathScorecard: {
+      dharmaAlignment: number;
+      arthaMomentum: number;
+      kamaHarmony: number;
+      mokshaClarity: number;
+    };
+    purusharthaMatrix: {
+      dharma: string;
+      artha: string;
+      kama: string;
+      moksha: string;
+    };
+    triggeredNatalPlanets: {
+      planet: string;
+      natalPlacement: string;
+      transitTrigger: string;
+      lifePathImpact: string;
+    }[];
+    karmicTurningPoints: {
+      window: string;
+      title: string;
+      activatedHouse: string;
+      guidance: string;
+    }[];
+  };
+}
+
 export interface TransitDosAndDonts {
   category: 'Career & Investments' | 'Relationships & Marriage' | 'Health & Physical Wellbeing' | 'Decisions & Legal / Travel';
   dos: string[];
@@ -183,6 +251,8 @@ export interface PlanetaryImpactRecord {
   businessEffect: string;
   relationEffect: string;
   marriageEffect: string;
+  educationEffect: string;
+  mentalStateEffect: string;
   tone: 'Auspicious' | 'Caution' | 'Transformative' | 'Neutral';
 }
 
@@ -195,6 +265,11 @@ export interface BirthTimeHousePrediction {
   planetsHere: string[];
   headline: string;
   prediction: string;
+  bhriguSamhitaReading: string;
+  bhriguActivationAge: string;
+  lalKitabReading: string;
+  lalKitabPakkaGharLord: string;
+  lalKitabUpay: string;
   lifeDomain:
     | 'Self & Vitality'
     | 'Wealth & Speech'
@@ -209,6 +284,39 @@ export interface BirthTimeHousePrediction {
     | 'Gains & Aspirations'
     | 'Moksha & Foreign';
   strengthScore: number;
+}
+
+export interface BhriguLalKitabSummary {
+  bhriguBindu: {
+    rasiName: VedicRasiName;
+    rasiNumber: number;
+    degree: number;
+    minute: number;
+    houseFromLagna: number;
+    houseFromMoon: number;
+    interpretation: string;
+  };
+  karmicBlueprint: string;
+  bhagyodayaAges: {
+    age: number;
+    planet: string;
+    house: number;
+    milestone: string;
+  }[];
+  lalKitabRina: {
+    name: string;
+    status: 'Active Caution' | 'Harmonized';
+    reason: string;
+    upay: string;
+  }[];
+  lalKitabPlanetPlacements: {
+    planet: string;
+    khana: number;
+    pakkaGhar: string;
+    status: 'Awakened (Shubh)' | 'Mixed (Madhyam)' | 'Caution (Manda)';
+    effect: string;
+    remedy: string;
+  }[];
 }
 
 export interface NatalYoga {

@@ -17,10 +17,13 @@ import { NorthIndianChart } from './NorthIndianChart';
 import { ProfileSelector } from './ProfileSelector';
 import { PlaceValue } from './PlaceOfBirthInput';
 import { HouseCardDeck } from './HouseCardDeck';
+import { BhriguLalKitabSection } from './BhriguLalKitabSection';
+import { ShadbalaD3Chart } from './ShadbalaD3Chart';
 import {
   calculatePlanetaryPositions,
   buildHouseStructure,
   calculateBirthTimeHousePredictions,
+  calculateBhriguAndLalKitab,
   calculateNatalYogas,
   calculateVimshottariDasha,
 } from '../vedicMath';
@@ -99,6 +102,15 @@ export function BirthTimePredictionsTab({
   const [selectedHouse, setSelectedHouse] = useState<HouseInfo | null>(null);
   const [selectedHouseNumber, setSelectedHouseNumber] = useState<number>(1);
   const [houseDomainFilter, setHouseDomainFilter] = useState<string>('ALL');
+  const [activeBirthSectionTab, setActiveBirthSectionTab] = useState<
+    | 'profile'
+    | 'coordinates'
+    | 'shadbala'
+    | 'houses-summary'
+    | 'bhava-deck'
+    | 'bhrigu-samhita'
+    | 'lal-kitab'
+  >('profile');
 
   // AI Birth Reading state
   const [isLoadingAi, setIsLoadingAi] = useState(false);
@@ -250,192 +262,447 @@ export function BirthTimePredictionsTab({
 
   return (
     <div className="w-full space-y-2">
-      {/* Saved Profiles Selector */}
-      <ProfileSelector
-        profiles={profiles}
-        activeProfileId={activeProfileId}
-        onSelectProfile={handleSelectProfile}
-        onSaveProfile={handleSaveProfile}
-        onDeleteProfile={handleDeleteProfile}
-      />
+      {/* Sacred Lord Ganesha Outline & Mangalacharan Header Banner */}
+      <div className="bg-gradient-to-r from-[#FDF8EE] via-[#FFFDF9] to-[#FDF8EE] rounded-lg border border-amber-200/90 px-3 py-2 shadow-3xs flex flex-col sm:flex-row items-center justify-between gap-2 relative overflow-hidden">
+        <div className="flex items-center space-x-3">
+          {/* Artistic Sacred Ganesha Line-Art Outline SVG */}
+          <div className="w-12 h-12 rounded-full bg-amber-50/90 border border-amber-300/80 flex items-center justify-center shrink-0 shadow-2xs">
+            <svg
+              viewBox="0 0 100 100"
+              className="w-10 h-10 text-amber-800"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              {/* Sacred Halo Circle */}
+              <circle cx="50" cy="50" r="46" strokeWidth="1.2" strokeDasharray="3 2" className="text-amber-500/70" />
+              {/* Mukut (Crown) Tiered Outline */}
+              <path d="M36 32 L50 10 L64 32 Z" strokeWidth="2" />
+              <path d="M41 25 L50 14 L59 25" strokeWidth="1.5" />
+              <path d="M33 32 Q50 35 67 32" strokeWidth="2.2" />
+              <circle cx="50" cy="7" r="2" fill="currentColor" />
+              {/* Left & Right Auspicious Ears */}
+              <path d="M34 35 C16 32, 14 56, 32 58" strokeWidth="2" />
+              <path d="M66 35 C84 32, 86 56, 68 58" strokeWidth="2" />
+              {/* Sacred Tilak (Tripundra) on Forehead */}
+              <path d="M43 39 Q50 41 57 39" strokeWidth="1.6" />
+              <path d="M45 43 Q50 45 55 43" strokeWidth="1.6" />
+              <circle cx="50" cy="47" r="1.6" fill="currentColor" />
+              {/* Serene Eyes */}
+              <path d="M38 46 Q41 44 44 46" strokeWidth="1.6" />
+              <path d="M56 46 Q59 44 62 46" strokeWidth="1.6" />
+              {/* Graceful Curved Trunk & Tusk (Ekadanta) */}
+              <path d="M44 50 C43 64, 44 76, 56 76 C63 76, 64 68, 59 66 C56 65, 55 69, 58 70" strokeWidth="2.2" />
+              <path d="M40 57 L36 61 L42 60" strokeWidth="1.6" />
+              {/* Modak in Trunk Curve */}
+              <circle cx="60" cy="63" r="2.5" fill="currentColor" className="text-amber-600" />
+              {/* Sacred Lotus Base */}
+              <path d="M28 84 Q50 92 72 84" strokeWidth="1.8" />
+              <path d="M35 86 Q50 78 65 86" strokeWidth="1.5" />
+            </svg>
+          </div>
 
-      {/* Core Natal Vitals Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-        {[
-          { label: 'Ascendant', val: VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName, lord: VEDIC_RASIS[natalLagnaRasi - 1]?.lord, color: 'amber' },
-          { label: 'Moon Sign', val: VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName, lord: VEDIC_RASIS[natalMoonRasi - 1]?.lord, color: 'sky' },
-          { label: 'Nakshatra', val: natalNakshatra, lord: `Dasha: ${vimshottariDasha?.birthLord}`, color: 'emerald' },
-          { label: 'Current Dasha', val: `${vimshottariDasha?.currentLord} Dasha`, lord: 'Active Phase', color: 'purple' },
-        ].map((item, idx) => (
-          <div key={idx} className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/80 px-2.5 py-1.5 shadow-3xs">
-            <span className={`text-[11px] font-black text-${item.color}-800 uppercase tracking-wider block`}>
-              {item.label}
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+            <span className="font-vedic font-black text-amber-900 text-[15px] tracking-wide shrink-0">
+              ॥ श्री गणेशाय नमः ॥
             </span>
-            <div className="flex items-baseline space-x-1 mt-0.5">
-              <span className="text-[14px] font-vedic font-bold text-stone-900 leading-snug">
-                {item.val}
+            <span className="text-amber-300 hidden sm:inline">|</span>
+            <span className="text-[13px] text-stone-700 font-semibold leading-snug">
+              Vakratunda Mahakaya Suryakoti Samaprabha • Nirvighnam Kuru Me Deva Sarva-Karyeshu Sarvada
+            </span>
+          </div>
+        </div>
+
+        <div className="hidden md:flex items-center space-x-2 text-[12px] font-bold text-amber-900 bg-amber-100/60 border border-amber-200 px-2.5 py-1 rounded-md shrink-0">
+          <span>Shubh Muhurta &amp; Sidereal Lahiri</span>
+        </div>
+      </div>
+
+      {/* 7 BIRTH CHARTS & READINGS — COMPACT 1-ROW DECK OF CARDS SELECTOR */}
+      <div className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/90 px-2 py-1.5 shadow-3xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1.5">
+          {[
+            {
+              id: 'profile',
+              title: "Person's Profile",
+              icon: User,
+            },
+            {
+              id: 'coordinates',
+              title: 'Coordinates',
+              icon: BookOpen,
+            },
+            {
+              id: 'shadbala',
+              title: 'Shadbala',
+              icon: Sparkles,
+            },
+            {
+              id: 'houses-summary',
+              title: 'Summary of 12 Houses',
+              icon: Layers,
+            },
+            {
+              id: 'bhava-deck',
+              title: 'Bhava Deck',
+              icon: Compass,
+            },
+            {
+              id: 'bhrigu-samhita',
+              title: 'Bhrigu Samhita',
+              icon: Award,
+            },
+            {
+              id: 'lal-kitab',
+              title: 'Lal Kitab',
+              icon: ShieldCheck,
+            },
+          ].map((card) => {
+            const Icon = card.icon;
+            const isActive = activeBirthSectionTab === card.id;
+            return (
+              <div
+                key={card.id}
+                onClick={() => setActiveBirthSectionTab(card.id as any)}
+                className={`group relative rounded-md px-2.5 py-1.5 transition-all duration-150 cursor-pointer border flex items-center justify-between gap-1.5 ${
+                  isActive
+                    ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
+                    : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5] shadow-3xs'
+                }`}
+              >
+                <span
+                  className={`font-vedic font-bold text-[12px] leading-none truncate ${
+                    isActive ? 'text-amber-950' : 'text-stone-900'
+                  }`}
+                >
+                  {card.title}
+                </span>
+                <Icon
+                  className={`w-3.5 h-3.5 shrink-0 ${
+                    isActive ? 'text-amber-700' : 'text-stone-400 group-hover:text-amber-600'
+                  }`}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* TAB 1: PERSON'S PROFILE & JANAM KUNDALI OVERVIEW */}
+      {activeBirthSectionTab === 'profile' && (
+        <div className="space-y-2">
+          {/* Person's Profile Selector */}
+          <ProfileSelector
+            profiles={profiles}
+            activeProfileId={activeProfileId}
+            onSelectProfile={handleSelectProfile}
+            onSaveProfile={handleSaveProfile}
+            onDeleteProfile={handleDeleteProfile}
+          />
+
+          {/* North Indian Diamond Chart & Kundali Focus Area */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 items-start">
+            {/* Left Column: D1 Birth Chart */}
+            <div className="lg:col-span-5 flex justify-center">
+              <NorthIndianChart
+                houses={natalHouses}
+                title="Janam Kundali"
+                subtitle="Sidereal D1"
+                showTransitsTogether={false}
+                onSelectHouse={handleSelectHouse}
+                selectedHouseNumber={selectedHouseNumber}
+              />
+            </div>
+
+            {/* Right Column: Core Natal Vitals, Chart Focus & Key Yogas Formed at Birth */}
+            <div className="lg:col-span-7 space-y-2">
+              {/* Core Natal Vitals Bar (Ascendant, Moon Sign, Nakshatra, Current Dasha) */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                {[
+                  { label: 'Ascendant', val: VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName, lord: VEDIC_RASIS[natalLagnaRasi - 1]?.lord, textColor: 'text-amber-800' },
+                  { label: 'Moon Sign', val: VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName, lord: VEDIC_RASIS[natalMoonRasi - 1]?.lord, textColor: 'text-sky-800' },
+                  { label: 'Nakshatra', val: natalNakshatra, lord: `Dasha: ${vimshottariDasha?.birthLord}`, textColor: 'text-emerald-800' },
+                  { label: 'Current Dasha', val: `${vimshottariDasha?.currentLord} Dasha`, lord: 'Active Phase', textColor: 'text-purple-800' },
+                ].map((item, idx) => (
+                  <div key={idx} className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/80 px-2.5 py-1.5 shadow-3xs">
+                    <span className={`text-[11px] font-black ${item.textColor} uppercase tracking-wider block`}>
+                      {item.label}
+                    </span>
+                    <div className="flex items-baseline space-x-1 mt-0.5">
+                      <span className="text-[14px] font-vedic font-bold text-stone-900 leading-snug">
+                        {item.val}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Active House Selection Quick Bar (Tanu Bhava / Selected House) */}
+              <div className="bg-gradient-to-r from-amber-50/50 via-white to-transparent rounded-lg border border-amber-200/80 px-2.5 py-1.5 shadow-3xs flex items-center justify-between gap-2">
+                <div className="flex items-center space-x-2.5">
+                  <div className="text-amber-700 font-vedic font-bold text-[20px] leading-none">
+                    H{selectedHouseNumber}
+                  </div>
+                  <div className="h-5 w-px bg-stone-200" />
+                  <div>
+                    <span className="font-vedic font-bold text-stone-900 text-[15px]">
+                      {selectedHouse?.vedicName}
+                    </span>
+                    <p className="text-[12px] text-stone-600 font-bold uppercase tracking-wider">
+                      {selectedHouse?.rasiName} • Lord: {selectedHouse?.signLord}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Natal Yogas Card */}
+              <div className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/80 px-2.5 py-2 shadow-2xs space-y-1.5">
+                <div className="flex items-center justify-between border-b border-stone-100 pb-1">
+                  <h4 className="font-vedic font-bold text-stone-900 text-[14px] flex items-center space-x-1.5">
+                    <Award className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Natal Yogas</span>
+                  </h4>
+                </div>
+
+                <div className="space-y-1.5">
+                  {natalYogas.map((yoga) => (
+                    <div key={yoga.name} className="space-y-0.5">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="font-bold text-amber-900 text-[14px] uppercase tracking-wide">{yoga.name}</span>
+                        <span className="text-[11px] font-black text-amber-600 uppercase tracking-wider">
+                          {yoga.auspiciousness}
+                        </span>
+                      </div>
+                      <p className="text-[13px] text-stone-700 leading-snug">
+                        {yoga.effect}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Optional Real-time AI Deep Birth Reading */}
+          <div className="bg-white rounded-lg border border-stone-200 px-2.5 py-2 shadow-2xs space-y-1.5">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center space-x-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                <h3 className="font-vedic font-bold text-stone-900 text-[14px]">
+                  AI Synthesis
+                </h3>
+              </div>
+
+              <button
+                type="button"
+                onClick={fetchAiBirthPrediction}
+                disabled={isLoadingAi}
+                className="inline-flex items-center space-x-1.5 bg-stone-900 hover:bg-stone-800 text-white text-[13px] font-semibold py-1 px-2.5 rounded transition-colors cursor-pointer disabled:opacity-50 shrink-0"
+              >
+                {isLoadingAi ? (
+                  <>
+                    <Loader2 className="w-3 h-3 animate-spin text-amber-400" />
+                    <span>Analyzing...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-3 h-3 text-amber-400" />
+                    <span>Generate Reading</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {aiReading && (
+              <div className="bg-[#FAF8F5] rounded border border-amber-300/80 px-2.5 py-2 text-stone-800 text-[14px] leading-snug space-y-1">
+                {aiReading.split('\n').map((para, idx) =>
+                  para.trim() ? <p key={idx}>{para}</p> : null
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 2: NATAL PLANETARY COORDINATES */}
+      {activeBirthSectionTab === 'coordinates' && (
+        <div className="space-y-2">
+          {/* Planetary Coordinates Table (Sidereal Lahiri) */}
+          <div className="bg-white rounded-lg border border-stone-200 px-2.5 py-2 shadow-2xs space-y-1">
+            <div className="flex items-center justify-between mb-1 border-b border-stone-100 pb-1">
+              <div className="flex items-center space-x-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-amber-700" />
+                <h3 className="text-[15px] font-vedic font-bold text-stone-900">
+                  Natal Planetary Coordinates (Sidereal Lahiri — {name})
+                </h3>
+              </div>
+              <span className="text-[12px] font-semibold text-amber-800">
+                Lagna: {VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName} • Moon: {VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName}
               </span>
             </div>
-          </div>
-        ))}
-      </div>
 
-      {/* North Indian Diamond Chart & Kundali Focus Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 items-start">
-        {/* Left Column: D1 Birth Chart */}
-        <div className="lg:col-span-5 flex justify-center">
-          <NorthIndianChart
-            houses={natalHouses}
-            title="Janam Kundali"
-            subtitle="Sidereal D1"
-            showTransitsTogether={false}
-            onSelectHouse={handleSelectHouse}
-            selectedHouseNumber={selectedHouseNumber}
-          />
+            <div className="overflow-x-auto w-full">
+              <table className="w-full text-left text-[13px] border-collapse">
+                <thead>
+                  <tr className="border-b border-stone-200 bg-[#FAF8F5] text-stone-900 text-[12px] font-bold">
+                    <th className="py-1 px-2 uppercase tracking-wider">Graha</th>
+                    <th className="py-1 px-2 uppercase tracking-wider">Rasi</th>
+                    <th className="py-1 px-2 uppercase tracking-wider">Deg</th>
+                    <th className="py-1 px-2 uppercase tracking-wider">Nakshatra</th>
+                    <th className="py-1 px-2 uppercase tracking-wider">H</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100">
+                  {natalPlanets.map((planet) => (
+                    <tr key={planet.name} className="hover:bg-stone-50/80 transition-colors">
+                      <td className="py-1 px-2 font-semibold text-stone-950">
+                        {planet.symbol} {planet.name} ({planet.englishName})
+                      </td>
+                      <td className="py-1 px-2 text-stone-900">
+                        {planet.rasiName}
+                      </td>
+                      <td className="py-1 px-2 text-stone-950 font-mono">
+                        {planet.degree}° {planet.minute}&apos;
+                      </td>
+                      <td className="py-1 px-2 text-stone-900">
+                        {planet.nakshatra} (Pada {planet.pada})
+                      </td>
+                      <td className="py-1 px-2">
+                        <span className="px-1.5 py-0.5 rounded bg-stone-100 font-semibold text-stone-950">
+                          H{planet.house}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
+      )}
 
-        {/* Right Column: Chart Focus & Key Yogas Formed at Birth */}
-        <div className="lg:col-span-7 space-y-2">
-          {/* Active House Selection Quick Bar */}
-          <div className="bg-gradient-to-r from-amber-50/50 via-white to-transparent rounded-lg border border-amber-200/80 px-2.5 py-1.5 shadow-3xs flex items-center justify-between gap-2">
-            <div className="flex items-center space-x-2.5">
-              <div className="text-amber-700 font-vedic font-bold text-[20px] leading-none">
-                H{selectedHouseNumber}
-              </div>
-              <div className="h-5 w-px bg-stone-200" />
-              <div>
-                <span className="font-vedic font-bold text-stone-900 text-[15px]">
-                  {selectedHouse?.vedicName}
-                </span>
-                <p className="text-[12px] text-stone-600 font-bold uppercase tracking-wider">
-                  {selectedHouse?.rasiName} • Lord: {selectedHouse?.signLord}
-                </p>
-              </div>
+      {/* TAB 3: SHADBALA (SIX-FOLD PLANETARY STRENGTH) */}
+      {activeBirthSectionTab === 'shadbala' && (
+        <div className="space-y-2">
+          {natalPlanets.length > 0 && (
+            <ShadbalaD3Chart planets={natalPlanets} birthTime={birthTime} />
+          )}
+        </div>
+      )}
+
+      {/* TAB 3: SUMMARY OF ALL 12 HOUSES (DVADASA BHAVA AT-A-GLANCE OVERVIEW) */}
+      {activeBirthSectionTab === 'houses-summary' && (
+        <div className="bg-white/95 backdrop-blur-sm rounded-lg border border-stone-200 p-2.5 shadow-2xs space-y-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-stone-100 pb-1.5">
+            <div className="flex items-center space-x-1.5">
+              <Layers className="w-4 h-4 text-amber-700" />
+              <h3 className="font-vedic font-bold text-stone-950 text-[15px] tracking-tight">
+                Summary of All 12 Houses (Dvadasa Bhava Overview — {name})
+              </h3>
             </div>
+            <span className="text-[12px] text-stone-600 font-medium">
+              Click any house card to open its detailed Bhava Deck dossier
+            </span>
           </div>
 
-          {/* Natal Yogas Card */}
-          <div className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/80 px-2.5 py-2 shadow-2xs space-y-1.5">
-            <div className="flex items-center justify-between border-b border-stone-100 pb-1">
-              <h4 className="font-vedic font-bold text-stone-900 text-[14px] flex items-center space-x-1.5">
-                <Award className="w-3.5 h-3.5 text-amber-600" />
-                <span>Natal Yogas</span>
-              </h4>
-            </div>
-
-            <div className="space-y-1.5">
-              {natalYogas.map((yoga) => (
-                <div key={yoga.name} className="space-y-0.5">
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="font-bold text-amber-900 text-[14px] uppercase tracking-wide">{yoga.name}</span>
-                    <span className="text-[11px] font-black text-amber-600 uppercase tracking-wider">
-                      {yoga.auspiciousness}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {housePredictions.map((hp) => {
+              const isSelected = hp.houseNumber === selectedHouseNumber;
+              const rasiObj = VEDIC_RASIS.find((r) => r.sanskritName === hp.signName);
+              return (
+                <div
+                  key={hp.houseNumber}
+                  onClick={() => {
+                    handleSelectHouseNumber(hp.houseNumber);
+                    setActiveBirthSectionTab('bhava-deck');
+                  }}
+                  className={`rounded-md border p-2 transition-all cursor-pointer space-y-1 ${
+                    isSelected
+                      ? 'bg-amber-50/70 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
+                      : 'bg-[#FAF8F5]/70 hover:bg-white border-stone-200/90 hover:border-amber-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-1 border-b border-stone-200/60 pb-1">
+                    <div className="flex items-center space-x-1.5">
+                      <span
+                        className={`px-1.5 py-0.5 rounded text-[12px] font-vedic font-bold ${
+                          isSelected
+                            ? 'bg-amber-700 text-white'
+                            : 'bg-amber-100/80 text-amber-900 border border-amber-200'
+                        }`}
+                      >
+                        H{hp.houseNumber}
+                      </span>
+                      <span className="font-vedic font-bold text-stone-950 text-[13px] truncate">
+                        {hp.vedicName.replace(/\s*\(\d+\w+\s+House\)/i, '')}
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800 shrink-0">
+                      {hp.lifeDomain}
                     </span>
                   </div>
-                  <p className="text-[13px] text-stone-700 leading-snug">
-                    {yoga.effect}
+
+                  <div className="flex flex-wrap items-center justify-between gap-1 text-[12px]">
+                    <span className="text-stone-700 font-semibold">
+                      Rashi: <strong className="text-stone-950">{hp.signName}</strong>
+                      {rasiObj ? ` (${rasiObj.westernEquivalent})` : ''}
+                    </span>
+                    <span className="text-stone-600">
+                      Lord: <strong className="text-stone-900">{hp.signLord}</strong>
+                    </span>
+                  </div>
+
+                  <div className="text-[12px]">
+                    {hp.planetsHere.length > 0 ? (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-900 border border-emerald-200 font-semibold text-[11px]">
+                        Grahas: {hp.planetsHere.join(', ')}
+                      </span>
+                    ) : (
+                      <span className="text-[11px] text-stone-500 italic">
+                        Unoccupied • Governed by {hp.signLord}
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-[12px] text-stone-700 leading-snug">
+                    {hp.prediction}
                   </p>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </div>
-      </div>
+      )}
 
-      {/* ALL 12 HOUSES AS DECK OF CARDS & SELECTED HOUSE DETAILS ONLY */}
-      <HouseCardDeck
-        houses={natalHouses}
-        housePredictions={housePredictions}
-        natalPlanets={natalPlanets}
-        selectedHouseNumber={selectedHouseNumber}
-        onSelectHouseNumber={handleSelectHouseNumber}
-      />
+      {/* TAB 4: BHAVA DECK (ALL 12 HOUSES AS DECK OF CARDS & SELECTED HOUSE DOSSIER) */}
+      {activeBirthSectionTab === 'bhava-deck' && (
+        <HouseCardDeck
+          houses={natalHouses}
+          housePredictions={housePredictions}
+          natalPlanets={natalPlanets}
+          selectedHouseNumber={selectedHouseNumber}
+          onSelectHouseNumber={handleSelectHouseNumber}
+        />
+      )}
 
-      {/* Optional Real-time AI Deep Birth Reading */}
-      <div className="bg-white rounded-lg border border-stone-200 px-2.5 py-2 shadow-2xs space-y-1.5">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center space-x-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-            <h3 className="font-vedic font-bold text-stone-900 text-[14px]">
-              AI Synthesis
-            </h3>
-          </div>
+      {/* TAB 5: BHRIGU SAMHITA INTERPRETATION */}
+      {activeBirthSectionTab === 'bhrigu-samhita' && natalPlanets.length > 0 && (
+        <BhriguLalKitabSection
+          data={calculateBhriguAndLalKitab(natalLagnaRasi, natalPlanets)}
+          seekerName={name}
+          forcedView="bhrigu"
+        />
+      )}
 
-          <button
-            type="button"
-            onClick={fetchAiBirthPrediction}
-            disabled={isLoadingAi}
-            className="inline-flex items-center space-x-1.5 bg-stone-900 hover:bg-stone-800 text-white text-[13px] font-semibold py-1 px-2.5 rounded transition-colors cursor-pointer disabled:opacity-50 shrink-0"
-          >
-            {isLoadingAi ? (
-              <>
-                <Loader2 className="w-3 h-3 animate-spin text-amber-400" />
-                <span>Analyzing...</span>
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-3 h-3 text-amber-400" />
-                <span>Generate Reading</span>
-              </>
-            )}
-          </button>
-        </div>
-
-        {aiReading && (
-          <div className="bg-[#FAF8F5] rounded border border-amber-300/80 px-2.5 py-2 text-stone-800 text-[14px] leading-snug space-y-1">
-            {aiReading.split('\n').map((para, idx) =>
-              para.trim() ? <p key={idx}>{para}</p> : null
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Planetary Coordinates Table (Sidereal Lahiri) */}
-      <div className="bg-white rounded-lg border border-stone-200 px-2.5 py-2 shadow-2xs space-y-1">
-        <div className="flex items-center space-x-1.5 mb-1">
-          <BookOpen className="w-3.5 h-3.5 text-amber-700" />
-          <h3 className="text-[14px] font-vedic font-bold text-stone-900">
-            Natal Planetary Coordinates
-          </h3>
-        </div>
-
-        <div className="overflow-x-auto w-full">
-          <table className="w-full text-left text-[13px] border-collapse">
-            <thead>
-              <tr className="border-b border-stone-200 bg-[#FAF8F5] text-stone-900 text-[12px] font-bold">
-                <th className="py-1 px-2 uppercase tracking-wider">Graha</th>
-                <th className="py-1 px-2 uppercase tracking-wider">Rasi</th>
-                <th className="py-1 px-2 uppercase tracking-wider">Deg</th>
-                <th className="py-1 px-2 uppercase tracking-wider">Nakshatra</th>
-                <th className="py-1 px-2 uppercase tracking-wider">H</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-stone-100">
-              {natalPlanets.map((planet) => (
-                <tr key={planet.name} className="hover:bg-stone-50/80 transition-colors">
-                  <td className="py-1 px-2 font-semibold text-stone-950">
-                    {planet.symbol} {planet.name}
-                  </td>
-                  <td className="py-1 px-2 text-stone-900">
-                    {planet.rasiName}
-                  </td>
-                  <td className="py-1 px-2 text-stone-950 font-mono">
-                    {planet.degree}° {planet.minute}'
-                  </td>
-                  <td className="py-1 px-2 text-stone-900">
-                    {planet.nakshatra}
-                  </td>
-                  <td className="py-1 px-2">
-                    <span className="px-1.5 py-0.5 rounded bg-stone-100 font-semibold text-stone-950">
-                      H{planet.house}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* TAB 6: LAL KITAB INTERPRETATION */}
+      {activeBirthSectionTab === 'lal-kitab' && natalPlanets.length > 0 && (
+        <BhriguLalKitabSection
+          data={calculateBhriguAndLalKitab(natalLagnaRasi, natalPlanets)}
+          seekerName={name}
+          forcedView="lalkitab"
+        />
+      )}
     </div>
   );
 }

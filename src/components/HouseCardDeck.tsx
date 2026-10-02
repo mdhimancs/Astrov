@@ -278,8 +278,8 @@ export function HouseCardDeck({
               </h3>
             </div>
 
-            {/* Category Filter - Zero Pill Style */}
-            <div className="flex flex-wrap items-center gap-2.5">
+            {/* Category Filter - Compact 1-Row Deck of Cards */}
+            <div className="flex flex-wrap items-center gap-1.5">
               {[
                 { id: 'ALL', label: 'All' },
                 { id: 'KENDRA', label: 'Kendra' },
@@ -287,39 +287,41 @@ export function HouseCardDeck({
                 { id: 'DHANA', label: 'Wealth' },
                 { id: 'UPACHAYA', label: 'Growth' },
                 { id: 'DUSTHANA', label: 'Moksha' },
-              ].map((cat) => (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => setFilterCategory(cat.id as any)}
-                  className={`text-[12px] font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer pb-0.5 border-b-2 ${
-                    filterCategory === cat.id
-                      ? 'text-amber-800 border-amber-600'
-                      : 'text-stone-600 border-transparent hover:text-stone-800'
-                  }`}
-                >
-                  {cat.label}
-                </button>
-              ))}
+              ].map((cat) => {
+                const isActive = filterCategory === cat.id;
+                return (
+                  <div
+                    key={cat.id}
+                    onClick={() => setFilterCategory(cat.id as any)}
+                    className={`rounded-md px-2.5 py-1 text-[12px] font-vedic font-bold transition-all duration-150 cursor-pointer border ${
+                      isActive
+                        ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 text-amber-950 shadow-2xs'
+                        : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'
+                    }`}
+                  >
+                    {cat.label}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
           {/* THE 12 HOUSES NAVIGATION CARDS (H1, H2, etc.) */}
-          <div className="grid grid-cols-6 sm:flex sm:flex-wrap gap-1.5 mt-2">
+          <div className="grid grid-cols-6 sm:grid-cols-12 gap-1.5 mt-2">
             {displayedHouses.map((h) => {
               const isSelected = h.houseNumber === selectedHouseNumber;
               return (
-                <button
+                <div
                   key={h.houseNumber}
                   onClick={() => onSelectHouseNumber(h.houseNumber)}
-                  className={`px-2.5 py-1 min-w-[2.25rem] rounded-md font-vedic font-bold text-[13px] flex items-center justify-center transition-all duration-150 border cursor-pointer ${
+                  className={`px-2 py-1 rounded-md font-vedic font-bold text-[12px] flex items-center justify-center transition-all duration-150 border cursor-pointer ${
                     isSelected
-                      ? 'bg-amber-700 text-white border-amber-600 shadow-2xs'
-                      : 'bg-white border-stone-200 text-stone-700 hover:border-amber-300 hover:text-amber-800'
+                      ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 text-amber-950 shadow-2xs'
+                      : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'
                   }`}
                 >
                   H{h.houseNumber}
-                </button>
+                </div>
               );
             })}
           </div>
@@ -455,12 +457,56 @@ export function HouseCardDeck({
             </div>
           </div>
 
-          {/* PREDICTIVE READING - ELEGANT BLOCK */}
-          <div className="bg-amber-50/40 rounded-lg p-2.5 border-l-2 border-amber-400">
-            <h4 className="text-[12px] font-black text-amber-800 uppercase tracking-wider mb-1">Sage Parashari Reading</h4>
-            <p className="font-serif italic text-stone-800 text-[15px] leading-snug antialiased">
-              "{activePrediction.prediction}"
-            </p>
+          {/* PREDICTIVE READINGS: PARASHARI, BHRIGU SAMHITA & LAL KITAB */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+            {/* 1. Sage Parashari Reading */}
+            <div className="bg-amber-50/40 rounded-lg p-2.5 border-l-2 border-amber-500 space-y-1">
+              <div className="flex items-center justify-between gap-1">
+                <h4 className="text-[12px] font-black text-amber-900 uppercase tracking-wider">
+                  Sage Parashari Reading
+                </h4>
+                <span className="text-[11px] font-bold text-amber-800 bg-amber-100/80 px-1.5 py-0.5 rounded">
+                  Brihat Parashara
+                </span>
+              </div>
+              <p className="font-serif italic text-stone-800 text-[14px] leading-snug antialiased">
+                "{activePrediction.prediction}"
+              </p>
+            </div>
+
+            {/* 2. Bhrigu Samhita Reading */}
+            <div className="bg-purple-50/40 rounded-lg p-2.5 border-l-2 border-purple-500 space-y-1">
+              <div className="flex flex-wrap items-center justify-between gap-1">
+                <h4 className="text-[12px] font-black text-purple-900 uppercase tracking-wider">
+                  Bhrigu Samhita Reading
+                </h4>
+                <span className="text-[11px] font-bold text-purple-800 bg-purple-100/80 px-1.5 py-0.5 rounded">
+                  {activePrediction.bhriguActivationAge}
+                </span>
+              </div>
+              <p className="text-stone-800 text-[13px] leading-snug">
+                {activePrediction.bhriguSamhitaReading}
+              </p>
+            </div>
+
+            {/* 3. Lal Kitab Reading & Upay */}
+            <div className="bg-rose-50/40 rounded-lg p-2.5 border-l-2 border-rose-500 space-y-1">
+              <div className="flex flex-wrap items-center justify-between gap-1">
+                <h4 className="text-[12px] font-black text-rose-900 uppercase tracking-wider">
+                  Lal Kitab (Khana {activeHouse.houseNumber})
+                </h4>
+                <span className="text-[11px] font-bold text-rose-800 bg-rose-100/80 px-1.5 py-0.5 rounded">
+                  Pakka Ghar: {activePrediction.lalKitabPakkaGharLord.split('—')[0].trim()}
+                </span>
+              </div>
+              <p className="text-stone-800 text-[13px] leading-snug">
+                {activePrediction.lalKitabReading}
+              </p>
+              <div className="pt-1 border-t border-rose-200/60 text-[12px] text-rose-950">
+                <strong className="uppercase tracking-wider text-rose-800">Lal Kitab Upay: </strong>
+                <span>{activePrediction.lalKitabUpay}</span>
+              </div>
+            </div>
           </div>
 
           {/* REMEDIES - ZERO CARD LOOK */}
