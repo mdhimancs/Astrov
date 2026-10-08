@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { GlossaryTerm } from './GlossaryTerm';
 import {
   Sparkles,
   Calendar,
@@ -28,7 +29,9 @@ import {
   calculateAntardashas,
   calculatePlanetaryPositions,
   getDashaMonthlyPlanetaryGuidance,
+  calculateYoginiDasha,
   ALL_MONTH_WISE_PREDICTIONS,
+  getPlanetFavorability,
 } from '../vedicMath';
 import { VEDIC_RASIS, NAKSHATRAS } from '../data';
 import { ProfileSelector } from './ProfileSelector';
@@ -86,8 +89,8 @@ export function VimshottariDashaTab({
   // Selected Mahadasha for Antardashas inspection
   const [selectedMahadashaPlanet, setSelectedMahadashaPlanet] = useState<GrahaName | null>(null);
 
-  // Deck of Cards selector for Dasha sections: 1. Dasha Interpretation, 2. Monthly Guidance
-  const [activeDashaDeck, setActiveDashaDeck] = useState<'interpretation' | 'monthly'>('interpretation');
+  // Deck of Cards selector for Dasha sections: 1. Dasha Interpretation, 2. Monthly Guidance, 3. Yogini Dasha
+  const [activeDashaDeck, setActiveDashaDeck] = useState<'interpretation' | 'monthly' | 'yogini'>('interpretation');
 
   // Sync state when profile changes
   useEffect(() => {
@@ -117,8 +120,9 @@ export function VimshottariDashaTab({
   const natalLagnaRasi = natalCalc.lagnaRasi || 1;
   const natalNakshatra = natalMoon?.nakshatra || 'Rohini';
 
-  // 2. Calculate Vimshottari Mahadashas
+  // 2. Calculate Vimshottari Mahadashas & Yogini Dasha
   const vimshottariDasha = calculateVimshottariDasha(natalMoonTotalDeg, birthDate);
+  const yoginiDasha = calculateYoginiDasha(natalMoonTotalDeg, birthDate);
 
   // Default selected Mahadasha to currently active one
   const activeDashaLord = selectedMahadashaPlanet || vimshottariDasha.currentLord;
@@ -363,12 +367,12 @@ export function VimshottariDashaTab({
       </div>
 
       {/* SECTION 1: 9-PLANET MAHADASHA TIMELINE (COMPACT) */}
-      <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-stone-200 px-2 py-1.5 shadow-3xs space-y-1.5">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-1">
+      <div className="bg-white rounded-md border border-stone-100 px-2 py-1.5 space-y-1.5">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-50 pb-1">
           <div className="flex items-center space-x-2">
             <h2 className="font-vedic font-bold text-stone-950 text-[13px] uppercase tracking-wider flex items-center space-x-1.5 leading-tight">
               <ShieldCheck className="w-3.5 h-3.5 text-purple-700" />
-              <span>Mahadasha</span>
+              <span><GlossaryTerm term="Mahadasha">Mahadasha</GlossaryTerm></span>
             </h2>
             <span className="px-1.5 py-0.5 rounded bg-stone-100 border border-stone-200 text-stone-800 text-[11px] font-semibold">
               Nak: <strong className="text-stone-950">{natalNakshatra}</strong> ({vimshottariDasha.yearsRemainingAtBirth}y Bal)
@@ -384,19 +388,29 @@ export function VimshottariDashaTab({
           {vimshottariDasha.cycle.map((d) => {
             const isCurrentlyActive = d.planet === vimshottariDasha.currentLord;
             const isSelected = (selectedMahadashaPlanet || vimshottariDasha.currentLord) === d.planet;
+            const fav = getPlanetFavorability(d.planet, natalLagnaRasi);
+            const lineBg = fav === 'favourable' ? 'bg-emerald-600' : fav === 'unfavourable' ? 'bg-rose-600' : 'bg-amber-300';
+            const startDate = new Date(d.startMonthYear + '-01');
+            const endDate = new Date(d.endMonthYear + '-01');
+            const now = new Date();
+            const totalMs = endDate.getTime() - startDate.getTime();
+            const elapsedMs = now.getTime() - startDate.getTime();
+            const progress = totalMs > 0 ? Math.max(0, Math.min(100, (elapsedMs / totalMs) * 100)) : (now >= endDate ? 100 : 0);
 
             return (
               <div
                 key={`${d.planet}-${d.startMonthYear}`}
                 onClick={() => setSelectedMahadashaPlanet(d.planet)}
-                className={`px-1 py-1 rounded border transition-all duration-150 cursor-pointer flex flex-col items-center justify-center text-center ${
+                className={`px-1 py-1 rounded border transition-all duration-150 cursor-pointer flex flex-col items-center justify-center text-center overflow-hidden ${
                   isSelected
                     ? 'bg-amber-50/95 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
                     : isCurrentlyActive
                     ? 'bg-purple-50/50 border-purple-300'
                     : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5]'
                 }`}
+                title={`Mahadasha Lord: ${d.planet} — Favorability: ${fav}`}
               >
+                <div className={`w-full h-[2px] rounded-t-sm mb-0.5 ${lineBg}`} />
                 <div className="flex items-center justify-center space-x-1 leading-none">
                   <span className="font-vedic font-bold text-stone-950 text-[12px]">{d.planet}</span>
                   <span className="text-[10px] font-bold text-amber-800">({d.durationYears}y)</span>
@@ -405,6 +419,9 @@ export function VimshottariDashaTab({
                 <span className="text-[10px] text-stone-600 leading-tight mt-0.5 truncate w-full">
                   {d.startMonthYear}–{d.endMonthYear}
                 </span>
+                <div className="w-full bg-stone-100 rounded-sm h-1 mt-1 overflow-hidden shadow-inner">
+                  <div className="bg-stone-400/60 h-full rounded-sm transition-all" style={{ width: `${progress}%` }} />
+                </div>
               </div>
             );
           })}
@@ -427,19 +444,29 @@ export function VimshottariDashaTab({
         <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-1">
           {antardashas.map((antar) => {
             const isSelectedAntar = activeAntardashaInfo?.planet === antar.planet;
+            const favAntar = getPlanetFavorability(antar.planet, natalLagnaRasi);
+            const lineBgAntar = favAntar === 'favourable' ? 'bg-emerald-600' : favAntar === 'unfavourable' ? 'bg-rose-600' : 'bg-amber-300';
+            const startDateAntar = new Date(antar.startMonthYear + '-01');
+            const endDateAntar = new Date(antar.endMonthYear + '-01');
+            const nowAntar = new Date();
+            const totalMsAntar = endDateAntar.getTime() - startDateAntar.getTime();
+            const elapsedMsAntar = nowAntar.getTime() - startDateAntar.getTime();
+            const progressAntar = totalMsAntar > 0 ? Math.max(0, Math.min(100, (elapsedMsAntar / totalMsAntar) * 100)) : (nowAntar >= endDateAntar ? 100 : 0);
 
             return (
               <div
                 key={`${activeDashaLord}-${antar.planet}-${antar.startMonthYear}`}
                 onClick={() => setSelectedAntardashaPlanet(antar.planet)}
-                className={`px-1 py-1 rounded border transition-all cursor-pointer flex flex-col items-center justify-center text-center ${
+                className={`px-1 py-1 rounded border transition-all cursor-pointer flex flex-col items-center justify-center text-center overflow-hidden ${
                   isSelectedAntar
                     ? 'bg-amber-50/95 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
                     : antar.isCurrent
                     ? 'bg-purple-50/50 border-purple-300'
                     : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5]'
                 }`}
+                title={`Sub-Period Lord: ${antar.planet} — Favorability: ${favAntar}`}
               >
+                <div className={`w-full h-[2px] rounded-t-sm mb-0.5 ${lineBgAntar}`} />
                 <div className="flex items-center justify-center space-x-1 leading-none">
                   <span className="font-vedic font-bold text-stone-950 text-[12px]">{antar.planet}</span>
                   <span className="text-[10px] font-bold text-amber-800">({antar.durationYearsStr})</span>
@@ -448,6 +475,9 @@ export function VimshottariDashaTab({
                 <span className="text-[10px] text-stone-600 leading-tight mt-0.5 truncate w-full">
                   {antar.startMonthYear}–{antar.endMonthYear}
                 </span>
+                <div className="w-full bg-stone-100 rounded-sm h-1 mt-1 overflow-hidden shadow-inner">
+                  <div className="bg-stone-400/60 h-full rounded-sm transition-all" style={{ width: `${progressAntar}%` }} />
+                </div>
               </div>
             );
           })}
@@ -456,7 +486,7 @@ export function VimshottariDashaTab({
 
       {/* DASHA SECTIONS — COMPACT 1-ROW DECK OF CARDS SELECTOR */}
       <div className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/90 px-2 py-1.5 shadow-3xs">
-        <div className="grid grid-cols-2 gap-1.5">
+        <div className="grid grid-cols-3 gap-1.5">
           {[
             {
               id: 'interpretation',
@@ -468,13 +498,18 @@ export function VimshottariDashaTab({
               title: 'Monthly Guidance',
               icon: Calendar,
             },
+            {
+              id: 'yogini',
+              title: 'Yogini Dasha (36y)',
+              icon: Sparkles,
+            },
           ].map((card) => {
             const Icon = card.icon;
             const isActive = activeDashaDeck === card.id;
             return (
               <div
                 key={card.id}
-                onClick={() => setActiveDashaDeck(card.id as 'interpretation' | 'monthly')}
+                onClick={() => setActiveDashaDeck(card.id as 'interpretation' | 'monthly' | 'yogini')}
                 className={`group relative rounded-md px-2.5 py-1.5 transition-all duration-150 cursor-pointer border flex items-center justify-between gap-1.5 ${
                   isActive
                     ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
@@ -734,6 +769,68 @@ export function VimshottariDashaTab({
           </div>
         </div>
       </div>
+      )}
+
+      {/* CARD 3: YOGINI DASHA (FAST 36-YEAR CYCLE) */}
+      {activeDashaDeck === 'yogini' && (
+        <div className="bg-white rounded-lg border border-stone-200 p-2.5 shadow-2xs space-y-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-stone-100 pb-1.5">
+            <div className="flex items-center space-x-1.5">
+              <Sparkles className="w-4 h-4 text-purple-700" />
+              <div>
+                <h3 className="font-vedic font-bold text-stone-950 text-[14px]">
+                  Yogini Dasha (36-Year Sacred Tantric &amp; Vedic Timing Cycle)
+                </h3>
+                <p className="text-[11px] text-stone-600">
+                  Operates under 8 cosmic divine shaktis for acute event manifestation
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-1.5 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded text-[11px] font-bold text-purple-900">
+              <span>Active: {yoginiDasha.currentYogini.name} ({yoginiDasha.currentYogini.sanskrit})</span>
+            </div>
+          </div>
+
+          {/* Active Yogini Spotlight Banner */}
+          <div className="bg-gradient-to-r from-purple-50 via-[#FAF8F5] to-purple-50 rounded-md border border-purple-200 p-2 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-wider text-purple-800 block">
+                Current Yogini Period ({yoginiDasha.currentYogini.startDate} – {yoginiDasha.currentYogini.endDate})
+              </span>
+              <span className="text-[14px] font-bold text-stone-950">
+                {yoginiDasha.currentYogini.name} ({yoginiDasha.currentYogini.sanskrit}) • Lord: {yoginiDasha.currentYogini.lord} ({yoginiDasha.currentYogini.durationYears} Years)
+              </span>
+              <p className="text-[12px] text-stone-700 leading-tight mt-0.5">
+                {yoginiDasha.currentYogini.theme}
+              </p>
+            </div>
+          </div>
+
+          {/* 8 Yogini Cycle Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1.5">
+            {yoginiDasha.cycle.map((y) => (
+              <div
+                key={y.name}
+                className={`p-2 rounded border text-center flex flex-col justify-between ${
+                  y.isActive
+                    ? 'bg-purple-100/90 border-purple-500 ring-1 ring-purple-400 font-bold shadow-2xs'
+                    : 'bg-[#FAF8F5] border-stone-200/80 hover:bg-white'
+                }`}
+              >
+                <div>
+                  <div className="text-[12px] font-bold text-stone-900">{y.name}</div>
+                  <div className="text-[10px] text-purple-900 font-serif font-bold">{y.sanskrit}</div>
+                  <div className="text-[10px] text-stone-500 mt-0.5">
+                    {y.lord} ({y.durationYears}y)
+                  </div>
+                </div>
+                <div className="text-[9px] text-stone-600 mt-1 font-mono leading-none border-t border-stone-200/60 pt-1">
+                  {y.startDate}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

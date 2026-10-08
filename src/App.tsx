@@ -10,6 +10,8 @@ import { PanchangTab } from './components/PanchangTab';
 import { KundaliMatchingTab } from './components/KundaliMatchingTab';
 import { DivisionalChartsTab } from './components/DivisionalChartsTab';
 import { UpayRemediesTab } from './components/UpayRemediesTab';
+import { AstrologySystemsTab } from './components/AstrologySystemsTab';
+import { AstronomicalEphemerisTab } from './components/AstronomicalEphemerisTab';
 import { UserProfile } from './types';
 import { getSavedProfiles, getActiveProfileId, setActiveProfileId as saveActiveId } from './utils/profileStorage';
 import { calculatePlanetaryPositions, buildHouseStructure, calculateYogas, calculateAshtakavarga } from './vedicMath';
@@ -68,6 +70,9 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         currentTransitTime={currentTimeStr}
+        currentProfile={currentProfile}
+        profiles={profiles}
+        onProfileChange={handleProfileChange}
       />
 
       {/* Main Vedic Content Area */}
@@ -114,6 +119,13 @@ export default function App() {
             onNavigateToMonthWise={() => setActiveTab('monthly-predictions')}
           />
         )}
+        {activeTab === 'astrology-systems' && (
+          <AstrologySystemsTab
+            activeProfile={currentProfile}
+            profiles={profiles}
+            onProfileChange={handleProfileChange}
+          />
+        )}
         {activeTab === 'divisional-charts' && (
           <DivisionalChartsTab
             natalHouses={natalHouses}
@@ -124,14 +136,33 @@ export default function App() {
             activeProfile={currentProfile}
           />
         )}
-        {activeTab === 'transits' && <TransitsLiveTab />}
+        {activeTab === 'transits' && (
+          <TransitsLiveTab
+            activeProfile={currentProfile}
+            natalPlanets={natalCalc.planets}
+            natalLagnaRasi={natalCalc.lagnaRasi}
+          />
+        )}
+        {activeTab === 'astronomical-ephemeris' && (
+          <AstronomicalEphemerisTab
+            activeProfile={currentProfile}
+            profiles={profiles}
+            onProfileChange={handleProfileChange}
+          />
+        )}
         {activeTab === 'sadesati' && (
           <SadeSatiTab
             activeProfileId={activeProfileId}
             profiles={profiles}
           />
         )}
-        {activeTab === 'panchang' && <PanchangTab />}
+        {activeTab === 'panchang' && (
+          <PanchangTab
+            activeProfile={currentProfile}
+            natalPlanets={natalCalc.planets}
+            natalLagnaRasi={natalCalc.lagnaRasi}
+          />
+        )}
         {activeTab === 'compatibility' && (
           <KundaliMatchingTab
             activeProfileId={activeProfileId}

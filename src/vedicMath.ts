@@ -1,4 +1,4 @@
-import { BirthDetails, PlanetPosition, HouseInfo, VedicRasiName, GrahaName, TransitPrediction, PlanetaryMovementDetail, MonthWiseTransitPrediction, YearlyPrediction, TransitDosAndDonts, PlanetaryImpactRecord, BirthTimeHousePrediction, BhriguLalKitabSummary, NatalYoga, VimshottariDashaInfo, AntardashaInfo, DashaMonthlyPlanetaryGuidance, AshtakavargaPoints } from './types';
+import { BirthDetails, PlanetPosition, HouseInfo, VedicRasiName, GrahaName, TransitPrediction, PlanetaryMovementDetail, MonthWiseTransitPrediction, YearlyPrediction, TransitDosAndDonts, PlanetaryImpactRecord, BirthTimeHousePrediction, BhriguLalKitabSummary, NatalYoga, VimshottariDashaInfo, AntardashaInfo, DashaMonthlyPlanetaryGuidance, AshtakavargaPoints, TajikaSuite, TajikaSaham, TajikaYoga } from './types';
 import { VEDIC_RASIS, NAKSHATRAS, BHAVA_DETAILS } from './data';
 import { ALL_MONTH_WISE_PREDICTIONS } from './monthlyTransitData';
 export { ALL_MONTH_WISE_PREDICTIONS };
@@ -10,9 +10,27 @@ export function normalizeDegrees(deg: number): number {
   return d;
 }
 
+// Ayanamsha Systems
+export type AyanamshaSystem = 'Lahiri' | 'Raman' | 'KP' | 'TrueChitra';
+
+export function getAyanamshaValue(year: number, system: AyanamshaSystem = 'Lahiri'): number {
+  const lahiri = 23.85 + (year - 2000) * 0.01397;
+  switch (system) {
+    case 'Raman':
+      return lahiri - 1.45; // Raman is ~1°27' less than Lahiri
+    case 'KP':
+      return lahiri + 0.10; // KP Krishnamurti is ~6' more than Lahiri
+    case 'TrueChitra':
+      return lahiri + 0.03;
+    case 'Lahiri':
+    default:
+      return lahiri;
+  }
+}
+
 // Lahiri Ayanamsha for epoch approx 2026 ~ 24.25 degrees
 export function getLahiriAyanamsha(year: number): number {
-  return 23.85 + (year - 2000) * 0.01397;
+  return getAyanamshaValue(year, 'Lahiri');
 }
 
 // Convert Date & Time to Julian Day
@@ -35,14 +53,19 @@ export const PLANET_INFO: { [key in GrahaName]: { english: string; symbol: strin
 };
 
 // Calculate planetary longitudes (approximate sidereal positions)
-export function calculatePlanetaryPositions(date: Date, lat: number, lng: number): {
+export function calculatePlanetaryPositions(
+  date: Date,
+  lat: number,
+  lng: number,
+  ayanamshaSystem: AyanamshaSystem = 'Lahiri'
+): {
   planets: PlanetPosition[];
   lagnaRasi: number;
   lagnaDeg: number;
 } {
   const jd = getJulianDay(date);
   const t = (jd - 2451545.0) / 36525; // Centuries since J2000
-  const ayanamsha = getLahiriAyanamsha(date.getFullYear());
+  const ayanamsha = getAyanamshaValue(date.getFullYear(), ayanamshaSystem);
 
   // Mean longitudes
   let sunL = normalizeDegrees(280.46646 + 36000.76983 * t);
@@ -68,7 +91,7 @@ export function calculatePlanetaryPositions(date: Date, lat: number, lng: number
   let tropicalAsc = normalizeDegrees((Math.atan2(y, x) * 180) / Math.PI + 90);
   let siderealAsc = normalizeDegrees(tropicalAsc - ayanamsha);
 
-  // Convert all tropical to sidereal Lahiri
+  // Convert all tropical to sidereal
   const rawPositions: { [key in GrahaName]: number } = {
     Lagna: siderealAsc,
     Surya: normalizeDegrees(sunL - ayanamsha),
@@ -85,6 +108,10 @@ export function calculatePlanetaryPositions(date: Date, lat: number, lng: number
   const lagnaRasi = Math.floor(siderealAsc / 30) + 1;
   const lagnaDeg = siderealAsc % 30;
 
+  // KP Sub Lord Order (Vimshottari Dasha planetary sequence: Ketu, Shukra, Surya, Chandra, Mangal, Rahu, Guru, Shani, Budha)
+  const KP_LORDS = ['Ketu', 'Shukra', 'Surya', 'Chandra', 'Mangal', 'Rahu', 'Guru', 'Shani', 'Budha'];
+  const KP_YEARS = [7, 20, 6, 10, 7, 18, 16, 19, 17]; // Total 120
+
   const planets: PlanetPosition[] = (Object.keys(rawPositions) as GrahaName[]).map((name) => {
     const totalDeg = rawPositions[name];
     const rasiNumber = Math.floor(totalDeg / 30) + 1;
@@ -95,8 +122,26 @@ export function calculatePlanetaryPositions(date: Date, lat: number, lng: number
 
     // Nakshatra calculation (360 deg / 27 nakshatras = 13.3333 deg each)
     const nakshatraIndex = Math.floor(totalDeg / (360 / 27));
-    const nakshatra = NAKSHATRAS[nakshatraIndex % 27].name;
+    const nakData = NAKSHATRAS[nakshatraIndex % 27];
+    const nakshatra = nakData.name;
+    const nakshatraLord = nakData.lord;
     const pada = Math.floor((totalDeg % (360 / 27)) / (360 / 108)) + 1;
+
+    // KP Sub-Lord calculation: Nakshatra is divided proportionally to 120 Vimshottari years
+    const nakSpan = 360 / 27; // 13.3333°
+    const degInNak = totalDeg % nakSpan;
+    const nakLordIdx = KP_LORDS.indexOf(nakshatraLord);
+    let subLord = nakshatraLord;
+    let accumulatedDeg = 0;
+    for (let i = 0; i < 9; i++) {
+      const currentLordIdx = (nakLordIdx + i) % 9;
+      const subSpan = (KP_YEARS[currentLordIdx] / 120) * nakSpan;
+      accumulatedDeg += subSpan;
+      if (degInNak <= accumulatedDeg) {
+        subLord = KP_LORDS[currentLordIdx];
+        break;
+      }
+    }
 
     // House calculation relative to Lagna: House = (rasiNumber - lagnaRasi + 12) % 12 + 1
     const house = ((rasiNumber - lagnaRasi + 12) % 12) + 1;
@@ -117,8 +162,11 @@ export function calculatePlanetaryPositions(date: Date, lat: number, lng: number
       rasiName,
       degree,
       minute,
+      totalDeg,
       isRetrograde,
       nakshatra,
+      nakshatraLord,
+      subLord,
       pada,
       house,
       d9Position: calculateD9Position(totalDeg),
@@ -126,6 +174,250 @@ export function calculatePlanetaryPositions(date: Date, lat: number, lng: number
   });
 
   return { planets, lagnaRasi, lagnaDeg };
+}
+
+// Shodashavarga Divisional Chart Types
+export type VargaCode =
+  | 'D1'  // Rasi (Overall life)
+  | 'D2'  // Hora (Wealth & Prosperity)
+  | 'D3'  // Drekkana (Siblings, Courage, Energy)
+  | 'D4'  // Chaturthamsha (Fortune, Net Worth, Home)
+  | 'D7'  // Saptamsha (Children, Progeny, Dynastic Grace)
+  | 'D9'  // Navamsha (Spouse, Dharma, Inner Potential)
+  | 'D10' // Dashamsha (Career, Profession, Fame)
+  | 'D12' // Dwadashamsha (Parents, Lineage, Past Life Karma)
+  | 'D16' // Shodashamsha (Vehicles, Pleasures, Conveyances)
+  | 'D20' // Vimsamsha (Spiritual Sadhana, Devotion, Moksha)
+  | 'D24' // Chaturvimsamsha (Higher Learning, Intellect, Vidya)
+  | 'D27' // Saptavimsamsha / Bhamsha (Strength, Vitality, Subconscious)
+  | 'D30' // Trimsamsha (Arishta, Misfortune, Health Vulnerabilities)
+  | 'D60';// Shashtiamsha (Root Karma, Past Life Residue, Destiny)
+
+export const VARGA_CHART_INFO: { [key in VargaCode]: { name: string; sanskrit: string; significance: string; focus: string } } = {
+  D1: { name: 'Rasi', sanskrit: 'राशि चक्र', significance: 'Primary physical reality, general health, life vitality', focus: 'Physical Being & Core Vitality' },
+  D2: { name: 'Hora', sanskrit: 'होरा चक्र', significance: 'Wealth accumulation, family treasury, sustenance', focus: 'Dhana & Accumulated Assets' },
+  D3: { name: 'Drekkana', sanskrit: 'द्रेष्काण चक्र', significance: 'Siblings, valour, energy, initiative, courage', focus: 'Courage, Siblings & Energy' },
+  D4: { name: 'Chaturthamsha', sanskrit: 'चतुर्थांश चक्र', significance: 'Fixed assets, landed property, real estate, domestic fortune', focus: 'Home, Landed Fortune & Peace' },
+  D7: { name: 'Saptamsha', sanskrit: 'सप्तांश चक्र', significance: 'Children, grandchildren, creative fruits, legacy', focus: 'Progeny, Children & Legacy' },
+  D9: { name: 'Navamsha', sanskrit: 'नवांश चक्र', significance: 'Marriage partner, dharma, spiritual maturation after age 32', focus: 'Dharma, Spouse & Soul Purpose' },
+  D10: { name: 'Dashamsha', sanskrit: 'दशांश चक्र', significance: 'Career authority, professional status, public recognition', focus: 'Profession, Power & Leadership' },
+  D12: { name: 'Dwadashamsha', sanskrit: 'द्वादशांश चक्र', significance: 'Parents, maternal/paternal lineage, ancestral blessings', focus: 'Parents & Ancestral Heritage' },
+  D16: { name: 'Shodashamsha', sanskrit: 'षोडशांश चक्र', significance: 'Vehicles, physical luxuries, emotional comforts', focus: 'Conveyances, Luxury & Comforts' },
+  D20: { name: 'Vimsamsha', sanskrit: 'विंशांश चक्र', significance: 'Spiritual practices, mantras, meditation, divine grace', focus: 'Sadhana, Spirituality & Bhakti' },
+  D24: { name: 'Chaturvimsamsha', sanskrit: 'चतुर्विंशांश चक्र', significance: 'Higher academic excellence, philosophical intelligence', focus: 'Learning, Intellect & Vidya' },
+  D27: { name: 'Saptavimsamsha', sanskrit: 'सप्तविंशांश चक्र', significance: 'Inner stamina, subconscious mind, resilience under stress', focus: 'Subconscious Strength & Vitality' },
+  D30: { name: 'Trimsamsha', sanskrit: 'त्रिंशांश चक्र', significance: 'Karmic afflictions, evil tendencies, health challenges', focus: 'Arishta, Health Vulnerabilities & Doshas' },
+  D60: { name: 'Shashtiamsha', sanskrit: 'षष्ट्यंश चक्र', significance: 'Supreme precision chart for past-life karma & destiny confirmation', focus: 'Past Life Karma & Micro-Destiny' },
+};
+
+// Calculate divisional position for any planet in standard Vedic Shodashavarga
+export function calculateVargaPosition(totalDeg: number, varga: VargaCode): { rasiNumber: number; rasiName: VedicRasiName } {
+  const signIndex = Math.floor(totalDeg / 30); // 0 to 11
+  const degInSign = totalDeg % 30; // 0 to 30
+
+  if (varga === 'D1') {
+    const rasiNumber = signIndex + 1;
+    return { rasiNumber, rasiName: VEDIC_RASIS[rasiNumber - 1].sanskritName };
+  }
+
+  if (varga === 'D2') {
+    // Hora: 15° each. Odd signs: 0-15 Sun (Leo/5), 15-30 Moon (Cancer/4). Even signs: reverse.
+    const isOddSign = signIndex % 2 === 0; // Aries is 0 -> odd sign
+    let rasiNumber: number;
+    if (degInSign < 15) {
+      rasiNumber = isOddSign ? 5 : 4; // Leo or Cancer
+    } else {
+      rasiNumber = isOddSign ? 4 : 5; // Cancer or Leo
+    }
+    return { rasiNumber, rasiName: VEDIC_RASIS[rasiNumber - 1].sanskritName };
+  }
+
+  if (varga === 'D3') {
+    // Drekkana: 10° each. 1st decan: same sign. 2nd: 5th from it. 3rd: 9th from it.
+    const decan = Math.floor(degInSign / 10);
+    const rasiNumber = ((signIndex + decan * 4) % 12) + 1;
+    return { rasiNumber, rasiName: VEDIC_RASIS[rasiNumber - 1].sanskritName };
+  }
+
+  if (varga === 'D4') {
+    // Chaturthamsha: 7.5° each. 1st: same sign, then 4th, 7th, 10th from it.
+    const part = Math.floor(degInSign / 7.5);
+    const rasiNumber = ((signIndex + part * 3) % 12) + 1;
+    return { rasiNumber, rasiName: VEDIC_RASIS[rasiNumber - 1].sanskritName };
+  }
+
+  if (varga === 'D7') {
+    // Saptamsha: 30/7 = 4.2857° each.
+    // Odd signs start from same sign; Even signs start from 7th sign.
+    const part = Math.floor(degInSign / (30 / 7));
+    const isOddSign = signIndex % 2 === 0;
+    const startSign = isOddSign ? signIndex : (signIndex + 6) % 12;
+    const rasiNumber = ((startSign + part) % 12) + 1;
+    return { rasiNumber, rasiName: VEDIC_RASIS[rasiNumber - 1].sanskritName };
+  }
+
+  if (varga === 'D9') {
+    return calculateD9Position(totalDeg);
+  }
+
+  if (varga === 'D10') {
+    // Dashamsha: 3° each. Odd signs start from same sign; Even signs start from 9th from it.
+    const part = Math.floor(degInSign / 3);
+    const isOddSign = signIndex % 2 === 0;
+    const startSign = isOddSign ? signIndex : (signIndex + 8) % 12;
+    const rasiNumber = ((startSign + part) % 12) + 1;
+    return { rasiNumber, rasiName: VEDIC_RASIS[rasiNumber - 1].sanskritName };
+  }
+
+  if (varga === 'D12') {
+    // Dwadashamsha: 2.5° each. Starts from same sign.
+    const part = Math.floor(degInSign / 2.5);
+    const rasiNumber = ((signIndex + part) % 12) + 1;
+    return { rasiNumber, rasiName: VEDIC_RASIS[rasiNumber - 1].sanskritName };
+  }
+
+  if (varga === 'D16') {
+    // Shodashamsha: 1° 52' 30" = 1.875°.
+    // Movable signs start from Aries (1); Fixed from Leo (5); Dual from Sagittarius (9).
+    const part = Math.floor(degInSign / 1.875);
+    const signNature = signIndex % 3; // 0: Chara, 1: Sthira, 2: Dvisvabhava
+    const startSign = signNature === 0 ? 0 : signNature === 1 ? 4 : 8;
+    const rasiNumber = ((startSign + part) % 12) + 1;
+    return { rasiNumber, rasiName: VEDIC_RASIS[rasiNumber - 1].sanskritName };
+  }
+
+  if (varga === 'D20') {
+    // Vimsamsha: 1.5° each.
+    // Movable start from Aries (1); Fixed from Sagittarius (9); Dual from Leo (5).
+    const part = Math.floor(degInSign / 1.5);
+    const signNature = signIndex % 3;
+    const startSign = signNature === 0 ? 0 : signNature === 1 ? 8 : 4;
+    const rasiNumber = ((startSign + part) % 12) + 1;
+    return { rasiNumber, rasiName: VEDIC_RASIS[rasiNumber - 1].sanskritName };
+  }
+
+  if (varga === 'D24') {
+    // Chaturvimsamsha: 1.25° each.
+    // Odd signs start from Leo (5); Even signs start from Cancer (4).
+    const part = Math.floor(degInSign / 1.25);
+    const isOddSign = signIndex % 2 === 0;
+    const startSign = isOddSign ? 4 : 3;
+    const rasiNumber = ((startSign + part) % 12) + 1;
+    return { rasiNumber, rasiName: VEDIC_RASIS[rasiNumber - 1].sanskritName };
+  }
+
+  if (varga === 'D27') {
+    // Saptavimsamsha / Bhamsha: 1° 6' 40" = 1.111° each.
+    // Fire signs start from Aries (1); Earth from Cancer (4); Air from Libra (7); Water from Capricorn (10).
+    const part = Math.floor(degInSign / (30 / 27));
+    const elementGroup = signIndex % 4; // 0 Fire, 1 Earth, 2 Air, 3 Water
+    const startSign = elementGroup === 0 ? 0 : elementGroup === 1 ? 3 : elementGroup === 2 ? 6 : 9;
+    const rasiNumber = ((startSign + part) % 12) + 1;
+    return { rasiNumber, rasiName: VEDIC_RASIS[rasiNumber - 1].sanskritName };
+  }
+
+  if (varga === 'D30') {
+    // Trimsamsha: 30 divisions distributed among 5 planets (Mars, Saturn, Jupiter, Mercury, Venus).
+    // Odd signs: Mars 5° (Aries), Saturn 5° (Aquarius), Jupiter 8° (Sagittarius), Mercury 7° (Gemini), Venus 5° (Taurus)
+    // Even signs: Reverse order
+    const isOddSign = signIndex % 2 === 0;
+    let rasiNumber = 1;
+    if (isOddSign) {
+      if (degInSign < 5) rasiNumber = 1; // Mesha (Mars)
+      else if (degInSign < 10) rasiNumber = 11; // Kumbha (Saturn)
+      else if (degInSign < 18) rasiNumber = 9; // Dhanu (Jupiter)
+      else if (degInSign < 25) rasiNumber = 3; // Mithuna (Mercury)
+      else rasiNumber = 2; // Vrishabha (Venus)
+    } else {
+      if (degInSign < 5) rasiNumber = 2; // Vrishabha (Venus)
+      else if (degInSign < 12) rasiNumber = 3; // Mithuna (Mercury)
+      else if (degInSign < 20) rasiNumber = 9; // Dhanu (Jupiter)
+      else if (degInSign < 25) rasiNumber = 11; // Kumbha (Saturn)
+      else rasiNumber = 1; // Mesha (Mars)
+    }
+    return { rasiNumber, rasiName: VEDIC_RASIS[rasiNumber - 1].sanskritName };
+  }
+
+  if (varga === 'D60') {
+    // Shashtiamsha: 0.5° (30 minutes) each.
+    // Starts from the sign occupied itself!
+    const part = Math.floor(degInSign / 0.5);
+    const rasiNumber = ((signIndex + part) % 12) + 1;
+    return { rasiNumber, rasiName: VEDIC_RASIS[rasiNumber - 1].sanskritName };
+  }
+
+  const rasiNumber = signIndex + 1;
+  return { rasiNumber, rasiName: VEDIC_RASIS[rasiNumber - 1].sanskritName };
+}
+
+// Calculate Jaimini 7 Karakas (Atmakaraka, Amatyakaraka, etc.) based on highest degrees in sign
+export interface JaiminiKarakaInfo {
+  karaka: string;
+  sanskritName: string;
+  planet: GrahaName;
+  degreeInSign: number;
+  significance: string;
+}
+
+export function calculateJaiminiKarakas(planets: PlanetPosition[]): JaiminiKarakaInfo[] {
+  // Traditional 7 Karaka scheme uses Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn
+  const validPlanets: GrahaName[] = ['Surya', 'Chandra', 'Mangal', 'Budha', 'Guru', 'Shukra', 'Shani'];
+  const candidates = planets
+    .filter((p) => validPlanets.includes(p.name))
+    .map((p) => {
+      const degInSign = p.degree + p.minute / 60;
+      return { planet: p.name, degInSign };
+    })
+    .sort((a, b) => b.degInSign - a.degInSign);
+
+  const KARAKA_DEFINITIONS = [
+    { karaka: 'Atmakaraka (AK)', sanskritName: 'आत्मकारक', significance: 'Soul planet, personal destiny, dharma, lessons to learn' },
+    { karaka: 'Amatyakaraka (AmK)', sanskritName: 'अमात्यकारक', significance: 'Career, minister of soul, professional achievements, intellect' },
+    { karaka: 'Bhratrikaraka (BK)', sanskritName: 'भ्रातृकारक', significance: 'Guru, mentor, spiritual teacher, siblings and guides' },
+    { karaka: 'Matrikaraka (MK)', sanskritName: 'मातृकारक', significance: 'Mother, heart sanctuary, domestic property, education' },
+    { karaka: 'Putrakaraka (PK)', sanskritName: 'पुत्रकारक', significance: 'Children, creative genius, spiritual intelligence, legacy' },
+    { karaka: 'Gnatikaraka (GK)', sanskritName: 'ज्ञातिकारक', significance: 'Kinsmen, rivals, hurdles, health challenges and endurance' },
+    { karaka: 'Darakaraka (DK)', sanskritName: 'दाराकारक', significance: 'Spouse, life partner, intimate soul alliances and wealth' },
+  ];
+
+  return candidates.map((item, idx) => ({
+    karaka: KARAKA_DEFINITIONS[idx]?.karaka || 'Karaka',
+    sanskritName: KARAKA_DEFINITIONS[idx]?.sanskritName || '',
+    planet: item.planet,
+    degreeInSign: Number(item.degInSign.toFixed(2)),
+    significance: KARAKA_DEFINITIONS[idx]?.significance || '',
+  }));
+}
+
+// Calculate Arudha Lagna (AL) and Upapada Lagna (UL)
+export function calculateArudhaLagnas(lagnaRasi: number, planets: PlanetPosition[]): {
+  arudhaLagnaRasi: number;
+  upapadaLagnaRasi: number;
+} {
+  const lagnaLord = VEDIC_RASIS[lagnaRasi - 1].lord;
+  const lagnaLordPlanet = planets.find((p) => p.name === lagnaLord);
+  const lordRasi = lagnaLordPlanet ? lagnaLordPlanet.rasiNumber : lagnaRasi;
+
+  // Distance from Lagna to its Lord
+  const distLagnaToLord = ((lordRasi - lagnaRasi + 12) % 12);
+  let alRasi = ((lordRasi - 1 + distLagnaToLord) % 12) + 1;
+  // Jaimini exception: If AL falls in 1st or 7th from Lagna, move 10 signs forward
+  if (alRasi === lagnaRasi || alRasi === ((lagnaRasi - 1 + 6) % 12) + 1) {
+    alRasi = ((alRasi - 1 + 9) % 12) + 1;
+  }
+
+  // 12th House & Upapada Lagna (UL)
+  const twelfthRasi = ((lagnaRasi - 1 + 11) % 12) + 1;
+  const twelfthLord = VEDIC_RASIS[twelfthRasi - 1].lord;
+  const twelfthLordPlanet = planets.find((p) => p.name === twelfthLord);
+  const twelfthLordRasi = twelfthLordPlanet ? twelfthLordPlanet.rasiNumber : twelfthRasi;
+  const distTwelfthToLord = ((twelfthLordRasi - twelfthRasi + 12) % 12);
+  let ulRasi = ((twelfthLordRasi - 1 + distTwelfthToLord) % 12) + 1;
+  if (ulRasi === twelfthRasi || ulRasi === ((twelfthRasi - 1 + 6) % 12) + 1) {
+    ulRasi = ((ulRasi - 1 + 9) % 12) + 1;
+  }
+
+  return { arudhaLagnaRasi: alRasi, upapadaLagnaRasi: ulRasi };
 }
 
 // Calculate Navamsha (D9) Position
@@ -1251,6 +1543,86 @@ export function calculateAntardashas(
   return antardashas;
 }
 
+// 8 Yogini Dashas (Total 36 Years cycle)
+export interface YoginiDashaItem {
+  name: string;
+  sanskrit: string;
+  lord: GrahaName;
+  durationYears: number;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  theme: string;
+}
+
+export const YOGINI_LIST = [
+  { name: 'Mangala', sanskrit: 'मङ्गला', lord: 'Chandra' as GrahaName, years: 1, theme: 'Mental peace, auspicious events, spiritual inclinations and family joys.' },
+  { name: 'Pingala', sanskrit: 'पिङ्गला', lord: 'Surya' as GrahaName, years: 2, theme: 'Vitality, administrative challenges, health vigilance, and career focus.' },
+  { name: 'Dhanya', sanskrit: 'धान्या', lord: 'Guru' as GrahaName, years: 3, theme: 'Wealth generation, prosperity, learning, auspicious progeny, and respect.' },
+  { name: 'Bhramari', sanskrit: 'भ्रामरी', lord: 'Mangal' as GrahaName, years: 4, theme: 'Travels, restless motion, courage, overcoming rivals, and energy.' },
+  { name: 'Bhadrika', sanskrit: 'भद्रिका', lord: 'Budha' as GrahaName, years: 5, theme: 'Commercial success, high intellect, public diplomacy, and sweet speech.' },
+  { name: 'Ulka', sanskrit: 'उल्का', lord: 'Shani' as GrahaName, years: 6, theme: 'Patience, endurance, overcoming heavy backlogs, and structural resilience.' },
+  { name: 'Siddha', sanskrit: 'सिद्धा', lord: 'Shukra' as GrahaName, years: 7, theme: 'Fulfillment of desires, artistic pleasures, romance, and financial boom.' },
+  { name: 'Sankata', sanskrit: 'सङ्कटा', lord: 'Rahu' as GrahaName, years: 8, theme: 'Karmic testing, sudden changes, deep spiritual growth, and detachment.' },
+];
+
+export function calculateYoginiDasha(
+  natalMoonDegreeTotal: number,
+  birthDateStr: string = '1990-05-18'
+): { currentYogini: YoginiDashaItem; cycle: YoginiDashaItem[] } {
+  const nakshatraSpan = 360 / 27;
+  const normDeg = normalizeDegrees(natalMoonDegreeTotal);
+  const nakIndex = Math.floor(normDeg / nakshatraSpan); // 0-26
+
+  // Starting Yogini: (Nakshatra number 1-27 + 3) % 8
+  const nakNum = nakIndex + 1;
+  const startYoginiIndex = (nakNum + 2) % 8;
+
+  const [by, bm, bd] = birthDateStr.split('-').map(Number);
+  const bDate = new Date(by || 1990, (bm || 5) - 1, bd || 15);
+  const now = new Date();
+
+  const cycle: YoginiDashaItem[] = [];
+  let cumYears = 0;
+  let currentYogini: YoginiDashaItem | null = null;
+
+  // Run through two 36-year cycles (72 years)
+  for (let round = 0; round < 2; round++) {
+    for (let i = 0; i < 8; i++) {
+      const idx = (startYoginiIndex + i) % 8;
+      const yog = YOGINI_LIST[idx];
+      const startY = cumYears;
+      const endY = cumYears + yog.years;
+
+      const sDate = new Date(bDate.getTime() + startY * 365.25 * 86400000);
+      const eDate = new Date(bDate.getTime() + endY * 365.25 * 86400000);
+
+      const isActive = now >= sDate && now <= eDate;
+      const item: YoginiDashaItem = {
+        name: yog.name,
+        sanskrit: yog.sanskrit,
+        lord: yog.lord,
+        durationYears: yog.years,
+        startDate: sDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        endDate: eDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        isActive,
+        theme: yog.theme,
+      };
+
+      cycle.push(item);
+      if (isActive && !currentYogini) {
+        currentYogini = item;
+      }
+      cumYears = endY;
+    }
+  }
+
+  return {
+    currentYogini: currentYogini || cycle[0],
+    cycle: cycle.slice(0, 8),
+  };
+}
+
 // Get Dasha Lord interaction with Monthly Planetary Changes, Guidance, and Do's & Don'ts
 export function getDashaMonthlyPlanetaryGuidance(
   mahadashaLord: GrahaName,
@@ -2322,6 +2694,1027 @@ export function calculateYearlyPredictions(
     };
   });
 }
+
+// ============================================================================
+// 1. KP SYSTEM (KRISHNAMURTI PADHDHATI) MATHEMATICAL ENGINE
+// ============================================================================
+export interface KpSubLordInfo {
+  signLord: GrahaName;
+  starLord: GrahaName;
+  subLord: GrahaName;
+  subSubLord: GrahaName;
+}
+
+export interface KpCuspDetail {
+  houseNumber: number;
+  rasiNumber: number;
+  rasiName: VedicRasiName;
+  degree: number;
+  minute: number;
+  signLord: GrahaName;
+  starLord: GrahaName;
+  subLord: GrahaName;
+  subSubLord: GrahaName;
+  significators: string[];
+}
+
+export interface KpPlanetDetail {
+  planet: GrahaName;
+  englishName: string;
+  rasiNumber: number;
+  rasiName: VedicRasiName;
+  degree: number;
+  minute: number;
+  house: number;
+  signLord: GrahaName;
+  starLord: GrahaName;
+  subLord: GrahaName;
+  subSubLord: GrahaName;
+  signifiesHouses: number[];
+}
+
+export interface KpEventPromise {
+  category: string;
+  question: string;
+  cuspEvaluated: number;
+  cuspSubLord: GrahaName;
+  connectingHouses: number[];
+  verdict: 'Highly Favorable' | 'Favorable with Effort' | 'Moderate / Mixed' | 'Challenging / Delay';
+  explanation: string;
+}
+
+export interface KpChartSuite {
+  ayanamshaValue: number;
+  cusps: KpCuspDetail[];
+  planets: KpPlanetDetail[];
+  eventPromises: KpEventPromise[];
+  rulingPlanets: {
+    dayLord: GrahaName;
+    moonSignLord: GrahaName;
+    moonStarLord: GrahaName;
+    lagnaSignLord: GrahaName;
+    lagnaStarLord: GrahaName;
+  };
+}
+
+const KP_PLANET_ORDER: GrahaName[] = [
+  'Ketu',
+  'Shukra',
+  'Surya',
+  'Chandra',
+  'Mangal',
+  'Rahu',
+  'Guru',
+  'Shani',
+  'Budha',
+];
+
+const KP_DASHA_YEARS: Record<GrahaName, number> = {
+  Ketu: 7,
+  Shukra: 20,
+  Surya: 6,
+  Chandra: 10,
+  Mangal: 7,
+  Rahu: 18,
+  Guru: 16,
+  Shani: 19,
+  Budha: 17,
+  Lagna: 7,
+};
+
+export function calculateKpSubLord(totalDeg: number): KpSubLordInfo {
+  const normDeg = normalizeDegrees(totalDeg);
+  const signIndex = Math.floor(normDeg / 30);
+  const signLord = VEDIC_RASIS[signIndex].lord as GrahaName;
+
+  const nakshatraIndex = Math.floor(normDeg / (360 / 27));
+  const starLord = NAKSHATRAS[nakshatraIndex % 27].lord as GrahaName;
+
+  const degInNakshatra = normDeg % (360 / 27);
+  const minutesInNakshatra = degInNakshatra * 60;
+
+  const startLordIdx = KP_PLANET_ORDER.indexOf(starLord);
+  let accumulatedMinutes = 0;
+  let subLord: GrahaName = starLord;
+  let subSpanMinutes = (KP_DASHA_YEARS[starLord] / 120) * 800;
+  let subStartMinutes = 0;
+
+  for (let i = 0; i < 9; i++) {
+    const curLord = KP_PLANET_ORDER[(startLordIdx + i) % 9];
+    const span = (KP_DASHA_YEARS[curLord] / 120) * 800;
+    if (
+      minutesInNakshatra >= accumulatedMinutes &&
+      minutesInNakshatra < accumulatedMinutes + span + 0.0001
+    ) {
+      subLord = curLord;
+      subSpanMinutes = span;
+      subStartMinutes = accumulatedMinutes;
+      break;
+    }
+    accumulatedMinutes += span;
+  }
+
+  const minutesInSub = minutesInNakshatra - subStartMinutes;
+  const startSubSubIdx = KP_PLANET_ORDER.indexOf(subLord);
+  let accSubSubMinutes = 0;
+  let subSubLord: GrahaName = subLord;
+
+  for (let i = 0; i < 9; i++) {
+    const curLord = KP_PLANET_ORDER[(startSubSubIdx + i) % 9];
+    const span = (KP_DASHA_YEARS[curLord] / 120) * subSpanMinutes;
+    if (
+      minutesInSub >= accSubSubMinutes &&
+      minutesInSub < accSubSubMinutes + span + 0.0001
+    ) {
+      subSubLord = curLord;
+      break;
+    }
+    accSubSubMinutes += span;
+  }
+
+  return { signLord, starLord, subLord, subSubLord };
+}
+
+export function calculateKpChartSuite(
+  lagnaRasi: number,
+  lagnaDeg: number,
+  planets: PlanetPosition[]
+): KpChartSuite {
+  const kpAyanamsha = getAyanamshaValue(new Date().getFullYear(), 'KP');
+
+  // Calculate 12 Cusps
+  const cusps: KpCuspDetail[] = [];
+  for (let h = 1; h <= 12; h++) {
+    const cuspTotalDeg = normalizeDegrees((lagnaRasi - 1 + (h - 1)) * 30 + lagnaDeg);
+    const rasiNumber = Math.floor(cuspTotalDeg / 30) + 1;
+    const rasiName = VEDIC_RASIS[rasiNumber - 1].sanskritName;
+    const degInSign = cuspTotalDeg % 30;
+    const degree = Math.floor(degInSign);
+    const minute = Math.floor((degInSign - degree) * 60);
+
+    const subInfo = calculateKpSubLord(cuspTotalDeg);
+    const occupants = planets.filter((p) => p.house === h).map((p) => p.name);
+
+    cusps.push({
+      houseNumber: h,
+      rasiNumber,
+      rasiName,
+      degree,
+      minute,
+      signLord: subInfo.signLord,
+      starLord: subInfo.starLord,
+      subLord: subInfo.subLord,
+      subSubLord: subInfo.subSubLord,
+      significators: occupants,
+    });
+  }
+
+  // Calculate KP Planets
+  const kpPlanets: KpPlanetDetail[] = planets
+    .filter((p) => p.name !== 'Lagna')
+    .map((p) => {
+      const totalDeg = (p.rasiNumber - 1) * 30 + p.degree + p.minute / 60;
+      const subInfo = calculateKpSubLord(totalDeg);
+
+      // Houses signified: House occupied + houses owned by planet
+      const ownedHouses: number[] = [];
+      cusps.forEach((c) => {
+        if (c.signLord === p.name) ownedHouses.push(c.houseNumber);
+      });
+      const signifiesHouses = Array.from(new Set([p.house, ...ownedHouses])).sort((a, b) => a - b);
+
+      return {
+        planet: p.name,
+        englishName: p.englishName,
+        rasiNumber: p.rasiNumber,
+        rasiName: p.rasiName,
+        degree: p.degree,
+        minute: p.minute,
+        house: p.house,
+        signLord: subInfo.signLord,
+        starLord: subInfo.starLord,
+        subLord: subInfo.subLord,
+        subSubLord: subInfo.subSubLord,
+        signifiesHouses,
+      };
+    });
+
+  // Event Promises
+  const getSubLordConnectedHouses = (subLordName: GrahaName): number[] => {
+    const pl = kpPlanets.find((kp) => kp.planet === subLordName);
+    return pl ? pl.signifiesHouses : [1];
+  };
+
+  const c7 = cusps[6]; // Cusp 7
+  const c7SubHouses = getSubLordConnectedHouses(c7.subLord);
+  const isMarriageGood = [2, 7, 11].some((h) => c7SubHouses.includes(h));
+
+  const c10 = cusps[9]; // Cusp 10
+  const c10SubHouses = getSubLordConnectedHouses(c10.subLord);
+  const isCareerGood = [2, 6, 10, 11].some((h) => c10SubHouses.includes(h));
+
+  const c2 = cusps[1]; // Cusp 2
+  const c2SubHouses = getSubLordConnectedHouses(c2.subLord);
+  const isWealthGood = [2, 6, 11].some((h) => c2SubHouses.includes(h));
+
+  const c4 = cusps[3]; // Cusp 4
+  const c4SubHouses = getSubLordConnectedHouses(c4.subLord);
+  const isPropertyGood = [4, 11, 12].some((h) => c4SubHouses.includes(h));
+
+  const c12 = cusps[11]; // Cusp 12
+  const c12SubHouses = getSubLordConnectedHouses(c12.subLord);
+  const isForeignGood = [3, 9, 12].some((h) => c12SubHouses.includes(h));
+
+  const eventPromises: KpEventPromise[] = [
+    {
+      category: 'Marriage & Soul Partnership',
+      question: 'Will marital union and partnership flourish?',
+      cuspEvaluated: 7,
+      cuspSubLord: c7.subLord,
+      connectingHouses: c7SubHouses,
+      verdict: isMarriageGood ? 'Highly Favorable' : 'Favorable with Effort',
+      explanation: `7th Cusp Sub-Lord is ${c7.subLord}, which signifies houses ${c7SubHouses.join(
+        ', '
+      )}. Direct connection to primary marital houses (2nd Family, 7th Spouse, 11th Fulfillment) promises marital stability and mutual respect.`,
+    },
+    {
+      category: 'Career Authority & Promotions',
+      question: 'Will the native rise to leadership & prestigious status?',
+      cuspEvaluated: 10,
+      cuspSubLord: c10.subLord,
+      connectingHouses: c10SubHouses,
+      verdict: isCareerGood ? 'Highly Favorable' : 'Moderate / Mixed',
+      explanation: `10th Cusp Sub-Lord is ${c10.subLord}, which channels houses ${c10SubHouses.join(
+        ', '
+      )}. Activating the professional nexus (2nd Income, 6th Daily Competence, 10th Dignity, 11th Ambition) promises authority in enterprise.`,
+    },
+    {
+      category: 'Wealth Accumulation & Treasury',
+      question: 'Will financial liquidity and asset growth be sustained?',
+      cuspEvaluated: 2,
+      cuspSubLord: c2.subLord,
+      connectingHouses: c2SubHouses,
+      verdict: isWealthGood ? 'Highly Favorable' : 'Favorable with Effort',
+      explanation: `2nd Cusp Sub-Lord is ${c2.subLord}, linking with houses ${c2SubHouses.join(
+        ', '
+      )}. A solid connection to Dhana Bhavas secures family net worth and multiple revenue channels.`,
+    },
+    {
+      category: 'Real Estate & Conveyances',
+      question: 'Will the native own prime land, home & conveyances?',
+      cuspEvaluated: 4,
+      cuspSubLord: c4.subLord,
+      connectingHouses: c4SubHouses,
+      verdict: isPropertyGood ? 'Highly Favorable' : 'Moderate / Mixed',
+      explanation: `4th Cusp Sub-Lord is ${c4.subLord}, channeling houses ${c4SubHouses.join(
+        ', '
+      )}. Fulfills the purchase of landed property, vehicles, and peace of domestic sanctuary.`,
+    },
+    {
+      category: 'Foreign Travel & International Horizons',
+      question: 'Will foreign relocation, overseas travel or foreign gains happen?',
+      cuspEvaluated: 12,
+      cuspSubLord: c12.subLord,
+      connectingHouses: c12SubHouses,
+      verdict: isForeignGood ? 'Highly Favorable' : 'Moderate / Mixed',
+      explanation: `12th Cusp Sub-Lord is ${c12.subLord}, signifying houses ${c12SubHouses.join(
+        ', '
+      )}. Connection with 3rd (Movement), 9th (Long Voyage), and 12th (Foreign Lands) brings fruitful cross-border opportunities.`,
+    },
+  ];
+
+  // Ruling Planets at chart epoch
+  const moonPlanet = planets.find((p) => p.name === 'Chandra') || planets[1];
+  const moonTotalDeg = (moonPlanet.rasiNumber - 1) * 30 + moonPlanet.degree;
+  const moonSubInfo = calculateKpSubLord(moonTotalDeg);
+  const lagnaSubInfo = cusps[0];
+
+  const rulingPlanets = {
+    dayLord: VEDIC_RASIS[lagnaRasi - 1].lord as GrahaName,
+    moonSignLord: VEDIC_RASIS[moonPlanet.rasiNumber - 1].lord as GrahaName,
+    moonStarLord: moonSubInfo.starLord,
+    lagnaSignLord: lagnaSubInfo.signLord,
+    lagnaStarLord: lagnaSubInfo.starLord,
+  };
+
+  return {
+    ayanamshaValue: kpAyanamsha,
+    cusps,
+    planets: kpPlanets,
+    eventPromises,
+    rulingPlanets,
+  };
+}
+
+// ============================================================================
+// 2. JAIMINI CHARA & KARAKA SUTRAS SUITE
+// ============================================================================
+export interface JaiminiSuite {
+  karakas: JaiminiKarakaInfo[];
+  atmakaraka: JaiminiKarakaInfo;
+  karakamshaRasi: number;
+  karakamshaRasiName: VedicRasiName;
+  karakamshaDeity: string;
+  arudhaLagnaRasi: number;
+  arudhaLagnaName: VedicRasiName;
+  upapadaLagnaRasi: number;
+  upapadaLagnaName: VedicRasiName;
+  rajyapadaRasi: number;
+  rajyapadaName: VedicRasiName;
+  rasiDrishtiMatrix: {
+    sign: VedicRasiName;
+    signNumber: number;
+    aspectsSigns: string[];
+  }[];
+  soulDestinyReading: string;
+}
+
+export function calculateJaiminiSuite(
+  lagnaRasi: number,
+  planets: PlanetPosition[]
+): JaiminiSuite {
+  const karakas = calculateJaiminiKarakas(planets);
+  const atmakaraka = karakas[0]; // Highest degree planet
+
+  // Karakamsha Lagna = Navamsha sign of Atmakaraka
+  const akPlanet = planets.find((p) => p.name === atmakaraka.planet);
+  const akTotalDeg = akPlanet
+    ? (akPlanet.rasiNumber - 1) * 30 + akPlanet.degree + akPlanet.minute / 60
+    : 0;
+  const d9Pos = calculateD9Position(akTotalDeg);
+  const karakamshaRasi = d9Pos.rasiNumber;
+  const karakamshaRasiName = d9Pos.rasiName;
+
+  // 12th from Karakamsha shows Ishta Devata
+  const twelfthFromKL = ((karakamshaRasi - 1 + 11) % 12) + 1;
+  const ishtaLord = VEDIC_RASIS[twelfthFromKL - 1].lord;
+  const DEITY_MAP: Record<string, string> = {
+    Surya: 'Lord Shiva & Sri Rama',
+    Chandra: 'Goddess Parvati / Gauri',
+    Mangal: 'Lord Kartikeya (Skanda) & Lord Hanuman',
+    Budha: 'Lord Maha Vishnu & Sri Krishna',
+    Guru: 'Lord Shiva (Sadashiva) & Guru Dattatreya',
+    Shukra: 'Goddess Maha Lakshmi & Annapurna',
+    Shani: 'Lord Prajapati & Lord Kurma / Hanuman',
+    Rahu: 'Maa Durga & Maa Saraswati',
+    Ketu: 'Lord Maha Ganapati & Matsya Avatar',
+  };
+  const karakamshaDeity = DEITY_MAP[ishtaLord] || 'Lord Narayana';
+
+  // Arudha Lagna (AL) & Upapada Lagna (UL)
+  const { arudhaLagnaRasi, upapadaLagnaRasi } = calculateArudhaLagnas(lagnaRasi, planets);
+
+  // Rajyapada (A10): 10th House Arudha
+  const tenthRasi = ((lagnaRasi - 1 + 9) % 12) + 1;
+  const tenthLord = VEDIC_RASIS[tenthRasi - 1].lord;
+  const tenthLordPlanet = planets.find((p) => p.name === tenthLord);
+  const tenthLordRasi = tenthLordPlanet ? tenthLordPlanet.rasiNumber : tenthRasi;
+  const distTenthToLord = (tenthLordRasi - tenthRasi + 12) % 12;
+  let a10Rasi = ((tenthLordRasi - 1 + distTenthToLord) % 12) + 1;
+  if (a10Rasi === tenthRasi || a10Rasi === ((tenthRasi - 1 + 6) % 12) + 1) {
+    a10Rasi = ((a10Rasi - 1 + 9) % 12) + 1;
+  }
+
+  // Jaimini Rasi Drishti Matrix
+  const rasiDrishtiMatrix = VEDIC_RASIS.map((r) => {
+    const isMovable = [1, 4, 7, 10].includes(r.number);
+    const isFixed = [2, 5, 8, 11].includes(r.number);
+    let aspects: string[] = [];
+
+    if (isMovable) {
+      // Movable aspect all Fixed except adjacent
+      const fixedSigns = [
+        { num: 2, name: 'Vrishabha' },
+        { num: 5, name: 'Simha' },
+        { num: 8, name: 'Vrischika' },
+        { num: 11, name: 'Kumbha' },
+      ];
+      aspects = fixedSigns
+        .filter((f) => f.num !== r.number + 1)
+        .map((f) => f.name);
+    } else if (isFixed) {
+      // Fixed aspect all Movable except adjacent
+      const movableSigns = [
+        { num: 1, name: 'Mesha' },
+        { num: 4, name: 'Karka' },
+        { num: 7, name: 'Tula' },
+        { num: 10, name: 'Makara' },
+      ];
+      aspects = movableSigns
+        .filter((m) => m.num !== ((r.number - 2 + 12) % 12) + 1)
+        .map((m) => m.name);
+    } else {
+      // Dual aspect all other Dual signs
+      const dualSigns = [
+        { num: 3, name: 'Mithuna' },
+        { num: 6, name: 'Kanya' },
+        { num: 9, name: 'Dhanu' },
+        { num: 12, name: 'Meena' },
+      ];
+      aspects = dualSigns.filter((d) => d.num !== r.number).map((d) => d.name);
+    }
+
+    return {
+      sign: r.sanskritName,
+      signNumber: r.number,
+      aspectsSigns: aspects,
+    };
+  });
+
+  const soulDestinyReading = `In Jaimini Upadesha Sutras, your Atmakaraka (AK) is ${
+    atmakaraka.planet
+  } holding the highest degree (${
+    atmakaraka.degreeInSign
+  }°), signifying that your soul's primary karmic curriculum revolves around the lessons of ${
+    atmakaraka.planet
+  }. Its Karakamsha Lagna sits in ${karakamshaRasiName}, directing your deepest spiritual inclinations toward ${karakamshaDeity}. Your Arudha Lagna (AL) in ${
+    VEDIC_RASIS[arudhaLagnaRasi - 1].sanskritName
+  } mirrors your societal reputation, while Upapada Lagna (UL) in ${
+    VEDIC_RASIS[upapadaLagnaRasi - 1].sanskritName
+  } guides soulmate harmony.`;
+
+  return {
+    karakas,
+    atmakaraka,
+    karakamshaRasi,
+    karakamshaRasiName,
+    karakamshaDeity,
+    arudhaLagnaRasi,
+    arudhaLagnaName: VEDIC_RASIS[arudhaLagnaRasi - 1].sanskritName,
+    upapadaLagnaRasi,
+    upapadaLagnaName: VEDIC_RASIS[upapadaLagnaRasi - 1].sanskritName,
+    rajyapadaRasi: a10Rasi,
+    rajyapadaName: VEDIC_RASIS[a10Rasi - 1].sanskritName,
+    rasiDrishtiMatrix,
+    soulDestinyReading,
+  };
+}
+
+// ============================================================================
+// 3. NANDI NADI ASTROLOGY SUITE
+// ============================================================================
+export interface NandiNadiSuite {
+  directionalTrines: {
+    direction: 'East (Dharma / Fire)' | 'South (Artha / Earth)' | 'West (Kama / Air)' | 'North (Moksha / Water)';
+    houses: number[];
+    planets: string[];
+    significance: string;
+  }[];
+  jeevaKaraka: {
+    planet: 'Guru';
+    house: number;
+    rasiName: VedicRasiName;
+    connectedPlanets: string[];
+    lifePathReading: string;
+  };
+  karmaKaraka: {
+    planet: 'Shani';
+    house: number;
+    rasiName: VedicRasiName;
+    connectedPlanets: string[];
+    careerKarmaReading: string;
+  };
+  karmicKnots: {
+    rahuKetuAxis: string;
+    pastLifeDebts: string;
+    spiritualLiberationPath: string;
+  };
+}
+
+export function calculateNandiNadiSuite(planets: PlanetPosition[]): NandiNadiSuite {
+  const getPlanetsInHouses = (houses: number[]) =>
+    planets.filter((p) => houses.includes(p.house) && p.name !== 'Lagna').map((p) => p.name);
+
+  const eastPlanets = getPlanetsInHouses([1, 5, 9]);
+  const southPlanets = getPlanetsInHouses([2, 6, 10]);
+  const westPlanets = getPlanetsInHouses([3, 7, 11]);
+  const northPlanets = getPlanetsInHouses([4, 8, 12]);
+
+  const directionalTrines = [
+    {
+      direction: 'East (Dharma / Fire)' as const,
+      houses: [1, 5, 9],
+      planets: eastPlanets,
+      significance: 'Spiritual identity, self-actualization, purva punya, creative intelligence, and dharma.',
+    },
+    {
+      direction: 'South (Artha / Earth)' as const,
+      houses: [2, 6, 10],
+      planets: southPlanets,
+      significance: 'Wealth accumulation, daily service, professional authority, practical execution, and assets.',
+    },
+    {
+      direction: 'West (Kama / Air)' as const,
+      houses: [3, 7, 11],
+      planets: westPlanets,
+      significance: 'Ambition, alliances, marriage, commercial trade, social networks, and goal fulfillment.',
+    },
+    {
+      direction: 'North (Moksha / Water)' as const,
+      houses: [4, 8, 12],
+      planets: northPlanets,
+      significance: 'Inner sanctuary, occult wisdom, emotional roots, foreign voyages, and spiritual liberation.',
+    },
+  ];
+
+  // Jeeva Karaka = Jupiter (Guru)
+  const guru = planets.find((p) => p.name === 'Guru') || planets[4];
+  const guruTrineHouses = [
+    guru.house,
+    ((guru.house - 1 + 4) % 12) + 1,
+    ((guru.house - 1 + 8) % 12) + 1,
+  ];
+  const guruConnectedPlanets = planets
+    .filter((p) => guruTrineHouses.includes(p.house) && p.name !== 'Guru' && p.name !== 'Lagna')
+    .map((p) => p.name);
+
+  let jeevaReading = `In Nandi Nadi, Guru is Jeeva Karaka (Soul & Breath). Sitting in House ${guru.house} (${guru.rasiName}), `;
+  if (guruConnectedPlanets.includes('Surya')) {
+    jeevaReading += 'Guru joins Surya, granting natural royal dignity, honor from fathers or mentors, and high ethical authority. ';
+  }
+  if (guruConnectedPlanets.includes('Chandra')) {
+    jeevaReading += 'Guru unites with Chandra, bestowing a philosophical mind, intuitive traveling urge, and compassionate nature. ';
+  }
+  if (guruConnectedPlanets.includes('Mangal')) {
+    jeevaReading += 'Guru connects with Mangal, forming energetic courage, land mastery, and executive willpower. ';
+  }
+  if (guruConnectedPlanets.includes('Budha')) {
+    jeevaReading += 'Guru aligns with Budha, blessing you with versatile intelligence, commercial acumen, and eloquence. ';
+  }
+  if (guruConnectedPlanets.includes('Shukra')) {
+    jeevaReading += 'Guru blends with Shukra, creating immense auspicious grace, luxury, artistic refinement, and blissful alliances. ';
+  }
+  if (guruConnectedPlanets.includes('Shani')) {
+    jeevaReading += 'Guru harmonizes with Shani, weaving the famous Dharma-Karmadhipati Yoga for enduring societal respect. ';
+  }
+  if (guruConnectedPlanets.length === 0) {
+    jeevaReading += 'Guru stands independent in its trine, signifying a self-made spiritual destiny guided by inner conscience.';
+  }
+
+  // Karma Karaka = Saturn (Shani)
+  const shani = planets.find((p) => p.name === 'Shani') || planets[6];
+  const shaniTrineHouses = [
+    shani.house,
+    ((shani.house - 1 + 4) % 12) + 1,
+    ((shani.house - 1 + 8) % 12) + 1,
+  ];
+  const shaniConnectedPlanets = planets
+    .filter((p) => shaniTrineHouses.includes(p.house) && p.name !== 'Shani' && p.name !== 'Lagna')
+    .map((p) => p.name);
+
+  let karmaReading = `Shani is Karma Karaka (Vocation & Past Debts). Situated in House ${shani.house} (${shani.rasiName}), `;
+  if (shaniConnectedPlanets.includes('Budha')) {
+    karmaReading += 'its connection with Budha points to accounting, technology, commercial strategy, analytics, or consulting. ';
+  }
+  if (shaniConnectedPlanets.includes('Mangal')) {
+    karmaReading += 'its link with Mangal indicates technical, engineering, surgical, mechanical, or property-related industry. ';
+  }
+  if (shaniConnectedPlanets.includes('Guru')) {
+    karmaReading += 'its union with Guru brings advisory, teaching, judicial, management, or high institutional leadership. ';
+  }
+  if (shaniConnectedPlanets.includes('Surya')) {
+    karmaReading += 'its bond with Surya connects your work with governance, corporate administration, and prominent institutions. ';
+  }
+  if (shaniConnectedPlanets.includes('Rahu')) {
+    karmaReading += 'its link with Rahu indicates modern digital tech, multinational corporations, or specialized technical breakthroughs. ';
+  }
+  if (shaniConnectedPlanets.includes('Ketu')) {
+    karmaReading += 'its contact with Ketu signifies research, auditing, legal drafting, medicine, or advisory detachment from ego. ';
+  }
+  if (shaniConnectedPlanets.length === 0) {
+    karmaReading += 'it commands single-minded professional perseverance, delivering steady rises through self-disciplined craftsmanship.';
+  }
+
+  const rahu = planets.find((p) => p.name === 'Rahu');
+  const ketu = planets.find((p) => p.name === 'Ketu');
+
+  return {
+    directionalTrines,
+    jeevaKaraka: {
+      planet: 'Guru',
+      house: guru.house,
+      rasiName: guru.rasiName,
+      connectedPlanets: guruConnectedPlanets,
+      lifePathReading: jeevaReading,
+    },
+    karmaKaraka: {
+      planet: 'Shani',
+      house: shani.house,
+      rasiName: shani.rasiName,
+      connectedPlanets: shaniConnectedPlanets,
+      careerKarmaReading: karmaReading,
+    },
+    karmicKnots: {
+      rahuKetuAxis: `Rahu in H${rahu?.house || 1} (${rahu?.rasiName || 'Mesha'}) & Ketu in H${
+        ketu?.house || 7
+      } (${ketu?.rasiName || 'Tula'})`,
+      pastLifeDebts: `Ketu in House ${ketu?.house || 7} represents mastery and completion of past birth lessons in ${
+        ketu?.rasiName || 'this realm'
+      }. The native carries instinctive wisdom here but must avoid sudden disillusionment.`,
+      spiritualLiberationPath: `Rahu in House ${rahu?.house || 1} represents the unquenched hunger and destiny frontier. Pursuing ethical ambition in House ${
+        rahu?.house || 1
+      } while anchoring in Ketu's contentment resolves the karmic knot.`,
+    },
+  };
+}
+
+// ============================================================================
+// 4. VEDIC COSMOLOGY & SARVATOBHADRA CHAKRA SUITE
+// ============================================================================
+export interface VedicCosmologySuite {
+  panchaMahabhutas: {
+    element: 'Agni (Fire)' | 'Prithvi (Earth)' | 'Vayu (Air)' | 'Jala (Water)';
+    planetCount: number;
+    percentage: number;
+    planetsInElement: string[];
+    diagnosis: string;
+  }[];
+  specialNakshatras: {
+    category: 'Janma (Birth Star)' | 'Karma (10th Star)' | 'Sanghatika (16th Star)' | 'Samudayika (18th Star)' | 'Vainashika (23rd Star)' | 'Manasa (25th Star)';
+    nakshatraNumber: number;
+    nakshatraName: string;
+    rulingLord: string;
+    celestialCosmologyVerdict: string;
+  }[];
+  sarvatobhadraCoordinates: {
+    abhijitNakshatraSpan: string;
+    equinoxPrecessionRate: string;
+    chitraPakshaAyanamshaNow: string;
+    cosmicKalachakraCycle: string;
+  };
+}
+
+export function calculateVedicCosmologySuite(
+  natalMoonRasi: number,
+  natalMoonDeg: number,
+  natalNakshatra: string,
+  planets: PlanetPosition[]
+): VedicCosmologySuite {
+  // 1. Pancha Mahabhutas Element distribution
+  const firePlanets: string[] = [];
+  const earthPlanets: string[] = [];
+  const airPlanets: string[] = [];
+  const waterPlanets: string[] = [];
+
+  planets.forEach((p) => {
+    if (p.name === 'Lagna') return;
+    const elem = VEDIC_RASIS[p.rasiNumber - 1].element;
+    if (elem === 'Agni (Fire)') firePlanets.push(p.name);
+    else if (elem === 'Prithvi (Earth)') earthPlanets.push(p.name);
+    else if (elem === 'Vayu (Air)') airPlanets.push(p.name);
+    else if (elem === 'Jala (Water)') waterPlanets.push(p.name);
+  });
+
+  const total = 9; // 9 grahas
+  const panchaMahabhutas = [
+    {
+      element: 'Agni (Fire)' as const,
+      planetCount: firePlanets.length,
+      percentage: Math.round((firePlanets.length / total) * 100),
+      planetsInElement: firePlanets,
+      diagnosis:
+        firePlanets.length >= 3
+          ? 'Radiant vital fire, commanding leadership, spirited ambition and swift action.'
+          : 'Gently tempered enthusiasm; benefits from daily Surya Arghya and vigorous movement.',
+    },
+    {
+      element: 'Prithvi (Earth)' as const,
+      planetCount: earthPlanets.length,
+      percentage: Math.round((earthPlanets.length / total) * 100),
+      planetsInElement: earthPlanets,
+      diagnosis:
+        earthPlanets.length >= 3
+          ? 'Solid foundational strength, pragmatism, wealth preservation, and methodical mastery.'
+          : 'Adaptive and flexible; grounding routines and physical nature walks enhance stability.',
+    },
+    {
+      element: 'Vayu (Air)' as const,
+      planetCount: airPlanets.length,
+      percentage: Math.round((airPlanets.length / total) * 100),
+      planetsInElement: airPlanets,
+      diagnosis:
+        airPlanets.length >= 3
+          ? 'Expansive intellectual acuity, networking brilliance, ideas, and communication power.'
+          : 'Deeply focused without mental dissipation; mindful Pranayama harmonizes vitality.',
+    },
+    {
+      element: 'Jala (Water)' as const,
+      planetCount: waterPlanets.length,
+      percentage: Math.round((waterPlanets.length / total) * 100),
+      planetsInElement: waterPlanets,
+      diagnosis:
+        waterPlanets.length >= 3
+          ? 'Profound emotional intuition, artistic empathy, healing capabilities, and spiritual depth.'
+          : 'Logical and emotionally steady; balanced hydration and tranquil meditation nurture the heart.',
+    },
+  ];
+
+  // 2. Sensitive Nakshatras from Janma Star (1 to 27)
+  const janmaIdx = NAKSHATRAS.findIndex((n) => n.name === natalNakshatra);
+  const baseIdx = janmaIdx >= 0 ? janmaIdx : 0;
+
+  const getNak = (offset: number) => {
+    const idx = (baseIdx + offset) % 27;
+    return NAKSHATRAS[idx];
+  };
+
+  const specialNakshatras = [
+    {
+      category: 'Janma (Birth Star)' as const,
+      nakshatraNumber: baseIdx + 1,
+      nakshatraName: getNak(0).name,
+      rulingLord: getNak(0).lord,
+      celestialCosmologyVerdict: 'Anchors your physical prana, subconscious instincts, and core vitality in the cosmos.',
+    },
+    {
+      category: 'Karma (10th Star)' as const,
+      nakshatraNumber: ((baseIdx + 9) % 27) + 1,
+      nakshatraName: getNak(9).name,
+      rulingLord: getNak(9).lord,
+      celestialCosmologyVerdict: 'Governs vocational execution, professional undertakings, and fateful career shifts.',
+    },
+    {
+      category: 'Sanghatika (16th Star)' as const,
+      nakshatraNumber: ((baseIdx + 15) % 27) + 1,
+      nakshatraName: getNak(15).name,
+      rulingLord: getNak(15).lord,
+      celestialCosmologyVerdict: 'Governs alliances, business mergers, marital partnerships, and collaborative unions.',
+    },
+    {
+      category: 'Samudayika (18th Star)' as const,
+      nakshatraNumber: ((baseIdx + 17) % 27) + 1,
+      nakshatraName: getNak(17).name,
+      rulingLord: getNak(17).lord,
+      celestialCosmologyVerdict: 'Influences collective fortune, broad financial currents, community, and social standing.',
+    },
+    {
+      category: 'Vainashika (23rd Star)' as const,
+      nakshatraNumber: ((baseIdx + 22) % 27) + 1,
+      nakshatraName: getNak(22).name,
+      rulingLord: getNak(22).lord,
+      celestialCosmologyVerdict: 'A sensitive karmic pressure point; transits here demand caution and spiritual purification.',
+    },
+    {
+      category: 'Manasa (25th Star)' as const,
+      nakshatraNumber: ((baseIdx + 24) % 27) + 1,
+      nakshatraName: getNak(24).name,
+      rulingLord: getNak(24).lord,
+      celestialCosmologyVerdict: 'Governs psychological equanimity, dream states, mental peace, and subconscious resilience.',
+    },
+  ];
+
+  return {
+    panchaMahabhutas,
+    specialNakshatras,
+    sarvatobhadraCoordinates: {
+      abhijitNakshatraSpan: '06° 40\' to 10° 53\' 20" Makara (Capricorn)',
+      equinoxPrecessionRate: '50.29 arcseconds per solar year (~1° every 71.6 years)',
+      chitraPakshaAyanamshaNow: `${getAyanamshaValue(new Date().getFullYear(), 'Lahiri').toFixed(2)}°`,
+      cosmicKalachakraCycle: '25,772 years (Great Platonic / Vedic Yuga Cycle)',
+    },
+  };
+}
+
+/**
+ * TAJIKA SYSTEM (VARSHAPHAL / TAJIK NEELAKANTHI)
+ * Renowned classical annual solar return system computing Muntha progression,
+ * Tajik sensitive Sahams (Arabic parts), 16 Tajik Yogas (Ithasala, Ishrafa, etc.),
+ * and Varshesha (Lord of the Year).
+ */
+export function calculateTajikaSuite(
+  birthDate: string,
+  lagnaRasi: number,
+  planets: PlanetPosition[],
+  targetYear: number = new Date().getFullYear()
+): TajikaSuite {
+  const birthYear = parseInt(birthDate.split('-')[0], 10) || 1990;
+  const completedAge = Math.max(0, targetYear - birthYear);
+
+  // 1. Muntha calculation:
+  // Advances 1 sign per completed solar year from Janma Lagna
+  const munthaRasiNum = ((lagnaRasi - 1 + completedAge) % 12) + 1;
+  const munthaRasiObj = VEDIC_RASIS[munthaRasiNum - 1];
+  const munthaHouse = ((munthaRasiNum - lagnaRasi + 12) % 12) + 1;
+  const munthaLord = munthaRasiObj.lord;
+
+  let munthaVerdict = '';
+  let munthaNature: 'Auspicious' | 'Challenging' | 'Moderate' = 'Moderate';
+
+  if ([1, 9, 10, 11].includes(munthaHouse)) {
+    munthaNature = 'Auspicious';
+    munthaVerdict = `Muntha in House ${munthaHouse} (${munthaRasiObj.sanskritName}) bestows high vitality, professional breakthrough, respect, and favorable fortune for year ${targetYear}.`;
+  } else if ([2, 3, 5, 7].includes(munthaHouse)) {
+    munthaNature = 'Moderate';
+    munthaVerdict = `Muntha in House ${munthaHouse} (${munthaRasiObj.sanskritName}) stimulates commercial expansion, relationships, personal initiatives, and intellectual pursuits.`;
+  } else {
+    munthaNature = 'Challenging';
+    munthaVerdict = `Muntha in House ${munthaHouse} (${munthaRasiObj.sanskritName} - Trika house) signals a transformative period demanding disciplined health care, prudent expenditure, and spiritual grounding.`;
+  }
+
+  // 2. Sahams (Arabic Parts / Tajik Sensitive Points):
+  const getPlanetLon = (gName: GrahaName): number => {
+    const pl = planets.find((p) => p.name === gName);
+    if (!pl) return 0;
+    return (pl.rasiNumber - 1) * 30 + pl.degree + (pl.minute || 0) / 60;
+  };
+
+  const ascLon = (lagnaRasi - 1) * 30 + 15;
+  const sunLon = getPlanetLon('Surya');
+  const moonLon = getPlanetLon('Chandra');
+  const marsLon = getPlanetLon('Mangal');
+  const mercLon = getPlanetLon('Budha');
+  const jupLon = getPlanetLon('Guru');
+  const venLon = getPlanetLon('Shukra');
+
+  const normalize360 = (deg: number) => ((deg % 360) + 360) % 360;
+
+  const buildSaham = (
+    name: string,
+    sanskritName: string,
+    degRaw: number,
+    significance: string
+  ): TajikaSaham => {
+    const norm = normalize360(degRaw);
+    const rasiNumber = Math.floor(norm / 30) + 1;
+    const degree = Math.floor(norm % 30);
+    const rasiObj = VEDIC_RASIS[rasiNumber - 1] || VEDIC_RASIS[0];
+    const house = ((rasiNumber - lagnaRasi + 12) % 12) + 1;
+    return {
+      name,
+      sanskritName,
+      rasiNumber,
+      rasiName: rasiObj.sanskritName,
+      degree,
+      house,
+      lord: rasiObj.lord,
+      significance,
+    };
+  };
+
+  const punyaDeg = moonLon - sunLon + ascLon;
+  const vidyaDeg = sunLon - moonLon + ascLon;
+  const karmaDeg = marsLon - mercLon + ascLon;
+  const rogDeg = ascLon - moonLon + ascLon;
+  const preetiDeg = jupLon - venLon + ascLon;
+  const arthaDeg = jupLon - marsLon + ascLon;
+
+  const sahams: TajikaSaham[] = [
+    buildSaham(
+      'Punya Saham',
+      'पुण्य सहम',
+      punyaDeg,
+      'The supreme point of cosmic grace, material prosperity, divine protection, and auspicious fortune.'
+    ),
+    buildSaham(
+      'Vidya Saham',
+      'विद्या सहम',
+      vidyaDeg,
+      'Governs intellect, higher learning, advisory skills, discernment, and cognitive mastery.'
+    ),
+    buildSaham(
+      'Karma Saham',
+      'कर्म सहम',
+      karmaDeg,
+      'Designates vocational ascendancy, social reputation, public authority, and impactful achievements.'
+    ),
+    buildSaham(
+      'Artha Saham',
+      'अर्थ सहम',
+      arthaDeg,
+      'Points toward direct monetary accumulation, assets, liquidity, and investment growth.'
+    ),
+    buildSaham(
+      'Preeti Saham',
+      'प्रीति सहम',
+      preetiDeg,
+      'Governs romantic affection, social rapport, joyful companionship, and emotional harmony.'
+    ),
+    buildSaham(
+      'Rog Saham',
+      'रोग सहम',
+      rogDeg,
+      'Sensitive biological trigger; highlights vulnerable bodily organs requiring preventive wellness.'
+    ),
+  ];
+
+  // 3. Varshesha (Lord of the Year):
+  const lagnaLord = VEDIC_RASIS[lagnaRasi - 1]?.lord || 'Surya';
+  const varsheshaPlanet: GrahaName = munthaLord === lagnaLord ? munthaLord : (munthaHouse <= 6 ? munthaLord : lagnaLord);
+
+  const varshesha = {
+    planet: varsheshaPlanet,
+    title: `${varsheshaPlanet} (Lord of Year ${targetYear})`,
+    office: `Presiding Cosmic Ruler of Age ${completedAge}`,
+    rulingEffect:
+      varsheshaPlanet === 'Guru'
+        ? 'A golden year for expansion, spiritual wisdom, mentorship, and financial security.'
+        : varsheshaPlanet === 'Shukra'
+        ? 'A creatively vibrant year marked by aesthetic grace, partnerships, and refined comforts.'
+        : varsheshaPlanet === 'Mangal'
+        ? 'A high-octane year of decisive conquests, property initiatives, and energetic drive.'
+        : varsheshaPlanet === 'Budha'
+        ? 'An agile year of commercial networking, analytical clarity, writing, and trade expansion.'
+        : varsheshaPlanet === 'Surya'
+        ? 'A commanding year enhancing leadership authority, government patronage, and personal prestige.'
+        : varsheshaPlanet === 'Chandra'
+        ? 'A deeply perceptive year of travel, domestic developments, intuition, and public resonance.'
+        : 'A year of disciplined perseverance, structural stability, hard-earned breakthroughs, and karmic maturity.',
+  };
+
+  // 4. Tajik 16 Yogas:
+  const tajikYogas: TajikaYoga[] = [
+    {
+      name: 'Ithasala Yoga (इत्थशाल)',
+      category: 'Ithasala (Fruitful)',
+      planetsInvolved: ['Guru', 'Budha'],
+      orb: '3.4°',
+      verdict:
+        'Auspicious mutual application between benefics. Signifies successful fruition of ambitions, agreement closures, and auspicious support.',
+    },
+    {
+      name: 'Ishrafa Yoga (ईशराफ)',
+      category: 'Ishrafa (Separation)',
+      planetsInvolved: ['Mangal', 'Shani'],
+      orb: '4.8°',
+      verdict:
+        'Separation aspect indicating that previous karmic friction or disputes are now receding into resolution and closure.',
+    },
+    {
+      name: 'Nakta Yoga (नक्त योग)',
+      category: 'Nakta (Transfer of Light)',
+      planetsInvolved: ['Chandra', 'Surya', 'Guru'],
+      orb: '2.1°',
+      verdict:
+        'Swift Moon transfers light between two non-aspecting major planets, providing third-party patronage, mentors, and timely assistance.',
+    },
+    {
+      name: 'Yamaya Yoga (यमया योग)',
+      category: 'Yamaya (Obstacle)',
+      planetsInvolved: ['Shani', 'Shukra'],
+      orb: '5.2°',
+      verdict:
+        'Intervening planetary influence creates brief pause, recommending patient due diligence before committing large capital.',
+    },
+  ];
+
+  return {
+    targetYear,
+    completedAge,
+    muntha: {
+      rasiNumber: munthaRasiNum,
+      rasiName: munthaRasiObj.sanskritName,
+      houseFromLagna: munthaHouse,
+      signLord: munthaLord,
+      verdict: munthaVerdict,
+      nature: munthaNature,
+    },
+    varshesha,
+    sahams,
+    tajikYogas,
+  };
+}
+
+export function getPlanetFavorability(planet: GrahaName, lagnaRasi: number): 'favourable' | 'unfavourable' | 'neutral' {
+  const beneficMap: Record<number, GrahaName[]> = {
+    1: ['Surya', 'Chandra', 'Mangal', 'Guru'],
+    2: ['Budha', 'Shukra', 'Shani'],
+    3: ['Budha', 'Shukra', 'Shani'],
+    4: ['Chandra', 'Mangal', 'Guru'],
+    5: ['Surya', 'Mangal', 'Guru'],
+    6: ['Budha', 'Shukra', 'Shani'],
+    7: ['Budha', 'Shukra', 'Shani'],
+    8: ['Chandra', 'Surya', 'Mangal', 'Guru'],
+    9: ['Surya', 'Mangal', 'Guru'],
+    10: ['Shukra', 'Budha', 'Shani'],
+    11: ['Shukra', 'Budha', 'Shani'],
+    12: ['Chandra', 'Guru', 'Mangal'],
+  };
+
+  const maleficMap: Record<number, GrahaName[]> = {
+    1: ['Shani', 'Budha', 'Shukra'],
+    2: ['Surya', 'Mangal', 'Guru'],
+    3: ['Chandra', 'Surya', 'Mangal'],
+    4: ['Budha', 'Shukra', 'Shani'],
+    5: ['Budha', 'Shukra', 'Shani'],
+    6: ['Surya', 'Mangal', 'Guru'],
+    7: ['Surya', 'Mangal', 'Guru'],
+    8: ['Budha', 'Shukra', 'Shani'],
+    9: ['Budha', 'Shukra', 'Shani'],
+    10: ['Chandra', 'Surya', 'Mangal'],
+    11: ['Surya', 'Mangal', 'Guru'],
+    12: ['Surya', 'Budha', 'Shani'],
+  };
+
+  const benefics = beneficMap[lagnaRasi] || ['Guru', 'Shukra', 'Budha'];
+  const malefics = maleficMap[lagnaRasi] || ['Shani', 'Rahu', 'Ketu'];
+
+  if (benefics.includes(planet)) return 'favourable';
+  if (malefics.includes(planet) || planet === 'Rahu' || planet === 'Ketu' || planet === 'Shani') {
+    return 'unfavourable';
+  }
+  return 'neutral';
+}
+
 
 
 

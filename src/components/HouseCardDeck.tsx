@@ -306,21 +306,43 @@ export function HouseCardDeck({
             </div>
           </div>
 
-          {/* THE 12 HOUSES NAVIGATION CARDS (H1, H2, etc.) */}
-          <div className="grid grid-cols-6 sm:grid-cols-12 gap-1.5 mt-2">
+          {/* THE 12 HOUSES DECK OF CARDS NAVIGATION */}
+          <div className="flex overflow-x-auto space-x-2 py-2 px-1 snap-x scrollbar-thin scrollbar-thumb-amber-300 mt-2">
             {displayedHouses.map((h) => {
               const isSelected = h.houseNumber === selectedHouseNumber;
               return (
                 <div
                   key={h.houseNumber}
                   onClick={() => onSelectHouseNumber(h.houseNumber)}
-                  className={`px-2 py-1 rounded-md font-vedic font-bold text-[12px] flex items-center justify-center transition-all duration-150 border cursor-pointer ${
+                  className={`snap-start w-32 shrink-0 rounded-lg p-2 transition-all duration-200 cursor-pointer border flex flex-col justify-between ${
                     isSelected
-                      ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 text-amber-950 shadow-2xs'
-                      : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'
+                      ? 'bg-amber-50/95 border-amber-500 ring-2 ring-amber-400 text-amber-950 shadow-md scale-105'
+                      : 'bg-white border-stone-200/90 text-stone-800 hover:border-amber-300 hover:bg-[#FAF8F5] shadow-xs'
                   }`}
                 >
-                  H{h.houseNumber}
+                  <div className="flex items-center justify-between">
+                    <span className={`px-1.5 py-0.5 rounded text-[11px] font-vedic font-bold ${
+                      isSelected ? 'bg-amber-700 text-white' : 'bg-stone-100 text-stone-800'
+                    }`}>
+                      H{h.houseNumber}
+                    </span>
+                    <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider truncate max-w-[70px]">
+                      {h.signLord}
+                    </span>
+                  </div>
+                  <div className="mt-1.5">
+                    <div className="font-vedic font-bold text-[13px] text-stone-950 truncate">
+                      {h.vedicName.split('—')[0].trim()}
+                    </div>
+                    <div className="text-[11px] text-stone-600 truncate flex justify-between">
+                      <span>{h.rasiName}</span>
+                      {housePredictions.find(p => p.houseNumber === h.houseNumber) && (
+                        <span className="font-black text-amber-800">
+                          {housePredictions.find(p => p.houseNumber === h.houseNumber)?.strengthScore}%
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               );
             })}

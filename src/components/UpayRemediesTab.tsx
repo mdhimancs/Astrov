@@ -341,8 +341,8 @@ export function UpayRemediesTab({
 
   // Deck of Cards selector
   const [selectedDeck, setSelectedDeck] = useState<
-    'all' | 'challenges' | 'dasha' | 'mantras' | 'gemstones' | 'lifestyle'
-  >('all');
+    'dasha' | 'challenges' | 'mantras' | 'gemstones' | 'lifestyle' | 'all'
+  >('dasha');
 
   // Interactive daily checklist state
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({
@@ -713,12 +713,12 @@ export function UpayRemediesTab({
       <div className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/90 px-2 py-1.5 shadow-3xs">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1.5">
           {[
-            { id: 'all', title: 'All Remedies View', icon: Sparkles },
-            { id: 'challenges', title: 'Natal Chart Challenges', icon: AlertTriangle },
             { id: 'dasha', title: 'Current Dasha Upay', icon: Layers },
+            { id: 'challenges', title: 'Natal Chart Challenges', icon: AlertTriangle },
             { id: 'mantras', title: 'Mantras & Stotras', icon: BookOpen },
             { id: 'gemstones', title: 'Gemstones & Rudraksha', icon: Gem },
             { id: 'lifestyle', title: 'Lifestyle & Lal Kitab', icon: Sun },
+            { id: 'all', title: 'All Remedies View', icon: Sparkles },
           ].map((card) => {
             const Icon = card.icon;
             const isActive = selectedDeck === card.id;
@@ -750,89 +750,7 @@ export function UpayRemediesTab({
         </div>
       </div>
 
-      {/* 1. NATAL CHART CHALLENGES & TARGETED REMEDIES */}
-      {(selectedDeck === 'all' || selectedDeck === 'challenges') && (
-        <div className="bg-white rounded-lg border border-stone-200 p-2.5 shadow-3xs space-y-2">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-1.5">
-            <div className="flex items-center space-x-1.5">
-              <AlertTriangle className="w-4 h-4 text-amber-700" />
-              <h2 className="font-vedic font-bold text-stone-950 text-[15px]">
-                Natal Chart Challenges &amp; Targeted Remedial Prescriptions
-              </h2>
-            </div>
-            <span className="text-[11px] font-semibold text-stone-600">
-              Diagnosed from Dusthana (H6/H8/H12) Placements, Shadbala Ratios &amp; Nodal Axis
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-            {astroDiagnostics.challenges.map((ch) => (
-              <div
-                key={ch.id}
-                className={`rounded-lg border p-2.5 space-y-2 flex flex-col justify-between ${
-                  ch.severity === 'High Priority'
-                    ? 'bg-amber-50/40 border-amber-300'
-                    : 'bg-[#FAF8F5] border-stone-200/90'
-                }`}
-              >
-                <div className="space-y-1">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 block">
-                        {ch.badge}
-                      </span>
-                      <h3 className="text-[14px] font-vedic font-bold text-stone-950 leading-snug">
-                        {ch.challengeTitle}
-                      </h3>
-                    </div>
-                    <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border shrink-0 ${
-                        ch.severity === 'High Priority'
-                          ? 'bg-rose-100 text-rose-900 border-rose-300'
-                          : 'bg-amber-100 text-amber-950 border-amber-300'
-                      }`}
-                    >
-                      {ch.severity}
-                    </span>
-                  </div>
-
-                  <p className="text-[12px] text-stone-700 leading-snug">
-                    {ch.diagnosticReason}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1.5 border-t border-stone-200/80 text-[12px]">
-                  <div className="bg-white rounded border border-purple-200/80 p-1.5">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-purple-900 block">
-                      Prescribed Mantra ({ch.remedyMaster.rulingDay})
-                    </span>
-                    <p className="font-semibold text-stone-900 leading-snug mt-0.5">
-                      {ch.remedyMaster.beejMantra}
-                    </p>
-                    <span className="text-[11px] text-stone-600 block mt-0.5">
-                      Stotra: {ch.remedyMaster.stotra}
-                    </span>
-                  </div>
-
-                  <div className="bg-white rounded border border-emerald-200/80 p-1.5">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900 block">
-                      Actionable Upay &amp; Lifestyle Fix
-                    </span>
-                    <p className="text-stone-800 leading-snug mt-0.5">
-                      {ch.specificAction}
-                    </p>
-                    <span className="text-[11px] text-emerald-900 font-medium block mt-0.5">
-                      Lal Kitab: {ch.remedyMaster.lalKitabUpay}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 2. CURRENT MAHADASHA & ANTARDASHA REMEDIAL PROTOCOL */}
+      {/* 1. CURRENT MAHADASHA & ANTARDASHA REMEDIAL PROTOCOL (FIRST) */}
       {(selectedDeck === 'all' || selectedDeck === 'dasha') && (
         <div className="bg-white rounded-lg border border-purple-200/90 p-2.5 shadow-3xs space-y-2">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-1.5">
@@ -953,6 +871,88 @@ export function UpayRemediesTab({
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2. NATAL CHART CHALLENGES & TARGETED REMEDIES */}
+      {(selectedDeck === 'all' || selectedDeck === 'challenges') && (
+        <div className="bg-white rounded-lg border border-stone-200 p-2.5 shadow-3xs space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-1.5">
+            <div className="flex items-center space-x-1.5">
+              <AlertTriangle className="w-4 h-4 text-amber-700" />
+              <h2 className="font-vedic font-bold text-stone-950 text-[15px]">
+                Natal Chart Challenges &amp; Targeted Remedial Prescriptions
+              </h2>
+            </div>
+            <span className="text-[11px] font-semibold text-stone-600">
+              Diagnosed from Dusthana (H6/H8/H12) Placements, Shadbala Ratios &amp; Nodal Axis
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+            {astroDiagnostics.challenges.map((ch) => (
+              <div
+                key={ch.id}
+                className={`rounded-lg border p-2.5 space-y-2 flex flex-col justify-between ${
+                  ch.severity === 'High Priority'
+                    ? 'bg-amber-50/40 border-amber-300'
+                    : 'bg-[#FAF8F5] border-stone-200/90'
+                }`}
+              >
+                <div className="space-y-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 block">
+                        {ch.badge}
+                      </span>
+                      <h3 className="text-[14px] font-vedic font-bold text-stone-950 leading-snug">
+                        {ch.challengeTitle}
+                      </h3>
+                    </div>
+                    <span
+                      className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border shrink-0 ${
+                        ch.severity === 'High Priority'
+                          ? 'bg-rose-100 text-rose-900 border-rose-300'
+                          : 'bg-amber-100 text-amber-950 border-amber-300'
+                      }`}
+                    >
+                      {ch.severity}
+                    </span>
+                  </div>
+
+                  <p className="text-[12px] text-stone-700 leading-snug">
+                    {ch.diagnosticReason}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1.5 border-t border-stone-200/80 text-[12px]">
+                  <div className="bg-white rounded border border-purple-200/80 p-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-purple-900 block">
+                      Prescribed Mantra ({ch.remedyMaster.rulingDay})
+                    </span>
+                    <p className="font-semibold text-stone-900 leading-snug mt-0.5">
+                      {ch.remedyMaster.beejMantra}
+                    </p>
+                    <span className="text-[11px] text-stone-600 block mt-0.5">
+                      Stotra: {ch.remedyMaster.stotra}
+                    </span>
+                  </div>
+
+                  <div className="bg-white rounded border border-emerald-200/80 p-1.5">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-900 block">
+                      Actionable Upay &amp; Lifestyle Fix
+                    </span>
+                    <p className="text-stone-800 leading-snug mt-0.5">
+                      {ch.specificAction}
+                    </p>
+                    <span className="text-[11px] text-emerald-900 font-medium block mt-0.5">
+                      Lal Kitab: {ch.remedyMaster.lalKitabUpay}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}

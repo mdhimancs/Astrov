@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from 'recharts';
 import {
   Calendar,
   Sparkles,
@@ -60,6 +63,103 @@ export function YearlyPredictions({
   const [aiLifePath, setAiLifePath] = useState<AiYearlyLifePathResponse | null>(null);
   const [isLoadingAiLifePath, setIsLoadingAiLifePath] = useState(false);
   const [aiLifePathError, setAiLifePathError] = useState<string | null>(null);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    if (scrollRef.current) {
+      const activeElement = scrollRef.current.querySelector('.active-year');
+      if (activeElement) {
+        activeElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+  }, [selectedYear]);
+
+  const getSentimentScore = (text: string) => {
+    if (text.includes('Excellent') || text.includes('Great')) return 5;
+    if (text.includes('Good') || text.includes('Stable')) return 4;
+    if (text.includes('Moderate') || text.includes('Average')) return 3;
+    if (text.includes('Caution') || text.includes('Challenging')) return 2;
+    return 1;
+  };
+
+  const [activeAspects, setActiveAspects] = useState<string[]>(['Overall', 'Health', 'Job', 'Wealth', 'Relations', 'Education', 'Mental']);
+  
+  const toggleAspect = (aspect: string) => {
+    setActiveAspects(prev => 
+      prev.includes(aspect) ? prev.filter(a => a !== aspect) : [...prev, aspect]
+    );
+  };
+  
+  const aspectOptions = [
+    { key: 'Overall', color: '#FF8042' },
+    { key: 'Health', color: '#8884d8' },
+    { key: 'Job', color: '#82ca9d' },
+    { key: 'Wealth', color: '#ffc658' },
+    { key: 'Relations', color: '#ff7300' },
+    { key: 'Education', color: '#0088FE' },
+    { key: 'Mental', color: '#00C49F' },
+  ];
+  const maxAge = 99;
+  
+  // Create a full array of years from birthYear to birthYear + 99
+  const allYears = Array.from({ length: maxAge + 1 }, (_, i) => birthYear + i);
+  
+  const chartData = allYears.map((year) => {
+    const prediction = yearlyPredictions.find((yp) => yp.year === year);
+    return {
+      year: year,
+      Health: prediction ? getSentimentScore(prediction.pillars.healthAndVitality) : null,
+      Job: prediction ? getSentimentScore(prediction.pillars.careerAndJob) : null,
+      Wealth: prediction ? getSentimentScore(prediction.pillars.wealthAndBusiness) : null,
+      Relations: prediction ? getSentimentScore(prediction.pillars.marriageAndFamily) : null,
+      Education: prediction ? getSentimentScore(prediction.pillars.educationAndIntellect) : null,
+      Mental: prediction ? getSentimentScore(prediction.pillars.mentalStateAndSpirit) : null,
+      Overall: prediction ? prediction.overallRating : null,
+      theme: prediction ? prediction.themeTitle : 'No forecast data',
+      majorTransits: prediction ? prediction.majorTransitsSummary : null,
+      triggeredPlanets: prediction ? prediction.lifePathSynthesis?.triggeredNatalPlanets : [],
+    };
+  });
+
+  // Filter data points based on 1, 5, or 10 year interval
+  const visibleChartData = chartData.filter((_, i) => i % graphPeriod === 0);
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-white p-3 border border-stone-200 shadow-xl text-[11px] max-w-xs">
+          <p className="font-bold text-stone-900 mb-1">{`Age ${label - birthYear} (${label})`}</p>
+          <p className="text-amber-800 font-semibold mb-2">{`Theme: ${data.theme}`}</p>
+          
+          <div className="grid grid-cols-2 gap-1 mb-2">
+            {payload.map((entry: any, index: number) => (
+              <p key={index} style={{ color: entry.stroke }} className="font-bold">
+                {`${entry.name}: ${entry.value || 'N/A'}`}
+              </p>
+            ))}
+          </div>
+
+          {data.majorTransits && (
+            <div className="border-t border-stone-100 pt-1 mt-1 text-stone-600">
+              <p className="font-bold text-stone-800">Transits:</p>
+              <p>Guru: {data.majorTransits.guruTransit.substring(0, 50)}...</p>
+              <p>Shani: {data.majorTransits.shaniTransit.substring(0, 50)}...</p>
+            </div>
+          )}
+          
+          {data.triggeredPlanets && data.triggeredPlanets.length > 0 && (
+            <div className="border-t border-stone-100 pt-1 mt-1 text-stone-600">
+              <p className="font-bold text-stone-800">Planetary Impact:</p>
+              <p>{data.triggeredPlanets[0].planet}: {data.triggeredPlanets[0].transitTrigger}</p>
+            </div>
+          )}
+        </div>
+      );
+    }
+    return null;
+  };
 
   if (!yearlyPredictions || yearlyPredictions.length === 0) return null;
 
@@ -172,14 +272,14 @@ export function YearlyPredictions({
           </div>
 
           {/* Year Selection Deck of Cards */}
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-1 shrink-0 overflow-x-auto max-w-[400px]" ref={scrollRef}>
             {yearlyPredictions.map((yp) => {
               const isSelected = yp.year === currentYearPred.year;
               return (
                 <div
                   key={yp.year}
                   onClick={() => onSelectYear(yp.year)}
-                  className={`rounded-md px-2.5 py-1 text-[12px] font-vedic font-bold transition-all cursor-pointer border ${
+                  className={`rounded-md px-2.5 py-1 text-[12px] font-vedic font-bold transition-all cursor-pointer border ${isSelected ? 'active-year ' : ''} ${
                     isSelected
                       ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 text-amber-950 shadow-2xs'
                       : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'
@@ -223,6 +323,63 @@ export function YearlyPredictions({
               Progressed H{lifePath.progressedHouse}: {lifePath.progressedRasi}
             </span>
           </div>
+        </div>
+
+        {/* Annual Trends Graph */}
+        <div className="h-64 mt-4 bg-white rounded-lg border border-stone-200 p-2">
+          <div className="flex flex-wrap justify-between gap-2 mb-2">
+            <div className="flex flex-wrap gap-1">
+              {aspectOptions.map(aspect => (
+                <button
+                  key={aspect.key}
+                  onClick={() => toggleAspect(aspect.key)}
+                  className={`text-[10px] px-2 py-0.5 rounded border ${
+                    activeAspects.includes(aspect.key)
+                      ? 'border-amber-400 text-amber-950 font-bold'
+                      : 'border-stone-200 text-stone-400'
+                  }`}
+                  style={{ backgroundColor: activeAspects.includes(aspect.key) ? `${aspect.color}20` : 'transparent' }}
+                >
+                  {aspect.key}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-1">
+              {[1, 5, 10].map((period) => (
+                <button
+                  key={period}
+                  onClick={() => setGraphPeriod(period as 1 | 5 | 10)}
+                  className={`text-[10px] px-2 py-0.5 rounded border ${
+                    graphPeriod === period
+                      ? 'bg-amber-100 border-amber-300 text-amber-900'
+                      : 'bg-stone-50 border-stone-200'
+                  }`}
+                >
+                  {period} Yr
+                </button>
+              ))}
+            </div>
+          </div>
+          <ResponsiveContainer width="100%" height="85%">
+            <LineChart data={visibleChartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="year" />
+              <YAxis domain={[0, 5]} ticks={[1, 2, 3, 4, 5]} />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend />
+              {aspectOptions.map(aspect => (
+                activeAspects.includes(aspect.key) && (
+                  <Line 
+                    key={aspect.key}
+                    type="monotone" 
+                    dataKey={aspect.key} 
+                    stroke={aspect.color} 
+                    strokeWidth={aspect.key === 'Overall' ? 3 : 2}
+                  />
+                )
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
         </div>
 
         {/* =====================================================================

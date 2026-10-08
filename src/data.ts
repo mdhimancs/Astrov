@@ -4,23 +4,24 @@ export const VEDIC_RASIS: {
   number: number;
   sanskritName: VedicRasiName;
   englishName: string;
+  westernEquivalent: string;
   symbol: string;
   lord: GrahaName;
   element: 'Agni (Fire)' | 'Prithvi (Earth)' | 'Vayu (Air)' | 'Jala (Water)';
   nature: 'Chara (Movable)' | 'Sthira (Fixed)' | 'Dvisvabhava (Dual)';
 }[] = [
-  { number: 1, sanskritName: 'Mesha', englishName: 'Aries', symbol: '♈', lord: 'Mangal', element: 'Agni (Fire)', nature: 'Chara (Movable)' },
-  { number: 2, sanskritName: 'Vrishabha', englishName: 'Taurus', symbol: '♉', lord: 'Shukra', element: 'Prithvi (Earth)', nature: 'Sthira (Fixed)' },
-  { number: 3, sanskritName: 'Mithuna', englishName: 'Gemini', symbol: '♊', lord: 'Budha', element: 'Vayu (Air)', nature: 'Dvisvabhava (Dual)' },
-  { number: 4, sanskritName: 'Karka', englishName: 'Cancer', symbol: '♋', lord: 'Chandra', element: 'Jala (Water)', nature: 'Chara (Movable)' },
-  { number: 5, sanskritName: 'Simha', englishName: 'Leo', symbol: '♌', lord: 'Surya', element: 'Agni (Fire)', nature: 'Sthira (Fixed)' },
-  { number: 6, sanskritName: 'Kanya', englishName: 'Virgo', symbol: '♍', lord: 'Budha', element: 'Prithvi (Earth)', nature: 'Dvisvabhava (Dual)' },
-  { number: 7, sanskritName: 'Tula', englishName: 'Libra', symbol: '♎', lord: 'Shukra', element: 'Vayu (Air)', nature: 'Chara (Movable)' },
-  { number: 8, sanskritName: 'Vrischika', englishName: 'Scorpio', symbol: '♏', lord: 'Mangal', element: 'Jala (Water)', nature: 'Sthira (Fixed)' },
-  { number: 9, sanskritName: 'Dhanu', englishName: 'Sagittarius', symbol: '♐', lord: 'Guru', element: 'Agni (Fire)', nature: 'Dvisvabhava (Dual)' },
-  { number: 10, sanskritName: 'Makara', englishName: 'Capricorn', symbol: '♑', lord: 'Shani', element: 'Prithvi (Earth)', nature: 'Chara (Movable)' },
-  { number: 11, sanskritName: 'Kumbha', englishName: 'Aquarius', symbol: '♒', lord: 'Shani', element: 'Vayu (Air)', nature: 'Sthira (Fixed)' },
-  { number: 12, sanskritName: 'Meena', englishName: 'Pisces', symbol: '♓', lord: 'Guru', element: 'Jala (Water)', nature: 'Dvisvabhava (Dual)' },
+  { number: 1, sanskritName: 'Mesha', englishName: 'Aries', westernEquivalent: 'Aries', symbol: '♈', lord: 'Mangal', element: 'Agni (Fire)', nature: 'Chara (Movable)' },
+  { number: 2, sanskritName: 'Vrishabha', englishName: 'Taurus', westernEquivalent: 'Taurus', symbol: '♉', lord: 'Shukra', element: 'Prithvi (Earth)', nature: 'Sthira (Fixed)' },
+  { number: 3, sanskritName: 'Mithuna', englishName: 'Gemini', westernEquivalent: 'Gemini', symbol: '♊', lord: 'Budha', element: 'Vayu (Air)', nature: 'Dvisvabhava (Dual)' },
+  { number: 4, sanskritName: 'Karka', englishName: 'Cancer', westernEquivalent: 'Cancer', symbol: '♋', lord: 'Chandra', element: 'Jala (Water)', nature: 'Chara (Movable)' },
+  { number: 5, sanskritName: 'Simha', englishName: 'Leo', westernEquivalent: 'Leo', symbol: '♌', lord: 'Surya', element: 'Agni (Fire)', nature: 'Sthira (Fixed)' },
+  { number: 6, sanskritName: 'Kanya', englishName: 'Virgo', westernEquivalent: 'Virgo', symbol: '♍', lord: 'Budha', element: 'Prithvi (Earth)', nature: 'Dvisvabhava (Dual)' },
+  { number: 7, sanskritName: 'Tula', englishName: 'Libra', westernEquivalent: 'Libra', symbol: '♎', lord: 'Shukra', element: 'Vayu (Air)', nature: 'Chara (Movable)' },
+  { number: 8, sanskritName: 'Vrischika', englishName: 'Scorpio', westernEquivalent: 'Scorpio', symbol: '♏', lord: 'Mangal', element: 'Jala (Water)', nature: 'Sthira (Fixed)' },
+  { number: 9, sanskritName: 'Dhanu', englishName: 'Sagittarius', westernEquivalent: 'Sagittarius', symbol: '♐', lord: 'Guru', element: 'Agni (Fire)', nature: 'Dvisvabhava (Dual)' },
+  { number: 10, sanskritName: 'Makara', englishName: 'Capricorn', westernEquivalent: 'Capricorn', symbol: '♑', lord: 'Shani', element: 'Prithvi (Earth)', nature: 'Chara (Movable)' },
+  { number: 11, sanskritName: 'Kumbha', englishName: 'Aquarius', westernEquivalent: 'Aquarius', symbol: '♒', lord: 'Shani', element: 'Vayu (Air)', nature: 'Sthira (Fixed)' },
+  { number: 12, sanskritName: 'Meena', englishName: 'Pisces', westernEquivalent: 'Pisces', symbol: '♓', lord: 'Guru', element: 'Jala (Water)', nature: 'Dvisvabhava (Dual)' },
 ];
 
 export const NAKSHATRAS = [

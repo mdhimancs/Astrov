@@ -14,6 +14,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { NorthIndianChart } from './NorthIndianChart';
+import { SouthIndianChart } from './SouthIndianChart';
 import { ProfileSelector } from './ProfileSelector';
 import { PlaceValue } from './PlaceOfBirthInput';
 import { HouseCardDeck } from './HouseCardDeck';
@@ -101,6 +102,7 @@ export function BirthTimePredictionsTab({
 
   const [selectedHouse, setSelectedHouse] = useState<HouseInfo | null>(null);
   const [selectedHouseNumber, setSelectedHouseNumber] = useState<number>(1);
+  const [birthChartLayout, setBirthChartLayout] = useState<'north' | 'south'>('north');
   const [houseDomainFilter, setHouseDomainFilter] = useState<string>('ALL');
   const [activeBirthSectionTab, setActiveBirthSectionTab] = useState<
     | 'profile'
@@ -348,16 +350,6 @@ export function BirthTimePredictionsTab({
               title: 'Bhava Deck',
               icon: Compass,
             },
-            {
-              id: 'bhrigu-samhita',
-              title: 'Bhrigu Samhita',
-              icon: Award,
-            },
-            {
-              id: 'lal-kitab',
-              title: 'Lal Kitab',
-              icon: ShieldCheck,
-            },
           ].map((card) => {
             const Icon = card.icon;
             const isActive = activeBirthSectionTab === card.id;
@@ -401,18 +393,54 @@ export function BirthTimePredictionsTab({
             onDeleteProfile={handleDeleteProfile}
           />
 
-          {/* North Indian Diamond Chart & Kundali Focus Area */}
+          {/* North Indian Diamond / South Indian Fixed Chart & Kundali Focus Area */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 items-start">
-            {/* Left Column: D1 Birth Chart */}
-            <div className="lg:col-span-5 flex justify-center">
-              <NorthIndianChart
-                houses={natalHouses}
-                title="Janam Kundali"
-                subtitle="Sidereal D1"
-                showTransitsTogether={false}
-                onSelectHouse={handleSelectHouse}
-                selectedHouseNumber={selectedHouseNumber}
-              />
+            {/* Left Column: D1 Birth Chart with Layout Toggle */}
+            <div className="lg:col-span-5 flex flex-col items-center space-y-1.5">
+              <div className="flex items-center justify-between w-full max-w-[360px] px-1">
+                <span className="text-[11px] font-bold text-stone-600">Chart Layout:</span>
+                <div className="flex rounded border border-stone-200 bg-white p-0.5 text-[11px] shadow-3xs">
+                  <button
+                    onClick={() => setBirthChartLayout('north')}
+                    className={`px-2 py-0.5 rounded font-bold transition-colors cursor-pointer ${
+                      birthChartLayout === 'north'
+                        ? 'bg-amber-100 text-amber-950 border border-amber-300'
+                        : 'text-stone-600'
+                    }`}
+                  >
+                    North (Diamond)
+                  </button>
+                  <button
+                    onClick={() => setBirthChartLayout('south')}
+                    className={`px-2 py-0.5 rounded font-bold transition-colors cursor-pointer ${
+                      birthChartLayout === 'south'
+                        ? 'bg-amber-100 text-amber-950 border border-amber-300'
+                        : 'text-stone-600'
+                    }`}
+                  >
+                    South (Fixed Rasi)
+                  </button>
+                </div>
+              </div>
+
+              {birthChartLayout === 'north' ? (
+                <NorthIndianChart
+                  houses={natalHouses}
+                  title="Janam Kundali"
+                  subtitle="Sidereal D1"
+                  showTransitsTogether={false}
+                  onSelectHouse={handleSelectHouse}
+                  selectedHouseNumber={selectedHouseNumber}
+                />
+              ) : (
+                <SouthIndianChart
+                  houses={natalHouses}
+                  title="Janam Kundali"
+                  subtitle="Sidereal D1"
+                  onSelectHouse={handleSelectHouse}
+                  selectedHouseNumber={selectedHouseNumber}
+                />
+              )}
             </div>
 
             {/* Right Column: Core Natal Vitals, Chart Focus & Key Yogas Formed at Birth */}
@@ -550,6 +578,8 @@ export function BirthTimePredictionsTab({
                     <th className="py-1 px-2 uppercase tracking-wider">Rasi</th>
                     <th className="py-1 px-2 uppercase tracking-wider">Deg</th>
                     <th className="py-1 px-2 uppercase tracking-wider">Nakshatra</th>
+                    <th className="py-1 px-2 uppercase tracking-wider">Star Lord</th>
+                    <th className="py-1 px-2 uppercase tracking-wider">KP Sub-Lord</th>
                     <th className="py-1 px-2 uppercase tracking-wider">H</th>
                   </tr>
                 </thead>
@@ -567,6 +597,12 @@ export function BirthTimePredictionsTab({
                       </td>
                       <td className="py-1 px-2 text-stone-900">
                         {planet.nakshatra} (Pada {planet.pada})
+                      </td>
+                      <td className="py-1 px-2 text-stone-700">
+                        {planet.nakshatraLord || '—'}
+                      </td>
+                      <td className="py-1 px-2 font-semibold text-amber-900 bg-amber-50/50 rounded">
+                        {planet.subLord || '—'}
                       </td>
                       <td className="py-1 px-2">
                         <span className="px-1.5 py-0.5 rounded bg-stone-100 font-semibold text-stone-950">
@@ -591,22 +627,23 @@ export function BirthTimePredictionsTab({
         </div>
       )}
 
-      {/* TAB 3: SUMMARY OF ALL 12 HOUSES (DVADASA BHAVA AT-A-GLANCE OVERVIEW) */}
+      {/* TAB 3: SUMMARY OF ALL 12 HOUSES (DVADASA BHAVA DECK OF CARDS) */}
       {activeBirthSectionTab === 'houses-summary' && (
         <div className="bg-white/95 backdrop-blur-sm rounded-lg border border-stone-200 p-2.5 shadow-2xs space-y-2">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-stone-100 pb-1.5">
             <div className="flex items-center space-x-1.5">
               <Layers className="w-4 h-4 text-amber-700" />
               <h3 className="font-vedic font-bold text-stone-950 text-[15px] tracking-tight">
-                Summary of All 12 Houses (Dvadasa Bhava Overview — {name})
+                Dvadasa Bhava Deck of Cards (Summary of 12 Houses — {name})
               </h3>
             </div>
             <span className="text-[12px] text-stone-600 font-medium">
-              Click any house card to open its detailed Bhava Deck dossier
+              Swipe or scroll through the card deck • Click any card to open its detailed dossier
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+          {/* DECK OF CARDS HORIZONTAL SLIDER / STACK */}
+          <div className="flex overflow-x-auto space-x-3 py-3 px-1 snap-x scrollbar-thin scrollbar-thumb-amber-300">
             {housePredictions.map((hp) => {
               const isSelected = hp.houseNumber === selectedHouseNumber;
               const rasiObj = VEDIC_RASIS.find((r) => r.sanskritName === hp.signName);
@@ -617,57 +654,64 @@ export function BirthTimePredictionsTab({
                     handleSelectHouseNumber(hp.houseNumber);
                     setActiveBirthSectionTab('bhava-deck');
                   }}
-                  className={`rounded-md border p-2 transition-all cursor-pointer space-y-1 ${
+                  className={`snap-start w-72 sm:w-80 shrink-0 rounded-xl border p-3 transition-all duration-200 cursor-pointer flex flex-col justify-between shadow-sm hover:shadow-md ${
                     isSelected
-                      ? 'bg-amber-50/70 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
-                      : 'bg-[#FAF8F5]/70 hover:bg-white border-stone-200/90 hover:border-amber-300'
+                      ? 'bg-amber-50/95 border-amber-500 ring-2 ring-amber-400 text-amber-950 scale-102'
+                      : 'bg-gradient-to-b from-white to-[#FAF8F5] border-stone-200/90 text-stone-800 hover:border-amber-400'
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-1 border-b border-stone-200/60 pb-1">
-                    <div className="flex items-center space-x-1.5">
-                      <span
-                        className={`px-1.5 py-0.5 rounded text-[12px] font-vedic font-bold ${
-                          isSelected
-                            ? 'bg-amber-700 text-white'
-                            : 'bg-amber-100/80 text-amber-900 border border-amber-200'
-                        }`}
-                      >
-                        H{hp.houseNumber}
-                      </span>
-                      <span className="font-vedic font-bold text-stone-950 text-[13px] truncate">
-                        {hp.vedicName.replace(/\s*\(\d+\w+\s+House\)/i, '')}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-1 border-b border-stone-200/70 pb-1.5">
+                      <div className="flex items-center space-x-2">
+                        <span
+                          className={`px-2 py-0.5 rounded-md text-[12px] font-vedic font-bold shadow-2xs ${
+                            isSelected
+                              ? 'bg-amber-700 text-white'
+                              : 'bg-amber-100 text-amber-900 border border-amber-300'
+                          }`}
+                        >
+                          H{hp.houseNumber}
+                        </span>
+                        <span className="font-vedic font-bold text-stone-950 text-[14px] truncate">
+                          {hp.vedicName.replace(/\s*\(\d+\w+\s+House\)/i, '')}
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/50 px-1.5 py-0.5 rounded shrink-0">
+                        {hp.lifeDomain}
                       </span>
                     </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800 shrink-0">
-                      {hp.lifeDomain}
-                    </span>
-                  </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-1 text-[12px]">
-                    <span className="text-stone-700 font-semibold">
-                      Rashi: <strong className="text-stone-950">{hp.signName}</strong>
-                      {rasiObj ? ` (${rasiObj.westernEquivalent})` : ''}
-                    </span>
-                    <span className="text-stone-600">
-                      Lord: <strong className="text-stone-900">{hp.signLord}</strong>
-                    </span>
-                  </div>
-
-                  <div className="text-[12px]">
-                    {hp.planetsHere.length > 0 ? (
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-900 border border-emerald-200 font-semibold text-[11px]">
-                        Grahas: {hp.planetsHere.join(', ')}
+                    <div className="flex items-center justify-between text-[12px] bg-stone-50/80 px-2 py-1 rounded border border-stone-100">
+                      <span className="text-stone-700 font-semibold">
+                        Rashi: <strong className="text-stone-950">{hp.signName}</strong>
+                        {rasiObj ? ` (${rasiObj.westernEquivalent})` : ''}
                       </span>
-                    ) : (
-                      <span className="text-[11px] text-stone-500 italic">
-                        Unoccupied • Governed by {hp.signLord}
+                      <span className="text-stone-600">
+                        Lord: <strong className="text-stone-900">{hp.signLord}</strong>
                       </span>
-                    )}
+                    </div>
+
+                    <div className="text-[12px]">
+                      {hp.planetsHere.length > 0 ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded bg-emerald-50 text-emerald-900 border border-emerald-200 font-semibold text-[11px]">
+                          Grahas: {hp.planetsHere.join(', ')}
+                        </span>
+                      ) : (
+                        <span className="text-[11px] text-stone-500 italic">
+                          Unoccupied • Governed by {hp.signLord}
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="text-[13px] text-stone-700 leading-snug line-clamp-4 font-serif italic">
+                      &quot;{hp.prediction}&quot;
+                    </p>
                   </div>
 
-                  <p className="text-[12px] text-stone-700 leading-snug">
-                    {hp.prediction}
-                  </p>
+                  <div className="mt-3 pt-2 border-t border-stone-200/60 flex items-center justify-between text-[11px] font-bold text-amber-800">
+                    <span>Bhava Deck Dossier →</span>
+                    <span>Bhrigu &amp; Lal Kitab</span>
+                  </div>
                 </div>
               );
             })}
@@ -683,24 +727,6 @@ export function BirthTimePredictionsTab({
           natalPlanets={natalPlanets}
           selectedHouseNumber={selectedHouseNumber}
           onSelectHouseNumber={handleSelectHouseNumber}
-        />
-      )}
-
-      {/* TAB 5: BHRIGU SAMHITA INTERPRETATION */}
-      {activeBirthSectionTab === 'bhrigu-samhita' && natalPlanets.length > 0 && (
-        <BhriguLalKitabSection
-          data={calculateBhriguAndLalKitab(natalLagnaRasi, natalPlanets)}
-          seekerName={name}
-          forcedView="bhrigu"
-        />
-      )}
-
-      {/* TAB 6: LAL KITAB INTERPRETATION */}
-      {activeBirthSectionTab === 'lal-kitab' && natalPlanets.length > 0 && (
-        <BhriguLalKitabSection
-          data={calculateBhriguAndLalKitab(natalLagnaRasi, natalPlanets)}
-          seekerName={name}
-          forcedView="lalkitab"
         />
       )}
     </div>

@@ -46,9 +46,12 @@ export interface PlanetPosition {
   rasiName: VedicRasiName;
   degree: number; // 0 to 30
   minute: number;
+  totalDeg?: number; // 0 to 360 absolute degree
   isRetrograde: boolean;
   nakshatra: string;
   pada: number;
+  nakshatraLord?: string;
+  subLord?: string;
   house: number; // 1 to 12
   dignity?: 'Exalted' | 'Moolatrikona' | 'Own' | 'Friendly' | 'Neutral' | 'Enemy' | 'Debilitated';
   d9Position?: { rasiNumber: number; rasiName: VedicRasiName };
@@ -422,4 +425,44 @@ export interface VedicAstroPredictionResult {
     charity: string;
     deity: string;
   };
+}
+
+export interface TajikaSaham {
+  name: string;
+  sanskritName: string;
+  rasiNumber: number;
+  rasiName: VedicRasiName;
+  degree: number;
+  house: number;
+  lord: GrahaName;
+  significance: string;
+}
+
+export interface TajikaYoga {
+  name: string;
+  category: 'Ithasala (Fruitful)' | 'Ishrafa (Separation)' | 'Nakta (Transfer of Light)' | 'Yamaya (Obstacle)';
+  planetsInvolved: string[];
+  verdict: string;
+  orb: string;
+}
+
+export interface TajikaSuite {
+  targetYear: number;
+  completedAge: number;
+  muntha: {
+    rasiNumber: number;
+    rasiName: VedicRasiName;
+    houseFromLagna: number;
+    signLord: GrahaName;
+    verdict: string;
+    nature: 'Auspicious' | 'Challenging' | 'Moderate';
+  };
+  varshesha: {
+    planet: GrahaName;
+    title: string;
+    office: string;
+    rulingEffect: string;
+  };
+  sahams: TajikaSaham[];
+  tajikYogas: TajikaYoga[];
 }

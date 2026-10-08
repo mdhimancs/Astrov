@@ -125,15 +125,15 @@ interface ShadbalaD3ChartProps {
 }
 
 const SHADBALA_COMPONENT_KEYS = [
-  { key: 'sthanaBala', label: 'Sthana (Positional)', color: '#D97706' },     // Amber-600
-  { key: 'digBala', label: 'Dig (Directional)', color: '#0284C7' },          // Sky-600
-  { key: 'kalaBala', label: 'Kala (Temporal)', color: '#7C3AED' },           // Violet-600
-  { key: 'cheshtaBala', label: 'Cheshta (Motional)', color: '#059669' },     // Emerald-600
-  { key: 'naisargikaBala', label: 'Naisargika (Natural)', color: '#E11D48' },// Rose-600
-  { key: 'drikBala', label: 'Drik (Aspectual)', color: '#4F46E5' },          // Indigo-600
+  { key: 'sthanaBala', label: 'Sthana (Positional)', color: '#FCD34D' },     // Pastel Amber-300
+  { key: 'digBala', label: 'Dig (Directional)', color: '#7DD3FC' },          // Pastel Sky-300
+  { key: 'kalaBala', label: 'Kala (Temporal)', color: '#C4B5FD' },           // Pastel Violet-300
+  { key: 'cheshtaBala', label: 'Cheshta (Motional)', color: '#6EE7B7' },     // Pastel Emerald-300
+  { key: 'naisargikaBala', label: 'Naisargika (Natural)', color: '#FDA4AF' },// Pastel Rose-300
+  { key: 'drikBala', label: 'Drik (Aspectual)', color: '#818CF8' },          // Pastel Indigo-400
 ] as const;
 
-const EXALTATION_DEGREE: Record<GrahaName, number> = {
+const EXALTATION_DEGREE: Partial<Record<GrahaName, number>> = {
   Surya: 10,     // Mesha 10°
   Chandra: 33,   // Vrishabha 3°
   Mangal: 298,   // Makara 28°
@@ -145,7 +145,7 @@ const EXALTATION_DEGREE: Record<GrahaName, number> = {
   Ketu: 230,     // Vrishchika 20°
 };
 
-const DIRECTIONAL_BEST_HOUSE: Record<GrahaName, number> = {
+const DIRECTIONAL_BEST_HOUSE: Partial<Record<GrahaName, number>> = {
   Guru: 1,
   Budha: 1,
   Surya: 10,
@@ -157,7 +157,7 @@ const DIRECTIONAL_BEST_HOUSE: Record<GrahaName, number> = {
   Ketu: 4,
 };
 
-const NAISARGIKA_VIRUPAS: Record<GrahaName, number> = {
+const NAISARGIKA_VIRUPAS: Partial<Record<GrahaName, number>> = {
   Surya: 60.0,
   Chandra: 51.4,
   Shukra: 42.9,
@@ -169,7 +169,7 @@ const NAISARGIKA_VIRUPAS: Record<GrahaName, number> = {
   Shani: 8.6,
 };
 
-const REQUIRED_SHADBALA_VIRUPAS: Record<GrahaName, number> = {
+const REQUIRED_SHADBALA_VIRUPAS: Partial<Record<GrahaName, number>> = {
   Surya: 390,   // 6.5 Rupas
   Chandra: 360, // 6.0 Rupas
   Mangal: 300,  // 5.0 Rupas
@@ -352,8 +352,8 @@ export function ShadbalaD3Chart({ planets, birthTime = '07:30' }: ShadbalaD3Char
     svg.selectAll('*').remove();
 
     const width = Math.max(340, containerWidth);
-    const height = 285;
-    const margin = { top: 24, right: 20, bottom: 48, left: 48 };
+    const height = 295;
+    const margin = { top: 24, right: 20, bottom: 56, left: 48 };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
@@ -368,11 +368,11 @@ export function ShadbalaD3Chart({ planets, birthTime = '07:30' }: ShadbalaD3Char
       .scaleBand<string>()
       .domain(shadbalaData.map((d) => d.planet))
       .range([0, innerWidth])
-      .padding(0.45); // Thinner bars
+      .padding(0.65); // Much thinner bars
 
     if (chartMode === 'stacked') {
       const maxVirupas =
-        d3.max(shadbalaData, (d) => Math.max(d.totalVirupas, d.requiredVirupas)) || 600;
+        d3.max(shadbalaData, (d: PlanetShadbalaData) => Math.max(d.totalVirupas, d.requiredVirupas)) || 600;
 
       const y = d3
         .scaleLinear()
@@ -491,7 +491,7 @@ export function ShadbalaD3Chart({ planets, birthTime = '07:30' }: ShadbalaD3Char
         );
     } else {
       // Mode 2: Shadbala Strength Ratio (% of Parashari Minimum Required)
-      const maxRatio = d3.max(shadbalaData, (d) => d.strengthRatio) || 140;
+      const maxRatio = (d3.max(shadbalaData, (d: PlanetShadbalaData) => d.strengthRatio) as number) || 140;
       const y = d3
         .scaleLinear()
         .domain([0, Math.max(140, Math.ceil(maxRatio * 1.12))])
@@ -536,31 +536,31 @@ export function ShadbalaD3Chart({ planets, birthTime = '07:30' }: ShadbalaD3Char
         .text('100% Required Threshold');
 
       // Bars for Ratio
-      g.selectAll('.ratio-bar')
+      g.selectAll<SVGRectElement, PlanetShadbalaData>('.ratio-bar')
         .data(shadbalaData)
         .enter()
         .append('rect')
         .attr('class', 'ratio-bar')
-        .attr('x', (d) => x(d.planet) || 0)
+        .attr('x', (d: PlanetShadbalaData) => x(d.planet) || 0)
         .attr('width', x.bandwidth())
         .attr('y', innerHeight)
         .attr('height', 0)
         .attr('rx', 4)
         .style('cursor', 'pointer')
-        .attr('fill', (d) =>
+        .attr('fill', (d: PlanetShadbalaData) =>
           d.strengthRatio >= 115
             ? '#059669'
             : d.strengthRatio >= 100
             ? '#D97706'
             : '#E11D48'
         )
-        .attr('stroke', (d) => (d.planet === selectedPlanetName ? '#1C1917' : 'none'))
+        .attr('stroke', (d: PlanetShadbalaData) => (d.planet === selectedPlanetName ? '#1C1917' : 'none'))
         .attr('stroke-width', 2)
-        .on('click', (_, d) => setSelectedPlanetName(d.planet))
+        .on('click', (_, d: PlanetShadbalaData) => setSelectedPlanetName(d.planet))
         .transition()
         .duration(450)
-        .attr('y', (d) => y(d.strengthRatio))
-        .attr('height', (d) => Math.max(0, innerHeight - y(d.strengthRatio)));
+        .attr('y', (d: PlanetShadbalaData) => y(d.strengthRatio))
+        .attr('height', (d: PlanetShadbalaData) => Math.max(0, innerHeight - y(d.strengthRatio)));
 
       // Labels on top of ratio bars
       shadbalaData.forEach((d) => {
@@ -603,10 +603,10 @@ export function ShadbalaD3Chart({ planets, birthTime = '07:30' }: ShadbalaD3Char
 
     xAxisGroup
       .selectAll('.tick text')
-      .attr('font-size', '11px') // Slightly smaller for better fit
+      .attr('font-size', '10px') // Smaller for clean fit
       .attr('font-weight', (d) => (d === selectedPlanetName ? '900' : '700'))
       .attr('fill', (d) => (d === selectedPlanetName ? '#92400E' : '#1C1917'))
-      .attr('dy', '1em') // Less dy to leave space below
+      .attr('dy', '0.7em')
       .style('cursor', 'pointer')
       .on('click', (_, d) => setSelectedPlanetName(d as GrahaName));
 
@@ -616,9 +616,9 @@ export function ShadbalaD3Chart({ planets, birthTime = '07:30' }: ShadbalaD3Char
       if (found) {
         d3.select(this)
           .append('text')
-          .attr('y', 26) // Positioned more carefully
+          .attr('y', 24) // Clear separation from Hindi name
           .attr('text-anchor', 'middle')
-          .attr('font-size', '9px') // Smaller for English names
+          .attr('font-size', '8.5px')
           .attr('font-weight', '600')
           .attr('fill', '#78716C')
           .text(`${found.englishName} (H${found.house})`);
