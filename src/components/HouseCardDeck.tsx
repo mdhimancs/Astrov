@@ -290,17 +290,18 @@ export function HouseCardDeck({
               ].map((cat) => {
                 const isActive = filterCategory === cat.id;
                 return (
-                  <div
-                    key={cat.id}
-                    onClick={() => setFilterCategory(cat.id as any)}
-                    className={`rounded-md px-2.5 py-1 text-[12px] font-vedic font-bold transition-all duration-150 cursor-pointer border ${
-                      isActive
-                        ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 text-amber-950 shadow-2xs'
-                        : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'
-                    }`}
-                  >
-                    {cat.label}
-                  </div>
+                <div
+                  key={cat.id}
+                  onClick={() => setFilterCategory(cat.id as any)}
+                  className={`group relative rounded-lg px-2.5 py-1.5 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 border ${
+                    isActive
+                      ? 'bg-amber-50/50 border-amber-400 text-amber-950 font-bold shadow-sm'
+                      : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5] shadow-none'
+                  }`}
+                >
+                  <span className="text-[12px] font-vedic font-bold">{cat.label}</span>
+                  {isActive && <div className="absolute bottom-0 left-1 right-1 h-0.5 bg-amber-500 rounded-t-full" />}
+                </div>
                 );
               })}
             </div>
