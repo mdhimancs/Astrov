@@ -83,6 +83,8 @@ export function YearlyPredictions({
     return 1;
   };
 
+  const [graphPeriod, setGraphPeriod] = useState<1 | 5 | 10>(10);
+  const birthYear = birthDate ? parseInt(birthDate.slice(0, 4), 10) || new Date(birthDate).getFullYear() || 1990 : 1990;
   const [activeAspects, setActiveAspects] = useState<string[]>(['Overall', 'Health', 'Job', 'Wealth', 'Relations', 'Education', 'Mental']);
   
   const toggleAspect = (aspect: string) => {

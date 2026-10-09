@@ -2360,7 +2360,7 @@ export function calculateYearlyPredictions(
   natalPlanets: PlanetPosition[] = []
 ): YearlyPrediction[] {
   const birthYear = parseInt(birthDateStr.split('-')[0] || '1990', 10) || 1990;
-  const years = [2025, 2026, 2027, 2028];
+  const years = Array.from({ length: 100 }, (_, i) => birthYear + i);
 
   // Year-specific major sidereal Rasi positions for Guru, Shani, and Rahu-Ketu
   const annualSkyConfig: Record<
