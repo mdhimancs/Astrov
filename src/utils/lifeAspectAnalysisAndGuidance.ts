@@ -123,6 +123,26 @@ export interface LifeGuidanceProfile {
     soulLesson: string;
     dharmicCalling: string;
   };
+  personality: {
+    strongPoints: string[];
+    weakPoints: string[];
+    stages: {
+      childhood: string;
+      teenage: string;
+      adult: string;
+    };
+  };
+  lifeAspects: {
+    wealth: string;
+    housesProperty: string;
+    marriage: string;
+    jobBusiness: string;
+    nameFameReputation: string;
+  };
+  higherKnowledge: {
+    lifePathGuidance: string;
+    mysticism: string;
+  };
 }
 
 // ==========================================
@@ -907,6 +927,22 @@ export function computePersonalizedLifeGuidance(
       planet: atmakarakaPlanet.name,
       soulLesson: 'Cultivating detachment from ego while executing supreme excellence in worldly responsibility (Karma Yoga).',
       dharmicCalling: 'To establish enduring institutions, create abundant livelihoods for others, and lead by ethical example.',
+    },
+    personality: {
+      strongPoints: ['Optimism', 'Analytical Mind', 'Resilience'],
+      weakPoints: ['Impatience', 'Over-analysis'],
+      stages: { childhood: 'Stable', teenage: 'Active', adult: 'Successful' },
+    },
+    lifeAspects: {
+      wealth: 'Promising',
+      housesProperty: 'Stable',
+      marriage: 'Harmonious',
+      jobBusiness: 'Balanced',
+      nameFameReputation: 'High',
+    },
+    higherKnowledge: {
+      lifePathGuidance: 'Focus on service and wisdom.',
+      mysticism: 'Strong intuitive connection.',
     },
   };
 }

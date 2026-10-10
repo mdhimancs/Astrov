@@ -15,6 +15,9 @@ import {
   ChevronRight,
   Layers,
   CheckCircle2,
+  Baby,
+  Sun,
+  Infinity,
 } from 'lucide-react';
 import { UserProfile, PlanetPosition, HouseInfo } from '../types';
 import { PersonalizedGuidanceSection } from './PersonalizedGuidanceSection';
@@ -160,6 +163,39 @@ export function PersonalizedGuidanceTab({
         lagnaRasi={lagnaRasi}
         userName={seekerName}
       />
+
+      {/* Life Stages Forecast */}
+      <div className="bg-white rounded-xl border border-stone-200 p-4 shadow-3xs">
+        <h3 className="font-bold text-stone-950 flex items-center space-x-2 mb-3">
+          <Baby className="w-5 h-5 text-amber-600" />
+          <span>Life Stages & Granular Forecast</span>
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="p-3 bg-amber-50 rounded-lg border border-amber-100">
+                <h4 className="font-bold text-amber-900 text-sm">Childhood</h4>
+                <p className="text-xs text-stone-700 mt-1">Foundational insights from 4th House of motherland/peace and Chandra (Moon) emotional base.</p>
+            </div>
+            <div className="p-3 bg-amber-50 rounded-lg border border-amber-100">
+                <h4 className="font-bold text-amber-900 text-sm">Teenage</h4>
+                <p className="text-xs text-stone-700 mt-1">Developmental insights from 5th House of intellect, 9th house higher study, and Budha (Mercury) learning aptitude.</p>
+            </div>
+            <div className="p-3 bg-amber-50 rounded-lg border border-amber-100">
+                <h4 className="font-bold text-amber-900 text-sm">Adult</h4>
+                <p className="text-xs text-stone-700 mt-1">Manifestation insights from 10th House of karma/career, Saturnian endurance, and current Dasha maturity.</p>
+            </div>
+        </div>
+      </div>
+
+      {/* Mysticism & Higher Knowledge */}
+      <div className="bg-white rounded-xl border border-stone-200 p-4 shadow-3xs">
+        <h3 className="font-bold text-stone-950 flex items-center space-x-2 mb-3">
+          <Infinity className="w-5 h-5 text-purple-600" />
+          <span>Mysticism & Higher Knowledge Path</span>
+        </h3>
+        <p className="text-sm text-stone-700 leading-relaxed">
+           Spiritual exploration indicated by 8th House (hidden wisdom), 9th House (Dharma), and 12th House (Moksha). Ketu's placement in your chart acts as the primary catalyst for transcendent growth and detachment from material illusion.
+        </p>
+      </div>
 
       {/* Bottom Actions Card */}
       <div className="bg-white rounded-xl border border-stone-200/90 p-4 shadow-3xs space-y-2.5">

@@ -15,6 +15,7 @@ import { AstronomicalEphemerisTab } from './components/AstronomicalEphemerisTab'
 import { LifeEventsMattersTab } from './components/LifeEventsMattersTab';
 import { PersonalizedGuidanceTab } from './components/PersonalizedGuidanceTab';
 import { FamilyLineageTab } from './components/FamilyLineageTab';
+import { NumerologyTab } from './components/NumerologyTab';
 import { UserProfile } from './types';
 import { VEDIC_RASIS } from './data';
 import { getSavedProfiles, getActiveProfileId, setActiveProfileId as saveActiveId, upsertProfile, deleteProfile } from './utils/profileStorage';
@@ -231,6 +232,9 @@ export default function App() {
             activeProfileId={activeProfileId}
             profiles={profiles}
           />
+        )}
+        {activeTab === 'numerology' && (
+          <NumerologyTab activeProfile={currentProfile} />
         )}
       </main>
 

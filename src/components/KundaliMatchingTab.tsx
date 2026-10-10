@@ -250,7 +250,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
             <select
               value={partner1ProfileId}
               onChange={(e) => setPartner1ProfileId(e.target.value)}
-              className="text-[10.5px] font-bold text-amber-900 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 cursor-pointer"
+              className="text-[10px] font-bold text-amber-900 bg-amber-50 border border-amber-200 rounded px-1 py-0 cursor-pointer"
             >
               {profiles.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -280,7 +280,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
               <select
                 value={person1.rasi}
                 onChange={(e) => setPerson1({ ...person1, rasi: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-1.5 py-1 text-stone-950 text-[11px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
+                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-1 py-0 text-stone-950 text-[10px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
               >
                 {VEDIC_RASIS.map((r) => (
                   <option key={r.sanskritName} value={r.sanskritName}>
@@ -297,7 +297,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
               <select
                 value={person1.nakshatra}
                 onChange={(e) => setPerson1({ ...person1, nakshatra: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-1.5 py-1 text-stone-950 text-[11px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
+                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-1 py-0 text-stone-950 text-[10px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
               >
                 {NAKSHATRAS.map((n) => (
                   <option key={n.name} value={n.name}>
@@ -335,7 +335,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
             <select
               value={partner2ProfileId}
               onChange={(e) => setPartner2ProfileId(e.target.value)}
-              className="text-[10.5px] font-bold text-amber-900 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 cursor-pointer"
+              className="text-[10px] font-bold text-amber-900 bg-amber-50 border border-amber-200 rounded px-1 py-0 cursor-pointer"
             >
               <option value="custom">Custom Partner</option>
               {profiles
@@ -368,7 +368,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
               <select
                 value={person2.rasi}
                 onChange={(e) => setPerson2({ ...person2, rasi: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-1.5 py-1 text-stone-950 text-[11px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
+                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-1 py-0 text-stone-950 text-[10px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
               >
                 {VEDIC_RASIS.map((r) => (
                   <option key={r.sanskritName} value={r.sanskritName}>
@@ -385,7 +385,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
               <select
                 value={person2.nakshatra}
                 onChange={(e) => setPerson2({ ...person2, nakshatra: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-1.5 py-1 text-stone-950 text-[11px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
+                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-1 py-0 text-stone-950 text-[10px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
               >
                 {NAKSHATRAS.map((n) => (
                   <option key={n.name} value={n.name}>
@@ -502,29 +502,38 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
           </div>
         </div>
 
-        {/* In-Depth Synastry & Dosha Parihar Section */}
-        <div className="bg-[#FAF8F5] rounded-lg p-3 border border-amber-200/80 space-y-2">
+      {/* In-Depth Synastry & Dosha Parihar Section */}
+        <div className="bg-[#FAF8F5] rounded-lg p-3 border border-amber-200/80 space-y-3">
           <h4 className="text-[12.5px] font-black text-stone-900 uppercase tracking-wider flex items-center space-x-1.5">
             <BookOpen className="w-4 h-4 text-amber-700" />
             <span>Astrological Synthesis &amp; Parihar (Remedial) Guidance</span>
           </h4>
-          <div className="text-[12.5px] text-stone-700 space-y-1.5 leading-relaxed">
-            <p>
-              <strong className="text-stone-900">Compatibility Overview:</strong> Between <span className="font-bold text-amber-900">{person1.name}</span> ({person1.rasi} Rasi, {person1.nakshatra}) and <span className="font-bold text-amber-900">{person2.name}</span> ({person2.rasi} Rasi, {person2.nakshatra}), the total score of <span className="font-bold text-amber-900">{results.total} / 36</span> indicates {results.verdict}.
-            </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[12px] text-stone-700">
+            <div className="space-y-1.5">
+              <p><strong className="text-stone-900">Compatibility Overview:</strong> The total score of <span className="font-bold text-amber-900">{results.total} / 36</span> indicates {results.verdict}.</p>
+              <p><strong className="text-stone-900">Temperament Synthesis:</strong> {person1.name}'s nature ({results.koots[5].points > 3 ? 'Resilient/Natural' : 'Sensitive/Refined'}) aligns with {person2.name}'s behavioral approach, indicating {results.total > 25 ? 'High' : 'Moderate'} emotional synergy.</p>
+            </div>
+            <div className="space-y-1.5">
+              <p><strong className="text-stone-900">Planetary Lord Friendliness:</strong> Assess Moon sign lords {VEDIC_RASIS[VEDIC_RASIS.findIndex(r => r.sanskritName === person1.rasi)]?.lord} and {VEDIC_RASIS[VEDIC_RASIS.findIndex(r => r.sanskritName === person2.rasi)]?.lord} to gauge base psychological resonance.</p>
+              <p><strong className="text-stone-900">Recommendation:</strong> Prioritize mutual respect and joint spiritual activities to bridge any gap indicated by lower Koot scores.</p>
+            </div>
+          </div>
+
+          <div className="space-y-1.5 leading-relaxed">
             {results.isNadiDosha && (
               <p className="text-rose-800 bg-rose-50 p-2 rounded border border-rose-200">
-                <strong>Nadi Dosha Warning:</strong> Both partners share the same Nadi category (Aadi/Madhya/Antya), which classical texts associate with progeny health and nervous constitution. Classical Parihar: Charity of gold/grains, Mahamrityunjaya Mantra chanting, or specific astrological cleansing rituals prior to marriage.
+                <strong>Nadi Dosha Warning:</strong> Both partners share the same Nadi category (Aadi/Madhya/Antya). Classical Parihar: Charity of gold/grains or Mahamrityunjaya Mantra chanting prior to marriage.
               </p>
             )}
             {results.isBhakootDosha && (
               <p className="text-amber-900 bg-amber-50 p-2 rounded border border-amber-200">
-                <strong>Bhakoot Dosha Warning:</strong> The relative Moon sign placement forms a 2/12 or 6/8 axis, requiring conscious emotional adjustments and mutual accommodation in domestic matters. Worshipping Lord Shiva and Goddess Parvati mitigates Bhakoot friction.
+                <strong>Bhakoot Dosha Warning:</strong> Requires conscious emotional accommodation. Worshipping Lord Shiva and Goddess Parvati mitigates friction.
               </p>
             )}
             {!results.isManglikMatch && (
               <p className="text-rose-800 bg-rose-50 p-2 rounded border border-rose-200">
-                <strong>Kuja Dosha Mismatch:</strong> One partner is Manglik while the other is Non-Manglik. Traditional reconciliation includes Kumbh Vivah (mock marriage to a sacred item) or performing Mangal Shanti pujas to balance Mars energy.
+                <strong>Kuja Dosha Mismatch:</strong> Manglik status mismatch detected. Kumbh Vivah or Mangal Shanti pujas recommended.
               </p>
             )}
             {results.isManglikMatch && (

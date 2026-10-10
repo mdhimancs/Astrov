@@ -25,6 +25,7 @@ import {
   Flame,
   GraduationCap,
   Users,
+  Calculator,
 } from 'lucide-react';
 import { UserProfile } from '../types';
 import { PlaceOfBirthInput, PlaceValue } from './PlaceOfBirthInput';
@@ -228,6 +229,7 @@ export function Navbar({
     { id: 'personalized-guidance', label: 'Personalized Guidance', icon: GraduationCap },
     { id: 'family-lineage', label: 'Family Members & Lineage', icon: Users },
     { id: 'compatibility', label: 'Matching & Remedies', icon: HeartHandshake },
+    { id: 'numerology', label: 'Numerology', icon: Calculator },
   ];
 
   return (
@@ -349,7 +351,7 @@ export function Navbar({
                         title="Add New Person Profile"
                       >
                         <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                        <span>+ Add Profile</span>
+                        <span>Add Profile</span>
                       </button>
                     </div>
 
@@ -423,7 +425,7 @@ export function Navbar({
                         title="Add New Profile"
                       >
                         <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                        <span>+ Add Profile</span>
+                        <span>Add Profile</span>
                       </button>
                     </div>
                   </div>
@@ -473,7 +475,7 @@ export function Navbar({
                 <div
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`group relative rounded-md px-2 py-2 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 shadow-none border ${
+                  className={`group relative rounded-md px-4 py-3 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 shadow-none border ${
                     isActive
                       ? 'bg-amber-50/80 border-amber-300 border-b-2 border-b-amber-600 text-amber-950 font-bold shadow-3xs'
                       : 'bg-white border-stone-200/60 border-b-2 border-b-stone-200 text-stone-700 hover:border-amber-300 hover:border-b-amber-400 hover:bg-[#FAF8F5]'
@@ -643,7 +645,7 @@ export function Navbar({
                   <select
                     value={formGender}
                     onChange={(e) => setFormGender(e.target.value as any)}
-                    className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-1.5 py-0.5 text-stone-900 focus:outline-none focus:border-amber-600 focus:bg-white text-[11px]"
+                    className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-1 py-0 text-stone-900 focus:outline-none focus:border-amber-600 focus:bg-white text-[10px]"
                   >
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
@@ -718,13 +720,13 @@ export function Navbar({
                   <button
                     type="button"
                     onClick={() => setIsProfileModalOpen(false)}
-                    className="px-3 py-1 rounded text-stone-600 hover:bg-stone-100 transition-colors cursor-pointer font-semibold text-[11px]"
+                    className="px-4 py-1.5 rounded text-stone-600 hover:bg-stone-100 transition-colors cursor-pointer font-semibold text-[13px]"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="bg-amber-700 hover:bg-amber-800 text-white font-bold py-1 px-3.5 rounded shadow-2xs transition-colors flex items-center space-x-1 cursor-pointer text-[12px]"
+                    className="bg-amber-700 hover:bg-amber-800 text-white font-bold py-1.5 px-5 rounded shadow-2xs transition-colors flex items-center space-x-1 cursor-pointer text-[14px]"
                   >
                     {modalMode === 'edit' ? (
                       <>
