@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { UserProfile } from '../types';
-import { Calculator, Target, Lightbulb, Compass, MessageCircle } from 'lucide-react';
+import { Calculator, Target, Lightbulb, Compass, MessageCircle, BarChart3 } from 'lucide-react';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 
 interface NumerologyMeaning {
   analysis: string;
@@ -45,8 +46,18 @@ export function NumerologyTab({ activeProfile }: NumerologyTabProps) {
     const expression = reduceToSingleDigit(
       name.split('').reduce((acc, char) => acc + (char.charCodeAt(0) - 96), 0)
     );
+    
+    // Soul Urge is commonly calculated from vowels
+    const soulUrge = reduceToSingleDigit(
+      name.split('').reduce((acc, char) => {
+        if ('aeiou'.includes(char)) {
+          return acc + (char.charCodeAt(0) - 96);
+        }
+        return acc;
+      }, 0)
+    );
 
-    return { lifePath, expression };
+    return { lifePath, expression, soulUrge };
   }, [activeProfile]);
 
   if (!activeProfile || !calculations) {
@@ -55,6 +66,13 @@ export function NumerologyTab({ activeProfile }: NumerologyTabProps) {
 
   const lifePathDetails = NUMEROLOGY_MEANINGS[calculations.lifePath];
   const expressionDetails = NUMEROLOGY_MEANINGS[calculations.expression];
+  const soulUrgeDetails = NUMEROLOGY_MEANINGS[calculations.soulUrge];
+
+  const chartData = [
+    { subject: 'Life Path', A: calculations.lifePath * 10, fullMark: 90 },
+    { subject: 'Expression', A: calculations.expression * 10, fullMark: 90 },
+    { subject: 'Soul Urge', A: calculations.soulUrge * 10, fullMark: 90 },
+  ];
 
   return (
     <div className="space-y-6 p-4 bg-[#FAF6EE] rounded-xl border border-amber-200 shadow-sm">
@@ -63,9 +81,27 @@ export function NumerologyTab({ activeProfile }: NumerologyTabProps) {
         <span>Numerology Analysis: {activeProfile.name}</span>
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <NumerologyCard title="Life Path Number" number={calculations.lifePath} details={lifePathDetails} />
-        <NumerologyCard title="Expression Number" number={calculations.expression} details={expressionDetails} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <NumerologyCard title="Life Path Number" number={calculations.lifePath} details={lifePathDetails} />
+          <NumerologyCard title="Expression Number" number={calculations.expression} details={expressionDetails} />
+          <NumerologyCard title="Soul Urge Number" number={calculations.soulUrge} details={soulUrgeDetails} />
+        </div>
+        
+        <div className="bg-white p-5 rounded-xl border border-stone-200 shadow-inner flex flex-col items-center">
+            <h3 className="font-bold text-amber-900 text-lg flex items-center gap-2 mb-4">
+                <BarChart3 className="w-5 h-5" />
+                Influence Map
+            </h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
+                <PolarGrid />
+                <PolarAngleAxis dataKey="subject" />
+                <PolarRadiusAxis angle={30} domain={[0, 90]} />
+                <Radar name="Influence" dataKey="A" stroke="#b45309" fill="#d97706" fillOpacity={0.6} />
+              </RadarChart>
+            </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );

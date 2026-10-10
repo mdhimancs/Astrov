@@ -30,7 +30,7 @@ export function FamilyLineageTab({
   natalHouses,
   lagnaRasi,
 }: FamilyLineageTabProps) {
-  const [selectedFamilyMember, setSelectedFamilyMember] = useState<'father' | 'mother' | 'siblings' | 'spouse' | 'children' | 'ancestral'>('father');
+  const [selectedFamilyMember, setSelectedFamilyMember] = useState<'father' | 'mother' | 'siblings' | 'spouse' | 'children' | 'inlaws' | 'ancestral'>('father');
 
   if (!activeProfile) {
     return (
@@ -79,13 +79,14 @@ export function FamilyLineageTab({
       </div>
 
       {/* Navigation Member Selector Tabs (30% bigger with robust text padding) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-1">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2 pt-1">
         {[
           { id: 'father', label: 'Father (9th House)', icon: ShieldCheck, desc: 'Paternal Line & Guidance' },
           { id: 'mother', label: 'Mother (4th House)', icon: Heart, desc: 'Maternal Roots & Home' },
           { id: 'siblings', label: 'Siblings (3rd/11th)', icon: Users, desc: 'Co-borns & Support' },
           { id: 'spouse', label: 'Spouse (7th House)', icon: Heart, desc: 'Partner & Union' },
           { id: 'children', label: 'Children (5th House)', icon: Star, desc: 'Progeny & Legacy' },
+          { id: 'inlaws', label: 'In-Laws & Kin', icon: Users, desc: 'Extended Family Dynamics' },
           { id: 'ancestral', label: 'Ancestors & Pitru', icon: BookOpen, desc: 'Karmic Lineage' },
         ].map((item) => {
           const Icon = item.icon;
@@ -338,6 +339,50 @@ export function FamilyLineageTab({
                 <div className="text-base font-bold text-stone-900 mt-1">Strong Ancestral Continuity</div>
                 <p className="text-[12px] text-stone-600 mt-1">
                   Favorable 5th house aspects guarantee legacy preservation and strong familial bonds across generations.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {selectedFamilyMember === 'inlaws' && (
+          <div className="space-y-4 animate-in fade-in duration-150">
+            <div className="flex items-center space-x-3 border-b border-amber-100 pb-3">
+              <div className="w-10 h-10 rounded-lg bg-amber-100 text-amber-900 flex items-center justify-center font-bold">
+                <Users className="w-6 h-6 text-amber-800" />
+              </div>
+              <div>
+                <h2 className="text-lg font-serif font-bold text-amber-950">
+                  In-Laws & Extended Relatives (Secondary Houses)
+                </h2>
+                <p className="text-stone-600 text-[13px]">
+                  Analyzes relationships with in-laws (2nd and 8th house interactions) and near relatives, focusing on familial harmony and mutual support structures.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="bg-amber-50/60 p-3.5 rounded-lg border border-amber-200">
+                <div className="text-[12px] font-bold text-amber-900 uppercase">In-Laws (8th House: {natalHouses.find((h) => h.houseNumber === 8)?.rasiName || 'Vrischika'})</div>
+                <div className="text-base font-bold text-stone-900 mt-1">Deep Family Bonds</div>
+                <p className="text-[12px] text-stone-600 mt-1">
+                  The 8th house reflects the hidden dynamics of in-law relations, joint assets, and the transformative power of extended family ties.
+                </p>
+              </div>
+
+              <div className="bg-amber-50/60 p-3.5 rounded-lg border border-amber-200">
+                <div className="text-[12px] font-bold text-amber-900 uppercase">Immediate Kin (2nd House: {natalHouses.find((h) => h.houseNumber === 2)?.rasiName || 'Vrishabha'})</div>
+                <div className="text-base font-bold text-stone-900 mt-1">Family Support Base</div>
+                <p className="text-[12px] text-stone-600 mt-1">
+                  The 2nd house governs family wealth, speech, and early childhood upbringing, influencing how one relates to near relatives.
+                </p>
+              </div>
+
+              <div className="bg-amber-50/60 p-3.5 rounded-lg border border-amber-200">
+                <div className="text-[12px] font-bold text-amber-900 uppercase">Relational Harmony</div>
+                <div className="text-base font-bold text-stone-900 mt-1">Constructive Synergy</div>
+                <p className="text-[12px] text-stone-600 mt-1">
+                  Favorable aspects in the 2nd and 8th houses facilitate respectful and supportive interactions within the extended kin network.
                 </p>
               </div>
             </div>
