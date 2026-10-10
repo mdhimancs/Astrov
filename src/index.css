@@ -2,28 +2,154 @@
 
 @layer base {
   html {
-    font-size: 20px;
-    line-height: 1.45;
+    font-size: 16px;
+    line-height: 1.5;
   }
 
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 1rem;
+    font-size: 13px;
     line-height: 1.5;
-    background-color: #FDFBF7; /* A cleaner, very light off-white/beige */
+    background-color: #FDFBF7; /* Clean, light off-white/warm canvas */
     color: #1C1917;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
 
-  button, input, select, textarea {
-    font-family: inherit;
+  /* 1. Main Page Headings: Majestic Classical Vedic Display (Cinzel Serif) */
+  h1, .heading-1, .font-h1 {
+    font-family: 'Cinzel', Georgia, serif;
+    font-weight: 700;
+    font-size: 17px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: #1C1917;
   }
 
-  h1, h2, h3, h4, h5, h6, .font-vedic {
+  h2, .heading-2, .font-h2 {
     font-family: 'Cinzel', Georgia, serif;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1.3;
     letter-spacing: -0.01em;
+    color: #1C1917;
   }
+
+  /* 2. Standardized Subheadings & Card Titles: Clean, Modern, Ultra-Legible Plus Jakarta Sans */
+  h3, .heading-3, .font-h3 {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.35;
+    letter-spacing: -0.005em;
+    color: #1C1917;
+  }
+
+  h4, .heading-4, .font-h4 {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 1.35;
+    color: #292524;
+  }
+
+  h5, h6, .heading-5, .font-h5, .font-h6 {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1.35;
+    color: #44403C;
+  }
+
+  /* 3. Standardized Body Copy */
+  p, .text-body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #292524;
+  }
+
+  /* 4. Standardized Interactive Controls */
+  button, 
+  .btn, 
+  input, 
+  select, 
+  textarea {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    letter-spacing: 0.005em;
+  }
+}
+
+/* Explicit font family helper classes */
+.font-vedic {
+  font-family: 'Cinzel', Georgia, serif;
+}
+
+/* Subheadings that carried font-vedic are normalized to clean Plus Jakarta Sans */
+h3.font-vedic,
+h4.font-vedic,
+h5.font-vedic,
+h6.font-vedic {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.font-sans, .font-ui {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+.font-display {
+  font-family: 'Cinzel', Georgia, serif;
+}
+
+/* Standardized Typography Hierarchy Utility Classes */
+.text-page-title {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #1C1917;
+  letter-spacing: -0.01em;
+}
+
+.text-section-title {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #1C1917;
+  letter-spacing: -0.01em;
+}
+
+.text-card-title {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #1C1917;
+}
+
+.text-subheading {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #57534E;
+}
+
+.text-caption {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #78716C;
+}
+
+/* Tabular figures for stats and metrics */
+.score-number,
+.stat-value,
+.coord-value {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Subtle scrollbar for light portal */
@@ -41,4 +167,3 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #B45309;
 }
-

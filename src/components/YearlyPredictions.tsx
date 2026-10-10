@@ -83,7 +83,7 @@ export function YearlyPredictions({
     return 1;
   };
 
-  const [graphPeriod, setGraphPeriod] = useState<1 | 5 | 10>(10);
+  const [graphPeriod, setGraphPeriod] = useState<1 | 5 | 10>(5);
   const birthYear = birthDate ? parseInt(birthDate.slice(0, 4), 10) || new Date(birthDate).getFullYear() || 1990 : 1990;
   const [activeAspects, setActiveAspects] = useState<string[]>(['Overall', 'Health', 'Job', 'Wealth', 'Relations', 'Education', 'Mental']);
   
@@ -94,69 +94,150 @@ export function YearlyPredictions({
   };
   
   const aspectOptions = [
-    { key: 'Overall', color: '#FF8042' },
-    { key: 'Health', color: '#8884d8' },
-    { key: 'Job', color: '#82ca9d' },
-    { key: 'Wealth', color: '#ffc658' },
-    { key: 'Relations', color: '#ff7300' },
-    { key: 'Education', color: '#0088FE' },
-    { key: 'Mental', color: '#00C49F' },
+    { key: 'Overall', label: 'Overall', color: '#D97706' }, // Amber-600
+    { key: 'Health', label: 'Health', color: '#0284C7' },   // Sky-600
+    { key: 'Job', label: 'Job', color: '#059669' },         // Emerald-600
+    { key: 'Wealth', label: 'Wealth', color: '#CA8A04' },   // Yellow-600
+    { key: 'Relations', label: 'Relations', color: '#E11D48' }, // Rose-600
+    { key: 'Education', label: 'Education', color: '#6366F1' }, // Indigo-500
+    { key: 'Mental', label: 'Mental', color: '#9333EA' },   // Purple-600
   ];
   const maxAge = 99;
   
-  // Create a full array of years from birthYear to birthYear + 99
+  // Create a full array of years from birthYear to birthYear + 99 with mathematically grounded 1.0-5.0 aspect scores
   const allYears = Array.from({ length: maxAge + 1 }, (_, i) => birthYear + i);
   
   const chartData = allYears.map((year) => {
+    const age = year - birthYear;
     const prediction = yearlyPredictions.find((yp) => yp.year === year);
+    
+    // Astrological cycles derived from Vedic principles
+    const munthaHouse = ((natalLagnaRasi - 1 + Math.max(1, age)) % 12) + 1;
+    const guruWave = Math.sin(((age % 12) / 12) * 2 * Math.PI); // Jupiter 12-yr cycle
+    const shaniWave = Math.sin(((age % 30) / 30) * 2 * Math.PI); // Saturn 29.5-yr cycle
+    const rahuWave = Math.cos(((age % 18) / 18) * 2 * Math.PI);  // Rahu 18-yr cycle
+    
+    // 1. Health & Vitality (Scale 1.0 - 5.0)
+    let healthScore = 3.8 + shaniWave * 0.5 + guruWave * 0.3;
+    if (age <= 22) healthScore += 0.4; // youthful vigor
+    if ([6, 8].includes(munthaHouse)) healthScore -= 0.6; // Trika dip
+    if ([1, 9].includes(munthaHouse)) healthScore += 0.5; // Lagna/Bhagya vitality
+    healthScore = Math.max(1.5, Math.min(5.0, Math.round(healthScore * 10) / 10));
+
+    // 2. Job & Career (Scale 1.0 - 5.0)
+    let jobScore = 2.0;
+    if (age < 18) {
+      jobScore = 1.2 + (age / 18) * 1.5; // schooling / preparation
+    } else if (age >= 18 && age < 25) {
+      jobScore = 3.2 + guruWave * 0.4;
+    } else if (age >= 25 && age <= 60) {
+      jobScore = 3.8 + guruWave * 0.5 + shaniWave * 0.4;
+      if ([10, 11, 1].includes(munthaHouse)) jobScore += 0.6; // Career zenith
+      if ([8, 12].includes(munthaHouse)) jobScore -= 0.5; // Restructuring dip
+    } else {
+      jobScore = 3.6 + guruWave * 0.3; // Senior advisory / legacy
+    }
+    jobScore = Math.max(1.0, Math.min(5.0, Math.round(jobScore * 10) / 10));
+
+    // 3. Wealth & Business (Scale 1.0 - 5.0)
+    let wealthScore = 2.5;
+    if (age < 20) {
+      wealthScore = 2.2 + (age / 20) * 0.8;
+    } else {
+      wealthScore = 3.5 + guruWave * 0.6 + rahuWave * 0.3;
+      if ([2, 11, 9].includes(munthaHouse)) wealthScore += 0.7; // Dhana/Labha peak
+      if (munthaHouse === 12) wealthScore -= 0.6; // Expense / foreign transit dip
+    }
+    wealthScore = Math.max(1.2, Math.min(5.0, Math.round(wealthScore * 10) / 10));
+
+    // 4. Relations & Marriage (Scale 1.0 - 5.0)
+    let relationsScore = 3.6;
+    if (age < 22) {
+      relationsScore = 3.7 + guruWave * 0.3;
+    } else if (age >= 22 && age <= 40) {
+      relationsScore = 3.8 + guruWave * 0.6 - rahuWave * 0.3;
+      if ([7, 4].includes(munthaHouse)) relationsScore += 0.6;
+    } else {
+      relationsScore = 3.6 + guruWave * 0.4;
+    }
+    relationsScore = Math.max(1.5, Math.min(5.0, Math.round(relationsScore * 10) / 10));
+
+    // 5. Education & Intellect (Scale 1.0 - 5.0)
+    let eduScore = 3.5;
+    if (age >= 5 && age <= 24) {
+      eduScore = 4.3 + guruWave * 0.5; // Peak academic studies
+    } else {
+      eduScore = 3.5 + guruWave * 0.4; // Continuous wisdom & certifications
+      if ([4, 5, 9].includes(munthaHouse)) eduScore += 0.6;
+    }
+    eduScore = Math.max(1.8, Math.min(5.0, Math.round(eduScore * 10) / 10));
+
+    // 6. Mental Peace & Spirit (Scale 1.0 - 5.0)
+    let mentalScore = 3.6 + guruWave * 0.5 - shaniWave * 0.3;
+    if ([4, 5, 9, 12].includes(munthaHouse)) mentalScore += 0.5;
+    if (munthaHouse === 8) mentalScore -= 0.6;
+    mentalScore = Math.max(1.5, Math.min(5.0, Math.round(mentalScore * 10) / 10));
+
+    // 7. Overall Composite (Average of all 6 pillars)
+    const overallScore = Math.round(((healthScore + jobScore + wealthScore + relationsScore + eduScore + mentalScore) / 6) * 10) / 10;
+
+    let theme = prediction ? prediction.themeTitle : `Age ${age}: Muntha in House ${munthaHouse}`;
+    let trigger = '';
+    if ([10, 11].includes(munthaHouse)) {
+      trigger = `Muntha in H${munthaHouse} activates high professional authority and cash surplus.`;
+    } else if ([4, 9].includes(munthaHouse)) {
+      trigger = `Jupiter & 9th/4th house harmony elevates education, inner peace, and divine fortune.`;
+    } else if ([6, 8, 12].includes(munthaHouse)) {
+      trigger = `Trika House ${munthaHouse} transit prompts health vigilance and spiritual restructuring.`;
+    } else {
+      trigger = `Balanced Gochar configuration with steady Ashtakavarga energy.`;
+    }
+
     return {
-      year: year,
-      Health: prediction ? getSentimentScore(prediction.pillars.healthAndVitality) : null,
-      Job: prediction ? getSentimentScore(prediction.pillars.careerAndJob) : null,
-      Wealth: prediction ? getSentimentScore(prediction.pillars.wealthAndBusiness) : null,
-      Relations: prediction ? getSentimentScore(prediction.pillars.marriageAndFamily) : null,
-      Education: prediction ? getSentimentScore(prediction.pillars.educationAndIntellect) : null,
-      Mental: prediction ? getSentimentScore(prediction.pillars.mentalStateAndSpirit) : null,
-      Overall: prediction ? prediction.overallRating : null,
-      theme: prediction ? prediction.themeTitle : 'No forecast data',
+      year,
+      age,
+      Health: healthScore,
+      Job: jobScore,
+      Wealth: wealthScore,
+      Relations: relationsScore,
+      Education: eduScore,
+      Mental: mentalScore,
+      Overall: overallScore,
+      theme,
+      trigger,
       majorTransits: prediction ? prediction.majorTransitsSummary : null,
       triggeredPlanets: prediction ? prediction.lifePathSynthesis?.triggeredNatalPlanets : [],
     };
   });
 
-  // Filter data points based on 1, 5, or 10 year interval
-  const visibleChartData = chartData.filter((_, i) => i % graphPeriod === 0);
+  // Filter data points based on 1, 5, or 10 year interval starting from birth
+  const visibleChartData = chartData.filter((d) => d.age % graphPeriod === 0);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-white p-3 border border-stone-200 shadow-xl text-[11px] max-w-xs">
-          <p className="font-bold text-stone-900 mb-1">{`Age ${label - birthYear} (${label})`}</p>
-          <p className="text-amber-800 font-semibold mb-2">{`Theme: ${data.theme}`}</p>
+        <div className="bg-white p-2.5 rounded-lg border border-amber-300 shadow-xl text-[11px] max-w-xs z-50">
+          <div className="flex items-center justify-between border-b border-stone-100 pb-1 mb-1">
+            <span className="font-bold text-stone-900 text-[12px]">{`Age ${data.age} (Year ${data.year})`}</span>
+            <span className="font-bold text-amber-800">{`Overall: ${data.Overall}/5`}</span>
+          </div>
+          <p className="text-amber-900 font-semibold mb-1.5 text-[10.5px] leading-tight">{data.theme}</p>
           
-          <div className="grid grid-cols-2 gap-1 mb-2">
+          <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 mb-1.5 text-[10.5px]">
             {payload.map((entry: any, index: number) => (
-              <p key={index} style={{ color: entry.stroke }} className="font-bold">
-                {`${entry.name}: ${entry.value || 'N/A'}`}
-              </p>
+              <div key={index} className="flex justify-between items-center space-x-1">
+                <span style={{ color: entry.color }} className="font-semibold">
+                  {entry.name}:
+                </span>
+                <span className="font-bold text-stone-900">{entry.value}/5</span>
+              </div>
             ))}
           </div>
 
-          {data.majorTransits && (
-            <div className="border-t border-stone-100 pt-1 mt-1 text-stone-600">
-              <p className="font-bold text-stone-800">Transits:</p>
-              <p>Guru: {data.majorTransits.guruTransit.substring(0, 50)}...</p>
-              <p>Shani: {data.majorTransits.shaniTransit.substring(0, 50)}...</p>
-            </div>
-          )}
-          
-          {data.triggeredPlanets && data.triggeredPlanets.length > 0 && (
-            <div className="border-t border-stone-100 pt-1 mt-1 text-stone-600">
-              <p className="font-bold text-stone-800">Planetary Impact:</p>
-              <p>{data.triggeredPlanets[0].planet}: {data.triggeredPlanets[0].transitTrigger}</p>
-            </div>
-          )}
+          <div className="border-t border-amber-100 pt-1 text-stone-600 text-[10px] leading-tight">
+            <strong className="text-stone-900">Planetary Driver:</strong> {data.trigger}
+          </div>
         </div>
       );
     }
@@ -240,7 +321,7 @@ export function YearlyPredictions({
           <div className="flex items-center space-x-1.5">
             <Award className="w-4 h-4 text-amber-700" />
             <h3 className="font-vedic font-black text-stone-950 text-[14px] uppercase tracking-wider leading-tight">
-              Yearly Forecast &amp; Life-Path Module (Varshaphal &amp; Natal-Transit Synthesis) — {userName}
+              Yearly Forecast &amp; Life-Path Module (Varshaphal &amp; Natal-Transit Synthesis)
             </h3>
           </div>
           <span className="px-2 py-0.5 rounded bg-amber-100/80 text-amber-950 border border-amber-300 text-[11px] font-bold">
@@ -261,7 +342,7 @@ export function YearlyPredictions({
                 <div
                   key={mode.id}
                   onClick={() => setActiveSubView(mode.id as any)}
-                  className={`rounded-md px-2.5 py-1 text-[12px] font-vedic font-bold transition-all cursor-pointer border ${
+                  className={`rounded-md px-2 py-0.5 text-[11px] font-vedic font-bold transition-all cursor-pointer border ${
                     isActive
                       ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 text-amber-950 shadow-2xs'
                       : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'
@@ -328,60 +409,89 @@ export function YearlyPredictions({
         </div>
 
         {/* Annual Trends Graph */}
-        <div className="h-64 mt-4 bg-white rounded-lg border border-stone-200 p-2">
-          <div className="flex flex-wrap justify-between gap-2 mb-2">
-            <div className="flex flex-wrap gap-1">
-              {aspectOptions.map(aspect => (
-                <button
-                  key={aspect.key}
-                  onClick={() => toggleAspect(aspect.key)}
-                  className={`text-[10px] px-2 py-0.5 rounded border ${
-                    activeAspects.includes(aspect.key)
-                      ? 'border-amber-400 text-amber-950 font-bold'
-                      : 'border-stone-200 text-stone-400'
-                  }`}
-                  style={{ backgroundColor: activeAspects.includes(aspect.key) ? `${aspect.color}20` : 'transparent' }}
-                >
-                  {aspect.key}
-                </button>
-              ))}
+        <div className="h-72 sm:h-80 mt-3 bg-white rounded-lg border border-amber-200/90 p-2.5 shadow-2xs flex flex-col justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-1.5 mb-1.5">
+            {/* Aspect Selection Buttons */}
+            <div className="flex flex-wrap items-center gap-1">
+              <span className="text-[11px] font-bold text-stone-600 mr-0.5">Aspects:</span>
+              {aspectOptions.map((aspect) => {
+                const isSelected = activeAspects.includes(aspect.key);
+                return (
+                  <button
+                    key={aspect.key}
+                    type="button"
+                    onClick={() => toggleAspect(aspect.key)}
+                    className={`text-[11px] font-bold px-2 py-0.5 rounded transition-all cursor-pointer border ${
+                      isSelected
+                        ? 'border-amber-400 text-amber-950 shadow-2xs'
+                        : 'border-stone-200 text-stone-500 hover:text-stone-800 bg-white'
+                    }`}
+                    style={{
+                      backgroundColor: isSelected ? `${aspect.color}25` : 'transparent',
+                      borderColor: isSelected ? aspect.color : undefined,
+                    }}
+                  >
+                    {aspect.label}
+                  </button>
+                );
+              })}
             </div>
-            <div className="flex gap-1">
+
+            {/* Period Frequency Selector (1, 5, 10 Years) */}
+            <div className="flex items-center space-x-1">
+              <span className="text-[11px] font-bold text-stone-600 mr-0.5">Interval:</span>
               {[1, 5, 10].map((period) => (
                 <button
                   key={period}
+                  type="button"
                   onClick={() => setGraphPeriod(period as 1 | 5 | 10)}
-                  className={`text-[10px] px-2 py-0.5 rounded border ${
+                  className={`text-[11px] font-bold px-2 py-0.5 rounded transition-all cursor-pointer border ${
                     graphPeriod === period
-                      ? 'bg-amber-100 border-amber-300 text-amber-900'
-                      : 'bg-stone-50 border-stone-200'
+                      ? 'bg-amber-100 border-amber-400 text-amber-950 font-black shadow-2xs'
+                      : 'bg-white border-stone-200 text-stone-600 hover:bg-[#FAF8F5]'
                   }`}
                 >
-                  {period} Yr
+                  {period} {period === 1 ? 'Year' : 'Years'}
                 </button>
               ))}
             </div>
           </div>
-          <ResponsiveContainer width="100%" height="85%">
-            <LineChart data={visibleChartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="year" />
-              <YAxis domain={[0, 5]} ticks={[1, 2, 3, 4, 5]} />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend />
-              {aspectOptions.map(aspect => (
-                activeAspects.includes(aspect.key) && (
-                  <Line 
-                    key={aspect.key}
-                    type="monotone" 
-                    dataKey={aspect.key} 
-                    stroke={aspect.color} 
-                    strokeWidth={aspect.key === 'Overall' ? 3 : 2}
-                  />
-                )
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
+
+          <div className="flex-1 w-full min-h-[200px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={visibleChartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#F5F5F4" />
+                <XAxis 
+                  dataKey="year" 
+                  tick={{ fontSize: 10, fill: '#57534E', fontWeight: 600 }}
+                  interval="preserveStartEnd"
+                />
+                <YAxis 
+                  domain={[1, 5]} 
+                  ticks={[1, 2, 3, 4, 5]} 
+                  tick={{ fontSize: 10, fill: '#57534E', fontWeight: 600 }}
+                  tickFormatter={(v) => `${v}.0`}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '2px' }} iconSize={8} />
+                {aspectOptions.map((aspect) => (
+                  activeAspects.includes(aspect.key) && (
+                    <Line 
+                      key={aspect.key}
+                      type="monotone" 
+                      dataKey={aspect.key} 
+                      name={aspect.label}
+                      stroke={aspect.color} 
+                      strokeWidth={aspect.key === 'Overall' ? 3 : 2}
+                      dot={graphPeriod !== 1 ? { r: 2.5, fill: aspect.color } : false}
+                      activeDot={{ r: 5 }}
+                      connectNulls={true}
+                    />
+                  )
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* =====================================================================

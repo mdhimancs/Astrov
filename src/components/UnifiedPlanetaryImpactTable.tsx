@@ -73,7 +73,7 @@ export function UnifiedPlanetaryImpactTable({
               <div
                 key={tab.id}
                 onClick={() => setActiveFilter(tab.id as any)}
-                className={`rounded-md px-2.5 py-1 text-[12px] font-vedic font-bold transition-all duration-150 cursor-pointer border flex items-center space-x-1.5 whitespace-nowrap shrink-0 ${
+                className={`rounded-md px-2 py-0.5 text-[11px] font-ui font-semibold transition-all duration-150 cursor-pointer border flex items-center space-x-1 whitespace-nowrap shrink-0 ${
                   isActive
                     ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 text-amber-950 shadow-2xs'
                     : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'

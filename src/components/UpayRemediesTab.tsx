@@ -616,7 +616,7 @@ export function UpayRemediesTab({
               <Flame className="w-3.5 h-3.5 text-amber-800" />
             </span>
             <h1 className="text-[16px] font-vedic font-bold text-stone-950 leading-tight">
-              Vedic Upay &amp; Remedies — {currentProfile?.name || 'Seeker'}
+              Vedic Upay &amp; Remedies (Planetary Harmonization)
             </h1>
             <span className="px-2 py-0.5 rounded bg-white border border-amber-200 text-amber-950 text-[11px] font-bold">
               Lagna: {astroDiagnostics.lagnaRasiObj.sanskritName} ({astroDiagnostics.lagnaLord})

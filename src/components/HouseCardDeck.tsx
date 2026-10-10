@@ -278,8 +278,8 @@ export function HouseCardDeck({
               </h3>
             </div>
 
-            {/* Category Filter - Compact 1-Row Deck of Cards */}
-            <div className="flex flex-wrap items-center gap-1.5">
+            {/* Category Filter - Compact 1-Row Deck of Cards (10% smaller) */}
+            <div className="flex flex-wrap items-center gap-1">
               {[
                 { id: 'ALL', label: 'All' },
                 { id: 'KENDRA', label: 'Kendra' },
@@ -293,13 +293,13 @@ export function HouseCardDeck({
                 <div
                   key={cat.id}
                   onClick={() => setFilterCategory(cat.id as any)}
-                  className={`group relative rounded-lg px-2.5 py-1.5 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 border ${
+                  className={`group relative rounded-md px-2 py-0.5 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 border ${
                     isActive
-                      ? 'bg-amber-50/50 border-amber-400 text-amber-950 font-bold shadow-sm'
+                      ? 'bg-amber-50/80 border-amber-400 text-amber-950 font-bold shadow-2xs'
                       : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5] shadow-none'
                   }`}
                 >
-                  <span className="text-[12px] font-vedic font-bold">{cat.label}</span>
+                  <span className="text-[10.5px] font-ui font-semibold">{cat.label}</span>
                   {isActive && <div className="absolute bottom-0 left-1 right-1 h-0.5 bg-amber-500 rounded-t-full" />}
                 </div>
                 );
@@ -322,7 +322,7 @@ export function HouseCardDeck({
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className={`px-1.5 py-0.5 rounded text-[11px] font-vedic font-bold ${
+                    <span className={`px-1.5 py-0.5 rounded text-[11px] font-ui font-semibold ${
                       isSelected ? 'bg-amber-700 text-white' : 'bg-stone-100 text-stone-800'
                     }`}>
                       H{h.houseNumber}

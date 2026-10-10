@@ -154,7 +154,7 @@ export function CelestialSkyMapWheel({
                       : 'text-stone-700 hover:text-stone-900'
                   }`}
                 >
-                  Natal Wheel ({seekerName})
+                  Natal Wheel
                 </button>
                 <button
                   type="button"
@@ -551,7 +551,7 @@ export function CelestialSkyMapWheel({
                       {activeDetailPlanet.name} ({activeDetailPlanet.englishName})
                     </h4>
                     <span className="text-[11px] text-amber-800 font-semibold">
-                      {wheelMode === 'natal' ? `Natal (${seekerName})` : 'Live Astronomical Positioning'}
+                      {wheelMode === 'natal' ? 'Natal Astrological Placement' : 'Live Astronomical Positioning'}
                     </span>
                   </div>
                 </div>

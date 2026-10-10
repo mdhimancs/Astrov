@@ -122,6 +122,8 @@ const PLANET_IMPROVEMENT_GUIDE: Record<GrahaName, PlanetStrengthImprovement> = {
 interface ShadbalaD3ChartProps {
   planets: PlanetPosition[];
   birthTime?: string;
+  selectedPlanet?: GrahaName;
+  onSelectPlanet?: (planet: GrahaName) => void;
 }
 
 const SHADBALA_COMPONENT_KEYS = [
@@ -314,12 +316,28 @@ export function calculatePlanetShadbala(
   });
 }
 
-export function ShadbalaD3Chart({ planets, birthTime = '07:30' }: ShadbalaD3ChartProps) {
+export function ShadbalaD3Chart({
+  planets,
+  birthTime = '07:30',
+  selectedPlanet,
+  onSelectPlanet,
+}: ShadbalaD3ChartProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [chartMode, setChartMode] = useState<'stacked' | 'ratio'>('stacked');
-  const [selectedPlanetName, setSelectedPlanetName] = useState<GrahaName>('Surya');
+  const [selectedPlanetName, setSelectedPlanetName] = useState<GrahaName>(selectedPlanet || 'Surya');
   const [containerWidth, setContainerWidth] = useState<number>(760);
+
+  useEffect(() => {
+    if (selectedPlanet && selectedPlanet !== selectedPlanetName) {
+      setSelectedPlanetName(selectedPlanet);
+    }
+  }, [selectedPlanet]);
+
+  const handleSelectPlanet = (name: GrahaName) => {
+    setSelectedPlanetName(name);
+    onSelectPlanet?.(name);
+  };
 
   const shadbalaData = useMemo(
     () => calculatePlanetShadbala(planets, birthTime),
@@ -849,7 +867,7 @@ export function ShadbalaD3Chart({ planets, birthTime = '07:30' }: ShadbalaD3Char
             return (
               <div
                 key={item.planet}
-                onClick={() => setSelectedPlanetName(item.planet)}
+                onClick={() => handleSelectPlanet(item.planet)}
                 className={`rounded-lg border p-2.5 transition-all cursor-pointer space-y-1.5 ${
                   isSelected
                     ? 'bg-amber-50/80 border-amber-400 ring-1 ring-amber-300 shadow-2xs'

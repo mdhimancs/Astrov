@@ -12,6 +12,8 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { NorthIndianChart } from './NorthIndianChart';
+import { CelestialSkyMapWheel } from './CelestialSkyMapWheel';
+import { AspectStrengthTrajectoryGraph } from './AspectStrengthTrajectoryGraph';
 import { ProfileSelector } from './ProfileSelector';
 import { MonthWisePredictions } from './MonthWisePredictions';
 import { UnifiedPlanetaryImpactTable } from './UnifiedPlanetaryImpactTable';
@@ -73,8 +75,8 @@ export function VedicKundaliTab() {
     };
   });
 
-  // View modes for the North Indian Chart: 'natal' | 'transit' | 'dual'
-  const [chartViewMode, setChartViewMode] = useState<'natal' | 'transit' | 'dual'>('natal');
+  // View modes for the Chart: 'natal' | 'transit' | 'dual' | 'wheel'
+  const [chartViewMode, setChartViewMode] = useState<'natal' | 'transit' | 'dual' | 'wheel'>('natal');
   const [selectedHouse, setSelectedHouse] = useState<HouseInfo | null>(null);
 
   // Selected Month Key for Month-wise Predictions dropdown
@@ -272,7 +274,7 @@ export function VedicKundaliTab() {
     } catch (err) {
       console.error(err);
       setAiReading(
-        `Transit Synthesis for ${name}: Current transits of Jupiter, Saturn, Rahu, and Ketu relative to your natal Moon in ${VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName} and Lagna in ${VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName} demand methodical discipline in professional projects and offer auspicious opportunities in personal learning.`
+        `Transit Synthesis: Current transits of Jupiter, Saturn, Rahu, and Ketu relative to your natal Moon in ${VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName} and Lagna in ${VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName} demand methodical discipline in professional projects and offer auspicious opportunities in personal learning.`
       );
     } finally {
       setIsLoadingAi(false);
@@ -281,14 +283,6 @@ export function VedicKundaliTab() {
 
   return (
     <div className="w-full space-y-2">
-      {/* Horizontally Compact Profile Selector Header */}
-      <ProfileSelector
-        profiles={profiles}
-        activeProfileId={activeProfileId}
-        onSelectProfile={handleSelectProfile}
-        onSaveProfile={handleSaveProfile}
-        onDeleteProfile={handleDeleteProfile}
-      />
 
       {/* Horizontally Compact Birth Details Form */}
       <div className="bg-white rounded-lg border border-stone-200 p-2.5 shadow-3xs">
@@ -476,29 +470,53 @@ export function VedicKundaliTab() {
               >
                 Dual
               </button>
+
+              <button
+                type="button"
+                onClick={() => setChartViewMode('wheel')}
+                className={`px-2.5 py-1 rounded text-[14px] font-semibold transition-all cursor-pointer ${
+                  chartViewMode === 'wheel'
+                    ? 'bg-amber-700 text-white shadow-3xs'
+                    : 'text-stone-700 hover:bg-stone-100'
+                }`}
+              >
+                360° Wheel
+              </button>
             </div>
           </div>
 
-          <NorthIndianChart
-            houses={chartViewMode === 'transit' ? transitHouses : natalHouses}
-            title={
-              chartViewMode === 'natal'
-                ? `Janam Kundali — ${name}`
-                : chartViewMode === 'transit'
-                ? 'Current Planetary Movement (Gochar)'
-                : `Dual Overlay (Birth + Transits) — ${name}`
-            }
-            subtitle={
-              chartViewMode === 'natal'
-                ? `Lagna: ${VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName} • Moon: ${VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName}`
-                : chartViewMode === 'transit'
-                ? 'Real-time planetary coordinates'
-                : 'Birth grahas + [G] Transits'
-            }
-            showTransitsTogether={chartViewMode === 'dual'}
-            onSelectHouse={(h) => setSelectedHouse(h)}
-            selectedHouseNumber={selectedHouse?.houseNumber}
-          />
+          {chartViewMode === 'wheel' ? (
+            <div className="w-full flex justify-center py-1">
+              <CelestialSkyMapWheel
+                livePlanets={transitPlanets}
+                natalPlanets={natalPlanets}
+                lagnaRasi={natalLagnaRasi}
+                seekerName={name}
+                locationName={selectedCity.name}
+              />
+            </div>
+          ) : (
+            <NorthIndianChart
+              houses={chartViewMode === 'transit' ? transitHouses : natalHouses}
+              title={
+                chartViewMode === 'natal'
+                  ? 'Janam Kundali (D1)'
+                  : chartViewMode === 'transit'
+                  ? 'Current Planetary Movement (Gochar)'
+                  : 'Dual Overlay (Birth + Transits)'
+              }
+              subtitle={
+                chartViewMode === 'natal'
+                  ? `Lagna: ${VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName} • Moon: ${VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName}`
+                  : chartViewMode === 'transit'
+                  ? 'Real-time planetary coordinates'
+                  : 'Birth grahas + [G] Transits'
+              }
+              showTransitsTogether={chartViewMode === 'dual'}
+              onSelectHouse={(h) => setSelectedHouse(h)}
+              selectedHouseNumber={selectedHouse?.houseNumber}
+            />
+          )}
         </div>
 
         <div className="lg:col-span-5 space-y-2">
@@ -594,6 +612,15 @@ export function VedicKundaliTab() {
         </div>
       </div>
 
+      {/* LIFE ASPECTS DIPS & RISES GRAPH (HEALTH, EDUCATION, WEALTH, CAREER, RELATIONSHIPS, MENTAL PEACE) */}
+      <AspectStrengthTrajectoryGraph
+        natalPlanets={natalPlanets}
+        natalHouses={natalHouses}
+        lagnaRasi={natalLagnaRasi}
+        userName={name}
+        currentTransitPlanets={transitPlanets}
+      />
+
       {/* MONTH-WISE TRANSIT PREDICTIONS (DROPDOWN MENU AT TOP) */}
       <MonthWisePredictions
         monthlyPredictions={monthlyPredictions}
@@ -606,7 +633,7 @@ export function VedicKundaliTab() {
       <UnifiedPlanetaryImpactTable
         records={unifiedImpactRecords}
         title="Most Important Planetary Changes & Specific Effects"
-        subtitle={`Effects of key planetary transits on Health, Job, Business, Relations, and Marriage for ${name}`}
+        subtitle="Effects of key planetary transits on Health, Job, Business, Relations, and Marriage"
       />
 
       {/* Optional Real-time AI Synthesis Button & Box */}

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { NorthIndianChart } from './NorthIndianChart';
 import { SouthIndianChart } from './SouthIndianChart';
+import { CelestialSkyMapWheel } from './CelestialSkyMapWheel';
 import { MoonPhasesImpact } from './MoonPhasesImpact';
 import { calculatePlanetaryPositions, buildHouseStructure, AyanamshaSystem } from '../vedicMath';
 import { HouseInfo, PlanetPosition, UserProfile } from '../types';
@@ -46,7 +47,7 @@ export function TransitsLiveTab({
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1); // days per step
   const [dayOffset, setDayOffset] = useState<number>(0);
-  const [chartLayout, setChartLayout] = useState<'north' | 'south'>('north');
+  const [chartLayout, setChartLayout] = useState<'north' | 'south' | 'wheel'>('north');
   const [ayanamshaSystem, setAyanamshaSystem] = useState<AyanamshaSystem>('Lahiri');
   const [showNatalOverlay, setShowNatalOverlay] = useState<boolean>(true);
 
@@ -261,7 +262,7 @@ export function TransitsLiveTab({
           <div className="flex rounded border border-stone-200 bg-white p-0.5 text-[11px]">
             <button
               onClick={() => setChartLayout('north')}
-              className={`px-1.5 py-0.5 rounded font-bold ${
+              className={`px-1.5 py-0.5 rounded font-bold cursor-pointer ${
                 chartLayout === 'north' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'text-stone-600'
               }`}
             >
@@ -269,11 +270,19 @@ export function TransitsLiveTab({
             </button>
             <button
               onClick={() => setChartLayout('south')}
-              className={`px-1.5 py-0.5 rounded font-bold ${
+              className={`px-1.5 py-0.5 rounded font-bold cursor-pointer ${
                 chartLayout === 'south' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'text-stone-600'
               }`}
             >
               South
+            </button>
+            <button
+              onClick={() => setChartLayout('wheel')}
+              className={`px-1.5 py-0.5 rounded font-bold cursor-pointer ${
+                chartLayout === 'wheel' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'text-stone-600'
+              }`}
+            >
+              360° Wheel
             </button>
           </div>
         </div>
@@ -396,7 +405,7 @@ export function TransitsLiveTab({
             <span>{showNatalOverlay ? 'Transit over Natal Chart (Overlay ON)' : 'Pure Gochar Chart Only'}</span>
           </button>
           <span className="text-[11px] text-stone-500 font-semibold hidden md:inline">
-            {showNatalOverlay ? `Showing Gochar planets transiting ${activeProfile?.name || 'Natal'}'s houses` : 'Direct Sky observation'}
+            {showNatalOverlay ? 'Showing Gochar planets transiting natal houses' : 'Direct Sky observation'}
           </span>
         </div>
 
@@ -417,28 +426,38 @@ export function TransitsLiveTab({
 
       {/* Grid: Gochar Kundali + Coordinates Table & Transit Hits */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 items-start">
-        {/* CHART DISPLAY (NORTH OR SOUTH) */}
-        <div className="lg:col-span-6">
+        {/* CHART DISPLAY (NORTH, SOUTH, OR 360 CELESTIAL WHEEL) */}
+        <div className={`${chartLayout === 'wheel' ? 'lg:col-span-12' : 'lg:col-span-6'} transition-all`}>
           {chartLayout === 'north' ? (
             <NorthIndianChart
               houses={showNatalOverlay ? overlayHouses : transitHouses}
-              title={showNatalOverlay ? `Gochar Transit on Natal (${activeProfile?.name || 'Seeker'})` : 'Live Gochar Sky'}
+              title={showNatalOverlay ? 'Gochar Transit on Natal Chart' : 'Live Gochar Sky'}
               subtitle={`${currentDate.toLocaleDateString()} • ${selectedCity.name}`}
               isTransit={true}
               showTransitsTogether={showNatalOverlay}
             />
-          ) : (
+          ) : chartLayout === 'south' ? (
             <SouthIndianChart
               houses={showNatalOverlay ? overlayHouses : transitHouses}
-              title={showNatalOverlay ? `Gochar Transit on Natal (${activeProfile?.name || 'Seeker'})` : 'Live Gochar Sky'}
+              title={showNatalOverlay ? 'Gochar Transit on Natal Chart' : 'Live Gochar Sky'}
               subtitle={`${currentDate.toLocaleDateString()} • ${selectedCity.name}`}
               isTransit={true}
             />
+          ) : (
+            <div className="w-full flex justify-center py-1">
+              <CelestialSkyMapWheel
+                livePlanets={transitPlanets}
+                natalPlanets={natalPlanets}
+                lagnaRasi={natalLagnaRasi}
+                seekerName=""
+                locationName={selectedCity.name}
+              />
+            </div>
           )}
         </div>
 
         {/* TRANSIT PLANETARY COORDINATES & HITS */}
-        <div className="lg:col-span-6 space-y-2">
+        <div className={`${chartLayout === 'wheel' ? 'lg:col-span-12' : 'lg:col-span-6'} space-y-2`}>
           {/* Natal Moon Conjunction Alerts (Chandra Conjunction Gochar) */}
           {showNatalOverlay && (
             <div className={`rounded-lg border p-2 shadow-3xs space-y-1.5 ${

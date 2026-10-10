@@ -12,9 +12,13 @@ import {
   BookOpen,
   CheckCircle2,
   ShieldCheck,
+  Activity,
+  Globe,
 } from 'lucide-react';
 import { NorthIndianChart } from './NorthIndianChart';
 import { SouthIndianChart } from './SouthIndianChart';
+import { CelestialSkyMapWheel } from './CelestialSkyMapWheel';
+import { AspectStrengthTrajectoryGraph } from './AspectStrengthTrajectoryGraph';
 import { ProfileSelector } from './ProfileSelector';
 import { PlaceValue } from './PlaceOfBirthInput';
 import { HouseCardDeck } from './HouseCardDeck';
@@ -102,17 +106,20 @@ export function BirthTimePredictionsTab({
 
   const [selectedHouse, setSelectedHouse] = useState<HouseInfo | null>(null);
   const [selectedHouseNumber, setSelectedHouseNumber] = useState<number>(1);
-  const [birthChartLayout, setBirthChartLayout] = useState<'north' | 'south'>('north');
+  const [birthChartLayout, setBirthChartLayout] = useState<'north' | 'south' | 'wheel'>('north');
   const [houseDomainFilter, setHouseDomainFilter] = useState<string>('ALL');
+  const [shadbalaSubTab, setShadbalaSubTab] = useState<string>('chart');
   const [activeBirthSectionTab, setActiveBirthSectionTab] = useState<
-    | 'profile'
+    | 'kundali'
+    | 'aspects'
     | 'coordinates'
     | 'shadbala'
+    | 'celestial-wheel'
     | 'houses-summary'
     | 'bhava-deck'
     | 'bhrigu-samhita'
     | 'lal-kitab'
-  >('profile');
+  >('kundali');
 
   // AI Birth Reading state
   const [isLoadingAi, setIsLoadingAi] = useState(false);
@@ -321,24 +328,29 @@ export function BirthTimePredictionsTab({
         </div>
       </div>
 
-      {/* 7 BIRTH CHARTS & READINGS — COMPACT 1-ROW DECK OF CARDS SELECTOR */}
-      <div className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/90 px-2 py-1.5 shadow-3xs">
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1.5">
+      {/* BIRTH CHARTS & READINGS — COMPACT DECK OF CARDS SELECTOR (10% smaller with standardized font) */}
+      <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-stone-200/90 px-2 py-0.5 shadow-3xs">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1">
           {[
             {
-              id: 'profile',
-              title: "Person's Profile",
-              icon: User,
+              id: 'kundali',
+              title: 'Janam Kundali (D1)',
+              icon: Compass,
             },
             {
-              id: 'coordinates',
-              title: 'Coordinates',
-              icon: BookOpen,
+              id: 'aspects',
+              title: 'Aspect Dips & Rises',
+              icon: Activity,
             },
             {
               id: 'shadbala',
-              title: 'Shadbala',
+              title: 'Shadbala & 9 Grahas',
               icon: Sparkles,
+            },
+            {
+              id: 'celestial-wheel',
+              title: '360° Celestial Wheel',
+              icon: Globe,
             },
             {
               id: 'houses-summary',
@@ -348,30 +360,32 @@ export function BirthTimePredictionsTab({
             {
               id: 'bhava-deck',
               title: 'Bhava Deck',
-              icon: Compass,
+              icon: Layers,
             },
           ].map((card) => {
             const Icon = card.icon;
-            const isActive = activeBirthSectionTab === card.id;
+            const isActive = activeBirthSectionTab === card.id || (card.id === 'shadbala' && activeBirthSectionTab === 'coordinates');
             return (
               <div
                 key={card.id}
-                onClick={() => setActiveBirthSectionTab(card.id as any)}
-                className={`group relative rounded-md px-2.5 py-1.5 transition-all duration-150 cursor-pointer border flex items-center justify-between gap-1.5 ${
+                onClick={() => {
+                  setActiveBirthSectionTab(card.id as any);
+                }}
+                className={`group relative rounded-md px-1.5 py-0.5 transition-all duration-150 cursor-pointer border flex items-center justify-between gap-1 shadow-3xs ${
                   isActive
                     ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
-                    : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5] shadow-3xs'
+                    : 'bg-white border-stone-200/70 hover:border-amber-300 hover:bg-[#FAF8F5]'
                 }`}
               >
                 <span
-                  className={`font-vedic font-bold text-[12px] leading-none truncate ${
-                    isActive ? 'text-amber-950' : 'text-stone-900'
+                  className={`font-ui font-semibold text-[10px] leading-tight truncate ${
+                    isActive ? 'text-amber-950 font-bold' : 'text-stone-800'
                   }`}
                 >
                   {card.title}
                 </span>
                 <Icon
-                  className={`w-3.5 h-3.5 shrink-0 ${
+                  className={`w-2.5 h-2.5 shrink-0 ${
                     isActive ? 'text-amber-700' : 'text-stone-400 group-hover:text-amber-600'
                   }`}
                 />
@@ -381,23 +395,14 @@ export function BirthTimePredictionsTab({
         </div>
       </div>
 
-      {/* TAB 1: PERSON'S PROFILE & JANAM KUNDALI OVERVIEW */}
-      {activeBirthSectionTab === 'profile' && (
+      {/* TAB 1: JANAM KUNDALI (D1) OVERVIEW */}
+      {activeBirthSectionTab === 'kundali' && (
         <div className="space-y-2">
-          {/* Person's Profile Selector */}
-          <ProfileSelector
-            profiles={profiles}
-            activeProfileId={activeProfileId}
-            onSelectProfile={handleSelectProfile}
-            onSaveProfile={handleSaveProfile}
-            onDeleteProfile={handleDeleteProfile}
-          />
-
           {/* North Indian Diamond / South Indian Fixed Chart & Kundali Focus Area */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 items-start">
-            {/* Left Column: D1 Birth Chart with Layout Toggle */}
-            <div className="lg:col-span-5 flex flex-col items-center space-y-1.5">
-              <div className="flex items-center justify-between w-full max-w-[360px] px-1">
+            {/* Left Column: D1 Birth Chart with Layout Toggle (North, South, 360° Celestial Wheel) */}
+            <div className={`${birthChartLayout === 'wheel' ? 'lg:col-span-12' : 'lg:col-span-5'} flex flex-col items-center space-y-1.5 transition-all`}>
+              <div className="flex flex-wrap items-center justify-between w-full max-w-[500px] px-1 gap-1">
                 <span className="text-[11px] font-bold text-stone-600">Chart Layout:</span>
                 <div className="flex rounded border border-stone-200 bg-white p-0.5 text-[11px] shadow-3xs">
                   <button
@@ -420,6 +425,16 @@ export function BirthTimePredictionsTab({
                   >
                     South (Fixed Rasi)
                   </button>
+                  <button
+                    onClick={() => setBirthChartLayout('wheel')}
+                    className={`px-2 py-0.5 rounded font-bold transition-colors cursor-pointer flex items-center space-x-1 ${
+                      birthChartLayout === 'wheel'
+                        ? 'bg-amber-100 text-amber-950 border border-amber-300'
+                        : 'text-stone-600'
+                    }`}
+                  >
+                    <span>360° Celestial Wheel</span>
+                  </button>
                 </div>
               </div>
 
@@ -432,7 +447,7 @@ export function BirthTimePredictionsTab({
                   onSelectHouse={handleSelectHouse}
                   selectedHouseNumber={selectedHouseNumber}
                 />
-              ) : (
+              ) : birthChartLayout === 'south' ? (
                 <SouthIndianChart
                   houses={natalHouses}
                   title="Janam Kundali"
@@ -440,6 +455,16 @@ export function BirthTimePredictionsTab({
                   onSelectHouse={handleSelectHouse}
                   selectedHouseNumber={selectedHouseNumber}
                 />
+              ) : (
+                <div className="w-full flex justify-center py-1 overflow-x-auto">
+                  <CelestialSkyMapWheel
+                    livePlanets={natalPlanets}
+                    natalPlanets={natalPlanets}
+                    lagnaRasi={natalLagnaRasi}
+                    seekerName=""
+                    locationName={selectedCity.name}
+                  />
+                </div>
               )}
             </div>
 
@@ -553,76 +578,187 @@ export function BirthTimePredictionsTab({
         </div>
       )}
 
-      {/* TAB 2: NATAL PLANETARY COORDINATES */}
-      {activeBirthSectionTab === 'coordinates' && (
-        <div className="space-y-2">
-          {/* Planetary Coordinates Table (Sidereal Lahiri) */}
-          <div className="bg-white rounded-lg border border-stone-200 px-2.5 py-2 shadow-2xs space-y-1">
-            <div className="flex items-center justify-between mb-1 border-b border-stone-100 pb-1">
-              <div className="flex items-center space-x-1.5">
-                <BookOpen className="w-3.5 h-3.5 text-amber-700" />
-                <h3 className="text-[15px] font-vedic font-bold text-stone-900">
-                  Natal Planetary Coordinates (Sidereal Lahiri — {name})
-                </h3>
-              </div>
-              <span className="text-[12px] font-semibold text-amber-800">
-                Lagna: {VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName} • Moon: {VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName}
-              </span>
-            </div>
+      {/* TAB 2: ASPECT DIPS & RISES (HEALTH, EDUCATION, WEALTH, CAREER, RELATIONSHIPS, MENTAL PEACE) */}
+      {activeBirthSectionTab === 'aspects' && (
+        <AspectStrengthTrajectoryGraph
+          natalPlanets={natalPlanets}
+          natalHouses={natalHouses}
+          lagnaRasi={natalLagnaRasi}
+          userName=""
+          currentTransitPlanets={natalPlanets}
+        />
+      )}
 
-            <div className="overflow-x-auto w-full">
-              <table className="w-full text-left text-[13px] border-collapse">
-                <thead>
-                  <tr className="border-b border-stone-200 bg-[#FAF8F5] text-stone-900 text-[12px] font-bold">
-                    <th className="py-1 px-2 uppercase tracking-wider">Graha</th>
-                    <th className="py-1 px-2 uppercase tracking-wider">Rasi</th>
-                    <th className="py-1 px-2 uppercase tracking-wider">Deg</th>
-                    <th className="py-1 px-2 uppercase tracking-wider">Nakshatra</th>
-                    <th className="py-1 px-2 uppercase tracking-wider">Star Lord</th>
-                    <th className="py-1 px-2 uppercase tracking-wider">KP Sub-Lord</th>
-                    <th className="py-1 px-2 uppercase tracking-wider">H</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100">
-                  {natalPlanets.map((planet) => (
-                    <tr key={planet.name} className="hover:bg-stone-50/80 transition-colors">
-                      <td className="py-1 px-2 font-semibold text-stone-950">
-                        {planet.symbol} {planet.name} ({planet.englishName})
-                      </td>
-                      <td className="py-1 px-2 text-stone-900">
-                        {planet.rasiName}
-                      </td>
-                      <td className="py-1 px-2 text-stone-950 font-mono">
-                        {planet.degree}° {planet.minute}&apos;
-                      </td>
-                      <td className="py-1 px-2 text-stone-900">
-                        {planet.nakshatra} (Pada {planet.pada})
-                      </td>
-                      <td className="py-1 px-2 text-stone-700">
-                        {planet.nakshatraLord || '—'}
-                      </td>
-                      <td className="py-1 px-2 font-semibold text-amber-900 bg-amber-50/50 rounded">
-                        {planet.subLord || '—'}
-                      </td>
-                      <td className="py-1 px-2">
-                        <span className="px-1.5 py-0.5 rounded bg-stone-100 font-semibold text-stone-950">
-                          H{planet.house}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+      {/* TAB: 360° GRAPHICAL CELESTIAL WHEEL & PLANET SKY MAP */}
+      {activeBirthSectionTab === 'celestial-wheel' && (
+        <div className="w-full flex justify-center py-1">
+          <CelestialSkyMapWheel
+            livePlanets={natalPlanets}
+            natalPlanets={natalPlanets}
+            lagnaRasi={natalLagnaRasi}
+            seekerName=""
+            locationName={selectedCity.name}
+          />
         </div>
       )}
 
-      {/* TAB 3: SHADBALA (SIX-FOLD PLANETARY STRENGTH) */}
-      {activeBirthSectionTab === 'shadbala' && (
+      {/* TAB: SHADBALA (SIX-FOLD PLANETARY STRENGTH) & ALL 9 PLANETS */}
+      {(activeBirthSectionTab === 'shadbala' || activeBirthSectionTab === 'coordinates') && (
         <div className="space-y-2">
-          {natalPlanets.length > 0 && (
-            <ShadbalaD3Chart planets={natalPlanets} birthTime={birthTime} />
+          {/* Sub-tab switcher inside Shadbala: Chart, Table, and Direct 9 Planet Tabs */}
+          <div className="flex flex-col gap-1.5 bg-amber-50/50 border border-amber-200/80 rounded-lg px-2.5 py-1.5 shadow-3xs">
+            <div className="flex flex-wrap items-center justify-between gap-1">
+              <div className="flex items-center space-x-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+                <span className="font-ui font-bold text-stone-950 text-[12.5px] tracking-tight">
+                  Shadbala &amp; 9 Grahas (Six-Fold Planetary Strengths)
+                </span>
+              </div>
+
+              {/* View options: 6-Fold Chart vs All 9 Planets Table */}
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setShadbalaSubTab('chart')}
+                  className={`rounded-md px-2 py-0.5 text-[11px] font-ui font-semibold transition-all cursor-pointer flex items-center space-x-1 border ${
+                    shadbalaSubTab === 'chart'
+                      ? 'bg-amber-100/90 border-amber-400 text-amber-950 shadow-2xs font-bold'
+                      : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'
+                  }`}
+                >
+                  <Sparkles className="w-3 h-3 text-amber-800" />
+                  <span>Shadbala 6-Fold Chart</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShadbalaSubTab('planets')}
+                  className={`rounded-md px-2 py-0.5 text-[11px] font-ui font-semibold transition-all cursor-pointer flex items-center space-x-1 border ${
+                    shadbalaSubTab === 'planets'
+                      ? 'bg-amber-100/90 border-amber-400 text-amber-950 shadow-2xs font-bold'
+                      : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'
+                  }`}
+                >
+                  <BookOpen className="w-3 h-3 text-amber-800" />
+                  <span>All 9 Planets Table</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Direct 9 Planet Sub-Tabs */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-0.5 pt-0.5 border-t border-amber-200/60 scrollbar-none">
+              <span className="text-[10px] font-bold text-amber-900 uppercase shrink-0 mr-1">
+                All 9 Planets:
+              </span>
+              {natalPlanets.filter((p) => p.name !== 'Lagna').map((planet) => {
+                const isPlanetActive = shadbalaSubTab === planet.name;
+                return (
+                  <button
+                    key={planet.name}
+                    type="button"
+                    onClick={() => setShadbalaSubTab(planet.name)}
+                    className={`rounded px-2 py-0.5 text-[10.5px] font-ui font-semibold transition-all cursor-pointer flex items-center space-x-1 whitespace-nowrap shrink-0 border ${
+                      isPlanetActive
+                        ? 'bg-amber-600 border-amber-700 text-white font-bold shadow-2xs'
+                        : 'bg-white border-stone-200 text-stone-700 hover:border-amber-300 hover:bg-amber-50/60'
+                    }`}
+                  >
+                    <span>{planet.symbol}</span>
+                    <span>{planet.name}</span>
+                    <span className="text-[9.5px] opacity-80">({planet.rasiName.slice(0, 3)})</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Subtab 1: Shadbala D3 Chart */}
+          {(shadbalaSubTab === 'chart' || !['chart', 'planets'].includes(shadbalaSubTab)) && natalPlanets.length > 0 && (
+            <div className="space-y-2">
+              <ShadbalaD3Chart
+                planets={natalPlanets}
+                birthTime={birthTime}
+                selectedPlanet={
+                  natalPlanets.some((p) => p.name === shadbalaSubTab)
+                    ? (shadbalaSubTab as any)
+                    : undefined
+                }
+                onSelectPlanet={(p) => setShadbalaSubTab(p)}
+              />
+            </div>
+          )}
+
+          {/* Subtab 2: All 9 Planets Natal Planetary Coordinates Table */}
+          {shadbalaSubTab === 'planets' && (
+            <div className="bg-white rounded-lg border border-stone-200 px-2.5 py-2 shadow-2xs space-y-1">
+              <div className="flex items-center justify-between mb-1 border-b border-stone-100 pb-1">
+                <div className="flex items-center space-x-1.5">
+                  <BookOpen className="w-3.5 h-3.5 text-amber-700" />
+                  <h3 className="text-[14px] font-vedic font-bold text-stone-900">
+                    All 9 Planets Coordinates &amp; Placements (Sidereal Lahiri)
+                  </h3>
+                </div>
+                <span className="text-[11px] font-semibold text-amber-800">
+                  Lagna: {VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName} • Moon: {VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName}
+                </span>
+              </div>
+
+              <div className="overflow-x-auto w-full">
+                <table className="w-full text-left text-[12px] border-collapse">
+                  <thead>
+                    <tr className="border-b border-stone-200 bg-[#FAF8F5] text-stone-900 text-[11px] font-bold">
+                      <th className="py-1 px-2 uppercase tracking-wider">Graha</th>
+                      <th className="py-1 px-2 uppercase tracking-wider">Rasi</th>
+                      <th className="py-1 px-2 uppercase tracking-wider">Deg</th>
+                      <th className="py-1 px-2 uppercase tracking-wider">Nakshatra</th>
+                      <th className="py-1 px-2 uppercase tracking-wider">Star Lord</th>
+                      <th className="py-1 px-2 uppercase tracking-wider">KP Sub-Lord</th>
+                      <th className="py-1 px-2 uppercase tracking-wider">House</th>
+                      <th className="py-1 px-2 uppercase tracking-wider">Dignity</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-100">
+                    {natalPlanets.map((planet) => (
+                      <tr key={planet.name} className="hover:bg-stone-50/80 transition-colors">
+                        <td className="py-1 px-2 font-semibold text-stone-950">
+                          {planet.symbol} {planet.name} ({planet.englishName})
+                        </td>
+                        <td className="py-1 px-2 text-stone-900">
+                          {planet.rasiName}
+                        </td>
+                        <td className="py-1 px-2 text-stone-950 font-mono">
+                          {planet.degree}° {planet.minute}&apos;
+                        </td>
+                        <td className="py-1 px-2 text-stone-900">
+                          {planet.nakshatra} (Pada {planet.pada})
+                        </td>
+                        <td className="py-1 px-2 text-stone-700">
+                          {planet.nakshatraLord || '—'}
+                        </td>
+                        <td className="py-1 px-2 font-semibold text-amber-900 bg-amber-50/50 rounded">
+                          {planet.subLord || '—'}
+                        </td>
+                        <td className="py-1 px-2">
+                          <span className="px-1.5 py-0.5 rounded bg-stone-100 font-semibold text-stone-950">
+                            H{planet.house}
+                          </span>
+                        </td>
+                        <td className="py-1 px-2">
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                            planet.dignity === 'Exalted' || planet.dignity === 'Moolatrikona' || planet.dignity === 'Own'
+                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                              : planet.dignity === 'Debilitated' || planet.dignity === 'Enemy'
+                              ? 'bg-rose-50 text-rose-800 border border-rose-200'
+                              : 'bg-stone-50 text-stone-700 border border-stone-200'
+                          }`}>
+                            {planet.dignity || 'Neutral'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           )}
         </div>
       )}
@@ -634,7 +770,7 @@ export function BirthTimePredictionsTab({
             <div className="flex items-center space-x-1.5">
               <Layers className="w-4 h-4 text-amber-700" />
               <h3 className="font-vedic font-bold text-stone-950 text-[15px] tracking-tight">
-                Dvadasa Bhava Deck of Cards (Summary of 12 Houses — {name})
+                Dvadasa Bhava Deck of Cards (Summary of 12 Houses)
               </h3>
             </div>
             <span className="text-[12px] text-stone-600 font-medium">

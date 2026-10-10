@@ -8,6 +8,7 @@ import {
 } from '../types';
 import { NorthIndianChart } from './NorthIndianChart';
 import { SouthIndianChart } from './SouthIndianChart';
+import { CelestialSkyMapWheel } from './CelestialSkyMapWheel';
 import {
   Layers,
   Sparkles,
@@ -64,7 +65,7 @@ export function DivisionalChartsTab({
   activeProfile,
 }: DivisionalChartsTabProps) {
   const [selectedVarga, setSelectedVarga] = useState<VargaCode>('D1');
-  const [chartLayout, setChartLayout] = useState<'north' | 'south'>('north');
+  const [chartLayout, setChartLayout] = useState<'north' | 'south' | 'wheel'>('north');
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiReading, setAiReading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -198,6 +199,16 @@ export function DivisionalChartsTab({
             >
               South (Fixed Rasi)
             </button>
+            <button
+              onClick={() => setChartLayout('wheel')}
+              className={`px-2 py-0.5 text-[11px] font-bold rounded transition-colors ${
+                chartLayout === 'wheel'
+                  ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              360° Wheel
+            </button>
           </div>
         </div>
       </div>
@@ -258,12 +269,22 @@ export function DivisionalChartsTab({
                 title={`${selectedVarga} ${vargaInfo.name}`}
                 subtitle={vargaInfo.focus}
               />
-            ) : (
+            ) : chartLayout === 'south' ? (
               <SouthIndianChart
                 houses={currentVargaHouses}
                 title={`${selectedVarga} ${vargaInfo.name}`}
                 subtitle={vargaInfo.focus}
               />
+            ) : (
+              <div className="w-full flex justify-center py-1">
+                <CelestialSkyMapWheel
+                  livePlanets={natalPlanets}
+                  natalPlanets={natalPlanets}
+                  lagnaRasi={lagnaRasi}
+                  seekerName=""
+                  locationName={activeProfile?.place || 'Observation Point'}
+                />
+              </div>
             )}
 
             <div className="mt-2 bg-white/90 rounded-md p-2 border border-amber-100 space-y-1 text-stone-800">

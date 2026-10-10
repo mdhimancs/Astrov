@@ -13,7 +13,7 @@ import { UpayRemediesTab } from './components/UpayRemediesTab';
 import { AstrologySystemsTab } from './components/AstrologySystemsTab';
 import { AstronomicalEphemerisTab } from './components/AstronomicalEphemerisTab';
 import { UserProfile } from './types';
-import { getSavedProfiles, getActiveProfileId, setActiveProfileId as saveActiveId } from './utils/profileStorage';
+import { getSavedProfiles, getActiveProfileId, setActiveProfileId as saveActiveId, upsertProfile, deleteProfile } from './utils/profileStorage';
 import { calculatePlanetaryPositions, buildHouseStructure, calculateYogas, calculateAshtakavarga } from './vedicMath';
 
 export default function App() {
@@ -46,6 +46,29 @@ export default function App() {
     setProfiles(updated);
   };
 
+  const handleAddProfile = (newProfile: UserProfile) => {
+    const updated = upsertProfile(newProfile);
+    setProfiles(updated);
+    setActiveProfileId(newProfile.id);
+    saveActiveId(newProfile.id);
+  };
+
+  const handleSaveProfile = (profile: UserProfile) => {
+    const updated = upsertProfile(profile);
+    setProfiles(updated);
+    setActiveProfileId(profile.id);
+    saveActiveId(profile.id);
+  };
+
+  const handleDeleteProfile = (id: string) => {
+    const updated = deleteProfile(id);
+    setProfiles(updated);
+    if (activeProfileId === id && updated.length > 0) {
+      setActiveProfileId(updated[0].id);
+      saveActiveId(updated[0].id);
+    }
+  };
+
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -73,6 +96,9 @@ export default function App() {
         currentProfile={currentProfile}
         profiles={profiles}
         onProfileChange={handleProfileChange}
+        onAddProfile={handleAddProfile}
+        onSaveProfile={handleSaveProfile}
+        onDeleteProfile={handleDeleteProfile}
       />
 
       {/* Main Vedic Content Area */}

@@ -197,8 +197,8 @@ export function AstrologySystemsTab({
           </div>
 
           <div className="flex items-center space-x-2 text-[12px] bg-black/40 border border-amber-600/40 rounded-md px-2.5 py-1 text-amber-200 shrink-0">
-            <span className="font-bold text-amber-300">Active Dossier:</span>
-            <span className="font-semibold text-white">{seekerName}</span>
+            <span className="font-bold text-amber-300">Perspective:</span>
+            <span className="font-semibold text-white">Classical Consensus</span>
           </div>
         </div>
 

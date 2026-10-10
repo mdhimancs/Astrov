@@ -270,9 +270,9 @@ export function AstronomicalEphemerisTab({
               </select>
             </div>
 
-            {/* Active Seeker Badge */}
+            {/* Active Anchor Badge */}
             <div className="text-[11px] bg-amber-900/60 border border-amber-600/50 rounded px-2.5 py-1 text-amber-100 font-bold">
-              Natal Anchor: <span className="text-white">{seekerName}</span>
+              Anchor: <span className="text-white">Natal Astrological Baseline</span>
             </div>
           </div>
         </div>
@@ -517,7 +517,7 @@ export function AstronomicalEphemerisTab({
             livePlanets={liveCalc.planets}
             natalPlanets={natalCalc.planets}
             lagnaRasi={natalCalc.lagnaRasi}
-            seekerName={seekerName}
+            seekerName=""
             locationName={selectedCity.name}
           />
 
@@ -865,7 +865,7 @@ export function AstronomicalEphemerisTab({
 
                 {evt.natalHouseImpact && (
                   <div className="text-[11px] font-bold text-purple-900 bg-purple-50 px-2 py-0.5 rounded border border-purple-200/80 w-fit mt-1">
-                    🎯 {evt.natalHouseImpact} for {seekerName}
+                    🎯 {evt.natalHouseImpact}
                   </div>
                 )}
               </div>
@@ -967,7 +967,7 @@ export function AstronomicalEphemerisTab({
                         Nakshatra: <strong className="text-amber-900">{p.nakshatra}</strong> (Pada {p.pada})
                       </div>
                       <div className="text-[10px] text-purple-900 font-bold pt-0.5">
-                        Activates Natal House H{houseFromNatal} ({seekerName})
+                        Activates Natal House H{houseFromNatal}
                       </div>
                     </div>
                   );

@@ -247,9 +247,9 @@ export function MonthWisePredictionsTab({
         </div>
       </div>
 
-      {/* MONTHLY & YEARLY READINGS — COMPACT 1-ROW DECK OF CARDS SELECTOR */}
-      <div className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/90 px-2 py-1.5 shadow-3xs">
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1.5">
+      {/* MONTHLY & YEARLY READINGS — COMPACT 1-ROW DECK OF CARDS SELECTOR (10% smaller) */}
+      <div className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/90 px-2 py-1 shadow-3xs">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1">
           {[
             {
               id: 'monthly',
@@ -278,21 +278,21 @@ export function MonthWisePredictionsTab({
               <div
                 key={card.id}
                 onClick={() => setReadingScope(card.id as any)}
-                className={`group relative rounded-md px-2.5 py-1.5 transition-all duration-150 cursor-pointer border flex items-center justify-between gap-1.5 ${
+                className={`group relative rounded-md px-2 py-1 transition-all duration-150 cursor-pointer border flex items-center justify-between gap-1 ${
                   isActive
                     ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
                     : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5] shadow-3xs'
                 }`}
               >
                 <span
-                  className={`font-vedic font-bold text-[12px] leading-none truncate ${
+                  className={`font-vedic font-bold text-[11px] leading-none truncate ${
                     isActive ? 'text-amber-950' : 'text-stone-900'
                   }`}
                 >
                   {card.title}
                 </span>
                 <Icon
-                  className={`w-3.5 h-3.5 shrink-0 ${
+                  className={`w-3 h-3 shrink-0 ${
                     isActive ? 'text-amber-700' : 'text-stone-400 group-hover:text-amber-600'
                   }`}
                 />
@@ -334,7 +334,7 @@ export function MonthWisePredictionsTab({
         <UnifiedPlanetaryImpactTable
           records={unifiedImpactRecords}
           title="Important Changes"
-          subtitle={`Impacts for ${name}`}
+          subtitle="Specific effects of key planetary transits across health, career, and life pillars"
         />
       )}
     </div>
