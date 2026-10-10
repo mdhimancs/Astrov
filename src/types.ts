@@ -187,6 +187,9 @@ export interface YearlyPrediction {
     healthAndVitality: string;
     educationAndIntellect: string;
     mentalStateAndSpirit: string;
+    nameAndFame: string;
+    propertyAndAssets: string;
+    childrenAndProgeny: string;
   };
   quarterlyBreakdown: {
     quarter: string;
@@ -211,6 +214,35 @@ export interface YearlyPrediction {
       arthaMomentum: number;
       kamaHarmony: number;
       mokshaClarity: number;
+      nameAndFameScore?: number;
+      propertyScore?: number;
+      childrenScore?: number;
+    };
+    domainForecasts?: {
+      nameAndFame: {
+        title: string;
+        score: number;
+        status: string;
+        analysis: string;
+        auspiciousWindows: string;
+        remedy: string;
+      };
+      property: {
+        title: string;
+        score: number;
+        status: string;
+        analysis: string;
+        auspiciousWindows: string;
+        remedy: string;
+      };
+      children: {
+        title: string;
+        score: number;
+        status: string;
+        analysis: string;
+        auspiciousWindows: string;
+        remedy: string;
+      };
     };
     purusharthaMatrix: {
       dharma: string;

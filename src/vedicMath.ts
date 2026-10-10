@@ -2583,11 +2583,57 @@ export function calculateYearlyPredictions(
       }
     }
 
+    // Specific calculations for Name & Fame, Property, and Children
+    const is10thHouseFavored = [1, 5, 7, 10, 11].includes(guruHouseFromLagna) || [1, 10, 11].includes(munthaHouse);
+    const nameAndFameScore = is10thHouseFavored ? (isMunthaAuspicious ? 94 : 88) : 78;
+
+    const is4thHouseFavored = [2, 4, 9, 11].includes(munthaHouse) || doubleTransitHouses.includes(4) || [4, 8, 10, 12].includes(guruHouseFromLagna);
+    const propertyScore = is4thHouseFavored ? 92 : 79;
+
+    const is5thHouseFavored = [1, 5, 9, 11].includes(munthaHouse) || [5, 9, 1, 11].includes(guruHouseFromLagna) || doubleTransitHouses.includes(5);
+    const childrenScore = is5thHouseFavored ? 93 : 80;
+
     const lifePathScorecard = {
       dharmaAlignment: isGuruBenefic ? 92 : 78,
       arthaMomentum: isMunthaAuspicious ? 90 : 75,
       kamaHarmony: [1, 2, 4, 5, 7, 9, 11].includes(guruHouseFromLagna) ? 88 : 74,
       mokshaClarity: sadeSatiActive ? 89 : 82,
+      nameAndFameScore,
+      propertyScore,
+      childrenScore,
+    };
+
+    const domainForecasts = {
+      nameAndFame: {
+        title: 'Name, Fame & Social Recognition (Kirti & Yash)',
+        score: nameAndFameScore,
+        status: is10thHouseFavored ? 'High Prominence & Authority' : 'Steady Professional Respect',
+        analysis: is10thHouseFavored
+          ? `In ${yr}, the synergistic alignment of Sun, Guru's trinal gaze on natal authority sectors (H1/H10/H11), and Muntha in House ${munthaHouse} sparks a major reputational surge. Your professional stature gains wide acknowledgment, executive confidence solidifies, and awards or leadership mandates materialize.`
+          : `Maintain integrity in institutional dealings during ${yr}. Recognition develops through meticulous execution and reliability rather than sudden fanfare; steady craftsmanship builds lasting social prestige.`,
+        auspiciousWindows: `April – June ${yr} (Solar Exaltation Window) & October – November ${yr}`,
+        remedy: `Offer Arghya (water) to Lord Surya at sunrise in a copper vessel with red sandalwood and chant the Aditya Hridaya Stotram on Sundays.`,
+      },
+      property: {
+        title: 'Property, Real Estate & Vehicles (Bhumi, Griha & Vahan)',
+        score: propertyScore,
+        status: is4thHouseFavored ? 'Prime Acquisition & Asset Growth' : 'Consolidation & Domestic Renovation',
+        analysis: is4thHouseFavored
+          ? `With the 4th House (Sukha & Griha Sthana) energized by ${doubleTransitHouses.includes(4) ? 'the auspicious Double-Transit' : 'benefic planetary vibrations'} and Muntha in House ${munthaHouse}, ${yr} is exceptional for purchasing residential real estate, commercial land, new vehicle acquisition, or upgrading home comforts.`
+          : `Focus on property maintenance, loan amortization, and clear legal title verification in ${yr}. Avoid hurried or speculative real estate commitments; verify all boundary and documentation details before signing.`,
+        auspiciousWindows: `May – July ${yr} & October – December ${yr} (Festive Property Muhurtas)`,
+        remedy: `Chant the Hanuman Chalisa on Tuesdays and offer jaggery/gram to laborers; pay respect to Mother Earth (Bhoomi Vandana) before initiating interior or foundation work.`,
+      },
+      children: {
+        title: 'Children, Progeny & Family Lineage (Santan Sukh & Growth)',
+        score: childrenScore,
+        status: is5thHouseFavored ? 'Joyous Milestones & Harmonious Bliss' : 'Supportive Guidance & Nurturing',
+        analysis: is5thHouseFavored
+          ? `The 5th House of progeny (Putra Bhava) and Purva-Punya receives luminous Devaguru grace in ${yr}. For prospective parents, this heralds highly auspicious conception and childbirth blessings. For parents with growing children, it signals outstanding academic laurels, creative talent recognition, and joyous family bonding.`
+          : `Provide empathetic emotional mentorship to children during ${yr}. Encourage consistent study disciplines and health routines; shared family pilgrimages or weekend learning activities strengthen intergenerational trust.`,
+        auspiciousWindows: `February – April ${yr} & September – November ${yr} (Jupiterian Blessing Windows)`,
+        remedy: `Recite the Santana Gopala Mantra or Brihaspati Kavacham on Thursdays; donate books, pens, or educational kits to underprivileged students on birth Nakshatra days.`,
+      },
     };
 
     const secondDoubleHouse = doubleTransitHouses[1] || munthaHouse;
@@ -2642,6 +2688,15 @@ export function calculateYearlyPredictions(
           : `Physical stamina and immunity remain supportive in ${yr}; balance active work schedules with regular pranayama and hydration.`,
         educationAndIntellect: `Guru in House ${guruHouseFromLagna} from Lagna sharpens higher learning, certifications, and research depth in ${yr}, rewarding structured study schedules.`,
         mentalStateAndSpirit: `Varsheshwara ${munthaLord} guides your inner compass in ${yr}, deepening meditative clarity, intuition, and dharmic resilience across all four quarters.`,
+        nameAndFame: is10thHouseFavored
+          ? `Royal solar rays and 10th-house activations elevate public standing, honors from superiors, and charismatic societal influence in ${yr}.`
+          : `Subtle, dependable contributions earn authentic long-term respect and professional trust in ${yr}; preserve ethical clarity in leadership.`,
+        propertyAndAssets: is4thHouseFavored
+          ? `Auspicious 4th-house Sukha vibrations open lucrative avenues for land acquisition, home construction, interior renovations, or new vehicle purchase in ${yr}.`
+          : `Safeguard real estate assets and consolidate home equity in ${yr}; ensure meticulous legal documentation and property insurance.`,
+        childrenAndProgeny: is5thHouseFavored
+          ? `Supreme Putrakaraka Guru blessings grace 5th-house affairs in ${yr}, bestowing joy from children's accomplishments, academic laurels, or auspicious progeny arrivals.`
+          : `Nurture open communication, patience, and encouraging guidance with children in ${yr}, celebrating their progressive efforts and character development.`,
       },
       quarterlyBreakdown: [
         {
@@ -2682,6 +2737,7 @@ export function calculateYearlyPredictions(
         lifePathHeadline,
         lifePathNarrative,
         lifePathScorecard,
+        domainForecasts,
         purusharthaMatrix: {
           dharma: `Dharma (H1/H5/H9 Purpose): Progressed age ${ageInYear} and Guru in H${guruHouseFromLagna} align your personal ethics with higher mentorship, authentic self-expression, and Purva-Punya grace.`,
           artha: `Artha (H2/H6/H10 Wealth & Career): Shani in H${shaniHouseFromLagna} and Muntha in H${munthaHouse} anchor material stability, disciplined enterprise growth, and long-term asset creation.`,

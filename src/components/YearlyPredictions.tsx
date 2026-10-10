@@ -19,6 +19,8 @@ import {
   CheckCircle2,
   Flame,
   Star,
+  Home,
+  Baby,
 } from 'lucide-react';
 import { YearlyPrediction, PlanetPosition } from '../types';
 import { VEDIC_RASIS } from '../data';
@@ -43,6 +45,9 @@ interface AiYearlyLifePathResponse {
   careerWealthTrajectory: string;
   relationshipsFamilyPath: string;
   spiritualKarmicLesson: string;
+  nameAndFameTrajectory?: string;
+  propertyAssetsTrajectory?: string;
+  childrenProgenyTrajectory?: string;
   keyMilestones: string[];
 }
 
@@ -85,7 +90,18 @@ export function YearlyPredictions({
 
   const [graphPeriod, setGraphPeriod] = useState<1 | 5 | 10>(5);
   const birthYear = birthDate ? parseInt(birthDate.slice(0, 4), 10) || new Date(birthDate).getFullYear() || 1990 : 1990;
-  const [activeAspects, setActiveAspects] = useState<string[]>(['Overall', 'Health', 'Job', 'Wealth', 'Relations', 'Education', 'Mental']);
+  const [activeAspects, setActiveAspects] = useState<string[]>([
+    'Overall',
+    'Health',
+    'Job',
+    'Wealth',
+    'Relations',
+    'Education',
+    'Mental',
+    'NameFame',
+    'Property',
+    'Children',
+  ]);
   
   const toggleAspect = (aspect: string) => {
     setActiveAspects(prev => 
@@ -101,6 +117,9 @@ export function YearlyPredictions({
     { key: 'Relations', label: 'Relations', color: '#E11D48' }, // Rose-600
     { key: 'Education', label: 'Education', color: '#6366F1' }, // Indigo-500
     { key: 'Mental', label: 'Mental', color: '#9333EA' },   // Purple-600
+    { key: 'NameFame', label: 'Name & Fame', color: '#B45309' }, // Amber-700 / Royal Gold
+    { key: 'Property', label: 'Property', color: '#0D9488' },   // Teal-600 / Earth & Asset
+    { key: 'Children', label: 'Children', color: '#EA580C' },   // Orange-600 / Saffron Progeny
   ];
   const maxAge = 99;
   
@@ -178,8 +197,50 @@ export function YearlyPredictions({
     if (munthaHouse === 8) mentalScore -= 0.6;
     mentalScore = Math.max(1.5, Math.min(5.0, Math.round(mentalScore * 10) / 10));
 
-    // 7. Overall Composite (Average of all 6 pillars)
-    const overallScore = Math.round(((healthScore + jobScore + wealthScore + relationsScore + eduScore + mentalScore) / 6) * 10) / 10;
+    // 7. Name & Fame (Scale 1.0 - 5.0)
+    let nameFameScore = 2.4;
+    if (age < 20) {
+      nameFameScore = 2.2 + (age / 20) * 1.0;
+    } else if (age >= 20 && age <= 65) {
+      nameFameScore = 3.7 + guruWave * 0.5 + Math.abs(shaniWave) * 0.3;
+      if ([1, 10, 11, 5].includes(munthaHouse)) nameFameScore += 0.7;
+    } else {
+      nameFameScore = 4.0 + guruWave * 0.4; // Elder respect & advisory honor
+    }
+    nameFameScore = Math.max(1.5, Math.min(5.0, Math.round(nameFameScore * 10) / 10));
+
+    // 8. Property & Assets (Scale 1.0 - 5.0)
+    let propertyScore = 1.8;
+    if (age < 24) {
+      propertyScore = 1.6 + (age / 24) * 1.2;
+    } else if (age >= 24 && age <= 70) {
+      propertyScore = 3.5 + Math.abs(guruWave) * 0.5 + shaniWave * 0.4;
+      if ([4, 2, 11, 9].includes(munthaHouse)) propertyScore += 0.7;
+      if (munthaHouse === 12) propertyScore -= 0.5;
+    } else {
+      propertyScore = 3.9 + guruWave * 0.3; // Established estate & ancestral peace
+    }
+    propertyScore = Math.max(1.2, Math.min(5.0, Math.round(propertyScore * 10) / 10));
+
+    // 9. Children & Progeny (Scale 1.0 - 5.0)
+    let childrenScore = 2.0;
+    if (age < 22) {
+      childrenScore = 2.1 + (age / 22) * 1.0;
+    } else if (age >= 22 && age <= 48) {
+      childrenScore = 3.7 + guruWave * 0.6; // Peak child-bearing & early schooling
+      if ([5, 9, 1, 11].includes(munthaHouse)) childrenScore += 0.6;
+    } else if (age > 48 && age <= 72) {
+      childrenScore = 3.8 + guruWave * 0.5; // Children's career, marriage & grandchildren
+      if ([5, 9].includes(munthaHouse)) childrenScore += 0.5;
+    } else {
+      childrenScore = 3.7 + guruWave * 0.4; // Family lineage legacy & bliss
+    }
+    childrenScore = Math.max(1.5, Math.min(5.0, Math.round(childrenScore * 10) / 10));
+
+    // Overall Composite (Average of all 9 pillars)
+    const overallScore = Math.round(
+      ((healthScore + jobScore + wealthScore + relationsScore + eduScore + mentalScore + nameFameScore + propertyScore + childrenScore) / 9) * 10
+    ) / 10;
 
     let theme = prediction ? prediction.themeTitle : `Age ${age}: Muntha in House ${munthaHouse}`;
     let trigger = '';
@@ -202,6 +263,9 @@ export function YearlyPredictions({
       Relations: relationsScore,
       Education: eduScore,
       Mental: mentalScore,
+      NameFame: nameFameScore,
+      Property: propertyScore,
+      Children: childrenScore,
       Overall: overallScore,
       theme,
       trigger,
@@ -335,7 +399,7 @@ export function YearlyPredictions({
             {[
               { id: 'all', label: 'Complete Forecast' },
               { id: 'lifepath', label: 'Life-Path & Birth Chart' },
-              { id: 'pillars', label: '6 Pillars & Quarters' },
+              { id: 'pillars', label: '9 Pillars & Quarters' },
             ].map((mode) => {
               const isActive = activeSubView === mode.id;
               return (
@@ -560,27 +624,59 @@ export function YearlyPredictions({
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                   <div className="bg-white/90 rounded p-2 border border-amber-200/80 space-y-0.5">
-                    <span className="text-[11px] font-black uppercase tracking-wider text-amber-900 block">
-                      Career &amp; Wealth Trajectory
+                    <span className="text-[11px] font-black uppercase tracking-wider text-amber-900 block flex items-center space-x-1">
+                      <Briefcase className="w-3 h-3 text-amber-700" />
+                      <span>Career &amp; Wealth Trajectory</span>
                     </span>
                     <p className="text-[12px] text-stone-800 leading-snug">
                       {aiLifePath.careerWealthTrajectory}
                     </p>
                   </div>
                   <div className="bg-white/90 rounded p-2 border border-amber-200/80 space-y-0.5">
-                    <span className="text-[11px] font-black uppercase tracking-wider text-rose-900 block">
-                      Relationships &amp; Family Path
+                    <span className="text-[11px] font-black uppercase tracking-wider text-rose-900 block flex items-center space-x-1">
+                      <Heart className="w-3 h-3 text-rose-700" />
+                      <span>Relationships &amp; Family Path</span>
                     </span>
                     <p className="text-[12px] text-stone-800 leading-snug">
                       {aiLifePath.relationshipsFamilyPath}
                     </p>
                   </div>
                   <div className="bg-white/90 rounded p-2 border border-amber-200/80 space-y-0.5">
-                    <span className="text-[11px] font-black uppercase tracking-wider text-purple-900 block">
-                      Spiritual &amp; Karmic Lesson
+                    <span className="text-[11px] font-black uppercase tracking-wider text-purple-900 block flex items-center space-x-1">
+                      <Brain className="w-3 h-3 text-purple-700" />
+                      <span>Spiritual &amp; Karmic Lesson</span>
                     </span>
                     <p className="text-[12px] text-stone-800 leading-snug">
                       {aiLifePath.spiritualKarmicLesson}
+                    </p>
+                  </div>
+
+                  {/* Specific AI Trajectories for Name & Fame, Property, Children */}
+                  <div className="bg-amber-100/50 rounded p-2 border border-amber-300/80 space-y-0.5">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-amber-950 block flex items-center space-x-1">
+                      <Award className="w-3 h-3 text-amber-800" />
+                      <span>Name &amp; Fame Trajectory</span>
+                    </span>
+                    <p className="text-[12px] text-stone-800 leading-snug">
+                      {aiLifePath.nameAndFameTrajectory || currentYearPred.pillars.nameAndFame}
+                    </p>
+                  </div>
+                  <div className="bg-teal-50/60 rounded p-2 border border-teal-300/80 space-y-0.5">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-teal-950 block flex items-center space-x-1">
+                      <Home className="w-3 h-3 text-teal-800" />
+                      <span>Property &amp; Real Estate</span>
+                    </span>
+                    <p className="text-[12px] text-stone-800 leading-snug">
+                      {aiLifePath.propertyAssetsTrajectory || currentYearPred.pillars.propertyAndAssets}
+                    </p>
+                  </div>
+                  <div className="bg-orange-50/60 rounded p-2 border border-orange-300/80 space-y-0.5">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-orange-950 block flex items-center space-x-1">
+                      <Baby className="w-3 h-3 text-orange-800" />
+                      <span>Children &amp; Progeny Path</span>
+                    </span>
+                    <p className="text-[12px] text-stone-800 leading-snug">
+                      {aiLifePath.childrenProgenyTrajectory || currentYearPred.pillars.childrenAndProgeny}
                     </p>
                   </div>
                 </div>
@@ -622,8 +718,8 @@ export function YearlyPredictions({
                 </p>
               </div>
 
-              {/* 4-Dimension Purushartha Alignment Scorecard */}
-              <div className="bg-white rounded-md p-2.5 border border-stone-200/90 space-y-1.5">
+              {/* Expanded 7-Dimension Purushartha & Life-Path Alignment Scorecard */}
+              <div className="bg-white rounded-md p-2.5 border border-stone-200/90 space-y-1">
                 <span className="text-[11px] font-black uppercase tracking-wider text-stone-800 block">
                   {currentYearPred.year} Life-Path Alignment Index
                 </span>
@@ -648,9 +744,24 @@ export function YearlyPredictions({
                     score: lifePath.lifePathScorecard?.mokshaClarity ?? 86,
                     barColor: 'bg-purple-600',
                   },
+                  {
+                    label: 'Name & Fame (Kirti / Honor)',
+                    score: lifePath.lifePathScorecard?.nameAndFameScore ?? 92,
+                    barColor: 'bg-amber-700',
+                  },
+                  {
+                    label: 'Property & Real Estate (Bhumi)',
+                    score: lifePath.lifePathScorecard?.propertyScore ?? 89,
+                    barColor: 'bg-teal-600',
+                  },
+                  {
+                    label: 'Children & Progeny (Santan Sukh)',
+                    score: lifePath.lifePathScorecard?.childrenScore ?? 90,
+                    barColor: 'bg-orange-600',
+                  },
                 ].map((item) => (
                   <div key={item.label} className="space-y-0.5">
-                    <div className="flex items-center justify-between text-[11px] font-bold text-stone-800">
+                    <div className="flex items-center justify-between text-[10.5px] font-bold text-stone-800">
                       <span>{item.label}</span>
                       <span className="font-black text-stone-950">{item.score}%</span>
                     </div>
@@ -779,6 +890,135 @@ export function YearlyPredictions({
                 </div>
               </div>
             )}
+
+            {/* Specific Life-Path Forecasts: Name & Fame, Property & Real Estate, Children & Progeny */}
+            <div className="space-y-1.5 pt-1.5 border-t border-amber-200/70">
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] font-black uppercase tracking-wider text-stone-900 flex items-center space-x-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Key Life-Path Trajectories: Name &amp; Fame • Property &amp; Real Estate • Children &amp; Progeny</span>
+                </span>
+                <span className="text-[10.5px] font-bold text-amber-900 bg-amber-100/80 border border-amber-300 px-2 py-0.5 rounded">
+                  Natal × Gochar Analysis
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                {/* 1. Name & Fame */}
+                <div className="bg-white rounded-md p-2.5 border border-amber-300/80 space-y-1.5 shadow-3xs hover:border-amber-400 transition-all">
+                  <div className="flex items-center justify-between gap-1 border-b border-amber-100 pb-1">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-amber-950 flex items-center space-x-1.5">
+                      <div className="w-5 h-5 rounded bg-amber-100 text-amber-800 flex items-center justify-center">
+                        <Award className="w-3.5 h-3.5" />
+                      </div>
+                      <span>Name &amp; Fame (Kirti &amp; Yash)</span>
+                    </span>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-950 border border-amber-200">
+                      {lifePath.domainForecasts?.nameAndFame?.score ?? lifePath.lifePathScorecard?.nameAndFameScore ?? 92}% Index
+                    </span>
+                  </div>
+
+                  <div className="inline-block text-[10px] font-black uppercase tracking-wider text-amber-800 bg-amber-50/80 px-1.5 py-0.2 rounded border border-amber-200/60">
+                    {lifePath.domainForecasts?.nameAndFame?.status ?? 'High Prominence & Authority'}
+                  </div>
+
+                  <p className="text-[12.5px] text-stone-800 leading-snug">
+                    {lifePath.domainForecasts?.nameAndFame?.analysis ?? currentYearPred.pillars.nameAndFame}
+                  </p>
+
+                  <div className="bg-[#FAF8F5] rounded p-1.5 border border-stone-200/70 space-y-1 text-[11px]">
+                    <div>
+                      <strong className="text-amber-950 font-bold">Auspicious Window:</strong>{' '}
+                      <span className="text-stone-700">
+                        {lifePath.domainForecasts?.nameAndFame?.auspiciousWindows ?? `April – June ${currentYearPred.year} (Solar Exaltation) & Navratri`}
+                      </span>
+                    </div>
+                    <div>
+                      <strong className="text-amber-950 font-bold">Vedic Remedy:</strong>{' '}
+                      <span className="text-stone-700">
+                        {lifePath.domainForecasts?.nameAndFame?.remedy ?? 'Offer Arghya (water) to Lord Surya at sunrise in a copper vessel; chant Aditya Hridaya Stotram on Sundays.'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Property & Real Estate */}
+                <div className="bg-white rounded-md p-2.5 border border-teal-300/80 space-y-1.5 shadow-3xs hover:border-teal-400 transition-all">
+                  <div className="flex items-center justify-between gap-1 border-b border-teal-100 pb-1">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-teal-950 flex items-center space-x-1.5">
+                      <div className="w-5 h-5 rounded bg-teal-100 text-teal-800 flex items-center justify-center">
+                        <Home className="w-3.5 h-3.5" />
+                      </div>
+                      <span>Property &amp; Real Estate (Bhumi)</span>
+                    </span>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-teal-50 text-teal-950 border border-teal-200">
+                      {lifePath.domainForecasts?.property?.score ?? lifePath.lifePathScorecard?.propertyScore ?? 89}% Index
+                    </span>
+                  </div>
+
+                  <div className="inline-block text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-50/80 px-1.5 py-0.2 rounded border border-teal-200/60">
+                    {lifePath.domainForecasts?.property?.status ?? 'Prime Acquisition & Asset Growth'}
+                  </div>
+
+                  <p className="text-[12.5px] text-stone-800 leading-snug">
+                    {lifePath.domainForecasts?.property?.analysis ?? currentYearPred.pillars.propertyAndAssets}
+                  </p>
+
+                  <div className="bg-[#FAF8F5] rounded p-1.5 border border-stone-200/70 space-y-1 text-[11px]">
+                    <div>
+                      <strong className="text-teal-950 font-bold">Auspicious Window:</strong>{' '}
+                      <span className="text-stone-700">
+                        {lifePath.domainForecasts?.property?.auspiciousWindows ?? `May – July ${currentYearPred.year} & Festive Property Muhurtas`}
+                      </span>
+                    </div>
+                    <div>
+                      <strong className="text-teal-950 font-bold">Vedic Remedy:</strong>{' '}
+                      <span className="text-stone-700">
+                        {lifePath.domainForecasts?.property?.remedy ?? 'Recite Hanuman Chalisa on Tuesdays and offer jaggery/gram; pay respect to Mother Earth (Bhoomi Vandana).'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Children & Progeny */}
+                <div className="bg-white rounded-md p-2.5 border border-orange-300/80 space-y-1.5 shadow-3xs hover:border-orange-400 transition-all">
+                  <div className="flex items-center justify-between gap-1 border-b border-orange-100 pb-1">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-orange-950 flex items-center space-x-1.5">
+                      <div className="w-5 h-5 rounded bg-orange-100 text-orange-800 flex items-center justify-center">
+                        <Baby className="w-3.5 h-3.5" />
+                      </div>
+                      <span>Children &amp; Progeny (Santan Sukh)</span>
+                    </span>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-50 text-orange-950 border border-orange-200">
+                      {lifePath.domainForecasts?.children?.score ?? lifePath.lifePathScorecard?.childrenScore ?? 90}% Index
+                    </span>
+                  </div>
+
+                  <div className="inline-block text-[10px] font-black uppercase tracking-wider text-orange-800 bg-orange-50/80 px-1.5 py-0.2 rounded border border-orange-200/60">
+                    {lifePath.domainForecasts?.children?.status ?? 'Joyous Milestones & Family Harmony'}
+                  </div>
+
+                  <p className="text-[12.5px] text-stone-800 leading-snug">
+                    {lifePath.domainForecasts?.children?.analysis ?? currentYearPred.pillars.childrenAndProgeny}
+                  </p>
+
+                  <div className="bg-[#FAF8F5] rounded p-1.5 border border-stone-200/70 space-y-1 text-[11px]">
+                    <div>
+                      <strong className="text-orange-950 font-bold">Auspicious Window:</strong>{' '}
+                      <span className="text-stone-700">
+                        {lifePath.domainForecasts?.children?.auspiciousWindows ?? `February – April ${currentYearPred.year} & September – November ${currentYearPred.year}`}
+                      </span>
+                    </div>
+                    <div>
+                      <strong className="text-orange-950 font-bold">Vedic Remedy:</strong>{' '}
+                      <span className="text-stone-700">
+                        {lifePath.domainForecasts?.children?.remedy ?? 'Recite Santana Gopala Mantra or Brihaspati Kavacham on Thursdays; donate educational items to needy students.'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -812,7 +1052,7 @@ export function YearlyPredictions({
           </div>
         </div>
 
-        {/* 6 Core Life Pillars & Quarterly Roadmap */}
+        {/* 9 Core Life Pillars & Quarterly Roadmap */}
         {(activeSubView === 'all' || activeSubView === 'pillars') && (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -828,6 +1068,24 @@ export function YearlyPredictions({
                   text: currentYearPred.pillars.wealthAndBusiness,
                   icon: TrendingUp,
                   textColor: 'text-emerald-800',
+                },
+                {
+                  label: 'Name & Fame',
+                  text: currentYearPred.pillars.nameAndFame,
+                  icon: Award,
+                  textColor: 'text-amber-900',
+                },
+                {
+                  label: 'Property & Assets',
+                  text: currentYearPred.pillars.propertyAndAssets,
+                  icon: Home,
+                  textColor: 'text-teal-800',
+                },
+                {
+                  label: 'Children & Progeny',
+                  text: currentYearPred.pillars.childrenAndProgeny,
+                  icon: Baby,
+                  textColor: 'text-orange-800',
                 },
                 {
                   label: 'Marriage & Family',
@@ -856,7 +1114,7 @@ export function YearlyPredictions({
               ].map((pillar, idx) => (
                 <div
                   key={idx}
-                  className="bg-[#FAF8F5]/80 rounded-md p-2 border border-stone-200/80 space-y-1"
+                  className="bg-[#FAF8F5]/80 rounded-md p-2 border border-stone-200/80 space-y-1 shadow-3xs"
                 >
                   <span
                     className={`text-[12px] font-black uppercase tracking-wider ${pillar.textColor} flex items-center space-x-1.5`}

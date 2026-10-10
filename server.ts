@@ -347,9 +347,12 @@ Provide a clear, high-conviction Vedic synthesis in JSON matching the schema.`;
           careerWealthTrajectory: `Annual Jupiter and Saturn transits interacting with your natal birth chart favor structured career elevation, authoritative leadership roles, and compounding asset growth. Focus on high-conviction execution during your peak auspicious months.`,
           relationshipsFamilyPath: `Domestic harmony, supportive alliances, and meaningful family milestones are strengthened by benefic trinal aspects to your natal houses. Practice patient, transparent dialogue during retrograde transit windows.`,
           spiritualKarmicLesson: `Your soul lesson in ${year} centers on balancing external ambition with inner meditative poise, honoring Varsheshwara ${varsheshwara}, and transforming karmic tests into enduring wisdom.`,
+          nameAndFameTrajectory: `Solar rays, 10th-house activations, and Guru's auspicious trinal gaze in ${year} accelerate public standing, institutional honor, and recognition of your core talents and leadership authority.`,
+          propertyAssetsTrajectory: `The 4th House (Sukha & Griha Sthana) receives strong protective planetary resonance in ${year}, opening high-probability windows for residential real estate purchase, land investments, vehicle acquisition, or home modernization.`,
+          childrenProgenyTrajectory: `Putrakaraka Guru blesses the 5th House axis in ${year}, favoring auspicious conception/birth news for aspiring parents, while delivering academic triumphs, creative honors, and joyous bonding for existing children.`,
           keyMilestones: [
             `Activate House ${progressedHouse} (${progressedRasi}) initiatives during the first half of ${year} for maximum natal-transit resonance.`,
-            `Leverage the Guru–Shani Double-Transit in Houses ${(doubleTransitHouses || [1, 9]).join(" & ")} for permanent career and financial agreements.`,
+            `Leverage the Guru–Shani Double-Transit in Houses ${(doubleTransitHouses || [1, 9]).join(" & ")} for permanent career, property, and financial agreements.`,
             `Perform Varshaphal remedies for ${varsheshwara} on Thursdays and birth Nakshatra days to harmonize annual planetary currents.`,
           ],
         });
@@ -370,7 +373,7 @@ Seeker & Birth Chart Context:
 - Natal Planetary Placements: ${JSON.stringify(natalSummary || [])}
 - Annual Major Transits (Guru, Shani, Rahu-Ketu): ${JSON.stringify(annualTransits || {})}
 
-Return a structured JSON response matching the schema.`;
+Ensure your forecast thoroughly addresses Name & Fame (Surya/H10/H1), Property & Real Estate (Mangal/H4/Sukra), and Children & Progeny (Guru/H5). Return a structured JSON response matching the schema.`;
 
       const response = await callWithRetry(() =>
         ai.models.generateContent({
@@ -378,7 +381,7 @@ Return a structured JSON response matching the schema.`;
           contents: prompt,
           config: {
             systemInstruction:
-              "You are an authoritative Vedic astrologer combining birth chart (Janam Kundali) placements, Bhrigu age progression, Tajika Muntha, and Guru-Shani Double-Transit rules to deliver deeply accurate, inspiring, and practical yearly life-path predictions.",
+              "You are an authoritative Vedic astrologer combining birth chart (Janam Kundali) placements, Bhrigu age progression, Tajika Muntha, and Guru-Shani Double-Transit rules to deliver deeply accurate, inspiring, and practical yearly life-path predictions covering Career, Wealth, Name & Fame, Property, Children, and Spiritual purpose.",
             temperature: 0.6,
             responseMimeType: "application/json",
             responseSchema: {
@@ -404,6 +407,18 @@ Return a structured JSON response matching the schema.`;
                   type: Type.STRING,
                   description: "2-3 sentences on inner spiritual evolution, karmic maturation, and dharmic purpose for the year.",
                 },
+                nameAndFameTrajectory: {
+                  type: Type.STRING,
+                  description: "2-3 sentences on Name, Fame, Kirti, Yash, honors, and social prestige based on Sun and 10th/1st house activations.",
+                },
+                propertyAssetsTrajectory: {
+                  type: Type.STRING,
+                  description: "2-3 sentences on property, real estate, land, home purchase/renovation, and vehicle acquisitions based on 4th House and Mars.",
+                },
+                childrenProgenyTrajectory: {
+                  type: Type.STRING,
+                  description: "2-3 sentences on children, progeny blessings, pregnancy/conception, children's education and familial bliss based on 5th House and Jupiter.",
+                },
                 keyMilestones: {
                   type: Type.ARRAY,
                   items: { type: Type.STRING },
@@ -416,6 +431,9 @@ Return a structured JSON response matching the schema.`;
                 "careerWealthTrajectory",
                 "relationshipsFamilyPath",
                 "spiritualKarmicLesson",
+                "nameAndFameTrajectory",
+                "propertyAssetsTrajectory",
+                "childrenProgenyTrajectory",
                 "keyMilestones",
               ],
             },

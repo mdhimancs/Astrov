@@ -294,143 +294,113 @@ export function Navbar({
             </div>
           </div>
 
-          {/* Right Side: Transit Clock + Profile Dropdown + Edit Profile Button + Plus Button to Add New Profile */}
+          {/* Right Side: Profile Dropdown Selector + Extreme Right Gochar */}
           <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
-            {/* Live Transit Info */}
-            <div className="hidden xl:flex items-center space-x-1.5 text-[11px] text-stone-600 font-bold uppercase tracking-wider bg-stone-50 border border-stone-200/80 px-2 py-0.5 rounded-md">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>
-                Gochar: <span className="text-amber-900 font-mono font-bold">{currentTransitTime}</span>
-              </span>
-            </div>
-
-            {/* PROFILE DROPDOWN WITH EDIT BUTTON — ON THE RIGHT SIDE */}
+            {/* PROFILE DROPDOWN WITH BIGGER SELECTOR BUTTON */}
             {currentProfile && (
               <div className="relative shrink min-w-0" ref={dropdownRef}>
-                <div className="flex items-center space-x-1">
-                  <button
-                    type="button"
-                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                    className="flex items-center space-x-1 sm:space-x-1.5 bg-gradient-to-r from-amber-50/95 via-amber-50/70 to-[#FAF6EE] hover:from-amber-100 hover:to-amber-50/90 border border-amber-300/90 rounded-md px-1.5 sm:px-2 py-0.5 sm:py-1 text-left transition-all shadow-3xs cursor-pointer group max-w-[190px] sm:max-w-[260px]"
-                    title="Switch Active Profile"
-                  >
-                    <div className="w-5 h-5 rounded bg-gradient-to-br from-amber-700 via-orange-700 to-amber-900 text-amber-100 flex items-center justify-center font-bold text-[10px] shadow-3xs shrink-0 border border-amber-400/40">
-                      <User className="w-3 h-3" />
+                {/* BIGGER BUTTON SELECTOR (+2pt font & increased vertical size) */}
+                <button
+                  type="button"
+                  onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                  className="flex items-center space-x-2 sm:space-x-2.5 bg-gradient-to-r from-amber-50/95 via-amber-50/80 to-[#FAF6EE] hover:from-amber-100 hover:to-amber-50 border border-amber-300 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-left transition-all shadow-3xs cursor-pointer group max-w-[220px] sm:max-w-[340px] md:max-w-[400px]"
+                  title="Switch Active Profile"
+                >
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-gradient-to-br from-amber-700 via-orange-700 to-amber-900 text-amber-100 flex items-center justify-center font-bold text-sm shadow-3xs shrink-0 border border-amber-400/40">
+                    <User className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <div className="flex items-center space-x-1 sm:space-x-1.5 leading-tight truncate">
+                      <span className="font-sans font-bold text-amber-950 text-[14px] sm:text-[15.5px] tracking-tight truncate max-w-[105px] sm:max-w-[140px]">
+                        {currentProfile.name}
+                      </span>
+                      <span className="text-amber-400 font-bold select-none text-sm">—</span>
+                      <span className="text-stone-800 font-semibold text-[13px] sm:text-[14px] truncate max-w-[95px] sm:max-w-[130px]">
+                        {formatProfileDoc(currentProfile.birthDate, currentProfile.birthTime)}
+                      </span>
+                      <span className="text-amber-400 font-bold select-none hidden xl:inline text-sm">—</span>
+                      <span className="text-stone-600 font-medium text-[13px] sm:text-[14px] truncate max-w-[100px] hidden xl:inline">
+                        {currentProfile.place}
+                      </span>
                     </div>
-                    <div className="flex flex-col min-w-0">
-                      <div className="flex items-center space-x-1 leading-tight text-[11px] truncate">
-                        <span className="font-sans font-bold text-amber-950 tracking-tight truncate max-w-[80px] sm:max-w-[110px]">
-                          {currentProfile.name}
-                        </span>
-                        <span className="text-amber-400 font-bold select-none">—</span>
-                        <span className="text-stone-800 font-semibold truncate max-w-[75px] sm:max-w-[100px]">
-                          {formatProfileDoc(currentProfile.birthDate, currentProfile.birthTime)}
-                        </span>
-                        <span className="text-amber-400 font-bold select-none hidden lg:inline">—</span>
-                        <span className="text-stone-600 font-medium truncate max-w-[80px] hidden lg:inline">
-                          {currentProfile.place}
-                        </span>
-                      </div>
-                    </div>
-                    <ChevronDown
-                      className={`w-3.5 h-3.5 text-amber-800 transition-transform shrink-0 ${
-                        isProfileDropdownOpen ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-
-                  {/* EDIT BUTTON DIRECTLY ACCESSIBLE ON THE TOP BAR */}
-                  <button
-                    type="button"
-                    onClick={() => handleOpenEditModal(currentProfile)}
-                    title={`Edit ${currentProfile.name}'s details`}
-                    className="flex items-center space-x-1 px-2 py-1 rounded-md bg-amber-50/90 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-all cursor-pointer text-[11px] font-bold shadow-3xs hover:shadow-2xs shrink-0 group"
-                  >
-                    <Edit3 className="w-3.5 h-3.5 text-amber-800 group-hover:scale-110 transition-transform" />
-                    <span className="hidden sm:inline">Edit</span>
-                  </button>
-                </div>
+                  </div>
+                  <ChevronDown
+                    className={`w-4.5 h-4.5 text-amber-800 transition-transform shrink-0 ml-0.5 ${
+                      isProfileDropdownOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
 
                 {/* Profiles Dropdown Switcher Menu */}
                 {isProfileDropdownOpen && (
-                  <div className="absolute right-0 mt-1 w-76 sm:w-88 bg-white rounded-lg shadow-xl border border-amber-200 py-1.5 z-50 animate-in fade-in duration-100">
-                    <div className="px-3 py-1.5 border-b border-stone-100 flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-amber-900">
+                  <div className="absolute right-0 mt-1.5 w-84 sm:w-96 bg-white rounded-lg shadow-xl border border-amber-200 py-1.5 z-50 animate-in fade-in duration-100">
+                    <div className="px-3.5 py-2 border-b border-stone-100 flex items-center justify-between text-[13px] font-bold uppercase tracking-wider text-amber-900 bg-amber-50/40">
                       <span>Select Person Profile</span>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          type="button"
-                          onClick={() => handleOpenEditModal(currentProfile)}
-                          className="text-amber-800 hover:text-amber-950 font-bold flex items-center space-x-1 cursor-pointer hover:underline text-[11px]"
-                          title="Edit Active Profile"
-                        >
-                          <Edit3 className="w-3 h-3" />
-                          <span>Edit</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={handleOpenAddModal}
-                          className="text-amber-800 hover:text-amber-950 font-bold flex items-center space-x-1 cursor-pointer hover:underline text-[11px]"
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>Add New</span>
-                        </button>
-                      </div>
+                      {/* + ADD PROFILE BUTTON IN HEADER (+2pt font & increased vertical size) */}
+                      <button
+                        type="button"
+                        onClick={handleOpenAddModal}
+                        className="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 px-2.5 py-1 rounded text-[13px] font-bold flex items-center space-x-1 cursor-pointer transition-colors shadow-3xs"
+                        title="Add New Person Profile"
+                      >
+                        <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                        <span>+ Add Profile</span>
+                      </button>
                     </div>
 
-                    <div className="max-h-60 overflow-y-auto py-1 divide-y divide-stone-50">
+                    <div className="max-h-64 overflow-y-auto py-1 divide-y divide-stone-50">
                       {profiles.map((p) => {
                         const isSelected = p.id === currentProfile.id;
                         return (
                           <div
                             key={p.id}
-                            className={`px-3 py-1.5 text-left transition-colors flex items-center justify-between gap-2 group/item ${
+                            onClick={() => {
+                              if (onProfileChange) {
+                                onProfileChange(p.id);
+                              }
+                              setIsProfileDropdownOpen(false);
+                            }}
+                            className={`px-3.5 py-2.5 text-left transition-colors flex items-center justify-between gap-2 cursor-pointer group/item ${
                               isSelected
                                 ? 'bg-amber-50/90 text-amber-950 font-bold'
                                 : 'hover:bg-[#FAF8F5] text-stone-800'
                             }`}
                           >
-                            <div
-                              className="min-w-0 flex-1 cursor-pointer"
-                              onClick={() => {
-                                if (onProfileChange) {
-                                  onProfileChange(p.id);
-                                }
-                                setIsProfileDropdownOpen(false);
-                              }}
-                            >
+                            <div className="min-w-0 flex-1">
                               <div className="flex items-center space-x-1.5">
-                                <span className="font-sans font-bold text-[13px] truncate">
+                                <span className="font-sans font-bold text-[15px] truncate">
                                   {p.name}
                                 </span>
                                 {p.label && (
-                                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-stone-100 text-stone-600 font-normal">
+                                  <span className="text-[12px] px-1.5 py-0.5 rounded bg-stone-100 text-stone-600 font-normal">
                                     {p.label}
                                   </span>
                                 )}
                               </div>
-                              <div className="text-[11px] text-stone-600 flex items-center space-x-1 mt-0.5 truncate">
+                              <div className="text-[13px] text-stone-600 flex items-center space-x-1 mt-0.5 truncate">
                                 <span>{formatProfileDoc(p.birthDate, p.birthTime)}</span>
                                 <span>•</span>
                                 <span className="truncate">{p.place}</span>
                               </div>
                             </div>
 
-                            <div className="flex items-center space-x-1 shrink-0">
-                              {/* EDIT BUTTON ON EACH ROW IN DROPDOWN */}
+                            {/* EDIT BUTTON AFTER EACH PROFILE & ACTIVE CHECKMARK (+2pt font & increased vertical size) */}
+                            <div className="flex items-center space-x-1.5 shrink-0">
                               <button
                                 type="button"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleOpenEditModal(p);
                                 }}
-                                className="p-1 rounded text-stone-400 hover:text-amber-800 hover:bg-amber-100/80 transition-colors cursor-pointer"
                                 title={`Edit ${p.name}`}
+                                className="px-2.5 py-1 rounded bg-amber-50/80 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors cursor-pointer text-[13px] font-bold flex items-center space-x-1 shadow-3xs"
                               >
-                                <Edit3 className="w-3.5 h-3.5" />
+                                <Edit3 className="w-3.5 h-3.5 text-amber-800" />
+                                <span>Edit</span>
                               </button>
 
                               {isSelected && (
-                                <Check className="w-4 h-4 text-amber-700 font-bold" />
+                                <Check className="w-4.5 h-4.5 text-emerald-600 font-bold shrink-0" />
                               )}
                             </div>
                           </div>
@@ -438,59 +408,49 @@ export function Navbar({
                       })}
                     </div>
 
-                    <div className="px-3 py-1.5 border-t border-stone-100 bg-[#FAF8F5] text-[11px] flex items-center justify-between">
-                      <span className="text-stone-500 font-medium">{profiles.length} Profiles Saved</span>
-                      <div className="flex items-center space-x-1.5">
-                        <button
-                          type="button"
-                          onClick={() => handleOpenEditModal(currentProfile)}
-                          className="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 px-2.5 py-0.5 rounded text-[11px] font-bold flex items-center space-x-1 cursor-pointer transition-colors shadow-3xs"
-                        >
-                          <Edit3 className="w-3 h-3" />
-                          <span>Edit Active</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={handleOpenAddModal}
-                          className="bg-amber-700 hover:bg-amber-800 text-white px-2.5 py-0.5 rounded text-[11px] font-bold flex items-center space-x-1 cursor-pointer transition-colors shadow-2xs"
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>Add Profile</span>
-                        </button>
-                      </div>
+                    {/* DROPDOWN FOOTER WITH + ADD PROFILE (+2pt font & increased vertical size) */}
+                    <div className="px-3.5 py-2 border-t border-stone-100 bg-[#FAF8F5] text-[13px] text-stone-500 font-medium flex items-center justify-between">
+                      <span className="text-stone-600 font-semibold">{profiles.length} Profiles Saved</span>
+                      <button
+                        type="button"
+                        onClick={handleOpenAddModal}
+                        className="bg-amber-700 hover:bg-amber-800 text-white px-3 py-1.5 rounded text-[13px] font-bold flex items-center space-x-1 cursor-pointer transition-colors shadow-2xs"
+                        title="Add New Profile"
+                      >
+                        <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                        <span>+ Add Profile</span>
+                      </button>
                     </div>
                   </div>
                 )}
               </div>
             )}
 
-            {/* PLUS BUTTON TO ADD NEW PROFILES */}
-            <button
-              type="button"
-              onClick={handleOpenAddModal}
-              title="Add New Person Profile"
-              className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-amber-700 hover:bg-amber-800 text-white shadow-2xs transition-all cursor-pointer border border-amber-800 hover:scale-105 shrink-0"
-            >
-              <Plus className="w-4 h-4 stroke-[2.5]" />
-            </button>
+            {/* LIVE GOCHAR TRANSIT INFO — POSITIONED AT EXTREME RIGHT (+2pt font & increased vertical size) */}
+            <div className="hidden md:flex items-center space-x-1.5 text-[13px] text-stone-600 font-bold uppercase tracking-wider bg-stone-50 border border-stone-200/90 px-3 py-2 rounded-lg shrink-0 shadow-3xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>
+                Gochar: <span className="text-amber-900 font-mono font-bold">{currentTransitTime}</span>
+              </span>
+            </div>
           </div>
         </div>
 
         {/* Mobile / Tablet Compact Profile Sub-Bar for smaller screens */}
         {currentProfile && (
-          <div className="md:hidden flex items-center justify-between py-0.5 px-1 border-t border-amber-100/60 text-[10px] text-stone-600">
+          <div className="md:hidden flex items-center justify-between py-1 px-1 border-t border-amber-100/60 text-[12px] text-stone-600">
             <div className="flex items-center space-x-1 truncate">
-              <MapPin className="w-2.5 h-2.5 text-amber-700 shrink-0" />
+              <MapPin className="w-3 h-3 text-amber-700 shrink-0" />
               <span className="truncate">{currentProfile.place}</span>
             </div>
             <div className="flex items-center space-x-1.5 shrink-0">
-              <span className="text-[10px] text-amber-900 font-semibold bg-amber-50 px-1.5 py-0.2 rounded">
+              <span className="text-[12px] text-amber-900 font-semibold bg-amber-50 px-1.5 py-0.5 rounded">
                 {currentProfile.birthDate} ({currentProfile.birthTime})
               </span>
               <button
                 type="button"
                 onClick={() => handleOpenEditModal(currentProfile)}
-                className="text-amber-800 font-bold hover:underline"
+                className="text-amber-800 font-bold hover:underline text-[12px]"
               >
                 Edit
               </button>
@@ -498,9 +458,9 @@ export function Navbar({
           </div>
         )}
 
-        {/* Desktop Tabs - Compact 2-Row Deck of Cards */}
-        <nav className="hidden lg:block pb-1.5 pt-0.5 space-y-1">
-          <div className="grid grid-cols-6 gap-1">
+        {/* Desktop Tabs - Increased Vertical Size & Increased Font by 2 Points (10px -> 12px) */}
+        <nav className="hidden lg:block pb-2 pt-1 space-y-1.5">
+          <div className="grid grid-cols-6 gap-1.5">
             {tabs.slice(0, 6).map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -508,17 +468,17 @@ export function Navbar({
                 <div
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`group relative rounded-md px-1.5 py-0.5 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 shadow-none border ${
+                  className={`group relative rounded-md px-2.5 py-2 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1.5 shadow-none border ${
                     isActive
                       ? 'bg-amber-50/80 border-amber-300 border-b-2 border-b-amber-600 text-amber-950 font-bold shadow-3xs'
                       : 'bg-white border-stone-200/60 border-b-2 border-b-stone-200 text-stone-700 hover:border-amber-300 hover:border-b-amber-400 hover:bg-[#FAF8F5]'
                   }`}
                 >
-                  <span className="font-ui font-semibold text-[10px] leading-tight truncate">
+                  <span className="font-ui font-semibold text-[12px] leading-tight truncate">
                     {tab.label}
                   </span>
                   <Icon
-                    className={`w-2.5 h-2.5 shrink-0 ${
+                    className={`w-3.5 h-3.5 shrink-0 ${
                       isActive ? 'text-amber-800' : 'text-stone-400 group-hover:text-amber-600'
                     }`}
                   />
@@ -526,7 +486,7 @@ export function Navbar({
               );
             })}
           </div>
-          <div className="grid grid-cols-6 gap-1">
+          <div className="grid grid-cols-6 gap-1.5">
             {tabs.slice(6).map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -534,17 +494,17 @@ export function Navbar({
                 <div
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`group relative rounded-md px-1.5 py-0.5 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 shadow-none border ${
+                  className={`group relative rounded-md px-2.5 py-2 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1.5 shadow-none border ${
                     isActive
                       ? 'bg-amber-50/80 border-amber-300 border-b-2 border-b-amber-600 text-amber-950 font-bold shadow-3xs'
                       : 'bg-white border-stone-200/60 border-b-2 border-b-stone-200 text-stone-700 hover:border-amber-300 hover:border-b-amber-400 hover:bg-[#FAF8F5]'
                   }`}
                 >
-                  <span className="font-ui font-semibold text-[10px] leading-tight truncate">
+                  <span className="font-ui font-semibold text-[12px] leading-tight truncate">
                     {tab.label}
                   </span>
                   <Icon
-                    className={`w-2.5 h-2.5 shrink-0 ${
+                    className={`w-3.5 h-3.5 shrink-0 ${
                       isActive ? 'text-amber-800' : 'text-stone-400 group-hover:text-amber-600'
                     }`}
                   />
@@ -555,9 +515,9 @@ export function Navbar({
         </nav>
       </div>
 
-      {/* Mobile / Tablet Scroll Navigation */}
+      {/* Mobile / Tablet Scroll Navigation - Increased Vertical Size & Font 2 Points (10px -> 12px) */}
       <div className="lg:hidden border-t border-[#F5F0E8] bg-[#FDFBF7]">
-        <div className="w-full max-w-6xl mx-auto flex overflow-x-auto px-2 sm:px-3 py-1 space-x-1 scrollbar-none">
+        <div className="w-full max-w-6xl mx-auto flex overflow-x-auto px-2 sm:px-3 py-1.5 space-x-1.5 scrollbar-none">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -565,15 +525,15 @@ export function Navbar({
               <div
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`rounded-md px-2 py-0.5 transition-all duration-150 cursor-pointer flex items-center space-x-1 whitespace-nowrap shrink-0 shadow-3xs ${
+                className={`rounded-md px-2.5 py-1.5 transition-all duration-150 cursor-pointer flex items-center space-x-1.5 whitespace-nowrap shrink-0 shadow-3xs ${
                   isActive
                     ? 'bg-amber-50 border-t border-l border-r border-amber-400 border-b-2 border-b-amber-700 text-amber-950 font-bold'
                     : 'bg-white border-t border-l border-r border-stone-200 border-b-2 border-b-stone-300 text-stone-700'
                 }`}
               >
-                <span className="font-ui font-semibold text-[10px] leading-none">{tab.label}</span>
+                <span className="font-ui font-semibold text-[12px] leading-none">{tab.label}</span>
                 <Icon
-                  className={`w-2.5 h-2.5 shrink-0 ${
+                  className={`w-3.5 h-3.5 shrink-0 ${
                     isActive ? 'text-amber-800' : 'text-stone-500'
                   }`}
                 />
