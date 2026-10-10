@@ -683,7 +683,7 @@ export function VimshottariDashaTab({
             <select
               value={selectedMonthKey}
               onChange={(e) => setSelectedMonthKey(e.target.value)}
-              className="bg-[#FAF8F5] border border-amber-300 text-stone-900 text-[13px] font-semibold rounded px-2 py-1 focus:outline-none focus:border-amber-600 focus:bg-white shadow-3xs cursor-pointer"
+              className="bg-[#FAF8F5] border border-amber-300 text-stone-900 text-[11px] font-semibold rounded px-1.5 py-0.5 focus:outline-none focus:border-amber-600 focus:bg-white shadow-3xs cursor-pointer"
             >
               {ALL_MONTH_WISE_PREDICTIONS.map((m) => (
                 <option key={m.monthKey} value={m.monthKey}>

@@ -249,7 +249,7 @@ export function TransitsLiveTab({
             <select
               value={ayanamshaSystem}
               onChange={(e) => setAyanamshaSystem(e.target.value as AyanamshaSystem)}
-              className="font-bold text-amber-950 bg-transparent focus:outline-none cursor-pointer"
+              className="font-bold text-amber-950 bg-transparent text-[11px] px-1 py-0.5 focus:outline-none cursor-pointer"
             >
               <option value="Lahiri">NC Lahiri (Chitra Paksha)</option>
               <option value="KP">KP (Krishnamurti)</option>

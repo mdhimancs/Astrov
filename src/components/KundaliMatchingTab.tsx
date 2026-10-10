@@ -250,7 +250,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
             <select
               value={partner1ProfileId}
               onChange={(e) => setPartner1ProfileId(e.target.value)}
-              className="text-[11px] font-bold text-amber-900 bg-amber-50 border border-amber-200 rounded px-2 py-1 cursor-pointer"
+              className="text-[10.5px] font-bold text-amber-900 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 cursor-pointer"
             >
               {profiles.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -268,7 +268,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
               type="text"
               value={person1.name}
               onChange={(e) => setPerson1({ ...person1, name: e.target.value })}
-              className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2.5 py-1.5 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white"
+              className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2.5 py-1 text-stone-950 text-[12px] focus:outline-none focus:border-amber-600 focus:bg-white"
             />
           </div>
 
@@ -280,7 +280,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
               <select
                 value={person1.rasi}
                 onChange={(e) => setPerson1({ ...person1, rasi: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1.5 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
+                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-1.5 py-1 text-stone-950 text-[11px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
               >
                 {VEDIC_RASIS.map((r) => (
                   <option key={r.sanskritName} value={r.sanskritName}>
@@ -297,7 +297,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
               <select
                 value={person1.nakshatra}
                 onChange={(e) => setPerson1({ ...person1, nakshatra: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1.5 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
+                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-1.5 py-1 text-stone-950 text-[11px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
               >
                 {NAKSHATRAS.map((n) => (
                   <option key={n.name} value={n.name}>
@@ -335,7 +335,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
             <select
               value={partner2ProfileId}
               onChange={(e) => setPartner2ProfileId(e.target.value)}
-              className="text-[11px] font-bold text-amber-900 bg-amber-50 border border-amber-200 rounded px-2 py-1 cursor-pointer"
+              className="text-[10.5px] font-bold text-amber-900 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 cursor-pointer"
             >
               <option value="custom">Custom Partner</option>
               {profiles
@@ -356,7 +356,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
               type="text"
               value={person2.name}
               onChange={(e) => setPerson2({ ...person2, name: e.target.value })}
-              className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2.5 py-1.5 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white"
+              className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2.5 py-1 text-stone-950 text-[12px] focus:outline-none focus:border-amber-600 focus:bg-white"
             />
           </div>
 
@@ -368,7 +368,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
               <select
                 value={person2.rasi}
                 onChange={(e) => setPerson2({ ...person2, rasi: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1.5 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
+                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-1.5 py-1 text-stone-950 text-[11px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
               >
                 {VEDIC_RASIS.map((r) => (
                   <option key={r.sanskritName} value={r.sanskritName}>
@@ -385,7 +385,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
               <select
                 value={person2.nakshatra}
                 onChange={(e) => setPerson2({ ...person2, nakshatra: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1.5 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
+                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-1.5 py-1 text-stone-950 text-[11px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
               >
                 {NAKSHATRAS.map((n) => (
                   <option key={n.name} value={n.name}>

@@ -261,7 +261,7 @@ export function AstronomicalEphemerisTab({
               <select
                 value={ayanamshaSystem}
                 onChange={(e) => setAyanamshaSystem(e.target.value as AyanamshaSystem)}
-                className="font-bold text-white bg-transparent focus:outline-none cursor-pointer"
+                className="font-bold text-white bg-transparent text-[11px] px-1 py-0.5 focus:outline-none cursor-pointer"
               >
                 <option value="Lahiri" className="bg-stone-900 text-white">NC Lahiri (Chitra Paksha)</option>
                 <option value="KP" className="bg-stone-900 text-white">KP (Krishnamurti)</option>
@@ -691,7 +691,7 @@ export function AstronomicalEphemerisTab({
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(parseInt(e.target.value, 10))}
-                className="bg-[#FAF8F5] border border-amber-300 text-stone-900 text-[12.5px] font-bold rounded px-2.5 py-1 focus:outline-none cursor-pointer"
+                className="bg-[#FAF8F5] border border-amber-300 text-stone-900 text-[11px] font-bold rounded px-1.5 py-0.5 focus:outline-none cursor-pointer"
               >
                 {monthNames.map((mName, idx) => (
                   <option key={mName} value={idx}>{mName}</option>
@@ -739,7 +739,7 @@ export function AstronomicalEphemerisTab({
               <select
                 value={planetFilter}
                 onChange={(e) => setPlanetFilter(e.target.value as any)}
-                className="bg-[#FAF8F5] border border-stone-300 text-stone-900 font-bold rounded px-2 py-1 focus:outline-none cursor-pointer"
+                className="bg-[#FAF8F5] border border-amber-300 text-stone-900 font-bold text-[11px] rounded px-1.5 py-0.5 focus:outline-none cursor-pointer"
               >
                 {grahaOptions.map((g) => (
                   <option key={g.id} value={g.id}>{g.label}</option>

@@ -643,7 +643,7 @@ export function Navbar({
                   <select
                     value={formGender}
                     onChange={(e) => setFormGender(e.target.value as any)}
-                    className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1 text-stone-900 focus:outline-none focus:border-amber-600 focus:bg-white text-[12px]"
+                    className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-1.5 py-0.5 text-stone-900 focus:outline-none focus:border-amber-600 focus:bg-white text-[11px]"
                   >
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>

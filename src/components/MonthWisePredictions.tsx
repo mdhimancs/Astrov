@@ -108,7 +108,7 @@ export function MonthWisePredictions({
               id="month-select-dropdown"
               value={currentIndex}
               onChange={handleMonthChange}
-              className="appearance-none bg-white border border-stone-200 text-stone-950 text-[14px] font-black uppercase tracking-wider rounded px-2.5 pr-7 py-1 focus:outline-none focus:border-amber-400 shadow-3xs cursor-pointer"
+              className="appearance-none bg-white border border-stone-200 text-stone-950 text-[11px] font-bold uppercase tracking-wider rounded px-2 pr-6 py-0.5 focus:outline-none focus:border-amber-400 shadow-3xs cursor-pointer"
             >
               {/* Year 2025 */}
               <optgroup label="2025">

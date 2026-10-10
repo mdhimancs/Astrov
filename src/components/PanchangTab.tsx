@@ -677,7 +677,7 @@ export function PanchangTab({
                   setCurrentMonth(parseInt(e.target.value, 10));
                   setSelectedDay(1);
                 }}
-                className="bg-[#FAF8F5] border border-amber-300 text-stone-900 text-[12px] font-bold rounded px-2 py-1 focus:outline-none focus:border-amber-600 cursor-pointer"
+                className="bg-[#FAF8F5] border border-amber-300 text-stone-900 text-[11px] font-bold rounded px-1.5 py-0.5 focus:outline-none focus:border-amber-600 cursor-pointer"
               >
                 {[
                   'January (पौष–माघ)',
