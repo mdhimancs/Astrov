@@ -236,7 +236,7 @@ export function AstronomicalEphemerisTab({
   ];
 
   return (
-    <div className="w-full space-y-2.5 pb-8">
+    <div className="w-full space-y-2.5 pb-8 bg-[#FAF6EE] p-3 sm:p-4 rounded-xl border border-amber-200/60 shadow-xs">
       {/* TOP HEADER: ASTRONOMICAL EPHEMERIS OBSERVATORY */}
       <div className="bg-gradient-to-r from-stone-900 via-amber-950 to-stone-950 rounded-lg p-3 text-amber-50 shadow-xs border border-amber-800/40 space-y-2">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-amber-800/50 pb-2">

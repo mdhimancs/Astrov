@@ -1,6 +1,6 @@
 {
-  "name": "Astrology App",
-  "description": "Light-themed Vedic astrology portal providing real-time predictions based on North Indian Kundali charts, date of birth, and current planetary movements (Gochar).",
+  "name": "Astrov Jotishveda - 20 Years Astrology & Astronomy Research Portal",
+  "description": "Professional 20 years astrology & astronomy research portal delivering precise Reading, Analysis / Impact, and Prediction / Guidance based on authentic Vedic Sidereal ephemeris and planetary transits.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

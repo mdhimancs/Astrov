@@ -339,7 +339,7 @@ export function BirthTimePredictionsTab({
             },
             {
               id: 'aspects',
-              title: 'Aspect Dips & Rises',
+              title: 'Aspects & Guidance',
               icon: Activity,
             },
             {
@@ -584,7 +584,7 @@ export function BirthTimePredictionsTab({
           natalPlanets={natalPlanets}
           natalHouses={natalHouses}
           lagnaRasi={natalLagnaRasi}
-          userName=""
+          userName={name}
           currentTransitPlanets={natalPlanets}
         />
       )}

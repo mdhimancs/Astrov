@@ -32,9 +32,14 @@ import {
   Layers,
   Compass,
   Info,
+  CheckCircle2,
+  Calculator,
+  BookOpen,
 } from 'lucide-react';
 import { PlanetPosition, HouseInfo, UserProfile } from '../types';
 import { VEDIC_RASIS } from '../data';
+import { LifeAspectProbabilitySection } from './LifeAspectProbabilitySection';
+import { PersonalizedGuidanceSection } from './PersonalizedGuidanceSection';
 
 export type LifeAspectKey =
   | 'health'
@@ -135,8 +140,9 @@ export function AspectStrengthTrajectoryGraph({
 }: AspectStrengthTrajectoryGraphProps) {
   const [selectedAspect, setSelectedAspect] = useState<LifeAspectKey | 'all'>('all');
   const [viewType, setViewType] = useState<'trajectory' | 'radar'>('trajectory');
-  // 13-Month Rolling Window: 6 Months Previous, Current Month (Index 6), 6 Months Forthcoming
-  const [activeMonthIndex, setActiveMonthIndex] = useState<number>(6); // default to current month (index 6: offset 0)
+  const [activeModuleSection, setActiveModuleSection] = useState<'all' | 'trajectory' | 'probabilities' | 'guidance'>('all');
+  // 21-Month Rolling Window: 10 Months Previous, Current Month (Index 10), 10 Months Forthcoming
+  const [activeMonthIndex, setActiveMonthIndex] = useState<number>(10); // default to current month (index 10: offset 0)
 
   // 1. Calculate Base Natal Strength (0-100) for each aspect based on natal kundali
   const natalStrengths = useMemo(() => {
@@ -185,14 +191,14 @@ export function AspectStrengthTrajectoryGraph({
     return scores;
   }, [natalPlanets, natalHouses]);
 
-  // 2. Generate 13-Month Dynamic Trajectory: 6 Months Previous, Current Month (Now), 6 Months Forthcoming
+  // 2. Generate 21-Month Dynamic Trajectory: 10 Months Previous, Current Month (Now), 10 Months Forthcoming
   const monthsData = useMemo(() => {
     const now = new Date();
     const curYear = now.getFullYear();
     const curMonth = now.getMonth(); // 0-indexed month
 
-    // 13 relative monthly offsets centered at 0 (current month)
-    const offsets = [-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6];
+    // 21 relative monthly offsets centered at 0 (current month)
+    const offsets = Array.from({ length: 21 }, (_, i) => i - 10);
 
     // Natal Moon Rasi
     const moon = natalPlanets.find((p) => p.name === 'Chandra') || natalPlanets[1];
@@ -222,7 +228,7 @@ export function AspectStrengthTrajectoryGraph({
 
       // Harmonic wave components modeling realistic transit passages
       // centered at offset 0 (current month)
-      const normalizedWave = (offset / 6) * Math.PI;
+      const normalizedWave = (offset / 10) * Math.PI;
       const midCycleSurge = Math.cos(normalizedWave * 0.8) * 14;
       const seasonalHarmonic = Math.sin(normalizedWave * 1.2) * 8;
       const marsFluctuation = Math.sin(offset * 1.6) * 10;
@@ -289,7 +295,7 @@ export function AspectStrengthTrajectoryGraph({
   }, [natalStrengths, natalPlanets, lagnaRasi]);
 
   // Active month object for detailed inspection
-  const activeMonthData = monthsData[activeMonthIndex] || monthsData[6] || monthsData[0];
+  const activeMonthData = monthsData[activeMonthIndex] || monthsData[10] || monthsData[0];
 
   // Radar Data for the selected month
   const radarData = useMemo(() => {
@@ -328,7 +334,7 @@ export function AspectStrengthTrajectoryGraph({
   }, [selectedAspect, activeMonthData, natalStrengths, natalPlanets]);
 
   return (
-    <div className="bg-white/95 backdrop-blur-sm rounded-lg border border-amber-200/90 shadow-3xs p-3 space-y-3">
+    <div className="bg-white/95 backdrop-blur-sm rounded-lg border border-amber-200/90 shadow-3xs p-3 space-y-3.5">
       {/* Module Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-200/60 pb-2.5">
         <div className="space-y-0.5">
@@ -348,43 +354,74 @@ export function AspectStrengthTrajectoryGraph({
           <button
             type="button"
             onClick={() => setViewType('trajectory')}
-            className={`rounded-md px-2.5 py-1 text-[11.5px] font-ui font-semibold transition-all cursor-pointer flex items-center space-x-1.5 border ${
+            className={`rounded-md px-3.5 py-1.5 text-[13.5px] font-ui font-semibold transition-all cursor-pointer flex items-center space-x-1.5 border w-fit whitespace-nowrap ${
               viewType === 'trajectory'
                 ? 'bg-amber-100/90 border-amber-400 text-amber-950 shadow-2xs font-bold'
                 : 'bg-white border-stone-200 text-stone-700 hover:bg-[#FAF8F5]'
             }`}
           >
-            <Activity className="w-3.5 h-3.5 text-amber-700" />
+            <Activity className="w-4 h-4 text-amber-700" />
             <span>Trajectory Curve</span>
           </button>
           <button
             type="button"
             onClick={() => setViewType('radar')}
-            className={`rounded-md px-2.5 py-1 text-[11.5px] font-ui font-semibold transition-all cursor-pointer flex items-center space-x-1.5 border ${
+            className={`rounded-md px-3.5 py-1.5 text-[13.5px] font-ui font-semibold transition-all cursor-pointer flex items-center space-x-1.5 border w-fit whitespace-nowrap ${
               viewType === 'radar'
                 ? 'bg-amber-100/90 border-amber-400 text-amber-950 shadow-2xs font-bold'
                 : 'bg-white border-stone-200 text-stone-700 hover:bg-[#FAF8F5]'
             }`}
           >
-            <Compass className="w-3.5 h-3.5 text-amber-700" />
+            <Compass className="w-4 h-4 text-amber-700" />
             <span>Aspect Balance Wheel</span>
           </button>
         </div>
       </div>
 
-      {/* 13-Month Interactive Timeline Navigator (6 Months Previous • Current Month • 6 Months Forthcoming) */}
+      {/* Top Section Navigator: All Views, 21-Month Graph, Probability Analysis, Personalized Guidance */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-amber-50/60 p-1.5 rounded-lg border border-amber-200/80">
+        {[
+          { id: 'all', label: 'Reading & Synthesis', icon: Layers },
+          { id: 'trajectory', label: '21-Month Trajectory', icon: Activity },
+          { id: 'probabilities', label: 'Analysis / Impact', icon: Sparkles },
+          { id: 'guidance', label: 'Prediction / Guidance', icon: Compass },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeModuleSection === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveModuleSection(tab.id as any)}
+              className={`px-3.5 py-2 rounded-md text-[13.5px] font-bold transition-all cursor-pointer flex items-center justify-center space-x-1.5 border w-fit whitespace-nowrap mx-auto ${
+                isActive
+                  ? 'bg-amber-800 text-white border-amber-950 shadow-2xs'
+                  : 'bg-white text-stone-700 border-stone-200/80 hover:bg-[#FAF8F5] hover:border-amber-300'
+              }`}
+            >
+              <Icon className={`w-4 h-4 ${isActive ? 'text-amber-200' : 'text-amber-800'}`} />
+              <span className="truncate">{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 1. 13-MONTH TRAJECTORY GRAPH & PLANETARY DRIVERS SECTION */}
+      {(activeModuleSection === 'all' || activeModuleSection === 'trajectory') && (
+        <div className="space-y-3">
+          {/* 21-Month Interactive Timeline Navigator (10 Months Previous • Current Month • 10 Months Forthcoming) */}
       <div className="bg-[#FAF8F5] rounded-lg p-2.5 border border-amber-200/80 space-y-1.5">
         <div className="flex flex-wrap items-center justify-between text-[11px] font-bold text-stone-700 gap-1">
           <div className="flex items-center space-x-2">
             <Calendar className="w-3.5 h-3.5 text-amber-800" />
             <span className="uppercase tracking-wider text-amber-950 font-black text-[11.5px]">
-              13-Month Timeline Navigator (6 Mo. Previous ← Current → 6 Mo. Forthcoming)
+              21-Month Timeline Navigator (10 Mo. Previous ← Current → 10 Mo. Forthcoming)
             </span>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-3 text-[10.5px]">
             <span className="flex items-center space-x-1 text-stone-500 font-semibold">
               <span className="w-2 h-2 rounded-full bg-stone-400 shrink-0" />
-              <span>6 Mo. Previous</span>
+              <span>10 Mo. Previous</span>
             </span>
             <span className="flex items-center space-x-1 text-amber-900 font-black">
               <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse shrink-0" />
@@ -392,15 +429,15 @@ export function AspectStrengthTrajectoryGraph({
             </span>
             <span className="flex items-center space-x-1 text-emerald-800 font-bold">
               <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-              <span>6 Mo. Forthcoming</span>
+              <span>10 Mo. Forthcoming</span>
             </span>
           </div>
         </div>
 
-        {/* 13 Month Buttons Strip */}
+        {/* 21 Month Buttons Strip */}
         <div
           className="grid gap-1 overflow-x-auto pb-0.5"
-          style={{ gridTemplateColumns: 'repeat(13, minmax(46px, 1fr))' }}
+          style={{ gridTemplateColumns: 'repeat(21, minmax(32px, 1fr))' }}
         >
           {monthsData.map((m, i) => {
             const isSelected = activeMonthIndex === i;
@@ -526,7 +563,7 @@ export function AspectStrengthTrajectoryGraph({
                 />
                 {/* VERTICAL REFERENCE LINE AT CURRENT MONTH (TODAY) */}
                 <ReferenceLine
-                  x={monthsData[6]?.month}
+                  x={monthsData[10]?.month}
                   stroke="#D97706"
                   strokeDasharray="4 4"
                   strokeWidth={2}
@@ -782,6 +819,29 @@ export function AspectStrengthTrajectoryGraph({
           </div>
         </div>
       </div>
+      </div>
+      )}
+
+      {/* 2. LIFE ASPECT ANALYSIS & PROBABILITY SECTION */}
+      {(activeModuleSection === 'all' || activeModuleSection === 'probabilities') && (
+        <LifeAspectProbabilitySection
+          natalPlanets={natalPlanets}
+          natalHouses={natalHouses}
+          lagnaRasi={lagnaRasi}
+          userName={userName}
+        />
+      )}
+
+      {/* 3. PERSONALIZED GUIDANCE & STRATEGIC WEALTH CALCULATOR SECTION */}
+      {(activeModuleSection === 'all' || activeModuleSection === 'guidance') && (
+        <PersonalizedGuidanceSection
+          natalPlanets={natalPlanets}
+          natalHouses={natalHouses}
+          lagnaRasi={lagnaRasi}
+          userName={userName}
+        />
+      )}
     </div>
   );
 }
+

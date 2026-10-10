@@ -12,7 +12,11 @@ import { DivisionalChartsTab } from './components/DivisionalChartsTab';
 import { UpayRemediesTab } from './components/UpayRemediesTab';
 import { AstrologySystemsTab } from './components/AstrologySystemsTab';
 import { AstronomicalEphemerisTab } from './components/AstronomicalEphemerisTab';
+import { LifeEventsMattersTab } from './components/LifeEventsMattersTab';
+import { PersonalizedGuidanceTab } from './components/PersonalizedGuidanceTab';
+import { FamilyLineageTab } from './components/FamilyLineageTab';
 import { UserProfile } from './types';
+import { VEDIC_RASIS } from './data';
 import { getSavedProfiles, getActiveProfileId, setActiveProfileId as saveActiveId, upsertProfile, deleteProfile } from './utils/profileStorage';
 import { calculatePlanetaryPositions, buildHouseStructure, calculateYogas, calculateAshtakavarga } from './vedicMath';
 
@@ -120,6 +124,30 @@ export default function App() {
             onNavigateToBirthTime={() => setActiveTab('birth-predictions')}
           />
         )}
+        {activeTab === 'life-events' && (
+          <LifeEventsMattersTab
+            activeProfile={currentProfile}
+            profiles={profiles}
+            natalPlanets={natalCalc.planets}
+            natalHouses={natalHouses}
+            lagnaRasi={natalCalc.lagnaRasi}
+            onNavigateToGuidance={() => setActiveTab('personalized-guidance')}
+            onNavigateToMonthly={() => setActiveTab('monthly-predictions')}
+            onNavigateToDasha={() => setActiveTab('vimshottari-dasha')}
+          />
+        )}
+        {activeTab === 'personalized-guidance' && (
+          <PersonalizedGuidanceTab
+            activeProfile={currentProfile}
+            profiles={profiles}
+            natalPlanets={natalCalc.planets}
+            natalHouses={natalHouses}
+            lagnaRasi={natalCalc.lagnaRasi}
+            onNavigateToLifeEvents={() => setActiveTab('life-events')}
+            onNavigateToUpay={() => setActiveTab('upay-remedies')}
+            onNavigateToBirthCharts={() => setActiveTab('birth-predictions')}
+          />
+        )}
         {activeTab === 'vimshottari-dasha' && (
           <VimshottariDashaTab
             activeProfileId={activeProfileId}
@@ -187,6 +215,15 @@ export default function App() {
             activeProfile={currentProfile}
             natalPlanets={natalCalc.planets}
             natalLagnaRasi={natalCalc.lagnaRasi}
+          />
+        )}
+        {activeTab === 'family-lineage' && (
+          <FamilyLineageTab
+            activeProfile={currentProfile}
+            profiles={profiles}
+            natalPlanets={natalCalc.planets}
+            natalHouses={natalHouses}
+            lagnaRasi={VEDIC_RASIS[natalCalc.lagnaRasi - 1]?.englishName || 'Aries'}
           />
         )}
         {activeTab === 'compatibility' && (

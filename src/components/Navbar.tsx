@@ -22,6 +22,9 @@ import {
   UserPlus,
   Edit3,
   Trash2,
+  Flame,
+  GraduationCap,
+  Users,
 } from 'lucide-react';
 import { UserProfile } from '../types';
 import { PlaceOfBirthInput, PlaceValue } from './PlaceOfBirthInput';
@@ -212,17 +215,19 @@ export function Navbar({
 
   const tabs = [
     { id: 'birth-predictions', label: 'Birth Charts', icon: Compass },
-    { id: 'monthly-predictions', label: 'Monthly & Yearly Readings', icon: Calendar },
-    { id: 'vimshottari-dasha', label: 'Dasha', icon: Layers },
-    { id: 'upay-remedies', label: 'Upay & Remedies', icon: Sparkles },
-    { id: 'critical-transits', label: 'Milestones', icon: Award },
-    { id: 'astrology-systems', label: 'Systems & Cosmology', icon: BookOpen },
     { id: 'divisional-charts', label: 'Divisional', icon: Brain },
+    { id: 'astronomical-ephemeris', label: 'Ephemeris & Nakshatras', icon: Globe },
+    { id: 'astrology-systems', label: 'Systems & Cosmology', icon: BookOpen },
+    { id: 'panchang', label: 'Panchang', icon: Clock },
+    { id: 'monthly-predictions', label: 'Monthly & Yearly', icon: Calendar },
+    { id: 'life-events', label: 'Life Events & Matters', icon: Flame },
+    { id: 'vimshottari-dasha', label: 'Dasha', icon: Layers },
+    { id: 'critical-transits', label: 'Milestones', icon: Award },
     { id: 'sadesati', label: 'Sade Sati', icon: Shield },
     { id: 'transits', label: 'Live', icon: Orbit },
-    { id: 'astronomical-ephemeris', label: 'Ephemeris & Nakshatras', icon: Globe },
-    { id: 'panchang', label: 'Panchang', icon: Clock },
-    { id: 'compatibility', label: 'Matching', icon: HeartHandshake },
+    { id: 'personalized-guidance', label: 'Personalized Guidance', icon: GraduationCap },
+    { id: 'family-lineage', label: 'Family Members & Lineage', icon: Users },
+    { id: 'compatibility', label: 'Matching & Remedies', icon: HeartHandshake },
   ];
 
   return (
@@ -288,8 +293,8 @@ export function Navbar({
                   Jotishveda
                 </span>
               </div>
-              <span className="text-[10px] font-bold text-amber-900/95 leading-none mt-0.5 font-vedic tracking-wide">
-                ॥ श्री गणेशाय नमः ॥
+              <span className="text-[10px] font-bold text-amber-900/95 leading-none mt-0.5 font-sans tracking-tight">
+                20 Years Astrology & Astronomy Researcher • Reading • Analysis / Impact • Prediction / Guidance
               </span>
             </div>
           </div>
@@ -458,23 +463,23 @@ export function Navbar({
           </div>
         )}
 
-        {/* Desktop Tabs - Increased Vertical Size & Increased Font by 2 Points (10px -> 12px) */}
+        {/* Desktop Tabs - 2 rows of 7 tabs (Increased Vertical Size & Increased Font by 2 Points) */}
         <nav className="hidden lg:block pb-2 pt-1 space-y-1.5">
-          <div className="grid grid-cols-6 gap-1.5">
-            {tabs.slice(0, 6).map((tab) => {
+          <div className="grid grid-cols-7 gap-1.5">
+            {tabs.slice(0, 7).map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
                 <div
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`group relative rounded-md px-2.5 py-2 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1.5 shadow-none border ${
+                  className={`group relative rounded-md px-2 py-2 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 shadow-none border ${
                     isActive
                       ? 'bg-amber-50/80 border-amber-300 border-b-2 border-b-amber-600 text-amber-950 font-bold shadow-3xs'
                       : 'bg-white border-stone-200/60 border-b-2 border-b-stone-200 text-stone-700 hover:border-amber-300 hover:border-b-amber-400 hover:bg-[#FAF8F5]'
                   }`}
                 >
-                  <span className="font-ui font-semibold text-[12px] leading-tight truncate">
+                  <span className="font-ui font-semibold text-[11.5px] leading-tight truncate">
                     {tab.label}
                   </span>
                   <Icon
@@ -486,21 +491,21 @@ export function Navbar({
               );
             })}
           </div>
-          <div className="grid grid-cols-6 gap-1.5">
-            {tabs.slice(6).map((tab) => {
+          <div className="grid grid-cols-7 gap-1.5">
+            {tabs.slice(7).map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
                 <div
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`group relative rounded-md px-2.5 py-2 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1.5 shadow-none border ${
+                  className={`group relative rounded-md px-2 py-2 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 shadow-none border ${
                     isActive
                       ? 'bg-amber-50/80 border-amber-300 border-b-2 border-b-amber-600 text-amber-950 font-bold shadow-3xs'
                       : 'bg-white border-stone-200/60 border-b-2 border-b-stone-200 text-stone-700 hover:border-amber-300 hover:border-b-amber-400 hover:bg-[#FAF8F5]'
                   }`}
                 >
-                  <span className="font-ui font-semibold text-[12px] leading-tight truncate">
+                  <span className="font-ui font-semibold text-[11.5px] leading-tight truncate">
                     {tab.label}
                   </span>
                   <Icon
@@ -545,7 +550,7 @@ export function Navbar({
 
       {/* PROFILE MODAL (EDIT OR ADD NEW) */}
       {isProfileModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-stone-950/50 backdrop-blur-xs animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-[40%] sm:pt-[40%] p-3 bg-stone-950/50 backdrop-blur-xs animate-in fade-in duration-150">
           <div className="bg-white rounded-xl shadow-2xl border border-amber-200 w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-150">
             {/* Modal Header */}
             <div className="px-3.5 py-2.5 bg-gradient-to-r from-amber-50 to-[#FAF8F5] border-b border-amber-200/80 flex items-center justify-between">

@@ -11,12 +11,12 @@ import {
   Heart,
   Calendar,
   Compass,
+  ShieldCheck,
+  BookOpen,
 } from 'lucide-react';
 import { VEDIC_RASIS, NAKSHATRAS } from '../data';
 import { UserProfile } from '../types';
 import { calculatePlanetaryPositions } from '../vedicMath';
-import { NorthIndianChart } from './NorthIndianChart';
-import { SouthIndianChart } from './SouthIndianChart';
 
 interface KundaliMatchingTabProps {
   activeProfileId: string;
@@ -61,7 +61,6 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
 
       const natalMoon = natalCalc.planets.find((p) => p.name === 'Chandra') || natalCalc.planets[1];
       const mars = natalCalc.planets.find((p) => p.name === 'Mangal');
-      // Manglik: Mars in 1, 4, 7, 8, 12 from Lagna or Moon
       const isManglik = mars ? [1, 4, 7, 8, 12].includes(mars.house) : false;
 
       setPerson1({
@@ -111,7 +110,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
     const nak1Idx = NAKSHATRAS.findIndex((n) => n.name === person1.nakshatra);
     const nak2Idx = NAKSHATRAS.findIndex((n) => n.name === person2.nakshatra);
 
-    // 1. Varna (1 Point): Brahmin (Water), Kshatriya (Fire), Vaishya (Earth), Shudra (Air)
+    // 1. Varna (1 Point)
     const getVarna = (rIdx: number) => {
       const el = VEDIC_RASIS[rIdx]?.element;
       if (el?.includes('Water')) return 4;
@@ -121,32 +120,32 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
     };
     const varnaPoints = getVarna(rasi1Idx) >= getVarna(rasi2Idx) ? 1 : 0;
 
-    // 2. Vashya (2 Points): Mutual attraction & devotion
+    // 2. Vashya (2 Points)
     const vashyaPoints = (rasi1Idx === rasi2Idx || Math.abs(rasi1Idx - rasi2Idx) === 4) ? 2 : 1;
 
-    // 3. Tara (3 Points): Destiny & Longevity
+    // 3. Tara (3 Points)
     const diffTara = ((nak2Idx - nak1Idx + 27) % 9) + 1;
     const taraPoints = [3, 5, 7].includes(diffTara) ? 1.5 : 3;
 
-    // 4. Yoni (4 Points): Biological & sexual harmony
+    // 4. Yoni (4 Points)
     const yoniPoints = 3;
 
-    // 5. Graha Maitri (5 Points): Moon sign lord friendship
+    // 5. Graha Maitri (5 Points)
     const lord1 = VEDIC_RASIS[rasi1Idx]?.lord;
     const lord2 = VEDIC_RASIS[rasi2Idx]?.lord;
     const maitriPoints = (lord1 === lord2) ? 5 : [1, 5, 9].includes(((rasi2Idx - rasi1Idx + 12) % 12) + 1) ? 4 : 3;
 
-    // 6. Gana (6 Points): Deva, Manushya, Rakshasa
+    // 6. Gana (6 Points)
     const gana1 = (nak1Idx % 3 === 0) ? 'Deva' : (nak1Idx % 3 === 1) ? 'Manushya' : 'Rakshasa';
     const gana2 = (nak2Idx % 3 === 0) ? 'Deva' : (nak2Idx % 3 === 1) ? 'Manushya' : 'Rakshasa';
     const ganaPoints = (gana1 === gana2) ? 6 : (gana1 === 'Rakshasa' && gana2 !== 'Rakshasa') ? 1 : 5;
 
-    // 7. Bhakoot (7 Points): 2/12, 6/8 (Shadashtak), or 9/5 (Navapancham)
+    // 7. Bhakoot (7 Points)
     const dist = ((rasi2Idx - rasi1Idx + 12) % 12) + 1;
     const isBhakootDosha = [2, 12, 6, 8].includes(dist);
     const bhakootPoints = isBhakootDosha ? 0 : 7;
 
-    // 8. Nadi (8 Points): Aadi, Madhya, Antya
+    // 8. Nadi (8 Points)
     const nadi1 = nak1Idx % 3;
     const nadi2 = nak2Idx % 3;
     const isNadiDosha = nadi1 === nadi2;
@@ -155,21 +154,61 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
     const total = varnaPoints + vashyaPoints + taraPoints + yoniPoints + maitriPoints + ganaPoints + bhakootPoints + nadiPoints;
 
     return {
-      total: Math.round(total),
+      total: Math.round(total * 10) / 10,
       max: 36,
       verdict: total >= 28 ? 'Uttama (Excellent Match)' : total >= 18 ? 'Madhyama (Auspicious & Acceptable)' : 'Adhama (Vulnerable — Remedies Advised)',
       isManglikMatch: person1.isManglik === person2.isManglik,
       isBhakootDosha,
       isNadiDosha,
       koots: [
-        { name: 'Varna (Work & Spiritual Compatibility)', points: varnaPoints, max: 1 },
-        { name: 'Vashya (Mutual Attraction & Harmony)', points: vashyaPoints, max: 2 },
-        { name: 'Tara (Destiny, Health & Longevity)', points: taraPoints, max: 3 },
-        { name: 'Yoni (Biological & Physical Harmony)', points: yoniPoints, max: 4 },
-        { name: 'Graha Maitri (Psychological Alignment & Friendship)', points: maitriPoints, max: 5 },
-        { name: 'Gana (Temperament & Behavioral Compatibility)', points: ganaPoints, max: 6 },
-        { name: 'Bhakoot (Emotional Joy & Family Prosperity)', points: bhakootPoints, max: 7 },
-        { name: 'Nadi (Genetic Health & Future Progeny)', points: nadiPoints, max: 8 },
+        {
+          name: 'Varna (Work & Spiritual Ego)',
+          points: varnaPoints,
+          max: 1,
+          description: 'Measures spiritual ego and compatibility of work ethic between partners.',
+        },
+        {
+          name: 'Vashya (Mutual Attraction & Control)',
+          points: vashyaPoints,
+          max: 2,
+          description: 'Evaluates mutual magnetism, emotional resonance, and influence.',
+        },
+        {
+          name: 'Tara (Destiny & Health Compatibility)',
+          points: taraPoints,
+          max: 3,
+          description: 'Calculates birth star resonance for health, well-being, and mutual destiny.',
+        },
+        {
+          name: 'Yoni (Physical & Biological Harmony)',
+          points: yoniPoints,
+          max: 4,
+          description: 'Reflects intimate harmony, temperament, and physical compatibility.',
+        },
+        {
+          name: 'Graha Maitri (Mental & Psychological Friendship)',
+          points: maitriPoints,
+          max: 5,
+          description: 'Assesses intellectual harmony and emotional understanding through Moon sign lords.',
+        },
+        {
+          name: 'Gana (Temperament & Behavioral Nature)',
+          points: ganaPoints,
+          max: 6,
+          description: 'Compares Deva (divine), Manushya (human), and Rakshasa (demonic) temperaments.',
+        },
+        {
+          name: 'Bhakoot (Emotional Love & Family Prosperity)',
+          points: bhakootPoints,
+          max: 7,
+          description: 'Evaluates long-term emotional bonding, family happiness, and financial prosperity.',
+        },
+        {
+          name: 'Nadi (Genetic Health & Progeny Vitality)',
+          points: nadiPoints,
+          max: 8,
+          description: 'The most critical Koot governing nervous energy, genetic health, and healthy progeny.',
+        },
       ],
     };
   };
@@ -177,35 +216,41 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
   const results = calculateGunas();
 
   return (
-    <div className="w-full space-y-2">
+    <div className="w-full space-y-3 bg-[#FAF6EE] p-3 sm:p-4 rounded-xl border border-amber-200/60 shadow-xs animate-in fade-in duration-150">
       {/* Intro Header */}
-      <div className="bg-amber-50/50 border border-amber-200/80 rounded-lg px-2.5 py-1.5 flex flex-col sm:flex-row items-center justify-between gap-2 shadow-3xs">
-        <div className="flex items-center space-x-1.5">
-          <HeartHandshake className="w-4 h-4 text-amber-700" />
-          <h1 className="text-[14px] font-black text-stone-800 uppercase tracking-wider font-vedic leading-tight">
-            Ashtakoot Milan &amp; Synastry Suite (36 Gunas)
-          </h1>
+      <div className="bg-gradient-to-r from-stone-900 via-amber-950 to-stone-900 rounded-lg p-3 text-amber-50 shadow-xs border border-amber-800/45 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="flex items-center space-x-2.5">
+          <div className="w-8 h-8 rounded-md bg-gradient-to-br from-amber-500 to-orange-700 text-stone-950 flex items-center justify-center font-bold text-[15px] shadow-2xs">
+            <HeartHandshake className="w-4 h-4 text-stone-950" />
+          </div>
+          <div>
+            <h1 className="text-[16px] sm:text-[18px] font-black text-amber-100 uppercase tracking-wider font-vedic leading-tight">
+              Comprehensive Ashtakoot Guna Milan &amp; Synastry Suite (36 Gunas)
+            </h1>
+            <p className="text-[12px] text-amber-200/80">
+              In-depth Vedic matching analysis covering all 8 Koots, Kuja Dosha (Manglik), Nadi, Bhakoot, and psychological alignment.
+            </p>
+          </div>
         </div>
 
-        <div className="text-[12px] font-black uppercase tracking-wider text-stone-600 shrink-0">
-          Threshold: <span className="text-amber-800">18 / 36 Minimum</span>
+        <div className="text-[12px] font-black uppercase tracking-wider text-amber-300 bg-black/40 border border-amber-600/40 rounded-md px-2.5 py-1 shrink-0">
+          Threshold: <span className="text-white">18 / 36 Minimum</span>
         </div>
       </div>
 
       {/* Input Columns for Both Partners */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
         {/* Partner 1 Card */}
-        <div className="bg-white rounded-lg border border-stone-200 p-2.5 shadow-3xs space-y-2">
-          <div className="flex items-center justify-between border-b border-stone-100 pb-1">
+        <div className="bg-white rounded-lg border border-stone-200 p-3 shadow-3xs space-y-2.5">
+          <div className="flex items-center justify-between border-b border-stone-100 pb-1.5">
             <h3 className="font-vedic font-bold text-[14px] text-stone-950 flex items-center space-x-1.5">
-              <Users className="w-3.5 h-3.5 text-amber-600" />
+              <Users className="w-4 h-4 text-amber-600" />
               <span>First Partner (Seeker)</span>
             </h3>
-            {/* Quick Profile Select */}
             <select
               value={partner1ProfileId}
               onChange={(e) => setPartner1ProfileId(e.target.value)}
-              className="text-[11px] font-bold text-amber-900 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 cursor-pointer"
+              className="text-[11px] font-bold text-amber-900 bg-amber-50 border border-amber-200 rounded px-2 py-1 cursor-pointer"
             >
               {profiles.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -216,26 +261,26 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold text-stone-800 uppercase tracking-wider mb-0.5">
+            <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
               Full Name
             </label>
             <input
               type="text"
               value={person1.name}
               onChange={(e) => setPerson1({ ...person1, name: e.target.value })}
-              className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2.5 py-1 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white"
+              className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2.5 py-1.5 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-[11px] font-semibold text-stone-800 uppercase tracking-wider mb-0.5">
+              <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
                 Moon Rasi
               </label>
               <select
                 value={person1.rasi}
                 onChange={(e) => setPerson1({ ...person1, rasi: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
+                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1.5 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
               >
                 {VEDIC_RASIS.map((r) => (
                   <option key={r.sanskritName} value={r.sanskritName}>
@@ -246,13 +291,13 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-stone-800 uppercase tracking-wider mb-0.5">
+              <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
                 Nakshatra
               </label>
               <select
                 value={person1.nakshatra}
                 onChange={(e) => setPerson1({ ...person1, nakshatra: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
+                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1.5 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
               >
                 {NAKSHATRAS.map((n) => (
                   <option key={n.name} value={n.name}>
@@ -264,11 +309,12 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
           </div>
 
           {/* Manglik Toggle */}
-          <div className="flex items-center justify-between pt-1 border-t border-stone-100 text-[12px]">
-            <span className="font-semibold text-stone-700">Manglik Dosha Status:</span>
+          <div className="flex items-center justify-between pt-1.5 border-t border-stone-100 text-[12px]">
+            <span className="font-semibold text-stone-700">Manglik (Kuja Dosha) Status:</span>
             <button
+              type="button"
               onClick={() => setPerson1({ ...person1, isManglik: !person1.isManglik })}
-              className={`px-2 py-0.5 rounded text-[11px] font-bold border transition-colors cursor-pointer ${
+              className={`px-2.5 py-1 rounded text-[11px] font-bold border transition-colors cursor-pointer ${
                 person1.isManglik
                   ? 'bg-rose-50 text-rose-800 border-rose-300'
                   : 'bg-emerald-50 text-emerald-800 border-emerald-300'
@@ -280,16 +326,16 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
         </div>
 
         {/* Partner 2 Card */}
-        <div className="bg-white rounded-lg border border-stone-200 p-2.5 shadow-3xs space-y-2">
-          <div className="flex items-center justify-between border-b border-stone-100 pb-1">
+        <div className="bg-white rounded-lg border border-stone-200 p-3 shadow-3xs space-y-2.5">
+          <div className="flex items-center justify-between border-b border-stone-100 pb-1.5">
             <h3 className="font-vedic font-bold text-[14px] text-stone-950 flex items-center space-x-1.5">
-              <Users className="w-3.5 h-3.5 text-amber-600" />
+              <Users className="w-4 h-4 text-amber-600" />
               <span>Second Partner</span>
             </h3>
             <select
               value={partner2ProfileId}
               onChange={(e) => setPartner2ProfileId(e.target.value)}
-              className="text-[11px] font-bold text-amber-900 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 cursor-pointer"
+              className="text-[11px] font-bold text-amber-900 bg-amber-50 border border-amber-200 rounded px-2 py-1 cursor-pointer"
             >
               <option value="custom">Custom Partner</option>
               {profiles
@@ -303,26 +349,26 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold text-stone-800 uppercase tracking-wider mb-0.5">
+            <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
               Full Name
             </label>
             <input
               type="text"
               value={person2.name}
               onChange={(e) => setPerson2({ ...person2, name: e.target.value })}
-              className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2.5 py-1 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white"
+              className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2.5 py-1.5 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-[11px] font-semibold text-stone-800 uppercase tracking-wider mb-0.5">
+              <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
                 Moon Rasi
               </label>
               <select
                 value={person2.rasi}
                 onChange={(e) => setPerson2({ ...person2, rasi: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
+                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1.5 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
               >
                 {VEDIC_RASIS.map((r) => (
                   <option key={r.sanskritName} value={r.sanskritName}>
@@ -333,13 +379,13 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-stone-800 uppercase tracking-wider mb-0.5">
+              <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
                 Nakshatra
               </label>
               <select
                 value={person2.nakshatra}
                 onChange={(e) => setPerson2({ ...person2, nakshatra: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
+                className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1.5 text-stone-950 text-[13px] focus:outline-none focus:border-amber-600 focus:bg-white cursor-pointer"
               >
                 {NAKSHATRAS.map((n) => (
                   <option key={n.name} value={n.name}>
@@ -351,11 +397,12 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
           </div>
 
           {/* Manglik Toggle */}
-          <div className="flex items-center justify-between pt-1 border-t border-stone-100 text-[12px]">
-            <span className="font-semibold text-stone-700">Manglik Dosha Status:</span>
+          <div className="flex items-center justify-between pt-1.5 border-t border-stone-100 text-[12px]">
+            <span className="font-semibold text-stone-700">Manglik (Kuja Dosha) Status:</span>
             <button
+              type="button"
               onClick={() => setPerson2({ ...person2, isManglik: !person2.isManglik })}
-              className={`px-2 py-0.5 rounded text-[11px] font-bold border transition-colors cursor-pointer ${
+              className={`px-2.5 py-1 rounded text-[11px] font-bold border transition-colors cursor-pointer ${
                 person2.isManglik
                   ? 'bg-rose-50 text-rose-800 border-rose-300'
                   : 'bg-emerald-50 text-emerald-800 border-emerald-300'
@@ -368,18 +415,18 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
       </div>
 
       {/* Results Score Box */}
-      <div className="bg-white rounded-lg border border-stone-200 p-2.5 shadow-3xs space-y-2">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-1.5 border-b border-stone-100 gap-2">
+      <div className="bg-white rounded-lg border border-stone-200 p-3.5 shadow-3xs space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2.5 border-b border-stone-200 gap-3">
           <div>
-            <span className="text-[11px] text-stone-600 font-semibold uppercase tracking-wider block">
-              Guna Milan Score:
+            <span className="text-[11px] text-stone-600 font-bold uppercase tracking-wider block">
+              Total Ashtakoot Guna Milan Score:
             </span>
-            <div className="flex flex-wrap items-baseline gap-2 mt-0.5">
-              <span className="text-[22px] font-vedic font-black text-amber-800">
+            <div className="flex flex-wrap items-baseline gap-2.5 mt-0.5">
+              <span className="text-[26px] font-vedic font-black text-amber-900">
                 {results.total} / {results.max} Gunas
               </span>
               <span
-                className={`text-[12px] font-bold px-2 py-0.5 rounded-full border ${
+                className={`text-[12.5px] font-bold px-2.5 py-0.5 rounded-full border ${
                   results.total >= 28
                     ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                     : results.total >= 18
@@ -393,61 +440,99 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
           </div>
 
           {/* Dosha & Synastry Quick Flags */}
-          <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap">
             <span
-              className={`px-2 py-0.5 rounded text-[11px] font-bold border ${
+              className={`px-2.5 py-1 rounded-md text-[11.5px] font-bold border ${
                 results.isManglikMatch
                   ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                   : 'bg-rose-50 text-rose-800 border-rose-300'
               }`}
             >
-              {results.isManglikMatch ? 'Manglik Balanced (Kuja Dosha Cancelled)' : 'Manglik Mismatch'}
+              {results.isManglikMatch ? '✓ Manglik Balanced (Kuja Dosha Cancelled)' : '⚠ Manglik Mismatch Detected'}
             </span>
             {results.isNadiDosha && (
-              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-50 text-rose-800 border border-rose-300">
-                Nadi Dosha Present
+              <span className="px-2.5 py-1 rounded-md text-[11.5px] font-bold bg-rose-50 text-rose-800 border border-rose-300">
+                ⚠ Nadi Dosha Present (0/8)
               </span>
             )}
             {results.isBhakootDosha && (
-              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-300">
-                Bhakoot Dosha Present
+              <span className="px-2.5 py-1 rounded-md text-[11.5px] font-bold bg-amber-50 text-amber-800 border border-amber-300">
+                ⚠ Bhakoot Dosha Present (0/7)
               </span>
             )}
           </div>
         </div>
 
-        {/* 8 Koot Detailed Breakdown */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-          {results.koots.map((koot) => (
-            <div
-              key={koot.name}
-              className={`p-2 rounded border space-y-0.5 transition-colors ${
-                koot.points === koot.max
-                  ? 'bg-emerald-50/40 border-emerald-200'
-                  : koot.points > 0
-                  ? 'bg-[#FAF8F5] border-stone-200'
-                  : 'bg-rose-50/40 border-rose-200'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold text-stone-950 truncate">{koot.name.split(' (')[0]}</span>
-                <span
-                  className={`text-[13px] font-black ${
-                    koot.points === koot.max
-                      ? 'text-emerald-800'
-                      : koot.points > 0
-                      ? 'text-amber-800'
-                      : 'text-rose-700'
-                  }`}
-                >
-                  {koot.points} / {koot.max}
-                </span>
+        {/* 8 Koot Detailed Breakdown Grid */}
+        <div className="space-y-1.5">
+          <h4 className="text-[12px] font-black text-stone-900 uppercase tracking-wider">
+            Detailed 8-Koot Score Breakdown &amp; Analysis
+          </h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+            {results.koots.map((koot) => (
+              <div
+                key={koot.name}
+                className={`p-2.5 rounded-lg border space-y-1 transition-colors ${
+                  koot.points === koot.max
+                    ? 'bg-emerald-50/50 border-emerald-200'
+                    : koot.points > 0
+                    ? 'bg-[#FAF8F5] border-stone-200'
+                    : 'bg-rose-50/50 border-rose-200'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[13px] font-bold text-stone-950 truncate">{koot.name}</span>
+                  <span
+                    className={`text-[13px] font-black px-1.5 py-0.5 rounded ${
+                      koot.points === koot.max
+                        ? 'bg-emerald-100 text-emerald-900'
+                        : koot.points > 0
+                        ? 'bg-amber-100 text-amber-900'
+                        : 'bg-rose-100 text-rose-900'
+                    }`}
+                  >
+                    {koot.points} / {koot.max}
+                  </span>
+                </div>
+                <p className="text-[11.5px] text-stone-600 leading-snug">
+                  {koot.description}
+                </p>
               </div>
-              <p className="text-[11px] text-stone-600 truncate leading-snug">
-                {koot.name.split(' (')[1]?.replace(')', '')}
+            ))}
+          </div>
+        </div>
+
+        {/* In-Depth Synastry & Dosha Parihar Section */}
+        <div className="bg-[#FAF8F5] rounded-lg p-3 border border-amber-200/80 space-y-2">
+          <h4 className="text-[12.5px] font-black text-stone-900 uppercase tracking-wider flex items-center space-x-1.5">
+            <BookOpen className="w-4 h-4 text-amber-700" />
+            <span>Astrological Synthesis &amp; Parihar (Remedial) Guidance</span>
+          </h4>
+          <div className="text-[12.5px] text-stone-700 space-y-1.5 leading-relaxed">
+            <p>
+              <strong className="text-stone-900">Compatibility Overview:</strong> Between <span className="font-bold text-amber-900">{person1.name}</span> ({person1.rasi} Rasi, {person1.nakshatra}) and <span className="font-bold text-amber-900">{person2.name}</span> ({person2.rasi} Rasi, {person2.nakshatra}), the total score of <span className="font-bold text-amber-900">{results.total} / 36</span> indicates {results.verdict}.
+            </p>
+            {results.isNadiDosha && (
+              <p className="text-rose-800 bg-rose-50 p-2 rounded border border-rose-200">
+                <strong>Nadi Dosha Warning:</strong> Both partners share the same Nadi category (Aadi/Madhya/Antya), which classical texts associate with progeny health and nervous constitution. Classical Parihar: Charity of gold/grains, Mahamrityunjaya Mantra chanting, or specific astrological cleansing rituals prior to marriage.
               </p>
-            </div>
-          ))}
+            )}
+            {results.isBhakootDosha && (
+              <p className="text-amber-900 bg-amber-50 p-2 rounded border border-amber-200">
+                <strong>Bhakoot Dosha Warning:</strong> The relative Moon sign placement forms a 2/12 or 6/8 axis, requiring conscious emotional adjustments and mutual accommodation in domestic matters. Worshipping Lord Shiva and Goddess Parvati mitigates Bhakoot friction.
+              </p>
+            )}
+            {!results.isManglikMatch && (
+              <p className="text-rose-800 bg-rose-50 p-2 rounded border border-rose-200">
+                <strong>Kuja Dosha Mismatch:</strong> One partner is Manglik while the other is Non-Manglik. Traditional reconciliation includes Kumbh Vivah (mock marriage to a sacred item) or performing Mangal Shanti pujas to balance Mars energy.
+              </p>
+            )}
+            {results.isManglikMatch && (
+              <p className="text-emerald-800 bg-emerald-50 p-2 rounded border border-emerald-200">
+                <strong>Manglik Harmony:</strong> Both partners share matching Manglik status, neutralizing any fiery marital friction regarding Mars energy.
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>
