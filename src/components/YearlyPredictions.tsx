@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine
 } from 'recharts';
 import {
   Calendar,
@@ -65,6 +65,7 @@ export function YearlyPredictions({
   natalPlanets = [],
 }: YearlyPredictionsProps) {
   const [activeSubView, setActiveSubView] = useState<'all' | 'lifepath' | 'pillars'>('all');
+  const [isScrollBounded, setIsScrollBounded] = useState(true);
   const [aiLifePath, setAiLifePath] = useState<AiYearlyLifePathResponse | null>(null);
   const [isLoadingAiLifePath, setIsLoadingAiLifePath] = useState(false);
   const [aiLifePathError, setAiLifePathError] = useState<string | null>(null);
@@ -90,23 +91,18 @@ export function YearlyPredictions({
 
   const [graphPeriod, setGraphPeriod] = useState<1 | 5 | 10>(5);
   const birthYear = birthDate ? parseInt(birthDate.slice(0, 4), 10) || new Date(birthDate).getFullYear() || 1990 : 1990;
-  const [activeAspects, setActiveAspects] = useState<string[]>([
-    'Overall',
-    'Health',
-    'Job',
-    'Wealth',
-    'Relations',
-    'Education',
-    'Mental',
-    'NameFame',
-    'Property',
-    'Children',
-  ]);
+  // Default to ONLY 'Overall' selected by default
+  const [activeAspects, setActiveAspects] = useState<string[]>(['Overall']);
   
   const toggleAspect = (aspect: string) => {
-    setActiveAspects(prev => 
-      prev.includes(aspect) ? prev.filter(a => a !== aspect) : [...prev, aspect]
-    );
+    setActiveAspects((prev) => {
+      if (prev.includes(aspect)) {
+        if (prev.length === 1) return prev; // Keep at least one aspect selected
+        return prev.filter((a) => a !== aspect);
+      } else {
+        return [...prev, aspect];
+      }
+    });
   };
   
   const aspectOptions = [
@@ -274,8 +270,31 @@ export function YearlyPredictions({
     };
   });
 
-  // Filter data points based on 1, 5, or 10 year interval starting from birth
-  const visibleChartData = chartData.filter((d) => d.age % graphPeriod === 0);
+  // Current Actual Month & Year for Reference Indicators
+  const now = new Date();
+  const currentActualYear = now.getFullYear();
+  const currentMonthName = now.toLocaleString('en-US', { month: 'short' });
+  const currentMonthYearLabel = `${currentMonthName} ${currentActualYear}`;
+
+  // Find data point for current actual year and score for primary active aspect
+  const currentYearDataPoint = chartData.find((d) => d.year === currentActualYear);
+  const primaryAspectKey = activeAspects[0] || 'Overall';
+  const currentYearScore = currentYearDataPoint
+    ? ((currentYearDataPoint as any)[primaryAspectKey] as number) || currentYearDataPoint.Overall || 3.8
+    : 3.8;
+
+  // Filter data points based on 1, 5, or 10 year interval, ensuring current year is always included
+  const visibleChartData = useMemo(() => {
+    const filtered = chartData.filter((d) => d.age % graphPeriod === 0);
+    const hasCurrent = filtered.some((d) => d.year === currentActualYear);
+    if (!hasCurrent) {
+      const currentPoint = chartData.find((d) => d.year === currentActualYear);
+      if (currentPoint) {
+        return [...filtered, currentPoint].sort((a, b) => a.year - b.year);
+      }
+    }
+    return filtered;
+  }, [chartData, graphPeriod, currentActualYear]);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -416,6 +435,18 @@ export function YearlyPredictions({
                 </div>
               );
             })}
+            <button
+              type="button"
+              onClick={() => setIsScrollBounded(!isScrollBounded)}
+              className={`rounded-md px-2 py-0.5 text-[11px] font-vedic font-bold transition-all cursor-pointer border ${
+                isScrollBounded
+                  ? 'bg-amber-100/90 text-amber-950 border-amber-300 shadow-2xs'
+                  : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'
+              }`}
+              title={isScrollBounded ? 'Scrollable container active (reduces page length). Click to expand.' : 'Page expanded. Click to enable compact scroll view.'}
+            >
+              {isScrollBounded ? 'Scroll: 600px' : 'Expanded'}
+            </button>
           </div>
 
           {/* Year Selection Deck of Cards */}
@@ -440,8 +471,8 @@ export function YearlyPredictions({
         </div>
       </div>
 
-      {/* Main Yearly Dossier Content */}
-      <div className="p-2.5 space-y-2.5">
+      {/* Main Yearly Dossier Content (Scrollable Container to reduce page length) */}
+      <div className={`p-2.5 space-y-2.5 ${isScrollBounded ? 'max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-amber-300 hover:scrollbar-thumb-amber-400 scrollbar-track-stone-100' : ''}`}>
         {/* Year Headline, Muntha Vitals & Rating */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 pb-2 border-b border-stone-100">
           <div className="space-y-0.5">
@@ -499,31 +530,47 @@ export function YearlyPredictions({
                   </button>
                 );
               })}
+              {activeAspects.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => setActiveAspects(['Overall'])}
+                  className="text-[10px] font-semibold text-amber-800 hover:text-amber-950 underline px-1 py-0.5 cursor-pointer ml-1"
+                >
+                  Reset to Overall
+                </button>
+              )}
             </div>
 
-            {/* Period Frequency Selector (1, 5, 10 Years) */}
-            <div className="flex items-center space-x-1">
-              <span className="text-[11px] font-bold text-stone-600 mr-0.5">Interval:</span>
-              {[1, 5, 10].map((period) => (
-                <button
-                  key={period}
-                  type="button"
-                  onClick={() => setGraphPeriod(period as 1 | 5 | 10)}
-                  className={`text-[11px] font-bold px-2 py-0.5 rounded transition-all cursor-pointer border ${
-                    graphPeriod === period
-                      ? 'bg-amber-100 border-amber-400 text-amber-950 font-black shadow-2xs'
-                      : 'bg-white border-stone-200 text-stone-600 hover:bg-[#FAF8F5]'
-                  }`}
-                >
-                  {period} {period === 1 ? 'Year' : 'Years'}
-                </button>
-              ))}
+            {/* Current Month/Year Indicator & Period Frequency Selector */}
+            <div className="flex items-center space-x-2">
+              <div className="hidden sm:flex items-center space-x-1.5 text-[10px] font-bold text-amber-900 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
+                <span>Now: {currentMonthYearLabel}</span>
+              </div>
+
+              <div className="flex items-center space-x-1">
+                <span className="text-[11px] font-bold text-stone-600 mr-0.5">Interval:</span>
+                {[1, 5, 10].map((period) => (
+                  <button
+                    key={period}
+                    type="button"
+                    onClick={() => setGraphPeriod(period as 1 | 5 | 10)}
+                    className={`text-[11px] font-bold px-2 py-0.5 rounded transition-all cursor-pointer border ${
+                      graphPeriod === period
+                        ? 'bg-amber-100 border-amber-400 text-amber-950 font-black shadow-2xs'
+                        : 'bg-white border-stone-200 text-stone-600 hover:bg-[#FAF8F5]'
+                    }`}
+                  >
+                    {period} {period === 1 ? 'Year' : 'Years'}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
           <div className="flex-1 w-full min-h-[200px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={visibleChartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+              <LineChart data={visibleChartData} margin={{ top: 12, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F5F5F4" />
                 <XAxis 
                   dataKey="year" 
@@ -538,6 +585,37 @@ export function YearlyPredictions({
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '2px' }} iconSize={8} />
+
+                {/* VERTICAL REFERENCE LINE AT CURRENT MONTH / YEAR */}
+                <ReferenceLine
+                  x={currentActualYear}
+                  stroke="#D97706"
+                  strokeWidth={2}
+                  strokeDasharray="4 4"
+                  label={{
+                    value: `CURRENT: ${currentMonthYearLabel}`,
+                    fill: '#92400E',
+                    fontSize: 9.5,
+                    fontWeight: 'bold',
+                    position: 'top',
+                  }}
+                />
+
+                {/* HORIZONTAL REFERENCE LINE AT CURRENT SCORE LEVEL */}
+                <ReferenceLine
+                  y={currentYearScore}
+                  stroke="#D97706"
+                  strokeWidth={1.5}
+                  strokeDasharray="4 4"
+                  label={{
+                    value: `Current Level (${currentYearScore.toFixed(1)}/5)`,
+                    fill: '#92400E',
+                    fontSize: 9,
+                    fontWeight: 'bold',
+                    position: 'right',
+                  }}
+                />
+
                 {aspectOptions.map((aspect) => (
                   activeAspects.includes(aspect.key) && (
                     <Line 
@@ -1133,32 +1211,49 @@ export function YearlyPredictions({
                 {currentYearPred.year} Quarterly Progression Roadmap
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1.5">
-                {currentYearPred.quarterlyBreakdown.map((q) => (
-                  <div
-                    key={q.quarter}
-                    className="bg-white rounded border border-stone-200/90 p-2 space-y-0.5"
-                  >
-                    <div className="flex items-center justify-between gap-1">
-                      <span className="font-vedic font-bold text-stone-950 text-[13px]">
-                        {q.quarter}
-                      </span>
-                      <span
-                        className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
-                          q.tone === 'Peak Auspicious'
-                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                            : q.tone === 'Progressive'
-                            ? 'bg-amber-50 text-amber-900 border-amber-200'
-                            : q.tone === 'Caution & Discipline'
-                            ? 'bg-rose-50 text-rose-800 border-rose-200'
-                            : 'bg-stone-50 text-stone-700 border-stone-200'
-                        }`}
-                      >
-                        {q.tone}
-                      </span>
+                {currentYearPred.quarterlyBreakdown.map((q) => {
+                  const currentQuarterNum = Math.floor(now.getMonth() / 3) + 1;
+                  const isCurrentQuarter =
+                    currentYearPred.year === currentActualYear &&
+                    q.quarter.startsWith(`Q${currentQuarterNum}`);
+                  return (
+                    <div
+                      key={q.quarter}
+                      className={`bg-white rounded border p-2 space-y-0.5 ${
+                        isCurrentQuarter
+                          ? 'border-amber-400 ring-1 ring-amber-300 shadow-2xs bg-amber-50/30'
+                          : 'border-stone-200/90'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-1">
+                        <div className="flex items-center space-x-1.5">
+                          <span className="font-vedic font-bold text-stone-950 text-[13px]">
+                            {q.quarter}
+                          </span>
+                          {isCurrentQuarter && (
+                            <span className="text-[9.5px] font-bold px-1.5 py-0.2 rounded bg-amber-200/80 text-amber-950 border border-amber-300">
+                              Now ({currentMonthYearLabel})
+                            </span>
+                          )}
+                        </div>
+                        <span
+                          className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
+                            q.tone === 'Peak Auspicious'
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              : q.tone === 'Progressive'
+                              ? 'bg-amber-50 text-amber-900 border-amber-200'
+                              : q.tone === 'Caution & Discipline'
+                              ? 'bg-rose-50 text-rose-800 border-rose-200'
+                              : 'bg-stone-50 text-stone-700 border-stone-200'
+                          }`}
+                        >
+                          {q.tone}
+                        </span>
+                      </div>
+                      <p className="text-[12px] text-stone-700 leading-snug">{q.summary}</p>
                     </div>
-                    <p className="text-[12px] text-stone-700 leading-snug">{q.summary}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </>

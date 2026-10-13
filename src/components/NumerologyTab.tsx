@@ -76,9 +76,9 @@ export function NumerologyTab({ activeProfile }: NumerologyTabProps) {
 
   return (
     <div className="space-y-6 p-4 bg-[#FAF6EE] rounded-xl border border-amber-200 shadow-sm">
-      <h2 className="text-2xl font-bold text-stone-900 flex items-center space-x-3">
-        <Calculator className="w-8 h-8 text-amber-700" />
-        <span>Numerology Analysis: {activeProfile.name}</span>
+      <h2 className="text-xl sm:text-2xl font-vedic font-bold text-stone-900 flex items-center space-x-2.5">
+        <Calculator className="w-7 h-7 text-amber-700" />
+        <span>Vedic Numerology Analysis & Vibrational Blueprint</span>
       </h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

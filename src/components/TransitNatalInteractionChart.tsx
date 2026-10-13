@@ -20,8 +20,13 @@ export const TransitNatalInteractionChart: React.FC<InteractionChartProps> = ({ 
     const height = 300;
     const margin = { top: 30, right: 30, bottom: 30, left: 40 };
 
+    interface InteractionPoint {
+      natalPlanet: string;
+      count: number;
+    }
+
     // Simple interaction logic: count transiting planets in the same sign as natal planets
-    const interactionData = natalPlanets.map((np) => {
+    const interactionData: InteractionPoint[] = natalPlanets.map((np) => {
       const transitingInSign = transitPlanets.filter((tp) => tp.rasiNumber === np.rasiNumber && tp.name !== 'Lagna');
       return {
         natalPlanet: np.name,
@@ -34,19 +39,20 @@ export const TransitNatalInteractionChart: React.FC<InteractionChartProps> = ({ 
       .range([margin.left, width - margin.right])
       .padding(0.1);
 
+    const maxCount = d3.max(interactionData, (d: InteractionPoint) => d.count) ?? 1;
     const y = d3.scaleLinear()
-      .domain([0, (d3.max(interactionData, d => d.count) || 1) + 1])
+      .domain([0, Number(maxCount) + 1])
       .range([height - margin.bottom, margin.top]);
 
     svg.append('g')
-      .selectAll('rect')
+      .selectAll<SVGRectElement, InteractionPoint>('rect')
       .data(interactionData)
       .enter()
       .append('rect')
-      .attr('x', d => x(d.natalPlanet)!)
-      .attr('y', d => y(d.count))
+      .attr('x', (d: InteractionPoint) => x(d.natalPlanet)!)
+      .attr('y', (d: InteractionPoint) => y(d.count))
       .attr('width', x.bandwidth())
-      .attr('height', d => height - margin.bottom - y(d.count))
+      .attr('height', (d: InteractionPoint) => height - margin.bottom - y(d.count))
       .attr('fill', '#d97706'); // amber-600
 
     svg.append('g')

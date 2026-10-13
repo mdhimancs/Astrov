@@ -4,7 +4,8 @@ import {
   Briefcase,
   Globe,
   TrendingUp,
-  DollarSign,
+  IndianRupee,
+  Coins,
   Compass,
   Users,
   Award,
@@ -15,6 +16,8 @@ import {
   Calculator,
   PieChart,
   ArrowRight,
+  ArrowRightLeft,
+  Navigation,
   CheckCircle2,
   Calendar,
   Layers,
@@ -42,35 +45,34 @@ export function PersonalizedGuidanceSection({
     'education' | 'occupation' | 'foreign_stay' | 'career_transition' | 'wealth_calculator' | 'vastu_partners'
   >('education');
 
-  // Interactive Wealth Calculator State
-  const [baseAnnualSavings, setBaseAnnualSavings] = useState<number>(25000); // In USD or equivalent units
-  const [wealthCurrency, setWealthCurrency] = useState<'INR' | 'USD'>('USD');
+  // Selected Career Pillar sub-tab
+  const [selectedCareerPillar, setSelectedCareerPillar] = useState<
+    'jobChange' | 'transfer' | 'promotion' | 'favourFromSeniors'
+  >('jobChange');
+
+  // Interactive Wealth Calculator State (strictly INR)
+  const [baseAnnualSavingsINR, setBaseAnnualSavingsINR] = useState<number>(500000); // In INR (₹5 Lakhs/year default)
 
   const guidance = useMemo(() => {
     return computePersonalizedLifeGuidance(natalPlanets, natalHouses, lagnaRasi);
   }, [natalPlanets, natalHouses, lagnaRasi]);
 
-  // Projected wealth calculation
+  // Projected wealth calculation (strictly in INR)
   const calculatedProjectedNetWorth = useMemo(() => {
     const mult = guidance.maxWealth.dhanaYogaMultiplier;
     // Compounding over a 20-year prime career window with Dhana multiplier
-    const rawVal = baseAnnualSavings * 20 * mult * 1.6;
+    const rawVal = baseAnnualSavingsINR * 20 * mult * 1.6;
     return Math.round(rawVal);
-  }, [baseAnnualSavings, guidance.maxWealth.dhanaYogaMultiplier]);
+  }, [baseAnnualSavingsINR, guidance.maxWealth.dhanaYogaMultiplier]);
 
-  const currencySymbol = wealthCurrency === 'INR' ? '₹' : '$';
   const formatCurrency = (val: number) => {
-    if (wealthCurrency === 'INR') {
-      const inrVal = val * 83;
-      if (inrVal >= 10000000) {
-        return `₹${(inrVal / 10000000).toFixed(2)} Crores`;
-      }
-      return `₹${(inrVal / 100000).toFixed(2)} Lakhs`;
+    if (val >= 10000000) {
+      return `₹${(val / 10000000).toFixed(2)} Crores`;
     }
-    if (val >= 1000000) {
-      return `$${(val / 1000000).toFixed(2)} Million`;
+    if (val >= 100000) {
+      return `₹${(val / 100000).toFixed(2)} Lakhs`;
     }
-    return `$${val.toLocaleString()}`;
+    return `₹${val.toLocaleString('en-IN')}`;
   };
 
   return (
@@ -87,7 +89,7 @@ export function PersonalizedGuidanceSection({
             </h3>
           </div>
           <p className="text-[12px] text-stone-600 leading-snug">
-            Vedic life roadmap tailored to your natal lagna, karmic houses (2nd, 4th, 5th, 9th, 10th, 11th, 12th) and planetary strengths for {userName}.
+            Vedic life roadmap tailored to your natal lagna, karmic houses (2nd, 4th, 5th, 9th, 10th, 11th, 12th) and planetary strengths.
           </p>
         </div>
 
@@ -104,7 +106,7 @@ export function PersonalizedGuidanceSection({
           { id: 'education', label: 'Choice of Education', icon: GraduationCap },
           { id: 'occupation', label: 'Choice of Occupation', icon: Briefcase },
           { id: 'foreign_stay', label: 'Foreign vs Motherland', icon: Globe },
-          { id: 'career_transition', label: 'Promotion / Transfer', icon: TrendingUp },
+          { id: 'career_transition', label: 'Job Change & Promotion', icon: TrendingUp },
           { id: 'wealth_calculator', label: 'Max Wealth Calculator', icon: Calculator },
           { id: 'vastu_partners', label: 'Vastu & Co-Founders', icon: Users },
         ].map((tab) => {
@@ -369,67 +371,222 @@ export function PersonalizedGuidanceSection({
       )}
 
       {/* ======================================================== */}
-      {/* TAB 4: PROMOTION / TRANSFER / JOB CHANGE */}
+      {/* TAB 4: PROMOTION / TRANSFER / JOB CHANGE / SENIOR FAVOUR */}
       {/* ======================================================== */}
       {activeGuidanceTab === 'career_transition' && (
-        <div className="space-y-3 bg-white p-3.5 rounded-lg border border-amber-200/80 shadow-3xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-2">
+        <div className="space-y-3.5 bg-white p-3.5 rounded-lg border border-amber-200/80 shadow-3xs">
+          {/* Header & Overall Summary */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-2.5">
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 font-vedic">
-                Career Transition Radar (Next 24 Months)
+                Vedic Career Transition &amp; Auspicious Timing Radar
               </span>
-              <h4 className="font-vedic font-bold text-stone-950 text-[15px]">
-                Promotion Probability: {guidance.careerTransition.nextPromotionProbability}%
+              <h4 className="font-vedic font-bold text-stone-950 text-[16px]">
+                Job Change, Transfer, Promotion &amp; Senior Patronage
               </h4>
             </div>
             <div className="flex items-center space-x-1.5 text-[11px] font-bold">
               <span className="bg-emerald-100 text-emerald-950 px-2 py-0.5 rounded border border-emerald-300">
                 Salary Uplift: {guidance.careerTransition.expectedSalaryHikeMultiplier}
               </span>
-              <span className="bg-amber-100 text-amber-950 px-2 py-0.5 rounded border border-amber-300">
-                Transfer Likelihood: {guidance.careerTransition.transferLikelihood}%
-              </span>
             </div>
           </div>
 
-          {/* Transition Windows Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-            {guidance.careerTransition.transitionWindows.map((win, idx) => (
-              <div
-                key={idx}
-                className="bg-[#FAF8F5] p-2.5 rounded-md border border-stone-200/90 space-y-1.5"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-[10.5px] font-bold text-amber-900 uppercase tracking-wide">
-                    {win.window}
-                  </span>
-                  <span className="text-[10px] font-black bg-emerald-100 text-emerald-900 px-1.5 py-0.2 rounded">
-                    {win.favorabilityScore}% Favored
-                  </span>
+          {/* 4 Pillars Probability Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {[
+              {
+                id: 'jobChange' as const,
+                title: 'Job Change / New Job',
+                sanskrit: 'कर्म परिवर्तन',
+                score: guidance.careerTransition.jobChangeProbability,
+                icon: ArrowRightLeft,
+                color: 'text-indigo-800',
+                border: 'border-indigo-200',
+                bg: 'bg-indigo-50/60',
+              },
+              {
+                id: 'transfer' as const,
+                title: 'Transfer / Relocation',
+                sanskrit: 'स्थान परिवर्तन',
+                score: guidance.careerTransition.transferLikelihood,
+                icon: Navigation,
+                color: 'text-amber-800',
+                border: 'border-amber-200',
+                bg: 'bg-amber-50/60',
+              },
+              {
+                id: 'promotion' as const,
+                title: 'Promotion & Elevation',
+                sanskrit: 'पदोन्नति योग',
+                score: guidance.careerTransition.nextPromotionProbability,
+                icon: TrendingUp,
+                color: 'text-emerald-800',
+                border: 'border-emerald-200',
+                bg: 'bg-emerald-50/60',
+              },
+              {
+                id: 'favourFromSeniors' as const,
+                title: 'Favour from Seniors',
+                sanskrit: 'अधिकारी कृपा',
+                score: guidance.careerTransition.favourFromSeniorsScore,
+                icon: Users,
+                color: 'text-blue-800',
+                border: 'border-blue-200',
+                bg: 'bg-blue-50/60',
+              },
+            ].map((pillar) => {
+              const Icon = pillar.icon;
+              const isSelected = selectedCareerPillar === pillar.id;
+              return (
+                <button
+                  key={pillar.id}
+                  type="button"
+                  onClick={() => setSelectedCareerPillar(pillar.id)}
+                  className={`p-2.5 rounded-lg border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between space-y-1 ${
+                    isSelected
+                      ? 'bg-amber-900 text-white border-amber-950 shadow-xs'
+                      : `${pillar.bg} ${pillar.border} hover:border-amber-400`
+                  }`}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="text-[10px] font-bold opacity-80 uppercase tracking-wide truncate">
+                      {pillar.sanskrit}
+                    </span>
+                    <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-200' : pillar.color}`} />
+                  </div>
+                  <div>
+                    <h5 className={`font-bold text-[12px] truncate ${isSelected ? 'text-white' : 'text-stone-900'}`}>
+                      {pillar.title}
+                    </h5>
+                    <div className="flex items-center space-x-1 mt-0.5">
+                      <span className={`text-[15px] font-black font-vedic ${isSelected ? 'text-amber-300' : pillar.color}`}>
+                        {pillar.score}%
+                      </span>
+                      <span className={`text-[9.5px] ${isSelected ? 'text-amber-200/80' : 'text-stone-500'}`}>
+                        Favorability
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active Pillar Deep Dive Card */}
+          {guidance.careerTransition.pillars && (
+            <div className="bg-[#FAF8F5] p-3 rounded-lg border border-stone-200/90 space-y-2.5">
+              {(() => {
+                const current = guidance.careerTransition.pillars[selectedCareerPillar];
+                return (
+                  <>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-stone-200/70 pb-2">
+                      <div>
+                        <div className="flex items-center space-x-1.5">
+                          <span className="text-[10px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200">
+                            {current.sanskritTitle}
+                          </span>
+                          <span className="text-[11px] font-semibold text-stone-500">
+                            Houses: {current.governingHouses.map((h) => `${h}th`).join(', ')}
+                          </span>
+                        </div>
+                        <h5 className="font-bold text-stone-950 text-[14px] mt-0.5">
+                          {current.title} Analysis &amp; Astrological Potential
+                        </h5>
+                      </div>
+                      <div className="flex items-center space-x-1.5 text-[11px]">
+                        <span className="font-bold text-stone-700">Key Karakas:</span>
+                        <div className="flex gap-1">
+                          {current.keyPlanets.map((p) => (
+                            <span key={p} className="bg-white border border-stone-200 px-1.5 py-0.2 rounded font-medium text-stone-800 text-[10px]">
+                              {p}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="text-[12px] text-stone-700 leading-snug">
+                      {current.verdict}
+                    </p>
+
+                    {/* Detected Yogas & Timing Window */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11.5px]">
+                      <div className="bg-white p-2 rounded border border-stone-200/80 space-y-1">
+                        <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide block">
+                          Classical Yogas Identified:
+                        </span>
+                        <ul className="space-y-0.5 text-stone-800">
+                          {current.yogasDetected.map((y, idx) => (
+                            <li key={idx} className="flex items-center space-x-1.5">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                              <span>{y}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-2 rounded border border-stone-200/80 space-y-1">
+                        <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide block">
+                          Optimal Timing &amp; Ingress:
+                        </span>
+                        <p className="text-stone-700 leading-snug">
+                          {current.timingWindow}
+                        </p>
+                        <div className="pt-0.5 text-[10.5px] text-amber-900 font-medium">
+                          <strong>Vedic Counsel:</strong> {current.strategicAdvice}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          )}
+
+          {/* Transition Windows Chronological Radar */}
+          <div className="space-y-1.5">
+            <span className="text-[11px] font-bold text-stone-900 block">
+              24-Month Astrological Transition Timeline:
+            </span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+              {guidance.careerTransition.transitionWindows.map((win, idx) => (
+                <div
+                  key={idx}
+                  className="bg-[#FAF8F5] p-2.5 rounded-md border border-stone-200/90 space-y-1"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide">
+                      {win.window}
+                    </span>
+                    <span className="text-[10px] font-black bg-emerald-100 text-emerald-900 px-1.5 py-0.2 rounded">
+                      {win.favorabilityScore}% Favored
+                    </span>
+                  </div>
+                  <h5 className="font-bold text-stone-950 text-[11.5px]">{win.type}</h5>
+                  <p className="text-[10.5px] text-stone-600 leading-snug">
+                    {win.astrologicalTrigger}
+                  </p>
                 </div>
-                <h5 className="font-bold text-stone-950 text-[12px]">{win.type}</h5>
-                <p className="text-[11px] text-stone-600 leading-snug">
-                  {win.astrologicalTrigger}
-                </p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           <div className="bg-amber-50/70 p-2.5 rounded border border-amber-200 text-[11.5px] text-stone-800">
-            <strong className="text-amber-950">Strategic Advice:</strong> {guidance.careerTransition.jobSwitchTiming}. Initiate critical interviews when Surya or Budha transit through Kendra houses.
+            <strong className="text-amber-950">Strategic Counsel:</strong> {guidance.careerTransition.jobSwitchTiming}. Schedule major negotiations and resignation notices on Shukla Paksha Wednesdays or Thursdays.
           </div>
         </div>
       )}
 
       {/* ======================================================== */}
-      {/* TAB 5: MAX WEALTH CALCULATOR (INTERACTIVE ENGINE) */}
+      {/* TAB 5: MAX WEALTH CALCULATOR (INTERACTIVE ENGINE - INR) */}
       {/* ======================================================== */}
       {activeGuidanceTab === 'wealth_calculator' && (
         <div className="space-y-3.5 bg-white p-3.5 rounded-lg border border-amber-300 shadow-3xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-200/80 pb-2.5">
             <div>
               <div className="flex items-center space-x-1.5">
-                <DollarSign className="w-4 h-4 text-amber-800" />
+                <Coins className="w-4 h-4 text-amber-800" />
                 <span className="text-[11px] font-black uppercase tracking-wider text-amber-900 font-vedic">
                   Vedic Max Wealth Potential &amp; Lifetime Compounding Calculator
                 </span>
@@ -439,26 +596,10 @@ export function PersonalizedGuidanceSection({
               </h4>
             </div>
 
-            {/* Currency Toggle */}
-            <div className="flex rounded border border-stone-200 bg-stone-50 p-0.5 text-[11px] font-bold">
-              <button
-                type="button"
-                onClick={() => setWealthCurrency('USD')}
-                className={`px-2 py-0.5 rounded cursor-pointer ${
-                  wealthCurrency === 'USD' ? 'bg-amber-800 text-white' : 'text-stone-600'
-                }`}
-              >
-                USD ($)
-              </button>
-              <button
-                type="button"
-                onClick={() => setWealthCurrency('INR')}
-                className={`px-2 py-0.5 rounded cursor-pointer ${
-                  wealthCurrency === 'INR' ? 'bg-amber-800 text-white' : 'text-stone-600'
-                }`}
-              >
-                INR (₹ Crores)
-              </button>
+            {/* INR Only Indicator */}
+            <div className="flex items-center space-x-1.5 text-[11px] font-bold text-amber-950 bg-amber-100/80 border border-amber-300 px-2.5 py-1 rounded">
+              <IndianRupee className="w-3.5 h-3.5 text-amber-800" />
+              <span>Indian Rupees (₹ Lakhs &amp; Crores)</span>
             </div>
           </div>
 
@@ -503,24 +644,20 @@ export function PersonalizedGuidanceSection({
             <div className="flex items-center justify-between text-[12px] font-bold text-amber-950">
               <span className="flex items-center space-x-1">
                 <Calculator className="w-3.5 h-3.5 text-amber-800" />
-                <span>Simulate Annual Savings / Surplus Capital:</span>
+                <span>Simulate Annual Savings / Surplus Capital (INR):</span>
               </span>
               <span className="font-vedic font-black text-[15px] text-amber-900">
-                {currencySymbol}
-                {wealthCurrency === 'INR'
-                  ? (baseAnnualSavings * 83).toLocaleString()
-                  : baseAnnualSavings.toLocaleString()}{' '}
-                / year
+                ₹{(baseAnnualSavingsINR / 100000).toFixed(2)} Lakhs (₹{baseAnnualSavingsINR.toLocaleString('en-IN')}) / year
               </span>
             </div>
 
             <input
               type="range"
-              min={5000}
-              max={250000}
-              step={5000}
-              value={baseAnnualSavings}
-              onChange={(e) => setBaseAnnualSavings(Number(e.target.value))}
+              min={100000}
+              max={5000000}
+              step={50000}
+              value={baseAnnualSavingsINR}
+              onChange={(e) => setBaseAnnualSavingsINR(Number(e.target.value))}
               className="w-full accent-amber-800 cursor-pointer"
             />
 

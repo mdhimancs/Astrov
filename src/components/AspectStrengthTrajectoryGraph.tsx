@@ -143,6 +143,8 @@ export function AspectStrengthTrajectoryGraph({
   const [activeModuleSection, setActiveModuleSection] = useState<'all' | 'trajectory' | 'probabilities' | 'guidance'>('all');
   // 21-Month Rolling Window: 10 Months Previous, Current Month (Index 10), 10 Months Forthcoming
   const [activeMonthIndex, setActiveMonthIndex] = useState<number>(10); // default to current month (index 10: offset 0)
+  // Scope mode: 'from_selected' (adjusts graph to show rest of months from selected month) or 'all' (all 21 months)
+  const [graphScopeMode, setGraphScopeMode] = useState<'from_selected' | 'all'>('from_selected');
 
   // 1. Calculate Base Natal Strength (0-100) for each aspect based on natal kundali
   const natalStrengths = useMemo(() => {
@@ -297,6 +299,16 @@ export function AspectStrengthTrajectoryGraph({
   // Active month object for detailed inspection
   const activeMonthData = monthsData[activeMonthIndex] || monthsData[10] || monthsData[0];
 
+  // Adjust graph to show rest of the months according to the selected month
+  const chartVisibleMonths = useMemo(() => {
+    if (graphScopeMode === 'all') {
+      return monthsData;
+    }
+    // "clicking a month should adjust the graph to show rest of the months according to that month"
+    const startIdx = Math.min(activeMonthIndex, Math.max(0, monthsData.length - 2));
+    return monthsData.slice(startIdx);
+  }, [monthsData, activeMonthIndex, graphScopeMode]);
+
   // Radar Data for the selected month
   const radarData = useMemo(() => {
     return ASPECT_METAS.map((m) => ({
@@ -445,7 +457,10 @@ export function AspectStrengthTrajectoryGraph({
               <button
                 key={m.month}
                 type="button"
-                onClick={() => setActiveMonthIndex(i)}
+                onClick={() => {
+                  setActiveMonthIndex(i);
+                  setGraphScopeMode('from_selected');
+                }}
                 className={`py-1 px-1 rounded-md text-center transition-all cursor-pointer border flex flex-col items-center justify-center ${
                   isSelected
                     ? 'bg-amber-700 text-white border-amber-800 font-black shadow-2xs scale-102 ring-2 ring-amber-400/80'
@@ -455,7 +470,7 @@ export function AspectStrengthTrajectoryGraph({
                     ? 'bg-white text-stone-600 border-stone-200 hover:bg-stone-100'
                     : 'bg-emerald-50/80 text-emerald-950 border-emerald-200 hover:bg-emerald-100/90'
                 }`}
-                title={`${m.fullMonthName} (${m.periodTag}) — Click to inspect planetary drivers`}
+                title={`${m.fullMonthName} (${m.periodTag}) — Click to adjust graph from this month onward`}
               >
                 <span className="text-[10px] sm:text-[11px] leading-tight font-bold">
                   {m.month.split(' ')[0]}
@@ -469,7 +484,7 @@ export function AspectStrengthTrajectoryGraph({
         </div>
       </div>
 
-      {/* Aspect Selector Buttons Deck + Active Month Badge */}
+      {/* Aspect Selector Buttons Deck + Active Month Badge & Graph Scope Controls */}
       <div className="flex flex-wrap items-center justify-between gap-1.5">
         <div className="flex flex-wrap items-center gap-1">
           <button
@@ -509,19 +524,49 @@ export function AspectStrengthTrajectoryGraph({
           })}
         </div>
 
-        {/* Current Active Timeline Badge */}
-        <span className={`text-[11.5px] font-bold px-2.5 py-1 rounded-md border shrink-0 flex items-center space-x-1.5 ${
-          activeMonthData.isCurrent
-            ? 'bg-amber-100 text-amber-950 border-amber-300 shadow-3xs'
-            : activeMonthData.isPrevious
-            ? 'bg-stone-100 text-stone-800 border-stone-300'
-            : 'bg-emerald-50 text-emerald-950 border-emerald-300'
-        }`}>
-          <Calendar className="w-3.5 h-3.5 text-amber-800" />
-          <span>
-            Viewing: <strong className="text-stone-950">{activeMonthData.fullMonthName}</strong> ({activeMonthData.periodTag})
+        {/* Current Active Timeline Badge & Graph Scope Switcher */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          <div className="flex items-center space-x-1 bg-stone-100/90 border border-stone-200 p-0.5 rounded-md text-[10.5px]">
+            <span className="text-stone-500 font-bold px-1 hidden sm:inline">Scope:</span>
+            <button
+              type="button"
+              onClick={() => setGraphScopeMode('from_selected')}
+              className={`px-2 py-0.5 rounded cursor-pointer font-bold transition-all ${
+                graphScopeMode === 'from_selected'
+                  ? 'bg-amber-800 text-white shadow-3xs'
+                  : 'text-stone-600 hover:text-stone-950'
+              }`}
+              title="Show from selected month onward"
+            >
+              From {activeMonthData.month.split(' ')[0]} ({chartVisibleMonths.length} Mo.)
+            </button>
+            <button
+              type="button"
+              onClick={() => setGraphScopeMode('all')}
+              className={`px-2 py-0.5 rounded cursor-pointer font-bold transition-all ${
+                graphScopeMode === 'all'
+                  ? 'bg-amber-800 text-white shadow-3xs'
+                  : 'text-stone-600 hover:text-stone-950'
+              }`}
+              title="Show all 21 months"
+            >
+              All 21 Mo.
+            </button>
+          </div>
+
+          <span className={`text-[11px] font-bold px-2 py-1 rounded-md border shrink-0 flex items-center space-x-1.5 ${
+            activeMonthData.isCurrent
+              ? 'bg-amber-100 text-amber-950 border-amber-300 shadow-3xs'
+              : activeMonthData.isPrevious
+              ? 'bg-stone-100 text-stone-800 border-stone-300'
+              : 'bg-emerald-50 text-emerald-950 border-emerald-300'
+          }`}>
+            <Calendar className="w-3.5 h-3.5 text-amber-800" />
+            <span>
+              Selected: <strong className="text-stone-950">{activeMonthData.fullMonthName}</strong> ({activeMonthData.periodTag})
+            </span>
           </span>
-        </span>
+        </div>
       </div>
 
       {/* Graph Display Area */}
@@ -530,10 +575,17 @@ export function AspectStrengthTrajectoryGraph({
           <div className="h-68 sm:h-76 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
-                data={monthsData}
+                data={chartVisibleMonths}
                 onClick={(e: any) => {
                   if (e && e.activeTooltipIndex !== undefined) {
-                    setActiveMonthIndex(e.activeTooltipIndex);
+                    const selectedItem = chartVisibleMonths[e.activeTooltipIndex];
+                    if (selectedItem) {
+                      const fullIdx = monthsData.findIndex((m) => m.month === selectedItem.month);
+                      if (fullIdx !== -1) {
+                        setActiveMonthIndex(fullIdx);
+                        setGraphScopeMode('from_selected');
+                      }
+                    }
                   }
                 }}
               >
@@ -561,20 +613,38 @@ export function AspectStrengthTrajectoryGraph({
                   tick={{ fontSize: 10, fill: '#57534E', fontWeight: 600 }}
                   tickFormatter={(v) => `${v}%`}
                 />
-                {/* VERTICAL REFERENCE LINE AT CURRENT MONTH (TODAY) */}
-                <ReferenceLine
-                  x={monthsData[10]?.month}
-                  stroke="#D97706"
-                  strokeDasharray="4 4"
-                  strokeWidth={2}
-                  label={{
-                    value: 'TODAY (NOW)',
-                    fill: '#92400E',
-                    fontSize: 9.5,
-                    fontWeight: 'bold',
-                    position: 'top',
-                  }}
-                />
+                {/* VERTICAL REFERENCE LINE AT CURRENT MONTH (TODAY) IF PRESENT */}
+                {chartVisibleMonths.some((m) => m.isCurrent) && (
+                  <ReferenceLine
+                    x={monthsData[10]?.month}
+                    stroke="#D97706"
+                    strokeDasharray="4 4"
+                    strokeWidth={2}
+                    label={{
+                      value: 'TODAY (NOW)',
+                      fill: '#92400E',
+                      fontSize: 9.5,
+                      fontWeight: 'bold',
+                      position: 'top',
+                    }}
+                  />
+                )}
+                {/* START OF ADJUSTED WINDOW REFERENCE LINE */}
+                {graphScopeMode === 'from_selected' && activeMonthIndex > 0 && chartVisibleMonths.length > 0 && (
+                  <ReferenceLine
+                    x={chartVisibleMonths[0]?.month}
+                    stroke="#B45309"
+                    strokeDasharray="3 3"
+                    strokeWidth={1.5}
+                    label={{
+                      value: `START: ${chartVisibleMonths[0]?.month}`,
+                      fill: '#B45309',
+                      fontSize: 9,
+                      fontWeight: 'bold',
+                      position: 'insideTopLeft',
+                    }}
+                  />
+                )}
                 <Tooltip
                   content={({ active, payload, label }: any) => {
                     if (active && payload && payload.length) {

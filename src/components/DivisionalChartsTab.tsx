@@ -248,8 +248,8 @@ export function DivisionalChartsTab({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-2">
-        {/* CHART SECTION (LEFT) */}
-        <div className="lg:col-span-7 space-y-2">
+        {/* CHART SECTION (LEFT / FULL ON WHEEL) */}
+        <div className={`${chartLayout === 'wheel' ? 'lg:col-span-12' : 'lg:col-span-7'} space-y-2 transition-all`}>
           <div className="bg-[#FAF9F6] rounded-lg border border-amber-200/60 p-2 shadow-3xs overflow-hidden relative">
             <div className="flex items-center justify-between mb-1.5 px-1">
               <div>
@@ -437,7 +437,7 @@ export function DivisionalChartsTab({
         </div>
 
         {/* RIGHT COLUMN: ASHTAKAVARGA + AI MASTER SYNTHESIS */}
-        <div className="lg:col-span-5 space-y-2">
+        <div className={`${chartLayout === 'wheel' ? 'lg:col-span-12' : 'lg:col-span-5'} space-y-2`}>
           {/* ASHTAKAVARGA TABLE */}
           <div className="bg-white rounded-lg border border-stone-200 p-2.5 shadow-3xs space-y-2">
             <div className="flex items-center justify-between border-b border-stone-100 pb-1">

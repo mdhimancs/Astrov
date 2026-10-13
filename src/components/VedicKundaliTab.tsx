@@ -431,8 +431,8 @@ export function VedicKundaliTab() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 items-start">
-        {/* Left Column: North Indian Chart Visualizer */}
-        <div className="lg:col-span-7 space-y-2">
+        {/* Left Column: Chart Visualizer / 360 Wheel */}
+        <div className={`${chartViewMode === 'wheel' ? 'lg:col-span-12' : 'lg:col-span-7'} space-y-2 transition-all`}>
           <div className="bg-white p-1.5 rounded-lg border border-stone-200 flex items-center justify-between shadow-3xs">
             <div className="flex items-center space-x-1.5">
               <button
@@ -491,7 +491,6 @@ export function VedicKundaliTab() {
                 livePlanets={transitPlanets}
                 natalPlanets={natalPlanets}
                 lagnaRasi={natalLagnaRasi}
-                seekerName={name}
                 locationName={selectedCity.name}
               />
             </div>
@@ -519,7 +518,7 @@ export function VedicKundaliTab() {
           )}
         </div>
 
-        <div className="lg:col-span-5 space-y-2">
+        <div className={`${chartViewMode === 'wheel' ? 'lg:col-span-12' : 'lg:col-span-5'} space-y-2`}>
           {selectedHouse && (
             <div className="bg-white rounded-lg border border-stone-200 p-2.5 shadow-3xs space-y-1.5">
               <div className="flex items-center justify-between border-b border-stone-100 pb-1">

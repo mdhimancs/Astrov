@@ -472,7 +472,7 @@ export function BirthTimePredictionsTab({
             </div>
 
             {/* Right Column: Core Natal Vitals, Chart Focus & Key Yogas Formed at Birth */}
-            <div className="lg:col-span-7 space-y-2">
+            <div className={`${birthChartLayout === 'wheel' ? 'lg:col-span-12' : 'lg:col-span-7'} space-y-2`}>
               {/* Core Natal Vitals Bar (Ascendant, Moon Sign, Nakshatra, Current Dasha) */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                 {[

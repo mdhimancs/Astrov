@@ -24,10 +24,10 @@ export function BhriguLalKitabSection({
           <ScrollText className="w-4 h-4 text-amber-700" />
           <h3 className="font-vedic font-bold text-stone-950 text-[15px] tracking-tight">
             {activeView === 'bhrigu'
-              ? `Maharishi Bhrigu Samhita Interpretation — ${seekerName}`
+              ? `Maharishi Bhrigu Samhita Interpretation`
               : activeView === 'lalkitab'
-              ? `Lal Kitab (Red Book) Interpretation & Upay — ${seekerName}`
-              : `Bhrigu Samhita & Lal Kitab Interpretation — ${seekerName}`}
+              ? `Lal Kitab (Red Book) Interpretation & Upay`
+              : `Bhrigu Samhita & Lal Kitab Interpretation`}
           </h3>
         </div>
 

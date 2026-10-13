@@ -90,10 +90,7 @@ export function LifeEventsMattersTab({
             </h1>
 
             <p className="text-[13px] text-amber-200/80 max-w-2xl leading-relaxed">
-              Algorithmic calculations of probabilities, karmic turning points, and timing windows for{' '}
-              <span className="text-amber-100 font-bold underline decoration-amber-400/50 underline-offset-2">
-                {seekerName}
-              </span>{' '}
+              Algorithmic calculations of probabilities, karmic turning points, and timing windows
               (Lagna: {ascendantSign}, Born: {activeProfile?.birthDate || 'N/A'}).
             </p>
           </div>

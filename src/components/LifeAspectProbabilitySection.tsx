@@ -17,6 +17,10 @@ import {
   AlertTriangle,
   Flame,
   Award,
+  TrendingUp,
+  ArrowRightLeft,
+  Users,
+  Navigation,
 } from 'lucide-react';
 import { PlanetPosition, HouseInfo } from '../types';
 import {
@@ -47,10 +51,23 @@ export function LifeAspectProbabilitySection({
   const filteredItems = useMemo(() => {
     if (selectedCategory === 'all') return aspectItems;
     if (selectedCategory === 'business_career') {
-      return aspectItems.filter((i) => ['business', 'governance_private_job', 'sudden_windfall', 'name_and_fame'].includes(i.id));
+      return aspectItems.filter((i) =>
+        [
+          'business',
+          'job_change_new_job',
+          'career_transfer',
+          'job_promotion',
+          'favour_from_seniors',
+          'governance_private_job',
+          'sudden_windfall',
+          'name_and_fame',
+        ].includes(i.id)
+      );
     }
     if (selectedCategory === 'home_property') {
-      return aspectItems.filter((i) => ['home', 'luxury_vehicles'].includes(i.id));
+      return aspectItems.filter((i) =>
+        ['home', 'property_purchase', 'property_sale', 'luxury_vehicles'].includes(i.id)
+      );
     }
     if (selectedCategory === 'relationships') {
       return aspectItems.filter((i) => ['extra_marital_affairs', 'marriage_time'].includes(i.id));
@@ -71,6 +88,18 @@ export function LifeAspectProbabilitySection({
     switch (id) {
       case 'business':
         return Briefcase;
+      case 'job_change_new_job':
+        return ArrowRightLeft;
+      case 'career_transfer':
+        return Navigation;
+      case 'job_promotion':
+        return TrendingUp;
+      case 'favour_from_seniors':
+        return Users;
+      case 'property_purchase':
+        return Home;
+      case 'property_sale':
+        return Building2;
       case 'home':
         return Home;
       case 'extra_marital_affairs':
@@ -128,7 +157,7 @@ export function LifeAspectProbabilitySection({
             </h3>
           </div>
           <p className="text-[12px] text-stone-600 leading-snug">
-            Parashari &amp; Jaimini probability algorithms computed from natal kundali bhavas, karakas, and yogas for {userName}.
+            Parashari &amp; Jaimini probability algorithms computed from natal kundali bhavas, karakas, and yogas.
           </p>
         </div>
 

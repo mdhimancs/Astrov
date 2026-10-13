@@ -25,18 +25,18 @@ function toHindiDigits(num: number | string): string {
 
 // 12 Hindu Lunar Months (Vikrami Samvat Chaitradi System)
 const HINDU_MASAS = [
-  { num: 1, hindi: 'चैत्र', english: 'Chaitra', gregMonths: 'Mar – Apr', rituHindi: 'वसंत ऋतु', rituEng: 'Vasanta (Spring)' },
-  { num: 2, hindi: 'वैशाख', english: 'Vaishakha', gregMonths: 'Apr – May', rituHindi: 'वसंत ऋतु', rituEng: 'Vasanta (Spring)' },
-  { num: 3, hindi: 'ज्येष्ठ', english: 'Jyeshtha', gregMonths: 'May – Jun', rituHindi: 'ग्रीष्म ऋतु', rituEng: 'Grishma (Summer)' },
-  { num: 4, hindi: 'आषाढ़', english: 'Ashadha', gregMonths: 'Jun – Jul', rituHindi: 'ग्रीष्म ऋतु', rituEng: 'Grishma (Summer)' },
-  { num: 5, hindi: 'श्रावण', english: 'Shravana', gregMonths: 'Jul – Aug', rituHindi: 'वर्षा ऋतु', rituEng: 'Varsha (Monsoon)' },
-  { num: 6, hindi: 'भाद्रपद', english: 'Bhadrapada', gregMonths: 'Aug – Sep', rituHindi: 'वर्षा ऋतु', rituEng: 'Varsha (Monsoon)' },
-  { num: 7, hindi: 'आश्विन', english: 'Ashwin', gregMonths: 'Sep – Oct', rituHindi: 'शरद ऋतु', rituEng: 'Sharad (Autumn)' },
-  { num: 8, hindi: 'कार्तिक', english: 'Kartika', gregMonths: 'Oct – Nov', rituHindi: 'शरद ऋतु', rituEng: 'Sharad (Autumn)' },
-  { num: 9, hindi: 'मार्गशीर्ष', english: 'Margashirsha (Agrahayana)', gregMonths: 'Nov – Dec', rituHindi: 'हेमंत ऋतु', rituEng: 'Hemanta (Pre-Winter)' },
-  { num: 10, hindi: 'पौष', english: 'Pausha', gregMonths: 'Dec – Jan', rituHindi: 'हेमंत ऋतु', rituEng: 'Hemanta (Pre-Winter)' },
-  { num: 11, hindi: 'माघ', english: 'Magha', gregMonths: 'Jan – Feb', rituHindi: 'शिशिर ऋतु', rituEng: 'Shishira (Winter)' },
-  { num: 12, hindi: 'फाल्गुन', english: 'Phalguna', gregMonths: 'Feb – Mar', rituHindi: 'शिशिर ऋतु', rituEng: 'Shishira (Winter)' },
+  { num: 1, hindi: 'चैत्र', english: 'Chaitra', gregMonths: 'March – April', rituHindi: 'वसंत ऋतु', rituEng: 'Vasanta (Spring)' },
+  { num: 2, hindi: 'वैशाख', english: 'Vaishakha', gregMonths: 'April – May', rituHindi: 'वसंत ऋतु', rituEng: 'Vasanta (Spring)' },
+  { num: 3, hindi: 'ज्येष्ठ', english: 'Jyeshtha', gregMonths: 'May – June', rituHindi: 'ग्रीष्म ऋतु', rituEng: 'Grishma (Summer)' },
+  { num: 4, hindi: 'आषाढ़', english: 'Ashadha', gregMonths: 'June – July', rituHindi: 'ग्रीष्म ऋतु', rituEng: 'Grishma (Summer)' },
+  { num: 5, hindi: 'श्रावण', english: 'Shravana', gregMonths: 'July – August', rituHindi: 'वर्षा ऋतु', rituEng: 'Varsha (Monsoon)' },
+  { num: 6, hindi: 'भाद्रपद', english: 'Bhadrapada', gregMonths: 'August – September', rituHindi: 'वर्षा ऋतु', rituEng: 'Varsha (Monsoon)' },
+  { num: 7, hindi: 'आश्विन', english: 'Ashwin', gregMonths: 'September – October', rituHindi: 'शरद ऋतु', rituEng: 'Sharad (Autumn)' },
+  { num: 8, hindi: 'कार्तिक', english: 'Kartika', gregMonths: 'October – November', rituHindi: 'शरद ऋतु', rituEng: 'Sharad (Autumn)' },
+  { num: 9, hindi: 'मार्गशीर्ष', english: 'Margashirsha (Agrahayana)', gregMonths: 'November – December', rituHindi: 'हेमंत ऋतु', rituEng: 'Hemanta (Pre-Winter)' },
+  { num: 10, hindi: 'पौष', english: 'Pausha', gregMonths: 'December – January', rituHindi: 'हेमंत ऋतु', rituEng: 'Hemanta (Pre-Winter)' },
+  { num: 11, hindi: 'माघ', english: 'Magha', gregMonths: 'January – February', rituHindi: 'शिशिर ऋतु', rituEng: 'Shishira (Winter)' },
+  { num: 12, hindi: 'फाल्गुन', english: 'Phalguna', gregMonths: 'February – March', rituHindi: 'शिशिर ऋतु', rituEng: 'Shishira (Winter)' },
 ];
 
 const TITHI_NAMES = [
@@ -457,10 +457,10 @@ export function PanchangTab({
       <div className="bg-white rounded-lg border border-stone-200 p-2.5 shadow-3xs space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-1.5">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="px-2 py-0.5 rounded bg-amber-700 text-white font-vedic font-bold text-[13px]">
+            <span className="px-2.5 py-0.5 rounded bg-amber-700 text-white font-vedic font-bold text-[13px] shadow-2xs">
               {activeDayCell.date.toLocaleDateString('en-US', {
-                weekday: 'short',
-                month: 'short',
+                weekday: 'long',
+                month: 'long',
                 day: 'numeric',
                 year: 'numeric',
               })}
@@ -551,17 +551,17 @@ export function PanchangTab({
 
       {/* MAIN CONTENT AREA: FESTIVALS (LEFT) & CALENDAR (RIGHT) SIDE-BY-SIDE */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 items-start">
-        {/* LEFT SIDE: IMPORTANT DATES, VRATS & HINDU FESTIVALS DIRECTORY */}
-        <div className="lg:col-span-4 bg-white rounded-lg border border-stone-200 p-2.5 shadow-3xs space-y-2 flex flex-col h-full max-h-[600px] lg:max-h-[700px]">
-          <div className="flex flex-col gap-2 border-b border-stone-200 pb-1.5">
+        {/* LEFT SIDE: IMPORTANT DATES, VRATS & HINDU FESTIVALS DIRECTORY (HORIZONTALLY COMPACT) */}
+        <div className="lg:col-span-3 bg-white rounded-lg border border-stone-200 p-2 shadow-3xs space-y-2 flex flex-col h-full max-h-[620px] lg:max-h-[720px]">
+          <div className="flex flex-col gap-1.5 border-b border-stone-200 pb-1.5">
             <div className="flex items-center space-x-1.5">
-              <Award className="w-4 h-4 text-amber-700" />
-              <h3 className="font-vedic font-bold text-stone-950 text-[14px] leading-tight">
-                प्रमुख हिन्दू पर्व, व्रत एवं तिथियाँ (Festivals)
+              <Award className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+              <h3 className="font-vedic font-bold text-stone-950 text-[13px] leading-tight truncate">
+                महत्वपूर्ण तिथियाँ एवं पर्व
               </h3>
             </div>
 
-            <div className="flex flex-wrap items-center gap-1">
+            <div className="grid grid-cols-4 gap-1 text-center">
               {[
                 { id: 'month', label: 'Month' },
                 { id: 'all', label: 'Year' },
@@ -570,29 +570,29 @@ export function PanchangTab({
               ].map((tab) => {
                 const isActive = festivalFilter === tab.id;
                 return (
-                  <div
+                  <button
                     key={tab.id}
+                    type="button"
                     onClick={() => setFestivalFilter(tab.id as any)}
-                    className={`rounded-md px-1.5 py-0.5 text-[11px] font-vedic font-bold transition-all cursor-pointer border ${
+                    className={`rounded px-1 py-0.5 text-[10.5px] font-vedic font-bold transition-all cursor-pointer border ${
                       isActive
-                        ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 text-amber-950 shadow-2xs'
+                        ? 'bg-amber-100/90 border-amber-400 ring-1 ring-amber-300 text-amber-950 shadow-2xs'
                         : 'bg-white border-stone-200/80 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'
                     }`}
                   >
                     {tab.label}
-                  </div>
+                  </button>
                 );
               })}
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto pr-0.5 scrollbar-thin space-y-2">
+          <div className="flex-1 overflow-y-auto pr-0.5 scrollbar-thin space-y-1.5">
             {displayedFestivals.length > 0 ? (
               displayedFestivals.map((fest, idx) => {
                 const festDate = new Date(currentYear, fest.month - 1, fest.day);
-                const dateStr = festDate.toLocaleDateString('en-US', {
-                  weekday: 'short',
-                  month: 'short',
+                const fullMonthDateStr = festDate.toLocaleDateString('en-US', {
+                  month: 'long',
                   day: 'numeric',
                 });
 
@@ -603,51 +603,51 @@ export function PanchangTab({
                       setCurrentMonth(fest.month - 1);
                       setSelectedDay(fest.day);
                     }}
-                    className="bg-[#FAF8F5] hover:bg-amber-50/40 rounded-md border border-stone-200/90 hover:border-amber-300 p-2 transition-all cursor-pointer space-y-1"
+                    className="bg-[#FAF8F5] hover:bg-amber-50/50 rounded-md border border-stone-200/90 hover:border-amber-300 p-1.5 transition-all cursor-pointer space-y-1"
                   >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <h4 className="font-vedic font-bold text-stone-950 text-[13px] leading-snug truncate">
+                    <div className="flex items-start justify-between gap-1.5">
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-vedic font-bold text-stone-950 text-[12px] leading-snug truncate">
                           {fest.hindiName}
                         </h4>
-                        <span className="text-[11px] font-semibold text-amber-900 block truncate">
+                        <span className="text-[10px] font-semibold text-amber-900 block truncate">
                           {fest.englishName || fest.english}
                         </span>
                       </div>
-                      <span className="px-1.5 py-0.2 rounded bg-amber-100/90 text-amber-950 border border-amber-300 font-bold text-[10px] shrink-0">
-                        {dateStr}
+                      <span className="px-1.5 py-0.5 rounded bg-amber-100/90 text-amber-950 border border-amber-300 font-bold text-[9.5px] shrink-0 whitespace-nowrap">
+                        {fullMonthDateStr}
                       </span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-1 text-[10px]">
-                      <span className="px-1 py-0.2 rounded bg-white border border-stone-200 text-stone-800 font-semibold">
+                    <div className="flex flex-wrap items-center gap-1 text-[9.5px]">
+                      <span className="px-1 py-0.2 rounded bg-white border border-stone-200 text-stone-800 font-semibold truncate max-w-[125px]">
                         {fest.vikramMasa}
                       </span>
-                      <span className="px-1 py-0.2 rounded bg-purple-50 border border-purple-200 text-purple-900 font-semibold">
+                      <span className="px-1 py-0.2 rounded bg-purple-50 border border-purple-200 text-purple-900 font-semibold truncate max-w-[125px]">
                         {fest.tithiLabel}
                       </span>
                     </div>
 
-                    <p className="text-[11px] text-stone-600 leading-tight line-clamp-2">
+                    <p className="text-[10.5px] text-stone-600 leading-tight line-clamp-2">
                       {fest.significance}
                     </p>
                   </div>
                 );
               })
             ) : (
-              <div className="py-8 text-center text-stone-400 text-[12px] italic">
+              <div className="py-8 text-center text-stone-400 text-[11px] italic">
                 No festivals found for this filter.
               </div>
             )}
           </div>
         </div>
 
-        {/* RIGHT SIDE: INTERACTIVE MONTHLY HINDI PANCHANG CALENDAR GRID */}
-        <div className="lg:col-span-8 bg-white rounded-lg border border-stone-200 shadow-3xs overflow-hidden">
+        {/* RIGHT SIDE: INTERACTIVE MONTHLY HINDI PANCHANG CALENDAR GRID (EXPANDED WIDTH) */}
+        <div className="lg:col-span-9 bg-white rounded-lg border border-stone-200 shadow-3xs overflow-hidden">
           {/* Calendar Month Navigation Bar */}
           <div className="px-3 py-2 bg-gradient-to-r from-[#FAF8F5] via-white to-[#FAF8F5] border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="font-vedic font-black text-stone-950 text-[16px]">
                   {monthGregorianName}
                 </span>
@@ -719,8 +719,8 @@ export function PanchangTab({
                   idx === 0 ? 'text-rose-800' : 'text-stone-800'
                 }`}
               >
-                <div>{v.shortHindi}</div>
-                <div className="text-[9px] font-semibold text-stone-500">{v.english.slice(0, 3)}</div>
+                <div>{v.hindi}</div>
+                <div className="text-[9.5px] font-semibold text-stone-500">{v.english}</div>
               </div>
             ))}
           </div>
@@ -729,7 +729,7 @@ export function PanchangTab({
           <div className="grid grid-cols-7 divide-x divide-y divide-stone-200/80 border-b border-stone-200">
             {/* Empty leading slots before 1st of month */}
             {Array.from({ length: firstDayWeekday }).map((_, idx) => (
-              <div key={`empty-${idx}`} className="min-h-[70px] bg-stone-50/40 p-1" />
+              <div key={`empty-${idx}`} className="min-h-[82px] bg-stone-50/40 p-1.5" />
             ))}
 
             {/* Actual Days of Month */}
@@ -743,9 +743,9 @@ export function PanchangTab({
                 <div
                   key={cell.dayOfMonth}
                   onClick={() => setSelectedDay(cell.dayOfMonth)}
-                  className={`min-h-[78px] p-1 transition-all cursor-pointer flex flex-col justify-between ${
+                  className={`min-h-[84px] p-1.5 transition-all cursor-pointer flex flex-col justify-between ${
                     isSelected
-                      ? 'bg-amber-50/90 ring-2 ring-inset ring-amber-500'
+                      ? 'bg-amber-50/95 ring-2 ring-inset ring-amber-500'
                       : cell.festival
                       ? 'bg-rose-50/30 hover:bg-amber-50/40'
                       : isPurnima
@@ -754,54 +754,54 @@ export function PanchangTab({
                   }`}
                 >
                   {/* Top Row: Hindi & English Date Numbers + Moon Phase Badge */}
-                  <div className="flex items-start justify-between gap-0.5">
+                  <div className="flex items-start justify-between gap-1">
                     <div className="flex items-baseline space-x-1">
                       <span
-                        className={`text-[13px] font-black leading-none ${
+                        className={`text-[14px] font-black leading-none ${
                           cell.date.getDay() === 0 ? 'text-rose-700' : 'text-stone-950'
                         }`}
                       >
                         {cell.dayOfMonth}
                       </span>
-                      <span className="text-[11px] font-bold text-amber-800 leading-none">
+                      <span className="text-[11.5px] font-bold text-amber-800 leading-none">
                         ({cell.hindiDayDigits})
                       </span>
                     </div>
 
                     {isPurnima && (
-                      <span className="text-[8px] px-1 rounded bg-amber-100 text-amber-900 font-bold border border-amber-300">
+                      <span className="text-[8.5px] px-1 py-0.2 rounded bg-amber-100 text-amber-900 font-bold border border-amber-300">
                         पूर्णिमा
                       </span>
                     )}
                     {isAmavasya && (
-                      <span className="text-[8px] px-1 rounded bg-stone-200 text-stone-900 font-bold border border-stone-300">
+                      <span className="text-[8.5px] px-1 py-0.2 rounded bg-stone-200 text-stone-900 font-bold border border-stone-300">
                         अमावस्या
                       </span>
                     )}
                     {isEkadashi && (
-                      <span className="text-[8px] px-1 rounded bg-purple-100 text-purple-900 font-bold border border-purple-200">
+                      <span className="text-[8.5px] px-1 py-0.2 rounded bg-purple-100 text-purple-900 font-bold border border-purple-200">
                         एकादशी
                       </span>
                     )}
                   </div>
 
                   {/* Middle Row: Hindi Tithi & Nakshatra */}
-                  <div className="my-0.5 space-y-0.5">
-                    <div className="text-[10px] font-semibold text-stone-800 leading-tight truncate">
-                      {cell.pakshaEng === 'Shukla Paksha' ? 'शु०' : 'कृ०'} {cell.tithiHindi}
+                  <div className="my-1 space-y-0.5">
+                    <div className="text-[10.5px] font-semibold text-stone-800 leading-tight truncate">
+                      {cell.pakshaEng === 'Shukla Paksha' ? 'शुक्ल' : 'कृष्ण'} {cell.tithiHindi}
                     </div>
-                    <div className="text-[9px] text-stone-500 leading-tight truncate">
+                    <div className="text-[9.5px] text-stone-500 leading-tight truncate">
                       नक्षत्र: {cell.nakshatra.hindi}
                     </div>
                   </div>
 
                   {/* Bottom Row: Festival or Vrat Highlight */}
                   {cell.festival ? (
-                    <div className="text-[9px] font-bold text-rose-800 bg-rose-100/80 border border-rose-200 rounded px-1 py-0.5 leading-tight truncate">
+                    <div className="text-[9.5px] font-bold text-rose-800 bg-rose-100/90 border border-rose-200 rounded px-1 py-0.5 leading-tight truncate" title={cell.festival.hindiName}>
                       ★ {cell.festival.hindiName}
                     </div>
                   ) : cell.specialVratBadge ? (
-                    <div className="text-[9px] font-semibold text-amber-900 bg-amber-50 border border-amber-200/70 rounded px-1 py-0.5 leading-tight truncate">
+                    <div className="text-[9.5px] font-semibold text-amber-900 bg-amber-50 border border-amber-200/70 rounded px-1 py-0.5 leading-tight truncate">
                       {cell.specialVratBadge}
                     </div>
                   ) : null}

@@ -30,7 +30,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
   const [partner2ProfileId, setPartner2ProfileId] = useState<string>('custom');
 
   const [person1, setPerson1] = useState({
-    name: currentProfile?.name || 'Aarav Patel',
+    name: 'First Partner (Seeker)',
     rasi: 'Mesha',
     nakshatra: 'Ashwini',
     isManglik: false,
@@ -38,7 +38,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
   });
 
   const [person2, setPerson2] = useState({
-    name: 'Priya Sharma',
+    name: 'Second Partner',
     rasi: 'Simha',
     nakshatra: 'Magha',
     isManglik: false,
@@ -64,7 +64,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
       const isManglik = mars ? [1, 4, 7, 8, 12].includes(mars.house) : false;
 
       setPerson1({
-        name: prof.name,
+        name: prof.label || 'First Partner (Seeker)',
         rasi: natalMoon.rasiName || 'Mesha',
         nakshatra: natalMoon.nakshatra || 'Ashwini',
         isManglik,
@@ -93,7 +93,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
         const isManglik = mars ? [1, 4, 7, 8, 12].includes(mars.house) : false;
 
         setPerson2({
-          name: prof.name,
+          name: prof.label || 'Second Partner',
           rasi: natalMoon.rasiName || 'Simha',
           nakshatra: natalMoon.nakshatra || 'Magha',
           isManglik,
@@ -250,11 +250,11 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
             <select
               value={partner1ProfileId}
               onChange={(e) => setPartner1ProfileId(e.target.value)}
-              className="text-[10px] font-bold text-amber-900 bg-amber-50 border border-amber-200 rounded px-1 py-0 cursor-pointer"
+              className="text-[10px] font-bold text-amber-900 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 cursor-pointer"
             >
               {profiles.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name}
+                  {p.label || `Profile ${p.id.replace('profile-', '')}`}
                 </option>
               ))}
             </select>
@@ -262,7 +262,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
 
           <div>
             <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
-              Full Name
+              Partner Label
             </label>
             <input
               type="text"
@@ -335,14 +335,14 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
             <select
               value={partner2ProfileId}
               onChange={(e) => setPartner2ProfileId(e.target.value)}
-              className="text-[10px] font-bold text-amber-900 bg-amber-50 border border-amber-200 rounded px-1 py-0 cursor-pointer"
+              className="text-[10px] font-bold text-amber-900 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 cursor-pointer"
             >
               <option value="custom">Custom Partner</option>
               {profiles
                 .filter((p) => p.id !== partner1ProfileId)
                 .map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.name}
+                    {p.label || `Profile ${p.id.replace('profile-', '')}`}
                   </option>
                 ))}
             </select>
@@ -350,7 +350,7 @@ export function KundaliMatchingTab({ activeProfileId, profiles }: KundaliMatchin
 
           <div>
             <label className="block text-[11px] font-semibold text-stone-700 uppercase tracking-wider mb-0.5">
-              Full Name
+              Partner Label
             </label>
             <input
               type="text"

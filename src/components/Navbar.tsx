@@ -119,7 +119,7 @@ export function Navbar({
     setFormBirthDate('1995-01-01');
     setFormBirthTime('12:00');
     setFormGender('Male');
-    setFormLabel('Profile');
+    setFormLabel('');
     setFormNotes('');
     setFormPlace({
       name: 'New Delhi, India',
@@ -141,7 +141,8 @@ export function Navbar({
     setFormBirthDate(target.birthDate || '1990-01-01');
     setFormBirthTime(target.birthTime || '12:00');
     setFormGender((target.gender as any) || 'Male');
-    setFormLabel(target.label || 'Profile');
+    const cleanLabel = (target.label || '').replace(/^Profile\s*1\s*\(.*?\)$/i, '');
+    setFormLabel(cleanLabel);
     setFormNotes(target.notes || '');
     setFormPlace({
       name: target.place || 'New Delhi, India',
@@ -216,8 +217,9 @@ export function Navbar({
 
   const tabs = [
     { id: 'birth-predictions', label: 'Birth Charts', icon: Compass },
+    { id: 'celestial-wheel', label: '360° Wheel', icon: Globe },
     { id: 'divisional-charts', label: 'Divisional', icon: Brain },
-    { id: 'astronomical-ephemeris', label: 'Ephemeris & Nakshatras', icon: Globe },
+    { id: 'astronomical-ephemeris', label: 'Ephemeris & Nakshatras', icon: Orbit },
     { id: 'astrology-systems', label: 'Systems & Cosmology', icon: BookOpen },
     { id: 'panchang', label: 'Panchang', icon: Clock },
     { id: 'monthly-predictions', label: 'Monthly & Yearly', icon: Calendar },
@@ -285,7 +287,7 @@ export function Navbar({
                 </span>
               </div>
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col justify-center">
               <div className="flex items-center space-x-1.5">
                 <span className="text-[16px] font-vedic font-bold bg-gradient-to-r from-amber-900 via-orange-800 to-stone-900 bg-clip-text text-transparent tracking-tight leading-none uppercase">
                   Astrov
@@ -295,69 +297,70 @@ export function Navbar({
                   Jotishveda
                 </span>
               </div>
-              <span className="text-[10px] font-bold text-amber-900/95 leading-none mt-0.5 font-sans tracking-tight">
-                20 Years Astrology & Astronomy Researcher • Reading • Analysis / Impact • Prediction / Guidance
-              </span>
             </div>
           </div>
 
           {/* Right Side: Profile Dropdown Selector + Extreme Right Gochar */}
-          <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
-            {/* PROFILE DROPDOWN WITH BIGGER SELECTOR BUTTON */}
+          <div className="flex items-center space-x-1 sm:space-x-1.5 shrink-0">
+            {/* PROFILE DROPDOWN WITH COMPACT SELECTOR BUTTON */}
             {currentProfile && (
               <div className="relative shrink min-w-0" ref={dropdownRef}>
-                {/* BIGGER BUTTON SELECTOR (+2pt font & increased vertical size) */}
+                {/* PROFILE BUTTON SELECTOR (Compact Size) */}
                 <button
                   type="button"
                   onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                  className="flex items-center space-x-2 sm:space-x-2.5 bg-gradient-to-r from-amber-50/95 via-amber-50/80 to-[#FAF6EE] hover:from-amber-100 hover:to-amber-50 border border-amber-300 rounded-lg px-4 py-2.5 text-left transition-all shadow-3xs cursor-pointer group max-w-[220px] sm:max-w-[340px] md:max-w-[400px]"
+                  className="flex items-center space-x-1.5 sm:space-x-2 bg-gradient-to-r from-amber-50/95 via-amber-50/80 to-[#FAF6EE] hover:from-amber-100 hover:to-amber-50 border border-amber-300 rounded-md px-2 py-0.5 text-left transition-all shadow-3xs cursor-pointer group max-w-[200px] sm:max-w-[310px] md:max-w-[360px]"
                   title="Switch Active Profile"
                 >
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-gradient-to-br from-amber-700 via-orange-700 to-amber-900 text-amber-100 flex items-center justify-center font-bold text-sm shadow-3xs shrink-0 border border-amber-400/40">
-                    <User className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+                  <div className="w-5 h-5 sm:w-5.5 sm:h-5.5 rounded bg-gradient-to-br from-amber-700 via-orange-700 to-amber-900 text-amber-100 flex items-center justify-center font-bold text-xs shadow-3xs shrink-0 border border-amber-400/40">
+                    <User className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <div className="flex items-center space-x-1 sm:space-x-1.5 leading-tight truncate">
-                      <span className="font-sans font-bold text-amber-950 text-[14px] sm:text-[15.5px] tracking-tight truncate max-w-[105px] sm:max-w-[140px]">
-                        {currentProfile.name}
+                    <div className="flex items-center space-x-1 leading-tight truncate">
+                      <span className="font-sans font-bold text-amber-950 text-[12.5px] sm:text-[13px] tracking-tight truncate max-w-[95px] sm:max-w-[130px]">
+                        {currentProfile.name && /profile\s*1\s*\(primary\s*\/\s*self\)/i.test(currentProfile.name) ? 'Munish Sharma' : currentProfile.name}
                       </span>
-                      <span className="text-amber-400 font-bold select-none text-sm">—</span>
-                      <span className="text-stone-800 font-semibold text-[13px] sm:text-[14px] truncate max-w-[95px] sm:max-w-[130px]">
+                      <span className="text-amber-400 font-bold select-none text-[11px]">—</span>
+                      <span className="text-stone-800 font-semibold text-[11px] sm:text-[11.5px] truncate max-w-[85px] sm:max-w-[120px]">
                         {formatProfileDoc(currentProfile.birthDate, currentProfile.birthTime)}
                       </span>
-                      <span className="text-amber-400 font-bold select-none hidden xl:inline text-sm">—</span>
-                      <span className="text-stone-600 font-medium text-[13px] sm:text-[14px] truncate max-w-[100px] hidden xl:inline">
+                      <span className="text-amber-400 font-bold select-none hidden xl:inline text-[11px]">—</span>
+                      <span className="text-stone-600 font-medium text-[11px] sm:text-[11.5px] truncate max-w-[90px] hidden xl:inline">
                         {currentProfile.place}
                       </span>
                     </div>
                   </div>
                   <ChevronDown
-                    className={`w-4.5 h-4.5 text-amber-800 transition-transform shrink-0 ml-0.5 ${
+                    className={`w-3 h-3 text-amber-800 transition-transform shrink-0 ml-0.5 ${
                       isProfileDropdownOpen ? 'rotate-180' : ''
                     }`}
                   />
                 </button>
 
-                {/* Profiles Dropdown Switcher Menu */}
+                {/* Profiles Dropdown Switcher Menu (Reduced compact size) */}
                 {isProfileDropdownOpen && (
-                  <div className="absolute right-0 mt-1.5 w-84 sm:w-96 bg-white rounded-lg shadow-xl border border-amber-200 py-1.5 z-50 animate-in fade-in duration-100">
-                    <div className="px-3.5 py-2 border-b border-stone-100 flex items-center justify-between text-[13px] font-bold uppercase tracking-wider text-amber-900 bg-amber-50/40">
-                      <span>Select Person Profile</span>
-                      {/* + ADD PROFILE BUTTON IN HEADER (+2pt font & increased vertical size) */}
+                  <div className="absolute right-0 mt-1 w-72 sm:w-80 bg-white rounded-lg shadow-xl border border-amber-200 py-0.5 z-50 animate-in fade-in duration-100">
+                    <div className="px-2.5 py-1 border-b border-stone-100 flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-amber-900 bg-amber-50/40">
+                      <span>Profiles</span>
+                      {/* + ADD PROFILE BUTTON IN HEADER */}
                       <button
                         type="button"
                         onClick={handleOpenAddModal}
-                        className="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 px-4 py-2.5 rounded text-[13px] font-bold flex items-center space-x-1 cursor-pointer transition-colors shadow-3xs"
+                        className="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 px-2 py-0.5 rounded text-[10.5px] font-bold flex items-center space-x-1 cursor-pointer transition-colors shadow-3xs"
                         title="Add New Person Profile"
                       >
-                        <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                        <Plus className="w-2.5 h-2.5 stroke-[2.5]" />
                         <span>Add Profile</span>
                       </button>
                     </div>
 
-                    <div className="max-h-64 overflow-y-auto py-1 divide-y divide-stone-50">
+                    <div className="max-h-60 overflow-y-auto py-0.5 divide-y divide-stone-50">
                       {profiles.map((p) => {
                         const isSelected = p.id === currentProfile.id;
+                        const cleanDisplayName = p.name && /profile\s*1\s*\(primary\s*\/\s*self\)/i.test(p.name) ? 'Munish Sharma' : p.name;
+                        // Filter out Profile 1 (Primary / Self) labels completely from the drop down menu
+                        const showCustomLabel = p.label && !/profile\s*1|primary|self/i.test(p.label) && p.label.trim() !== '';
+
                         return (
                           <div
                             key={p.id}
@@ -367,7 +370,7 @@ export function Navbar({
                               }
                               setIsProfileDropdownOpen(false);
                             }}
-                            className={`px-3.5 py-2.5 text-left transition-colors flex items-center justify-between gap-2 cursor-pointer group/item ${
+                            className={`px-2.5 py-1.5 text-left transition-colors flex items-center justify-between gap-1.5 cursor-pointer group/item ${
                               isSelected
                                 ? 'bg-amber-50/90 text-amber-950 font-bold'
                                 : 'hover:bg-[#FAF8F5] text-stone-800'
@@ -375,55 +378,70 @@ export function Navbar({
                           >
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center space-x-1.5">
-                                <span className="font-sans font-bold text-[15px] truncate">
-                                  {p.name}
+                                <span className="font-sans font-bold text-[13px] truncate">
+                                  {cleanDisplayName}
                                 </span>
-                                {p.label && (
-                                  <span className="text-[12px] px-1.5 py-0.5 rounded bg-stone-100 text-stone-600 font-normal">
-                                    {p.label}
+                                {showCustomLabel && (
+                                  <span className="text-[10.5px] px-1.5 py-0.2 rounded bg-stone-100 text-stone-600 font-normal">
+                                    {p.label.replace(/^Profile\s*\d*\s*\(?(.*?)\)?$/, '$1') || p.label}
                                   </span>
                                 )}
                               </div>
-                              <div className="text-[13px] text-stone-600 flex items-center space-x-1 mt-0.5 truncate">
+                              <div className="text-[11px] text-stone-600 flex items-center space-x-1 mt-0.5 truncate">
                                 <span>{formatProfileDoc(p.birthDate, p.birthTime)}</span>
                                 <span>•</span>
                                 <span className="truncate">{p.place}</span>
                               </div>
                             </div>
 
-                            {/* EDIT BUTTON AFTER EACH PROFILE & ACTIVE CHECKMARK (+2pt font & increased vertical size) */}
-                            <div className="flex items-center space-x-1.5 shrink-0">
+                            {/* ACTIONS: EDIT, DELETE & ACTIVE CHECKMARK */}
+                            <div className="flex items-center space-x-1 shrink-0">
                               <button
                                 type="button"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleOpenEditModal(p);
                                 }}
-                                title={`Edit ${p.name}`}
-                                className="px-4 py-2.5 rounded bg-amber-50/80 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors cursor-pointer text-[13px] font-bold flex items-center space-x-1 shadow-3xs"
+                                title={`Edit ${cleanDisplayName}`}
+                                className="px-2 py-0.5 rounded bg-amber-50/80 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors cursor-pointer text-[10.5px] font-bold flex items-center space-x-0.5 shadow-3xs"
                               >
-                                <Edit3 className="w-3.5 h-3.5 text-amber-800" />
+                                <Edit3 className="w-2.5 h-2.5 text-amber-800" />
                                 <span>Edit</span>
                               </button>
 
+                              {profiles.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOpenEditModal(p);
+                                    setShowDeleteConfirm(true);
+                                  }}
+                                  title={`Remove profile ${cleanDisplayName}`}
+                                  className="p-1 rounded text-stone-400 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer border border-transparent hover:border-red-200"
+                                >
+                                  <Trash2 className="w-2.5 h-2.5" />
+                                </button>
+                              )}
+
                               {isSelected && (
-                                <Check className="w-4.5 h-4.5 text-emerald-600 font-bold shrink-0" />
+                                <Check className="w-3.5 h-3.5 text-emerald-600 font-bold shrink-0 ml-0.5" />
                               )}
                             </div>
                           </div>
                         );
                       })}
-                     </div>
+                    </div>
                   </div>
                 )}
               </div>
             )}
 
-            {/* LIVE GOCHAR TRANSIT INFO — POSITIONED AT EXTREME RIGHT (+2pt font & increased vertical size) */}
-            <div className="hidden md:flex items-center space-x-1.5 text-[13px] text-stone-600 font-bold uppercase tracking-wider bg-stone-50 border border-stone-200/90 px-3 py-2 rounded-lg shrink-0 shadow-3xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            {/* LIVE GOCHAR TRANSIT INFO — REDUCED COMPACT SIZE */}
+            <div className="hidden md:flex items-center space-x-1 text-[10.5px] text-stone-600 font-bold uppercase tracking-wider bg-stone-50 border border-stone-200/90 px-2 py-0.5 rounded-md shrink-0 shadow-3xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>
-                Gochar: <span className="text-amber-900 font-mono font-bold">{currentTransitTime}</span>
+                Gochar: <span className="text-amber-900 font-mono font-bold text-[10.5px]">{currentTransitTime}</span>
               </span>
             </div>
           </div>
@@ -451,28 +469,27 @@ export function Navbar({
           </div>
         )}
 
-        {/* Desktop Tabs - 2 rows of 7 tabs (Increased Vertical Size & Increased Font by 2 Points) */}
-        <nav className="hidden lg:block pb-2 pt-1 space-y-1.5">
-          <div className="grid grid-cols-7 gap-1.5">
-            {tabs.slice(0, 7).map((tab, idx) => {
+        {/* Desktop Tabs - 2 rows of 7 tabs (Reduced Vertical Height by 10%) */}
+        <nav className="hidden lg:block pb-1 pt-0.5 space-y-0.5">
+          <div className="grid grid-cols-7 gap-1">
+            {tabs.slice(0, 7).map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
                 <div
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  style={idx === 0 ? { height: '37.1032px' } : undefined}
-                  className={`group relative rounded-md px-4 py-2.5 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 shadow-none border ${
+                  className={`group relative rounded-md px-2.5 py-[3px] sm:py-[4px] min-h-[25px] sm:min-h-[26px] transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 shadow-none border ${
                     isActive
                       ? 'bg-amber-50/80 border-amber-300 border-b-2 border-b-amber-600 text-amber-950 font-bold shadow-3xs'
                       : 'bg-white border-stone-200/60 border-b-2 border-b-stone-200 text-stone-700 hover:border-amber-300 hover:border-b-amber-400 hover:bg-[#FAF8F5]'
                   }`}
                 >
-                  <span className="font-ui font-semibold text-[11.5px] leading-tight truncate">
+                  <span className="font-ui font-semibold text-[11px] leading-tight truncate">
                     {tab.label}
                   </span>
                   <Icon
-                    className={`w-3.5 h-3.5 shrink-0 ${
+                    className={`w-3 h-3 shrink-0 ${
                       isActive ? 'text-amber-800' : 'text-stone-400 group-hover:text-amber-600'
                     }`}
                   />
@@ -480,7 +497,7 @@ export function Navbar({
               );
             })}
           </div>
-          <div className="grid grid-cols-7 gap-1.5">
+          <div className="grid grid-cols-7 gap-1">
             {tabs.slice(7).map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -488,17 +505,17 @@ export function Navbar({
                 <div
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`group relative rounded-md px-4 py-2.5 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 shadow-none border ${
+                  className={`group relative rounded-md px-2.5 py-[3px] sm:py-[4px] min-h-[25px] sm:min-h-[26px] transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 shadow-none border ${
                     isActive
                       ? 'bg-amber-50/80 border-amber-300 border-b-2 border-b-amber-600 text-amber-950 font-bold shadow-3xs'
                       : 'bg-white border-stone-200/60 border-b-2 border-b-stone-200 text-stone-700 hover:border-amber-300 hover:border-b-amber-400 hover:bg-[#FAF8F5]'
                   }`}
                 >
-                  <span className="font-ui font-semibold text-[11.5px] leading-tight truncate">
+                  <span className="font-ui font-semibold text-[11px] leading-tight truncate">
                     {tab.label}
                   </span>
                   <Icon
-                    className={`w-3.5 h-3.5 shrink-0 ${
+                    className={`w-3 h-3 shrink-0 ${
                       isActive ? 'text-amber-800' : 'text-stone-400 group-hover:text-amber-600'
                     }`}
                   />
@@ -509,9 +526,9 @@ export function Navbar({
         </nav>
       </div>
 
-      {/* Mobile / Tablet Scroll Navigation - Increased Vertical Size & Font 2 Points (10px -> 12px) */}
+      {/* Mobile / Tablet Scroll Navigation - Reduced Vertical Height by 10% */}
       <div className="lg:hidden border-t border-[#F5F0E8] bg-[#FDFBF7]">
-        <div className="w-full max-w-6xl mx-auto flex overflow-x-auto px-2 sm:px-3 py-1.5 space-x-1.5 scrollbar-none">
+        <div className="w-full max-w-6xl mx-auto flex overflow-x-auto px-2 sm:px-3 py-0.5 space-x-1 scrollbar-none">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -519,15 +536,15 @@ export function Navbar({
               <div
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`rounded-md px-2.5 py-1.5 transition-all duration-150 cursor-pointer flex items-center space-x-1.5 whitespace-nowrap shrink-0 shadow-3xs ${
+                className={`rounded-md px-2 py-0.5 min-h-[24px] transition-all duration-150 cursor-pointer flex items-center space-x-1 whitespace-nowrap shrink-0 shadow-3xs ${
                   isActive
                     ? 'bg-amber-50 border-t border-l border-r border-amber-400 border-b-2 border-b-amber-700 text-amber-950 font-bold'
                     : 'bg-white border-t border-l border-r border-stone-200 border-b-2 border-b-stone-300 text-stone-700'
                 }`}
               >
-                <span className="font-ui font-semibold text-[12px] leading-none">{tab.label}</span>
+                <span className="font-ui font-semibold text-[11px] leading-none">{tab.label}</span>
                 <Icon
-                  className={`w-3.5 h-3.5 shrink-0 ${
+                  className={`w-3 h-3 shrink-0 ${
                     isActive ? 'text-amber-800' : 'text-stone-500'
                   }`}
                 />
@@ -537,10 +554,16 @@ export function Navbar({
         </div>
       </div>
 
-      {/* PROFILE MODAL (EDIT OR ADD NEW) */}
+      {/* PROFILE MODAL (EDIT OR ADD NEW) — POSITIONED RIGHT NEAR THE TOP OF PROFILE DROPDOWN */}
       {isProfileModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-[40%] sm:pt-[40%] p-3 bg-stone-950/50 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white rounded-xl shadow-2xl border border-amber-200 w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-150">
+        <div
+          className="fixed inset-0 z-50 bg-stone-950/40 backdrop-blur-xs animate-in fade-in duration-150 overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsProfileModalOpen(false);
+          }}
+        >
+          <div className="w-full max-w-6xl mx-auto px-2 sm:px-3 pt-2 sm:pt-2.5 pb-6 flex justify-center sm:justify-end pr-1 sm:pr-4">
+            <div className="bg-white rounded-xl shadow-2xl border border-amber-300 w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-150 shadow-amber-950/15 mt-1 sm:mt-0">
             {/* Modal Header */}
             <div className="px-3.5 py-2.5 bg-gradient-to-r from-amber-50 to-[#FAF8F5] border-b border-amber-200/80 flex items-center justify-between">
               <div className="flex items-center space-x-2">
@@ -732,7 +755,8 @@ export function Navbar({
             </form>
           </div>
         </div>
-      )}
-    </header>
+      </div>
+    )}
+  </header>
   );
 }

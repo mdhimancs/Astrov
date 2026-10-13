@@ -51,9 +51,38 @@ export interface OccupationOption {
 
 export interface CareerTransitionWindow {
   window: string;
-  type: 'Promotion & Recognition' | 'Strategic Job Switch' | 'Department / City Transfer' | 'Salary Revision';
+  type: 'Promotion & Recognition' | 'Strategic Job Switch' | 'Department / City Transfer' | 'Salary Revision' | 'Favour from Seniors & Mentors' | 'Job Change / New Job';
   favorabilityScore: number;
   astrologicalTrigger: string;
+}
+
+export interface CareerPillarDetail {
+  id: string;
+  title: string;
+  sanskritTitle: string;
+  probability: number;
+  verdict: string;
+  governingHouses: number[];
+  keyPlanets: string[];
+  yogasDetected: string[];
+  timingWindow: string;
+  strategicAdvice: string;
+}
+
+export interface CareerTransitionAnalysis {
+  nextPromotionProbability: number;
+  jobSwitchTiming: string;
+  transferLikelihood: number;
+  jobChangeProbability: number;
+  favourFromSeniorsScore: number;
+  expectedSalaryHikeMultiplier: string;
+  transitionWindows: CareerTransitionWindow[];
+  pillars: {
+    jobChange: CareerPillarDetail;
+    transfer: CareerPillarDetail;
+    promotion: CareerPillarDetail;
+    favourFromSeniors: CareerPillarDetail;
+  };
 }
 
 export interface MaxWealthProjection {
@@ -97,13 +126,7 @@ export interface LifeGuidanceProfile {
     travelTiming: string;
     rationale: string;
   };
-  careerTransition: {
-    nextPromotionProbability: number;
-    jobSwitchTiming: string;
-    transferLikelihood: number;
-    expectedSalaryHikeMultiplier: string;
-    transitionWindows: CareerTransitionWindow[];
-  };
+  careerTransition: CareerTransitionAnalysis;
   maxWealth: MaxWealthProjection;
   vastuAndDirections: {
     auspiciousFacing: string;
@@ -195,6 +218,7 @@ export function computeLifeAspectProbabilities(
   const h4Lord = getHouseLord(4);
   const h5Lord = getHouseLord(5);
   const h7Lord = getHouseLord(7);
+  const h9Lord = getHouseLord(9);
   const h10Lord = getHouseLord(10);
   const h11Lord = getHouseLord(11);
 
@@ -651,6 +675,162 @@ export function computeLifeAspectProbabilities(
     ],
   };
 
+  // 13. JOB CHANGE / NEW JOB
+  let jobChangeScore = 56;
+  if ([5, 9, 3, 10].includes(mercHouse)) jobChangeScore += 12;
+  if ([5, 9, 3, 10].includes(rahuHouse)) jobChangeScore += 16;
+  if ([10, 11].includes(sunHouse)) jobChangeScore += 10;
+  if ([6, 10].includes(satHouse)) jobChangeScore += 8;
+  jobChangeScore = Math.max(35, Math.min(95, jobChangeScore));
+
+  const jobChangeTier: AspectProbabilityTier =
+    jobChangeScore >= 80 ? 'Very High (85-98%)' : jobChangeScore >= 68 ? 'High (70-84%)' : 'Moderate (50-69%)';
+
+  const jobChangeItem: AspectProbabilityItem = {
+    id: 'job_change_new_job',
+    title: 'Job Change & New Job Acquisition',
+    sanskritTitle: 'कर्म परिवर्तन व नूतन पद प्राप्ति (Karma Parivartana)',
+    category: 'career_wealth',
+    probability: jobChangeScore,
+    probabilityTier: jobChangeTier,
+    verdict:
+      jobChangeScore >= 70
+        ? 'Dynamic Karma-Parivartana Yoga active: Exceptional velocity for strategic lateral job changes, lucrative new offers, and industry pivots.'
+        : 'Steady tenure recommended: Plan job transitions carefully around auspicious Mercury/Jupiter transits rather than impulsive exits.',
+    governingHouses: [10, 5, 9, 3],
+    keyPlanets: ['Budha', 'Shani', 'Rahu', 'Surya'],
+    yogasDetected: [
+      rahuHouse === 10 || rahuHouse === 5 ? 'Rahu-Karma Parivartana (Dynamic Career Switch)' : 'Dashama-Panchama Transition Yoga',
+      [10, 11].includes(mercHouse) ? 'Budha Karma Vriddhi (Rapid Offer Acquisition)' : 'Shubha Dasha Career Pivot',
+      'Udyoga Siddhi Yoga',
+    ],
+    timingWindow: 'Optimal job switch window: During Mercury, Rahu, or Sun transits over 10th/11th Bhavas; especially Q1/Q3 lateral windows.',
+    detailedAnalysis: `The 10th House governs career status, while the 5th (8th from 10th) signifies role cessation and the 9th (12th from 10th) marks job transitions. With Budha in House ${mercHouse} and Rahu in House ${rahuHouse}, your chart possesses rapid interview adaptation and high market renegotiation leverage.`,
+    protectiveMeasures: 'Hand in resignation or sign new appointment letters on Wednesdays or Thursdays during Shukla Paksha. Keep resume updated under Budha hora.',
+    metrics: [
+      { label: 'New Job Offer Velocity', value: `${jobChangeScore}%`, score: jobChangeScore },
+      { label: 'Package & Role Upgrade', value: `${Math.min(96, jobChangeScore + 6)}%`, score: Math.min(96, jobChangeScore + 6) },
+      { label: 'Interview & Selection Ease', value: `${[3, 5, 10, 11].includes(mercHouse) ? 92 : 72}%`, score: [3, 5, 10, 11].includes(mercHouse) ? 92 : 72 },
+    ],
+  };
+
+  // 14. TRANSFER / RELOCATION IN JOB
+  let transferScore = 48;
+  if ([3, 9, 12].includes(satHouse)) transferScore += 18;
+  if ([3, 9, 12].includes(marsHouse)) transferScore += 14;
+  if ([3, 9, 12].includes(moonHouse)) transferScore += 12;
+  if ([3, 9, 12].includes(rahuHouse)) transferScore += 10;
+  transferScore = Math.max(25, Math.min(92, transferScore));
+
+  const transferTier: AspectProbabilityTier =
+    transferScore >= 75 ? 'Very High (85-98%)' : transferScore >= 60 ? 'High (70-84%)' : 'Moderate (50-69%)';
+
+  const transferItem: AspectProbabilityItem = {
+    id: 'career_transfer',
+    title: 'Career Transfer & Geographic Relocation',
+    sanskritTitle: 'स्थान परिवर्तन व पद स्थानान्तरण योग (Sthana Parivartana)',
+    category: 'career_wealth',
+    probability: transferScore,
+    probabilityTier: transferTier,
+    verdict:
+      transferScore >= 65
+        ? 'Active Sthana-Parivartana Yoga: High probability of inter-city transfers, outstation deputations, or overseas corporate relocations.'
+        : 'Geographic stability anchored: Career thrives primarily in the current metropolitan base or home territory with occasional business travel.',
+    governingHouses: [3, 9, 12, 10],
+    keyPlanets: ['Chandra', 'Shani', 'Mangal', 'Rahu'],
+    yogasDetected: [
+      [3, 9, 12].includes(satHouse) ? 'Sthana Parivartana Yoga (Saturnian Movement)' : 'Deshadhipati Transfer Ray',
+      [9, 12].includes(moonHouse) ? 'Chandra Pravasa Karaka (Travel Mobility)' : 'Administrative Transfer Alignment',
+      'Kshetradhipati Gochar Mobility',
+    ],
+    timingWindow: 'Transfer activation window: When Saturn or Mars transits the 3rd, 9th, or 12th house, or during Moon/Rahu antardashas.',
+    detailedAnalysis: `The 3rd House governs local movement, the 9th governs long-distance journeys, and the 12th represents displacement from homeland/base. In your horoscope, planetary triggers in mobility houses indicate that transfers directly unlock fresh leadership territory and expanded remuneration bands.`,
+    protectiveMeasures: 'Donate sesame oil or black mustard on Saturdays before shifting residences or accepting new regional postings.',
+    metrics: [
+      { label: 'Transfer Likelihood', value: `${transferScore}%`, score: transferScore },
+      { label: 'Outstation / Inter-city Mobility', value: `${[3, 9, 12].includes(rahuHouse) || [3, 9, 12].includes(moonHouse) ? 88 : 65}%`, score: [3, 9, 12].includes(rahuHouse) || [3, 9, 12].includes(moonHouse) ? 88 : 65 },
+      { label: 'New Location Prosperity', value: `${isPlanetInGoodHouse('Guru') ? 92 : 74}%`, score: isPlanetInGoodHouse('Guru') ? 92 : 74 },
+    ],
+  };
+
+  // 15. PROMOTION & EXECUTIVE ELEVATION
+  let promotionScore = 58;
+  if ([1, 10, 11].includes(sunHouse)) promotionScore += 18;
+  if ([1, 10, 11, 9].includes(jupHouse)) promotionScore += 15;
+  if ([10, 11].includes(marsHouse)) promotionScore += 12;
+  if (isPlanetInGoodHouse(h10Lord)) promotionScore += 10;
+  promotionScore = Math.max(35, Math.min(96, promotionScore));
+
+  const promotionTier: AspectProbabilityTier =
+    promotionScore >= 80 ? 'Very High (85-98%)' : promotionScore >= 68 ? 'High (70-84%)' : 'Moderate (50-69%)';
+
+  const promotionItem: AspectProbabilityItem = {
+    id: 'job_promotion',
+    title: 'Promotion & Executive Elevation',
+    sanskritTitle: 'पदोन्नति व अधिकार प्राप्ति योग (Padonnati Yoga)',
+    category: 'career_wealth',
+    probability: promotionScore,
+    probabilityTier: promotionTier,
+    verdict:
+      promotionScore >= 70
+        ? 'Formidable Padonnati & Simhasana Raja Yoga: Fast-tracked promotion to executive management, enhanced mandate, and higher compensation band.'
+        : 'Merit-driven progressive advancement: Earned promotions through consistent domain competence and cross-functional leadership execution.',
+    governingHouses: [10, 11, 1, 9],
+    keyPlanets: ['Surya', 'Guru', 'Mangal', 'Shani'],
+    yogasDetected: [
+      [10, 1].includes(sunHouse) ? 'Simhasana Raja Yoga (Executive Authority)' : 'Padonnati Adhikara Yoga',
+      [10, 11].includes(jupHouse) ? 'Guru Rajya Pada Elevation Yoga' : 'Dashama Labha Sambandha',
+      'Karmadhipati Shrestha Yoga',
+    ],
+    timingWindow: 'Peak promotion window: During Sun or Jupiter dasha sub-periods, and when transiting Jupiter aspects the 10th bhava.',
+    detailedAnalysis: `The 10th House (Karma/Kirti Bhava) commands leadership hierarchy, while the 11th Bhava dictates title gains and salary uplifts. Surya in House ${sunHouse} provides commanding presence, and Jupiter's benefic gaze shields against corporate friction, elevating you into senior decision-making councils.`,
+    protectiveMeasures: 'Offer Arghya to Surya at dawn chanting Aditya Hridaya Stotram on Sundays. Wear gold or ruby under astrologer consultation.',
+    metrics: [
+      { label: 'Promotion Velocity', value: `${promotionScore}%`, score: promotionScore },
+      { label: 'Executive Authority Mandate', value: `${Math.min(96, promotionScore + 4)}%`, score: Math.min(96, promotionScore + 4) },
+      { label: 'Pay Band Uplift on Elevation', value: `${[10, 11].includes(sunHouse) || [10, 11].includes(jupHouse) ? 92 : 75}%`, score: [10, 11].includes(sunHouse) || [10, 11].includes(jupHouse) ? 92 : 75 },
+    ],
+  };
+
+  // 16. FAVOUR FROM SENIORS & MENTORS
+  let favourSeniorsScore = 55;
+  if ([9, 10, 1, 5].includes(jupHouse)) favourSeniorsScore += 20;
+  if ([10, 9, 1].includes(sunHouse)) favourSeniorsScore += 16;
+  if ([9, 10].includes(moonHouse)) favourSeniorsScore += 10;
+  if (isPlanetInGoodHouse(h9Lord)) favourSeniorsScore += 10;
+  favourSeniorsScore = Math.max(30, Math.min(95, favourSeniorsScore));
+
+  const favourTier: AspectProbabilityTier =
+    favourSeniorsScore >= 80 ? 'Very High (85-98%)' : favourSeniorsScore >= 68 ? 'High (70-84%)' : 'Moderate (50-69%)';
+
+  const favourSeniorsItem: AspectProbabilityItem = {
+    id: 'favour_from_seniors',
+    title: 'Favour from Seniors & Executive Mentors',
+    sanskritTitle: 'उच्चाधिकारी व गुरु कृपा योग (Adhikari Kripa)',
+    category: 'career_wealth',
+    probability: favourSeniorsScore,
+    probabilityTier: favourTier,
+    verdict:
+      favourSeniorsScore >= 70
+        ? 'Auspicious Adhikari Kripa & Guru Prasada Yoga: Strong patronage from executive directors, benevolent mentorship from industry stalwarts, and institutional advocacy.'
+        : 'Professional rapport established through disciplined output: Maintain proactive reporting and clear alignment with senior leadership goals.',
+    governingHouses: [9, 10, 11, 1],
+    keyPlanets: ['Guru', 'Surya', 'Chandra', 'Budha'],
+    yogasDetected: [
+      [9, 10].includes(jupHouse) ? 'Guru-Prasada Maha Yoga (Divine Senior Grace)' : 'Raja Kripa Adhikari Yoga',
+      [10, 1].includes(sunHouse) ? 'Surya-Pratishtha Patronage (Director Favor)' : 'Mitra-Bhava Senior Harmony',
+      'Navama Guru Drishti Blessing',
+    ],
+    timingWindow: 'Mentorship grace peaks during Jupiter or Sun sub-dashas and when Jupiter transits over the 9th/10th houses.',
+    detailedAnalysis: `The 9th House governs gurus, directors, and benefactors (Pitru-Guru Bhava), while the 10th Bhava represents superiors and corporate boards. With Guru in House ${jupHouse} and Surya in House ${sunHouse}, senior management perceives you as trustworthy, intellectually aligned, and dependable for high-stakes responsibilities.`,
+    protectiveMeasures: 'Show deep respect to elders and teachers on Thursdays. Donate yellow grams (chana dal) or bananas to spiritual institutions.',
+    metrics: [
+      { label: 'Senior Patronage & Trust', value: `${favourSeniorsScore}%`, score: favourSeniorsScore },
+      { label: 'Board & Director Mentorship', value: `${[9, 10].includes(jupHouse) || [9, 10].includes(sunHouse) ? 94 : 72}%`, score: [9, 10].includes(jupHouse) || [9, 10].includes(sunHouse) ? 94 : 72 },
+      { label: 'Protection from Workplace Politics', value: `${isPlanetInGoodHouse('Guru') ? 88 : 68}%`, score: isPlanetInGoodHouse('Guru') ? 88 : 68 },
+    ],
+  };
+
   return [
     businessItem,
     purchaseItem,
@@ -659,6 +839,10 @@ export function computeLifeAspectProbabilities(
     kidsItem,
     marriageItem,
     govtJobItem,
+    jobChangeItem,
+    transferItem,
+    promotionItem,
+    favourSeniorsItem,
     legalItem,
     windfallItem,
     foreignItem,
@@ -791,9 +975,11 @@ export function computePersonalizedLifeGuidance(
       ? 'Dual-Base / Cross-Border Career'
       : 'Prosperity in Native Motherland';
 
-  // 4. PROMOTION, TRANSFER & JOB CHANGE
+  // 4. PROMOTION, TRANSFER, JOB CHANGE & FAVOUR FROM SENIORS
   const nextPromotionProb = [10, 11, 1].includes(sunHouse) || [10, 11].includes(jupHouse) ? 88 : 72;
   const transferLikelihood = [3, 9, 12].includes(satHouse) || [3, 9, 12].includes(marsHouse) ? 78 : 45;
+  const jobChangeProb = [5, 9, 3, 10].includes(mercHouse) || [5, 9, 10].includes(rahuHouse) ? 84 : 64;
+  const favourFromSeniorsScore = [9, 10, 1].includes(jupHouse) || [10, 1].includes(sunHouse) ? 86 : 68;
 
   const transitionWindows: CareerTransitionWindow[] = [
     {
@@ -804,17 +990,98 @@ export function computePersonalizedLifeGuidance(
     },
     {
       window: '6 to 12 Months Forthcoming',
-      type: 'Salary Revision',
-      favorabilityScore: Math.min(96, nextPromotionProb + 4),
-      astrologicalTrigger: 'Jupiter direct motion activates 2nd & 11th wealth houses, unleashing equity/bonus increases.',
+      type: 'Job Change / New Job',
+      favorabilityScore: jobChangeProb,
+      astrologicalTrigger: '5th & 10th house alignment activates dynamic Karma Parivartana and lateral opportunities.',
     },
     {
       window: '12 to 18 Months Forthcoming',
       type: 'Department / City Transfer',
       favorabilityScore: transferLikelihood,
-      astrologicalTrigger: 'Saturn Gochar aspects movable signs, encouraging geographic expansion and international responsibility.',
+      astrologicalTrigger: 'Saturn Gochar aspects movable signs, encouraging geographic expansion and regional postings.',
+    },
+    {
+      window: '18 to 24 Months Forthcoming',
+      type: 'Favour from Seniors & Mentors',
+      favorabilityScore: favourFromSeniorsScore,
+      astrologicalTrigger: 'Jupiter direct aspect on 9th/10th Bhavas unlocks executive director mentorship and board sponsorship.',
     },
   ];
+
+  const careerPillars = {
+    jobChange: {
+      id: 'job_change',
+      title: 'Job Change / New Job',
+      sanskritTitle: 'कर्म परिवर्तन व नूतन पद योग (Karma Parivartana)',
+      probability: jobChangeProb,
+      verdict: jobChangeProb >= 75
+        ? 'High agility for strategic job switches, higher compensation bands, and venture pivots.'
+        : 'Steady tenure favored; time lateral job switches during Mercury or Sun dasha windows.',
+      governingHouses: [10, 5, 9, 3],
+      keyPlanets: ['Budha', 'Shani', 'Rahu', 'Surya'],
+      yogasDetected: [
+        'Karma Parivartana Yoga',
+        'Dashama-Panchama Transition Ray',
+        'Budha Udyoga Siddhi',
+      ],
+      timingWindow: 'Optimal window: Q1/Q3 when Sun or Mercury enters Kendra/Trikona houses.',
+      strategicAdvice: 'Leverage industry networking; initiate critical interviews on Wednesdays or Thursdays.',
+    },
+    transfer: {
+      id: 'transfer',
+      title: 'Transfer / Relocation',
+      sanskritTitle: 'स्थान परिवर्तन व पद स्थानान्तरण योग (Sthana Parivartana)',
+      probability: transferLikelihood,
+      verdict: transferLikelihood >= 65
+        ? 'High likelihood of inter-city transfer, outstation deputation, or overseas corporate move.'
+        : 'Anchored in primary base; limited relocation with occasional client travel.',
+      governingHouses: [3, 9, 12, 10],
+      keyPlanets: ['Chandra', 'Shani', 'Mangal', 'Rahu'],
+      yogasDetected: [
+        'Sthana Parivartana Yoga',
+        'Deshadhipati Transfer Ray',
+        'Pravasa Karma Movement',
+      ],
+      timingWindow: 'Activation window: When Saturn or Mars transits the 3rd or 12th house.',
+      strategicAdvice: 'Embrace transfers as gateways to higher responsibility and leadership autonomy.',
+    },
+    promotion: {
+      id: 'promotion',
+      title: 'Promotion & Elevation',
+      sanskritTitle: 'पदोन्नति व अधिकार प्राप्ति योग (Padonnati Yoga)',
+      probability: nextPromotionProb,
+      verdict: nextPromotionProb >= 75
+        ? 'Simhasana Raja Yoga active: Fast-track promotion to executive hierarchy and title elevation.'
+        : 'Steady merit-based ascension; focus on cross-functional visibility to expedite promotion.',
+      governingHouses: [10, 11, 1, 9],
+      keyPlanets: ['Surya', 'Guru', 'Mangal', 'Shani'],
+      yogasDetected: [
+        'Padonnati Adhikara Yoga',
+        'Simhasana Raja Yoga',
+        'Dashama Labhadhipati Sambandha',
+      ],
+      timingWindow: 'Peak cycle: During Sun/Jupiter sub-periods and Jupiter 10th house transit.',
+      strategicAdvice: 'Take ownership of visible flagship projects; document measurable business impact.',
+    },
+    favourFromSeniors: {
+      id: 'favour_from_seniors',
+      title: 'Favour from Seniors',
+      sanskritTitle: 'उच्चाधिकारी व गुरु कृपा योग (Adhikari Kripa)',
+      probability: favourFromSeniorsScore,
+      verdict: favourFromSeniorsScore >= 75
+        ? 'Auspicious Adhikari Kripa: Exceptional backing from CXOs, directors, and veteran mentors.'
+        : 'Solid professional rapport; proactive communication builds senior executive alignment.',
+      governingHouses: [9, 10, 11, 1],
+      keyPlanets: ['Guru', 'Surya', 'Chandra', 'Budha'],
+      yogasDetected: [
+        'Guru Prasada Maha Yoga',
+        'Raja Kripa Patronage',
+        'Navama Drishti Blessing',
+      ],
+      timingWindow: 'Grace period: Jupiter transit across 9th/10th houses and during Guru antardashas.',
+      strategicAdvice: 'Maintain honest reporting, show respect to senior leaders, and seek executive sponsorship.',
+    },
+  };
 
   // 5. MAX WEALTH CALCULATOR
   let dhanaMultiplier = 2.4;
@@ -930,8 +1197,11 @@ export function computePersonalizedLifeGuidance(
       nextPromotionProbability: nextPromotionProb,
       jobSwitchTiming: 'Favorable strategic transition: Q1 or Q3 when Sun/Jupiter transit benefics.',
       transferLikelihood,
+      jobChangeProbability: jobChangeProb,
+      favourFromSeniorsScore,
       expectedSalaryHikeMultiplier: '28% to 45% uplift on lateral move',
       transitionWindows,
+      pillars: careerPillars,
     },
     maxWealth,
     vastuAndDirections: {

@@ -15,6 +15,8 @@ import { LifeEventsMattersTab } from './LifeEventsMattersTab';
 import { PersonalizedGuidanceTab } from './PersonalizedGuidanceTab';
 import { FamilyLineageTab } from './FamilyLineageTab';
 import { NumerologyTab } from './NumerologyTab';
+import { CelestialSkyMapWheel } from './CelestialSkyMapWheel';
+import { calculatePlanetaryPositions } from '../vedicMath';
 import { UserProfile } from '../types';
 import { VEDIC_RASIS } from '../data';
 
@@ -56,6 +58,25 @@ export function ContentRenderer({
           onNavigateToDasha={() => setActiveTab('vimshottari-dasha')}
         />
       );
+    case 'celestial-wheel':
+    case 'wheel': {
+      const transitCalc = calculatePlanetaryPositions(
+        new Date(),
+        currentProfile.latitude || 28.6139,
+        currentProfile.longitude || 77.209,
+        'Lahiri'
+      );
+      return (
+        <div className="space-y-3">
+          <CelestialSkyMapWheel
+            livePlanets={transitCalc.planets}
+            natalPlanets={natalCalc?.planets || []}
+            lagnaRasi={natalCalc?.lagnaRasi || transitCalc.lagnaRasi || 1}
+            locationName={currentProfile.place || 'Observation Point'}
+          />
+        </div>
+      );
+    }
     case 'monthly-predictions':
       return (
         <MonthWisePredictionsTab

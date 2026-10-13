@@ -498,11 +498,11 @@ export function AstronomicalEphemerisTab({
               })}
             </div>
 
-            {/* Vedic Astronomy Educational Callout */}
+            {/* Vedic Siddhanta Educational Callout */}
             <div className="bg-white/85 rounded-lg p-2.5 border border-amber-200/80 flex items-start space-x-2 text-[11.5px] text-stone-700">
               <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
               <p className="leading-relaxed">
-                <strong className="text-stone-900 font-bold">Vedic Astronomy Principle (Chesta Bala):</strong> When a planet enters apparent retrograde motion (<em>Vakri Gati</em>), it is closest to Earth (Perigee), imparting elevated <em>Chesta Bala</em> (motional strength). Vedic shastras teach that retrograde grahas manifest with heightened internal intensity, prompting deep re-evaluation, karmic completion, and conscious review rather than external haste.
+                <strong className="text-stone-900 font-bold">Vedic Siddhanta Principle (Chesta Bala):</strong> When a planet enters apparent retrograde motion (<em>Vakri Gati</em>), it is closest to Earth (Perigee), imparting elevated <em>Chesta Bala</em> (motional strength). Vedic shastras teach that retrograde grahas manifest with heightened internal intensity, prompting deep re-evaluation, karmic completion, and conscious review rather than external haste.
               </p>
             </div>
           </div>

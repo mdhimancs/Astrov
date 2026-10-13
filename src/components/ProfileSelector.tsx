@@ -154,7 +154,7 @@ export function ProfileSelector({
                 value={editForm.label}
                 onChange={(e) => setEditForm({ ...editForm, label: e.target.value })}
                 className="w-full bg-white border border-stone-300 rounded-md px-2.5 py-1 text-[16px] text-stone-900 focus:outline-none focus:border-amber-500"
-                placeholder="e.g. Profile 1 (Self)"
+                placeholder="e.g. Self, Spouse, Child"
                 required
               />
             </div>

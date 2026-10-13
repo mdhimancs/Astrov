@@ -8,11 +8,13 @@ import {
   Clock,
   User,
   ShieldAlert,
+  BookOpen,
 } from 'lucide-react';
 import { ProfileSelector } from './ProfileSelector';
 import { MonthWisePredictions } from './MonthWisePredictions';
 import { YearlyPredictions } from './YearlyPredictions';
 import { UnifiedPlanetaryImpactTable } from './UnifiedPlanetaryImpactTable';
+import { VedicReadingsObservations } from './VedicReadingsObservations';
 import {
   calculatePlanetaryPositions,
   checkSadeSati,
@@ -94,7 +96,7 @@ export function MonthWisePredictionsTab({
   const [selectedMonthKey, setSelectedMonthKey] = useState<string>('2026-09');
   const [selectedYear, setSelectedYear] = useState<number>(2026);
   const [readingScope, setReadingScope] = useState<
-    'monthly' | 'yearly' | 'impacts' | 'all'
+    'monthly' | 'yearly' | 'observations' | 'impacts' | 'all'
   >('monthly');
 
   // Astrological State
@@ -249,7 +251,7 @@ export function MonthWisePredictionsTab({
 
       {/* MONTHLY & YEARLY READINGS — COMPACT 1-ROW DECK OF CARDS SELECTOR (10% smaller) */}
       <div className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/90 px-2 py-1 shadow-3xs">
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1">
           {[
             {
               id: 'monthly',
@@ -258,8 +260,13 @@ export function MonthWisePredictionsTab({
             },
             {
               id: 'yearly',
-              title: 'Yearly & Life-Path Forecast',
+              title: 'Yearly & Life-Path',
               icon: Clock,
+            },
+            {
+              id: 'observations',
+              title: 'Readings & Observations',
+              icon: BookOpen,
             },
             {
               id: 'impacts',
@@ -278,7 +285,7 @@ export function MonthWisePredictionsTab({
               <div
                 key={card.id}
                 onClick={() => setReadingScope(card.id as any)}
-                className={`group relative rounded-md px-2 py-1 transition-all duration-150 cursor-pointer border flex items-center justify-between gap-1 ${
+                className={`group relative rounded-md px-2 py-[3px] min-h-[25px] transition-all duration-150 cursor-pointer border flex items-center justify-between gap-1 ${
                   isActive
                     ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
                     : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5] shadow-3xs'
@@ -329,7 +336,17 @@ export function MonthWisePredictionsTab({
         />
       )}
 
-      {/* CARD 3: THE SINGLE UNIFIED MASTER TABLE: PLANETARY CHANGES & IMPACTS */}
+      {/* CARD 3: VEDIC READINGS & OBSERVATIONS (Family, Relatives, Home, Health/Wealth, Education) */}
+      {(readingScope === 'observations' || readingScope === 'all') && (
+        <VedicReadingsObservations
+          natalPlanets={natalPlanets}
+          natalLagnaRasi={natalLagnaRasi}
+          natalMoonRasi={natalMoonRasi}
+          userName={name}
+        />
+      )}
+
+      {/* CARD 4: THE SINGLE UNIFIED MASTER TABLE: PLANETARY CHANGES & IMPACTS */}
       {(readingScope === 'impacts' || readingScope === 'all') && (
         <UnifiedPlanetaryImpactTable
           records={unifiedImpactRecords}

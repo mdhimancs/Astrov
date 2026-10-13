@@ -4,7 +4,7 @@ import {
   Briefcase,
   Globe,
   TrendingUp,
-  DollarSign,
+  IndianRupee,
   Compass,
   ArrowRight,
   ShieldCheck,
@@ -78,7 +78,7 @@ export function PersonalizedGuidanceTab({
             </div>
 
             <h1 className="font-vedic font-black text-xl sm:text-2xl text-white tracking-tight flex items-center space-x-2">
-              <span>Personalized Guidance for {seekerName}</span>
+              <span>Personalized Guidance</span>
             </h1>
 
             <p className="text-[13px] text-blue-200/80 max-w-2xl leading-relaxed">
@@ -143,7 +143,7 @@ export function PersonalizedGuidanceTab({
 
           <div className="bg-blue-950/60 border border-blue-500/30 rounded-lg p-2.5">
             <div className="flex items-center space-x-1.5 text-[11px] text-blue-300 font-medium">
-              <DollarSign className="w-3.5 h-3.5" />
+              <IndianRupee className="w-3.5 h-3.5" />
               <span>Wealth Multiplier</span>
             </div>
             <div className="text-[13px] sm:text-[14px] font-bold text-white mt-1 truncate">

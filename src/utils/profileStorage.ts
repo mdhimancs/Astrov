@@ -7,7 +7,7 @@ const ACTIVE_PROFILE_KEY = 'jyotish_active_profile_id_v1';
 export const DEFAULT_PROFILES: UserProfile[] = [
   {
     id: 'profile-1',
-    label: 'Profile 1 (Primary / Self)',
+    label: '',
     name: 'Munish Sharma',
     birthDate: '1990-05-18',
     birthTime: '07:30',
@@ -21,7 +21,7 @@ export const DEFAULT_PROFILES: UserProfile[] = [
   },
   {
     id: 'profile-2',
-    label: 'Profile 2 (Family / Partner)',
+    label: 'Partner',
     name: 'Priyanka Sharma',
     birthDate: '1993-11-22',
     birthTime: '14:15',
@@ -35,7 +35,7 @@ export const DEFAULT_PROFILES: UserProfile[] = [
   },
   {
     id: 'profile-3',
-    label: 'Profile 3 (Family / Child)',
+    label: 'Child',
     name: 'Aarav Sharma',
     birthDate: '2018-09-08',
     birthTime: '09:10',
@@ -58,7 +58,24 @@ export function getSavedProfiles(): UserProfile[] {
     }
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed;
+      return parsed.map((p: UserProfile) => {
+        let updatedProfile = { ...p };
+        // Strip legacy 'Profile 1 (Primary / Self)' label
+        if (updatedProfile.label && (/profile\s*1/i.test(updatedProfile.label) || /primary/i.test(updatedProfile.label) || /self/i.test(updatedProfile.label))) {
+          updatedProfile.label = '';
+        }
+        // Normalize name if legacy placeholder was stored
+        if (updatedProfile.name && (/profile\s*1\s*\(primary\s*\/\s*self\)/i.test(updatedProfile.name) || /profile\s*1/i.test(updatedProfile.name))) {
+          updatedProfile.name = 'Munish Sharma';
+        }
+        if (updatedProfile.label === 'Profile 2 (Family / Partner)') {
+          updatedProfile.label = 'Partner';
+        }
+        if (updatedProfile.label === 'Profile 3 (Family / Child)') {
+          updatedProfile.label = 'Child';
+        }
+        return updatedProfile;
+      });
     }
     return DEFAULT_PROFILES;
   } catch (err) {
