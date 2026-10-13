@@ -232,10 +232,13 @@ export function Navbar({
     { id: 'family-lineage', label: 'Family Members & Lineage', icon: Users },
     { id: 'compatibility', label: 'Matching & Remedies', icon: HeartHandshake },
     { id: 'numerology', label: 'Numerology', icon: Calculator },
+    { id: 'real-planets', label: 'Real Planets & Nakshatra', icon: Sparkles },
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#E7DEC8] shadow-3xs">
+    <>
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#E7DEC8] shadow-3xs">
+
       {/* Main Navbar Row */}
       <div className="w-full max-w-6xl mx-auto px-2 sm:px-3">
         <div className="flex items-center justify-between py-1.5 gap-2">
@@ -339,21 +342,7 @@ export function Navbar({
 
                 {/* Profiles Dropdown Switcher Menu (Reduced compact size) */}
                 {isProfileDropdownOpen && (
-                  <div className="absolute right-0 mt-1 w-72 sm:w-80 bg-white rounded-lg shadow-xl border border-amber-200 py-0.5 z-50 animate-in fade-in duration-100">
-                    <div className="px-2.5 py-1 border-b border-stone-100 flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-amber-900 bg-amber-50/40">
-                      <span>Profiles</span>
-                      {/* + ADD PROFILE BUTTON IN HEADER */}
-                      <button
-                        type="button"
-                        onClick={handleOpenAddModal}
-                        className="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 px-2 py-0.5 rounded text-[10.5px] font-bold flex items-center space-x-1 cursor-pointer transition-colors shadow-3xs"
-                        title="Add New Person Profile"
-                      >
-                        <Plus className="w-2.5 h-2.5 stroke-[2.5]" />
-                        <span>Add Profile</span>
-                      </button>
-                    </div>
-
+                  <div className="absolute right-0 mt-1 w-72 sm:w-80 bg-white rounded-lg shadow-xl border border-amber-200 py-1 z-50 animate-in fade-in duration-100">
                     <div className="max-h-60 overflow-y-auto py-0.5 divide-y divide-stone-50">
                       {profiles.map((p) => {
                         const isSelected = p.id === currentProfile.id;
@@ -403,10 +392,9 @@ export function Navbar({
                                   handleOpenEditModal(p);
                                 }}
                                 title={`Edit ${cleanDisplayName}`}
-                                className="px-2 py-0.5 rounded bg-amber-50/80 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors cursor-pointer text-[10.5px] font-bold flex items-center space-x-0.5 shadow-3xs"
+                                className="p-1.5 rounded bg-amber-50/80 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors cursor-pointer flex items-center justify-center shadow-3xs"
                               >
-                                <Edit3 className="w-2.5 h-2.5 text-amber-800" />
-                                <span>Edit</span>
+                                <Edit3 className="w-3.5 h-3.5 text-amber-800" />
                               </button>
 
                               {profiles.length > 1 && (
@@ -469,23 +457,23 @@ export function Navbar({
           </div>
         )}
 
-        {/* Desktop Tabs - 2 rows of 7 tabs (Reduced Vertical Height by 10%) */}
+        {/* Desktop Tabs - 2 rows of 9 tabs */}
         <nav className="hidden lg:block pb-1 pt-0.5 space-y-0.5">
-          <div className="grid grid-cols-7 gap-1">
-            {tabs.slice(0, 7).map((tab) => {
+          <div className="grid grid-cols-9 gap-1">
+            {tabs.slice(0, 9).map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
                 <div
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`group relative rounded-md px-2.5 py-[3px] sm:py-[4px] min-h-[25px] sm:min-h-[26px] transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 shadow-none border ${
+                  className={`group relative rounded-md px-2 py-[3px] sm:py-[4px] min-h-[25px] sm:min-h-[26px] transition-all duration-150 cursor-pointer flex items-center justify-between gap-0.5 shadow-none border ${
                     isActive
                       ? 'bg-amber-50/80 border-amber-300 border-b-2 border-b-amber-600 text-amber-950 font-bold shadow-3xs'
                       : 'bg-white border-stone-200/60 border-b-2 border-b-stone-200 text-stone-700 hover:border-amber-300 hover:border-b-amber-400 hover:bg-[#FAF8F5]'
                   }`}
                 >
-                  <span className="font-ui font-semibold text-[11px] leading-tight truncate">
+                  <span className="font-ui font-semibold text-[10.5px] leading-tight truncate">
                     {tab.label}
                   </span>
                   <Icon
@@ -497,21 +485,21 @@ export function Navbar({
               );
             })}
           </div>
-          <div className="grid grid-cols-7 gap-1">
-            {tabs.slice(7).map((tab) => {
+          <div className="grid grid-cols-9 gap-1">
+            {tabs.slice(9).map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
                 <div
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`group relative rounded-md px-2.5 py-[3px] sm:py-[4px] min-h-[25px] sm:min-h-[26px] transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 shadow-none border ${
+                  className={`group relative rounded-md px-2 py-[3px] sm:py-[4px] min-h-[25px] sm:min-h-[26px] transition-all duration-150 cursor-pointer flex items-center justify-between gap-0.5 shadow-none border ${
                     isActive
                       ? 'bg-amber-50/80 border-amber-300 border-b-2 border-b-amber-600 text-amber-950 font-bold shadow-3xs'
                       : 'bg-white border-stone-200/60 border-b-2 border-b-stone-200 text-stone-700 hover:border-amber-300 hover:border-b-amber-400 hover:bg-[#FAF8F5]'
                   }`}
                 >
-                  <span className="font-ui font-semibold text-[11px] leading-tight truncate">
+                  <span className="font-ui font-semibold text-[10.5px] leading-tight truncate">
                     {tab.label}
                   </span>
                   <Icon
@@ -757,6 +745,209 @@ export function Navbar({
         </div>
       </div>
     )}
-  </header>
+    </header>
+
+      {/* PROFILE MODAL (EDIT OR ADD NEW) — ROOT LEVEL VIEWPORT OVERLAY WITH Z-[99999] */}
+      {isProfileModalOpen && (
+        <div
+          className="fixed inset-0 z-[99999] bg-stone-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-150 overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsProfileModalOpen(false);
+          }}
+        >
+          <div className="bg-white rounded-xl shadow-2xl border border-amber-300 w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-150 shadow-amber-950/25 my-auto">
+            {/* Modal Header */}
+            <div className="px-3.5 py-2.5 bg-gradient-to-r from-amber-50 to-[#FAF8F5] border-b border-amber-200/80 flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="w-6 h-6 rounded-md bg-amber-700 text-white flex items-center justify-center shadow-3xs">
+                  {modalMode === 'edit' ? <Edit3 className="w-3.5 h-3.5" /> : <UserPlus className="w-3.5 h-3.5" />}
+                </div>
+                <div>
+                  <h3 className="font-heading-3 font-bold text-stone-950 text-[14px] leading-tight">
+                    {modalMode === 'edit' ? 'Edit Profile & Birth Details' : 'Add New Person Profile'}
+                  </h3>
+                  <p className="text-[11px] text-stone-500 leading-tight">
+                    Calibrates Janam Kundali, transits, and dashas
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsProfileModalOpen(false)}
+                className="p-1 rounded-md text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleSubmitProfileForm} className="p-3.5 space-y-2.5 text-[12px]">
+              <div>
+                <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-0.5">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Ramesh Kumar"
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2.5 py-1 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-amber-600 focus:bg-white text-[13px]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-0.5">
+                    Date of Birth *
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={formBirthDate}
+                    onChange={(e) => setFormBirthDate(e.target.value)}
+                    className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1 text-stone-900 focus:outline-none focus:border-amber-600 focus:bg-white text-[12px]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-0.5">
+                    Time of Birth *
+                  </label>
+                  <input
+                    type="time"
+                    required
+                    value={formBirthTime}
+                    onChange={(e) => setFormBirthTime(e.target.value)}
+                    className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1 text-stone-900 focus:outline-none focus:border-amber-600 focus:bg-white text-[12px]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-0.5">
+                  Place of Birth (City / Coordinates) *
+                </label>
+                <PlaceOfBirthInput
+                  value={formPlace.name}
+                  latitude={formPlace.lat}
+                  longitude={formPlace.lng}
+                  timezone={formPlace.tz}
+                  onChange={(p) => setFormPlace(p)}
+                  compact
+                  label=""
+                  placeholder="Search city, town, village..."
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-0.5">
+                    Gender
+                  </label>
+                  <select
+                    value={formGender}
+                    onChange={(e) => setFormGender(e.target.value as any)}
+                    className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-1 py-0 text-stone-900 focus:outline-none focus:border-amber-600 focus:bg-white text-[10px]"
+                  >
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-0.5">
+                    Category / Label
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Partner, Child, Self"
+                    value={formLabel}
+                    onChange={(e) => setFormLabel(e.target.value)}
+                    className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1 text-stone-900 focus:outline-none focus:border-amber-600 focus:bg-white text-[12px]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-0.5">
+                  Notes (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Accurate birth time from hospital record"
+                  value={formNotes}
+                  onChange={(e) => setFormNotes(e.target.value)}
+                  className="w-full bg-[#FAF8F5] border border-stone-300 rounded px-2 py-1 text-stone-900 focus:outline-none focus:border-amber-600 focus:bg-white text-[12px]"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-2 border-t border-stone-100 flex items-center justify-between">
+                <div>
+                  {modalMode === 'edit' && profiles.length > 1 && (
+                    <>
+                      {!showDeleteConfirm ? (
+                        <button
+                          type="button"
+                          onClick={() => setShowDeleteConfirm(true)}
+                          className="text-red-700 hover:text-red-800 text-[11px] font-bold flex items-center space-x-1 cursor-pointer transition-colors p-1 rounded hover:bg-red-50"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Delete</span>
+                        </button>
+                      ) : (
+                        <div className="flex items-center space-x-1.5">
+                          <span className="text-[10px] text-red-600 font-bold">Confirm delete?</span>
+                          <button
+                            type="button"
+                            onClick={handleDeleteProfileClick}
+                            className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded cursor-pointer hover:bg-red-700"
+                          >
+                            Yes
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowDeleteConfirm(false)}
+                            className="text-stone-500 text-[10px] px-1 py-0.5 rounded cursor-pointer hover:bg-stone-100"
+                          >
+                            No
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsProfileModalOpen(false)}
+                    className="px-4 py-1.5 rounded text-stone-600 hover:bg-stone-100 transition-colors cursor-pointer font-semibold text-[13px]"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-amber-700 hover:bg-amber-800 text-white font-bold py-1.5 px-5 rounded shadow-2xs transition-colors flex items-center space-x-1 cursor-pointer text-[14px]"
+                  >
+                    {modalMode === 'edit' ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Save Changes</span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Save &amp; Activate</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

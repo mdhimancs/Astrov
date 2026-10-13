@@ -15,6 +15,7 @@ import { LifeEventsMattersTab } from './LifeEventsMattersTab';
 import { PersonalizedGuidanceTab } from './PersonalizedGuidanceTab';
 import { FamilyLineageTab } from './FamilyLineageTab';
 import { NumerologyTab } from './NumerologyTab';
+import { RealPlanetPositionsTab } from './RealPlanetPositionsTab';
 import { CelestialSkyMapWheel } from './CelestialSkyMapWheel';
 import { calculatePlanetaryPositions } from '../vedicMath';
 import { UserProfile } from '../types';
@@ -209,6 +210,13 @@ export function ContentRenderer({
     case 'numerology':
       return (
         <NumerologyTab activeProfile={currentProfile} />
+      );
+    case 'real-planets':
+      return (
+        <RealPlanetPositionsTab
+          activeProfile={currentProfile}
+          profiles={profiles}
+        />
       );
     default:
       return null;

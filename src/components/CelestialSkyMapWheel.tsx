@@ -615,8 +615,7 @@ export function CelestialSkyMapWheel({
               const elemStyle = RASI_ELEMENT_STYLES[rasi.element] || RASI_ELEMENT_STYLES['Agni (Fire)'];
               const arcPath = describeArc(startAngle, endAngle, rRasiInner, rRasiOuter);
 
-              const glyphPos = degToXY(midAngle, (rRasiOuter + rRasiInner) / 2 + 12);
-              const namePos = degToXY(midAngle, (rRasiOuter + rRasiInner) / 2 - 8);
+              const namePos = degToXY(midAngle, (rRasiOuter + rRasiInner) / 2 + 3);
               const degRangePos = degToXY(midAngle, rRasiInner + 9);
 
               return (
@@ -641,45 +640,31 @@ export function CelestialSkyMapWheel({
                     return <line x1={lStart.x} y1={lStart.y} x2={lEnd.x} y2={lEnd.y} stroke="#B45309" strokeWidth="2" opacity="0.85" />;
                   })()}
 
-                  {/* Zodiac Glyph Symbol (Large & Crisp) */}
-                  <text
-                    x={glyphPos.x}
-                    y={glyphPos.y}
-                    fill={elemStyle.glyphColor}
-                    fontSize="18"
-                    fontWeight="bold"
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    className="pointer-events-none"
-                  >
-                    {rasi.symbol}
-                  </text>
-
-                  {/* Sanskrit Name + Western Name */}
+                  {/* Vedic Rashi Sanskrit Name */}
                   <text
                     x={namePos.x}
                     y={namePos.y}
                     fill={isLagna ? '#78350F' : elemStyle.text}
-                    fontSize="10"
+                    fontSize="11.5"
                     fontWeight="900"
                     textAnchor="middle"
                     dominantBaseline="central"
-                    className="pointer-events-none"
+                    className="pointer-events-none select-none tracking-wide"
                   >
-                    <tspan x={namePos.x} dy="-4">{rasi.sanskritName}</tspan>
-                    <tspan x={namePos.x} dy="11" fontSize="8" fontWeight="bold">({rasi.westernEquivalent.slice(0, 3)})</tspan>
+                    {rasi.sanskritName}
                   </text>
 
-                  {/* Sign Degrees Label */}
+                  {/* Degree Span Label */}
                   <text
                     x={degRangePos.x}
                     y={degRangePos.y}
                     fill="#92400E"
                     fontSize="7"
                     fontFamily="monospace"
+                    fontWeight="bold"
                     textAnchor="middle"
                     dominantBaseline="central"
-                    className="pointer-events-none opacity-80"
+                    className="pointer-events-none select-none opacity-80"
                   >
                     {idx * 30}° - {(idx + 1) * 30}°
                   </text>
@@ -1091,7 +1076,7 @@ export function CelestialSkyMapWheel({
               {/* Exact Coordinate Cards */}
               <div className="grid grid-cols-2 gap-2 text-[12px]">
                 <div className="bg-white rounded-xl p-2.5 border border-amber-200/90 shadow-2xs space-y-0.5">
-                  <span className="text-[10px] font-bold text-amber-800 uppercase block">Sidereal Sign (Rasi)</span>
+                  <span className="text-[10px] font-bold text-amber-800 uppercase block">Sidereal Rashi</span>
                   <div className="font-bold text-stone-950 text-[14px]">
                     {activeDetailPlanet.rasiName}
                   </div>
@@ -1182,7 +1167,7 @@ export function CelestialSkyMapWheel({
                     </div>
                     <div className="grid grid-cols-2 gap-1.5 text-[11.5px]">
                       <div>
-                        <span className="text-stone-500 text-[10px]">Sign Direction:</span>
+                        <span className="text-stone-500 text-[10px]">Rashi Direction:</span>
                         <div className="font-bold text-stone-900">{rasiDir.direction}</div>
                       </div>
                       <div>
@@ -1240,7 +1225,7 @@ export function CelestialSkyMapWheel({
             <strong className="text-stone-900 font-bold block">Classical 360° Sidereal Astronomical Wheel:</strong>
             <p className="text-stone-600 leading-relaxed">
               Planets are mapped across the continuous 360° sidereal zodiac starting at 0°00&apos; Mesha (Aries).
-              Each of the 12 signs encompasses exactly 30°, while the 27 Nakshatras span 13°20&apos; each.
+              Each of the 12 rashis encompasses exactly 30°, while the 27 Nakshatras span 13°20&apos; each.
               <span className="font-bold text-amber-900 ml-1">→ Direct motion</span> indicates regular celestial progression, while
               <span className="font-bold text-rose-700 ml-1">← Vakri (Retrograde)</span> indicates apparent backward motion.
             </p>

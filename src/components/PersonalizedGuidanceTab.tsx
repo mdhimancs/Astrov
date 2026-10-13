@@ -55,10 +55,10 @@ export function PersonalizedGuidanceTab({
   return (
     <div className="space-y-3.5 pb-8 animate-in fade-in duration-150 bg-[#FAF6EE] p-3 sm:p-4 rounded-xl border border-amber-200/60 shadow-xs">
       {/* Top Banner / Seeker Context */}
-      <div className="bg-gradient-to-r from-[#172554] via-[#1E3A8A] to-[#0F172A] text-blue-100 rounded-xl p-3.5 sm:p-5 border border-blue-400/30 shadow-sm relative overflow-hidden">
+      <div className="bg-gradient-to-r from-amber-900 via-amber-950 to-stone-900 text-amber-50 rounded-xl p-3.5 sm:p-5 border border-amber-600/30 shadow-sm relative overflow-hidden">
         {/* Subtle decorative background watermark */}
         <div className="absolute right-0 top-0 bottom-0 opacity-10 flex items-center pr-6 pointer-events-none">
-          <svg viewBox="0 0 100 100" className="w-56 h-56 text-blue-300" fill="currentColor">
+          <svg viewBox="0 0 100 100" className="w-56 h-56 text-amber-300" fill="currentColor">
             <circle cx="50" cy="50" r="45" stroke="currentColor" strokeWidth="2" fill="none" />
             <polygon points="50,5 90,85 10,85" stroke="currentColor" strokeWidth="1.5" fill="none" />
             <polygon points="50,95 90,15 10,15" stroke="currentColor" strokeWidth="1.5" fill="none" />

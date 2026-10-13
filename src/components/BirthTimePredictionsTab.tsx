@@ -23,6 +23,7 @@ import { ProfileSelector } from './ProfileSelector';
 import { PlaceValue } from './PlaceOfBirthInput';
 import { HouseCardDeck } from './HouseCardDeck';
 import { BhriguLalKitabSection } from './BhriguLalKitabSection';
+import { PlanetaryAspectsAndAlerts } from './PlanetaryAspectsAndAlerts';
 import { ShadbalaD3Chart } from './ShadbalaD3Chart';
 import {
   calculatePlanetaryPositions,
@@ -578,6 +579,9 @@ export function BirthTimePredictionsTab({
               </div>
             )}
           </div>
+
+          {/* Planetary Aspects & Upcoming Ingress / Station Alerts System */}
+          <PlanetaryAspectsAndAlerts planets={natalPlanets} activeProfile={currentProfile} />
         </div>
       )}
 
