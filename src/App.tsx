@@ -1,23 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
-import { BirthTimePredictionsTab } from './components/BirthTimePredictionsTab';
-import { MonthWisePredictionsTab } from './components/MonthWisePredictionsTab';
-import { VimshottariDashaTab } from './components/VimshottariDashaTab';
-import { CriticalDashaTransitsTab } from './components/CriticalDashaTransitsTab';
-import { TransitsLiveTab } from './components/TransitsLiveTab';
-import { SadeSatiTab } from './components/SadeSatiTab';
-import { PanchangTab } from './components/PanchangTab';
-import { KundaliMatchingTab } from './components/KundaliMatchingTab';
-import { DivisionalChartsTab } from './components/DivisionalChartsTab';
-import { UpayRemediesTab } from './components/UpayRemediesTab';
-import { AstrologySystemsTab } from './components/AstrologySystemsTab';
-import { AstronomicalEphemerisTab } from './components/AstronomicalEphemerisTab';
-import { LifeEventsMattersTab } from './components/LifeEventsMattersTab';
-import { PersonalizedGuidanceTab } from './components/PersonalizedGuidanceTab';
-import { FamilyLineageTab } from './components/FamilyLineageTab';
-import { NumerologyTab } from './components/NumerologyTab';
+import { ContentRenderer } from './components/ContentRenderer';
 import { UserProfile } from './types';
-import { VEDIC_RASIS } from './data';
 import { getSavedProfiles, getActiveProfileId, setActiveProfileId as saveActiveId, upsertProfile, deleteProfile } from './utils/profileStorage';
 import { calculatePlanetaryPositions, buildHouseStructure, calculateYogas, calculateAshtakavarga } from './vedicMath';
 
@@ -90,10 +74,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-stone-900 flex flex-col relative overflow-x-hidden selection:bg-amber-200 selection:text-amber-950">
-      {/* Subtle atmospheric depth layer */}
       <div className="fixed inset-0 bg-white/40 pointer-events-none" />
 
-      {/* Navigation Header */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -106,140 +88,22 @@ export default function App() {
         onDeleteProfile={handleDeleteProfile}
       />
 
-      {/* Main Vedic Content Area */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-2 sm:px-3 py-1.5">
-        {(activeTab === 'birth-predictions' || activeTab === 'kundali') && (
-          <BirthTimePredictionsTab
+      <main className="flex-1 w-full max-w-6xl mx-auto px-2 sm:px-3 py-3">
+        <ContentRenderer
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            currentProfile={currentProfile}
             profiles={profiles}
-            activeProfileId={activeProfileId}
-            onProfileChange={handleProfileChange}
-            onUpdateProfiles={handleUpdateProfiles}
-            onNavigateToMonthWise={() => setActiveTab('monthly-predictions')}
-            onNavigateToDasha={() => setActiveTab('vimshottari-dasha')}
-          />
-        )}
-        {activeTab === 'monthly-predictions' && (
-          <MonthWisePredictionsTab
-            activeProfileId={activeProfileId}
-            profiles={profiles}
-            onNavigateToBirthTime={() => setActiveTab('birth-predictions')}
-          />
-        )}
-        {activeTab === 'life-events' && (
-          <LifeEventsMattersTab
-            activeProfile={currentProfile}
-            profiles={profiles}
-            natalPlanets={natalCalc.planets}
+            handleProfileChange={handleProfileChange}
+            handleUpdateProfiles={handleUpdateProfiles}
+            natalCalc={natalCalc}
             natalHouses={natalHouses}
-            lagnaRasi={natalCalc.lagnaRasi}
-            onNavigateToGuidance={() => setActiveTab('personalized-guidance')}
-            onNavigateToMonthly={() => setActiveTab('monthly-predictions')}
-            onNavigateToDasha={() => setActiveTab('vimshottari-dasha')}
-          />
-        )}
-        {activeTab === 'personalized-guidance' && (
-          <PersonalizedGuidanceTab
-            activeProfile={currentProfile}
-            profiles={profiles}
-            natalPlanets={natalCalc.planets}
-            natalHouses={natalHouses}
-            lagnaRasi={natalCalc.lagnaRasi}
-            onNavigateToLifeEvents={() => setActiveTab('life-events')}
-            onNavigateToUpay={() => setActiveTab('upay-remedies')}
-            onNavigateToBirthCharts={() => setActiveTab('birth-predictions')}
-          />
-        )}
-        {activeTab === 'vimshottari-dasha' && (
-          <VimshottariDashaTab
-            activeProfileId={activeProfileId}
-            profiles={profiles}
-            onNavigateToMonthWise={() => setActiveTab('monthly-predictions')}
-            onNavigateToBirthTime={() => setActiveTab('birth-predictions')}
-            onNavigateToMilestones={() => setActiveTab('critical-transits')}
-          />
-        )}
-        {activeTab === 'upay-remedies' && (
-          <UpayRemediesTab
-            activeProfileId={activeProfileId}
-            profiles={profiles}
-            onNavigateToDasha={() => setActiveTab('vimshottari-dasha')}
-            onNavigateToBirthCharts={() => setActiveTab('birth-predictions')}
-          />
-        )}
-        {activeTab === 'critical-transits' && (
-          <CriticalDashaTransitsTab
-            activeProfileId={activeProfileId}
-            profiles={profiles}
-            onNavigateToDasha={() => setActiveTab('vimshottari-dasha')}
-            onNavigateToMonthWise={() => setActiveTab('monthly-predictions')}
-          />
-        )}
-        {activeTab === 'astrology-systems' && (
-          <AstrologySystemsTab
-            activeProfile={currentProfile}
-            profiles={profiles}
-            onProfileChange={handleProfileChange}
-          />
-        )}
-        {activeTab === 'divisional-charts' && (
-          <DivisionalChartsTab
-            natalHouses={natalHouses}
-            natalPlanets={natalCalc.planets}
             yogas={yogas}
             ashtakavarga={ashtakavarga}
-            lagnaRasi={natalCalc.lagnaRasi}
-            activeProfile={currentProfile}
-          />
-        )}
-        {activeTab === 'transits' && (
-          <TransitsLiveTab
-            activeProfile={currentProfile}
-            natalPlanets={natalCalc.planets}
-            natalLagnaRasi={natalCalc.lagnaRasi}
-          />
-        )}
-        {activeTab === 'astronomical-ephemeris' && (
-          <AstronomicalEphemerisTab
-            activeProfile={currentProfile}
-            profiles={profiles}
-            onProfileChange={handleProfileChange}
-          />
-        )}
-        {activeTab === 'sadesati' && (
-          <SadeSatiTab
-            activeProfileId={activeProfileId}
-            profiles={profiles}
-          />
-        )}
-        {activeTab === 'panchang' && (
-          <PanchangTab
-            activeProfile={currentProfile}
-            natalPlanets={natalCalc.planets}
-            natalLagnaRasi={natalCalc.lagnaRasi}
-          />
-        )}
-        {activeTab === 'family-lineage' && (
-          <FamilyLineageTab
-            activeProfile={currentProfile}
-            profiles={profiles}
-            natalPlanets={natalCalc.planets}
-            natalHouses={natalHouses}
-            lagnaRasi={VEDIC_RASIS[natalCalc.lagnaRasi - 1]?.englishName || 'Aries'}
-          />
-        )}
-        {activeTab === 'compatibility' && (
-          <KundaliMatchingTab
-            activeProfileId={activeProfileId}
-            profiles={profiles}
-          />
-        )}
-        {activeTab === 'numerology' && (
-          <NumerologyTab activeProfile={currentProfile} />
-        )}
+        />
       </main>
 
-      {/* Light Portal Footer */}
-      <footer className="border-t border-[#E8DEC8] bg-[#F7F2E7] py-1.5 text-[12px] text-stone-700">
+      <footer className="border-t border-[#E8DEC8] bg-[#F7F2E7] py-2 text-[12px] text-stone-700">
         <div className="w-full max-w-6xl mx-auto px-2 sm:px-3 flex flex-col md:flex-row items-center justify-between gap-1">
           <div className="flex items-center space-x-2">
             <div className="w-6 h-6 rounded-md bg-gradient-to-br from-amber-600 via-orange-700 to-red-900 text-amber-100 flex items-center justify-center font-serif font-bold text-[13px] shadow-2xs border border-amber-400/50">

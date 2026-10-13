@@ -239,43 +239,74 @@ export function computeLifeAspectProbabilities(
     ],
   };
 
-  // 2. HOME & REAL ESTATE ACQUISITION
-  let homeScore = 52;
-  if ([4, 1, 9, 10, 11].includes(marsHouse)) homeScore += 16; // Mars Bhoomi Karaka
-  if ([4, 2, 11].includes(venHouse)) homeScore += 12; // Venus Griha Sukha
-  if ([4, 9, 1, 5].includes(jupHouse)) homeScore += 10;
-  if (isPlanetInGoodHouse(h4Lord)) homeScore += 10;
-  if (satHouse === 4) homeScore += 6; // Saturn gives old or massive permanent structures
-  homeScore = Math.max(30, Math.min(96, homeScore));
+  // 2. PROPERTY PURCHASE YOGA
+  let purchaseScore = 52;
+  if ([4, 1, 9, 10, 11].includes(marsHouse)) purchaseScore += 18;
+  if ([4, 2, 11].includes(venHouse)) purchaseScore += 14;
+  if ([4, 9, 1, 5].includes(jupHouse)) purchaseScore += 10;
+  purchaseScore = Math.max(30, Math.min(96, purchaseScore));
 
-  const homeTier: AspectProbabilityTier =
-    homeScore >= 80 ? 'Very High (85-98%)' : homeScore >= 68 ? 'High (70-84%)' : 'Moderate (50-69%)';
+  const purchaseTier: AspectProbabilityTier =
+    purchaseScore >= 80 ? 'Very High (85-98%)' : purchaseScore >= 68 ? 'High (70-84%)' : 'Moderate (50-69%)';
 
-  const homeItem: AspectProbabilityItem = {
-    id: 'home',
-    title: 'Home & Real Estate Acquisition',
-    sanskritTitle: 'गृह सुख व भूमि योग (Griha Pravesh)',
+  const purchaseItem: AspectProbabilityItem = {
+    id: 'property_purchase',
+    title: 'Property Purchase Potential',
+    sanskritTitle: 'भूमि-गृह क्रय योग (Bhoomi Kraya)',
     category: 'vital_events',
-    probability: homeScore,
-    probabilityTier: homeTier,
-    verdict:
-      homeScore >= 72
-        ? 'Bhoomi Bhawana Yoga active: Exceptional likelihood of owning multiple prime residential and commercial properties.'
-        : 'Guaranteed residential property acquisition with steady accumulation; best realized after establishing stable family foundations.',
+    probability: purchaseScore,
+    probabilityTier: purchaseTier,
+    verdict: purchaseScore >= 72
+      ? 'Strong Bhoomi-Kraya Yoga: Exceptional likelihood of purchasing prime land, houses, or independent villas.'
+      : 'Steady accumulation of real estate assets favored, with acquisition likely during auspicious transit cycles.',
     governingHouses: [4, 2, 11],
-    keyPlanets: ['Mangal', 'Shukra', 'Guru', 'Shani'],
+    keyPlanets: ['Mangal', 'Shukra', 'Guru'],
     yogasDetected: [
-      marsHouse === 4 || marsHouse === 1 ? 'Bhoomi Karaka Yoga (Mars)' : 'Griha Sukha Yoga',
-      venHouse === 4 ? 'Malavya Aesthetic Mansion Yoga' : 'Vastu Dhana Yoga',
-      'Sthira Sampatti (Permanent Asset) Combination',
+      marsHouse === 4 || marsHouse === 1 ? 'Bhoomi Karaka Yoga' : 'Property Acquisition Yoga',
+      venHouse === 4 ? 'Malavya Mansion Yoga' : 'Real Estate Dhan Yoga',
     ],
-    timingWindow: 'Most auspicious home acquisition window: Age 28–32, and subsequent expansion at Age 41–44.',
-    detailedAnalysis: `The 4th House (Sukha Bhava) governs fixed assets, land, vehicles, and peace of mind. Mangal (Mars) acts as the celestial Bhoomi Karaka (architect of land) placed in House ${marsHouse}, while Shukra (Venus) infuses modern comforts, interior opulence, and architectural harmony from House ${venHouse}. You are favored to acquire ${marsHouse === 4 ? 'landed property or independent villa construction' : 'high-rise luxury apartment with serene natural light and open ventilation'}.`,
-    protectiveMeasures: 'Perform Griha Pravesh during Uttarayana (Sun moving northward) in a fixed Nakshatra (Rohini, Uttara Phalguni, Uttara Ashadha, or Uttara Bhadrapada). Keep Northeast corner free of clutter.',
+    timingWindow: 'Optimal purchase window: During Mars or Jupiter transit over 4th or 11th houses.',
+    detailedAnalysis: 'The 4th House governs land and fixed assets. Mars acts as the architect, while Venus provides the resources for luxury.',
+    protectiveMeasures: 'Purchase land/home on auspicious days in Shukla Paksha.',
     metrics: [
-      { label: 'Bhoomi Bala (Land Power)', value: `${homeScore}%`, score: homeScore },
-      { label: 'Interior Luxury (Shukra)', value: `${isPlanetInGoodHouse('Shukra') ? 88 : 70}%`, score: isPlanetInGoodHouse('Shukra') ? 88 : 70 },
-      { label: 'Asset Permanence (Shani)', value: `${satHouse === 4 || satHouse === 10 ? 92 : 74}%`, score: satHouse === 4 || satHouse === 10 ? 92 : 74 },
+      { label: 'Land Acquisition (Mangal)', value: `${purchaseScore}%`, score: purchaseScore },
+      { label: 'Asset Value (Shukra)', value: `${isPlanetInGoodHouse('Shukra') ? 88 : 70}%`, score: isPlanetInGoodHouse('Shukra') ? 88 : 70 },
+    ],
+  };
+
+  // 3. PROPERTY SALE YOGA
+  let saleScore = 50;
+  const h4LordHouse = getHouseOfPlanet(h4Lord);
+  if ([8, 12].includes(h4LordHouse)) saleScore += 22; // 4th lord in 8/12 implies change/loss/sale
+  if ([6, 8, 12].includes(marsHouse)) saleScore += 15; // Mars in malefic houses can drive sale
+  if (satHouse === 4 || satHouse === 8) saleScore += 12;
+  saleScore = Math.max(25, Math.min(95, saleScore));
+
+  const saleTier: AspectProbabilityTier =
+    saleScore >= 80 ? 'Very High (85-98%)' : saleScore >= 68 ? 'High (70-84%)' : 'Moderate (50-69%)';
+
+  const saleItem: AspectProbabilityItem = {
+    id: 'property_sale',
+    title: 'Property Sale Potential',
+    sanskritTitle: 'भूमि-गृह विक्रय योग (Bhoomi Vikraya)',
+    category: 'vital_events',
+    probability: saleScore,
+    probabilityTier: saleTier,
+    verdict: saleScore >= 70
+      ? 'Active Property Monetization Yoga: Favorable periods for liquidating fixed assets for reinvestment or capital restructuring.'
+      : 'Potential for strategic asset disposal when supported by dasha/transit triggers, particularly during 4th/12th house activations.',
+    governingHouses: [4, 8, 12],
+    keyPlanets: ['Mangal', 'Shani', 'Rahu'],
+    yogasDetected: [
+      h4LordHouse === 12 ? 'Asset Liquidation Yoga' : 'Property Sale Yoga',
+      'Dhana-Vriddhi through Asset Realization',
+    ],
+    timingWindow: 'Optimal sale window: When the 12th lord or Rahu activates the 4th house or lord.',
+    detailedAnalysis: 'The 4th house lord in 8th/12th houses often triggers the transfer, sale, or sudden change in ownership of real estate.',
+    protectiveMeasures: 'Ensure documentation is thorough to avoid complications during asset disposal.',
+    metrics: [
+      { label: 'Liquidity Potential', value: `${saleScore}%`, score: saleScore },
+      { label: 'Market Timing (Rahu)', value: `${[8, 12].includes(rahuHouse) ? 90 : 65}%`, score: [8, 12].includes(rahuHouse) ? 90 : 65 },
     ],
   };
 
@@ -622,7 +653,8 @@ export function computeLifeAspectProbabilities(
 
   return [
     businessItem,
-    homeItem,
+    purchaseItem,
+    saleItem,
     affairItem,
     kidsItem,
     marriageItem,

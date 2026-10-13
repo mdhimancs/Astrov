@@ -167,3 +167,16 @@ h6.font-vedic {
 ::-webkit-scrollbar-thumb:hover {
   background: #B45309;
 }
+
+/* User-requested specific UI style adjustments - standardize header buttons */
+header button {
+  height: 37.8131px;
+  font-size: 11px;
+}
+header button > div > span {
+  font-size: 12px;
+}
+div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) {
+  height: 30.1124px;
+}
+

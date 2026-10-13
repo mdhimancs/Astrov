@@ -20,6 +20,7 @@ import { NorthIndianChart } from './NorthIndianChart';
 import { SouthIndianChart } from './SouthIndianChart';
 import { CelestialSkyMapWheel } from './CelestialSkyMapWheel';
 import { MoonPhasesImpact } from './MoonPhasesImpact';
+import { TransitNatalInteractionChart } from './TransitNatalInteractionChart';
 import { calculatePlanetaryPositions, buildHouseStructure, AyanamshaSystem } from '../vedicMath';
 import { HouseInfo, PlanetPosition, UserProfile } from '../types';
 import { VEDIC_RASIS } from '../data';
@@ -244,12 +245,12 @@ export function TransitsLiveTab({
         {/* Ayanamsha & Layout Controls */}
         <div className="flex items-center gap-1.5 flex-wrap">
           {/* Ayanamsha Picker */}
-          <div className="flex items-center space-x-1 bg-white border border-stone-200 rounded px-1.5 py-0.5 text-[11px]">
+          <div className="flex items-center space-x-1 bg-white border border-stone-200 rounded px-1.25 py-0.25 text-[11px]">
             <span className="font-bold text-stone-500">Ayanamsha:</span>
             <select
               value={ayanamshaSystem}
               onChange={(e) => setAyanamshaSystem(e.target.value as AyanamshaSystem)}
-              className="font-bold text-amber-950 bg-transparent text-[11px] px-1 py-0.5 focus:outline-none cursor-pointer"
+              className="font-bold text-amber-950 bg-transparent text-[11px] px-0.5 py-0 focus:outline-none cursor-pointer"
             >
               <option value="Lahiri">NC Lahiri (Chitra Paksha)</option>
               <option value="KP">KP (Krishnamurti)</option>
@@ -262,7 +263,7 @@ export function TransitsLiveTab({
           <div className="flex rounded border border-stone-200 bg-white p-0.5 text-[11px]">
             <button
               onClick={() => setChartLayout('north')}
-              className={`px-1.5 py-0.5 rounded font-bold cursor-pointer ${
+              className={`px-1.25 py-0.25 rounded font-bold cursor-pointer ${
                 chartLayout === 'north' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'text-stone-600'
               }`}
             >
@@ -270,7 +271,7 @@ export function TransitsLiveTab({
             </button>
             <button
               onClick={() => setChartLayout('south')}
-              className={`px-1.5 py-0.5 rounded font-bold cursor-pointer ${
+              className={`px-1.25 py-0.25 rounded font-bold cursor-pointer ${
                 chartLayout === 'south' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'text-stone-600'
               }`}
             >
@@ -278,7 +279,7 @@ export function TransitsLiveTab({
             </button>
             <button
               onClick={() => setChartLayout('wheel')}
-              className={`px-1.5 py-0.5 rounded font-bold cursor-pointer ${
+              className={`px-1.25 py-0.25 rounded font-bold cursor-pointer ${
                 chartLayout === 'wheel' ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'text-stone-600'
               }`}
             >
@@ -319,7 +320,7 @@ export function TransitsLiveTab({
             </button>
             <button
               onClick={() => setIsPlaying(!isPlaying)}
-              className={`px-2.5 py-1 rounded text-[12px] font-bold flex items-center space-x-1 cursor-pointer transition-all ${
+              className={`px-2 py-0.5 rounded text-[12px] font-bold flex items-center space-x-1 cursor-pointer transition-all ${
                 isPlaying
                   ? 'bg-amber-600 text-white shadow-xs'
                   : 'bg-stone-900 hover:bg-stone-800 text-white'
@@ -529,6 +530,13 @@ export function TransitsLiveTab({
             natalPlanets={natalPlanets}
             natalLagnaRasi={natalLagnaRasi}
           />
+
+          {/* D3 Transit Visualization */}
+          {showNatalOverlay && (
+            <div className="bg-white p-2 rounded-lg border border-stone-200 shadow-3xs">
+              <TransitNatalInteractionChart transitPlanets={transitPlanets} natalPlanets={natalPlanets} />
+            </div>
+          )}
 
           {/* Active Planetary Hits / Conjunctions with Natal Chart */}
           {showNatalOverlay && transitHits.length > 0 && (

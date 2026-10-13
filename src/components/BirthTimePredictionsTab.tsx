@@ -329,7 +329,10 @@ export function BirthTimePredictionsTab({
       </div>
 
       {/* BIRTH CHARTS & READINGS — COMPACT DECK OF CARDS SELECTOR (10% smaller with standardized font) */}
-      <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-stone-200/90 px-2 py-0.5 shadow-3xs">
+      <div
+        style={{ height: '24.1399px' }}
+        className="bg-white/90 backdrop-blur-sm rounded-lg border border-stone-200/90 px-2 py-0.5 shadow-3xs"
+      >
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1">
           {[
             {

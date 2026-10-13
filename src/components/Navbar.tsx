@@ -310,7 +310,7 @@ export function Navbar({
                 <button
                   type="button"
                   onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                  className="flex items-center space-x-2 sm:space-x-2.5 bg-gradient-to-r from-amber-50/95 via-amber-50/80 to-[#FAF6EE] hover:from-amber-100 hover:to-amber-50 border border-amber-300 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-left transition-all shadow-3xs cursor-pointer group max-w-[220px] sm:max-w-[340px] md:max-w-[400px]"
+                  className="flex items-center space-x-2 sm:space-x-2.5 bg-gradient-to-r from-amber-50/95 via-amber-50/80 to-[#FAF6EE] hover:from-amber-100 hover:to-amber-50 border border-amber-300 rounded-lg px-4 py-2.5 text-left transition-all shadow-3xs cursor-pointer group max-w-[220px] sm:max-w-[340px] md:max-w-[400px]"
                   title="Switch Active Profile"
                 >
                   <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-gradient-to-br from-amber-700 via-orange-700 to-amber-900 text-amber-100 flex items-center justify-center font-bold text-sm shadow-3xs shrink-0 border border-amber-400/40">
@@ -347,7 +347,7 @@ export function Navbar({
                       <button
                         type="button"
                         onClick={handleOpenAddModal}
-                        className="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 px-2.5 py-1 rounded text-[13px] font-bold flex items-center space-x-1 cursor-pointer transition-colors shadow-3xs"
+                        className="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 px-4 py-2.5 rounded text-[13px] font-bold flex items-center space-x-1 cursor-pointer transition-colors shadow-3xs"
                         title="Add New Person Profile"
                       >
                         <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -400,7 +400,7 @@ export function Navbar({
                                   handleOpenEditModal(p);
                                 }}
                                 title={`Edit ${p.name}`}
-                                className="px-2.5 py-1 rounded bg-amber-50/80 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors cursor-pointer text-[13px] font-bold flex items-center space-x-1 shadow-3xs"
+                                className="px-4 py-2.5 rounded bg-amber-50/80 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors cursor-pointer text-[13px] font-bold flex items-center space-x-1 shadow-3xs"
                               >
                                 <Edit3 className="w-3.5 h-3.5 text-amber-800" />
                                 <span>Edit</span>
@@ -413,21 +413,7 @@ export function Navbar({
                           </div>
                         );
                       })}
-                    </div>
-
-                    {/* DROPDOWN FOOTER WITH + ADD PROFILE (+2pt font & increased vertical size) */}
-                    <div className="px-3.5 py-2 border-t border-stone-100 bg-[#FAF8F5] text-[13px] text-stone-500 font-medium flex items-center justify-between">
-                      <span className="text-stone-600 font-semibold">{profiles.length} Profiles Saved</span>
-                      <button
-                        type="button"
-                        onClick={handleOpenAddModal}
-                        className="bg-amber-700 hover:bg-amber-800 text-white px-3 py-1.5 rounded text-[13px] font-bold flex items-center space-x-1 cursor-pointer transition-colors shadow-2xs"
-                        title="Add New Profile"
-                      >
-                        <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                        <span>Add Profile</span>
-                      </button>
-                    </div>
+                     </div>
                   </div>
                 )}
               </div>
@@ -468,14 +454,15 @@ export function Navbar({
         {/* Desktop Tabs - 2 rows of 7 tabs (Increased Vertical Size & Increased Font by 2 Points) */}
         <nav className="hidden lg:block pb-2 pt-1 space-y-1.5">
           <div className="grid grid-cols-7 gap-1.5">
-            {tabs.slice(0, 7).map((tab) => {
+            {tabs.slice(0, 7).map((tab, idx) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
                 <div
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`group relative rounded-md px-4 py-3 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 shadow-none border ${
+                  style={idx === 0 ? { height: '37.1032px' } : undefined}
+                  className={`group relative rounded-md px-4 py-2.5 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 shadow-none border ${
                     isActive
                       ? 'bg-amber-50/80 border-amber-300 border-b-2 border-b-amber-600 text-amber-950 font-bold shadow-3xs'
                       : 'bg-white border-stone-200/60 border-b-2 border-b-stone-200 text-stone-700 hover:border-amber-300 hover:border-b-amber-400 hover:bg-[#FAF8F5]'
@@ -501,7 +488,7 @@ export function Navbar({
                 <div
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`group relative rounded-md px-2 py-2 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 shadow-none border ${
+                  className={`group relative rounded-md px-4 py-2.5 transition-all duration-150 cursor-pointer flex items-center justify-between gap-1 shadow-none border ${
                     isActive
                       ? 'bg-amber-50/80 border-amber-300 border-b-2 border-b-amber-600 text-amber-950 font-bold shadow-3xs'
                       : 'bg-white border-stone-200/60 border-b-2 border-b-stone-200 text-stone-700 hover:border-amber-300 hover:border-b-amber-400 hover:bg-[#FAF8F5]'
