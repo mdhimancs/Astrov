@@ -92,9 +92,17 @@ export function MonthWisePredictionsTab({
     }
   }, [currentProfile]);
 
-  // Selected Month Key for Month-wise Predictions dropdown & Selected Year for Yearly Predictions
-  const [selectedMonthKey, setSelectedMonthKey] = useState<string>('2026-09');
-  const [selectedYear, setSelectedYear] = useState<number>(2026);
+  // Current date helpers for dynamic default selection
+  const now = new Date();
+  const currentActualMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const currentActualYear = now.getFullYear();
+
+  // Selected Month Key for Month-wise Predictions dropdown & Selected Year for Yearly Predictions (defaults to current month & year)
+  const [selectedMonthKey, setSelectedMonthKey] = useState<string>(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  });
+  const [selectedYear, setSelectedYear] = useState<number>(() => new Date().getFullYear());
   const [readingScope, setReadingScope] = useState<
     'monthly' | 'yearly' | 'observations' | 'impacts' | 'all'
   >('monthly');
@@ -149,7 +157,8 @@ export function MonthWisePredictionsTab({
     );
 
     // Calculate transit for the 15th of the selected month so planetary positions & houses reflect the chosen month
-    const [tYear, tMonth] = (targetMonth || '2026-09').split('-').map(Number);
+    const fallbackMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+    const [tYear, tMonth] = (targetMonth || fallbackMonth).split('-').map(Number);
     const transitDate = new Date(tYear, tMonth - 1, 15, 12, 0, 0);
 
     const transitCalc = calculatePlanetaryPositions(

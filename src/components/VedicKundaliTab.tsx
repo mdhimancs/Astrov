@@ -79,8 +79,11 @@ export function VedicKundaliTab() {
   const [chartViewMode, setChartViewMode] = useState<'natal' | 'transit' | 'dual' | 'wheel'>('natal');
   const [selectedHouse, setSelectedHouse] = useState<HouseInfo | null>(null);
 
-  // Selected Month Key for Month-wise Predictions dropdown
-  const [selectedMonthKey, setSelectedMonthKey] = useState<string>('2026-09');
+  // Selected Month Key for Month-wise Predictions dropdown (defaults to current month)
+  const [selectedMonthKey, setSelectedMonthKey] = useState<string>(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  });
 
   // AI Prediction state
   const [isLoadingAi, setIsLoadingAi] = useState(false);

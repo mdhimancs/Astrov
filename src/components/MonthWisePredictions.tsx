@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   Calendar,
   Sparkles,
@@ -6,8 +6,6 @@ import {
   XCircle,
   Flame,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   Star,
   Compass,
   Briefcase,
@@ -42,17 +40,20 @@ export function MonthWisePredictions({
     );
   }
 
-  const [monthViewMode, setMonthViewMode] = useState<'stream' | 'spotlight'>('stream');
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
-
-  // Find index of selected month
-  const currentIndex = selectedMonthKey
-    ? Math.max(0, monthlyPredictions.findIndex((m) => m.monthKey === selectedMonthKey))
-    : 0;
 
   // Current month key for today's date
   const now = new Date();
   const currentActualMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+  // Use passed selectedMonthKey or default to current actual month
+  const activeMonthKey = selectedMonthKey || currentActualMonthKey;
+
+  // Find index of selected month
+  const currentIndex = Math.max(
+    0,
+    monthlyPredictions.findIndex((m) => m.monthKey === activeMonthKey)
+  );
 
   // Filter to show 12 months before and after
   const startIndex = Math.max(0, currentIndex - 12);
@@ -63,7 +64,7 @@ export function MonthWisePredictions({
 
   const handleMonthJump = (monthKey: string) => {
     onSelectMonthKey?.(monthKey);
-    // Smooth scroll to card inside container if in stream mode
+    // Smooth scroll to card inside container
     setTimeout(() => {
       const el = document.getElementById(`month-card-${monthKey}`);
       if (el) {
@@ -72,17 +73,13 @@ export function MonthWisePredictions({
     }, 50);
   };
 
-  const handlePrevMonth = () => {
-    if (currentIndex > 0) {
-      handleMonthJump(monthlyPredictions[currentIndex - 1].monthKey);
+  // Scroll to current / active month on initial mount
+  useEffect(() => {
+    const el = document.getElementById(`month-card-${activeMonthKey}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
-  };
-
-  const handleNextMonth = () => {
-    if (currentIndex < monthlyPredictions.length - 1) {
-      handleMonthJump(monthlyPredictions[currentIndex + 1].monthKey);
-    }
-  };
+  }, []);
 
   return (
     <div className="bg-white/95 backdrop-blur-sm rounded-lg border border-amber-200/90 shadow-3xs overflow-hidden space-y-2.5 p-2.5">
@@ -95,57 +92,16 @@ export function MonthWisePredictions({
               Month-Wise Transit Predictions Stream
             </h3>
             <span className="text-[11px] text-stone-500 font-medium">
-              Showing active 25-Month window • Compact scrollable container with visible scrollbar
+              Showing active 25-Month window • Click any month below to jump
             </span>
           </div>
         </div>
 
-        {/* View Mode & Prev/Next Controls */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          <div className="flex items-center bg-stone-100 border border-stone-200 p-0.5 rounded-md text-[10.5px]">
-            <button
-              type="button"
-              onClick={() => setMonthViewMode('stream')}
-              className={`px-2 py-0.5 rounded cursor-pointer font-bold transition-all ${
-                monthViewMode === 'stream'
-                  ? 'bg-amber-800 text-white shadow-3xs'
-                  : 'text-stone-600 hover:text-stone-950'
-              }`}
-            >
-              Scroll Stream
-            </button>
-            <button
-              type="button"
-              onClick={() => setMonthViewMode('spotlight')}
-              className={`px-2 py-0.5 rounded cursor-pointer font-bold transition-all ${
-                monthViewMode === 'spotlight'
-                  ? 'bg-amber-800 text-white shadow-3xs'
-                  : 'text-stone-600 hover:text-stone-950'
-              }`}
-            >
-              Single Month
-            </button>
-          </div>
-
-          <div className="flex items-center space-x-0.5">
-            <button
-              type="button"
-              onClick={handlePrevMonth}
-              disabled={currentIndex === 0}
-              className="p-1 rounded border border-stone-200 hover:bg-stone-100 disabled:opacity-40 cursor-pointer text-stone-700"
-              title="Previous Month"
-            >
-              <ChevronLeft className="w-3.5 h-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={handleNextMonth}
-              disabled={currentIndex === monthlyPredictions.length - 1}
-              className="p-1 rounded border border-stone-200 hover:bg-stone-100 disabled:opacity-40 cursor-pointer text-stone-700"
-              title="Next Month"
-            >
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
+        {/* Active Month Indicator badge (replacing single month toggle & arrows) */}
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="text-[11px] font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-2.5 py-0.5 rounded-md flex items-center space-x-1.5 shadow-3xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
+            <span>Active: {selectedMonthData?.monthName}</span>
           </div>
         </div>
       </div>
@@ -177,14 +133,10 @@ export function MonthWisePredictions({
         </div>
       </div>
 
-      {/* Bounded Scrollable Container with Custom Scrollbar (Prevents Endless Page Length) */}
+      {/* Bounded Scrollable Container with Custom Scrollbar */}
       <div
         ref={scrollContainerRef}
-        className={`${
-          monthViewMode === 'stream'
-            ? 'max-h-[580px] overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-amber-300 hover:scrollbar-thumb-amber-400 scrollbar-track-stone-100'
-            : ''
-        }`}
+        className="max-h-[580px] overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-amber-300 hover:scrollbar-thumb-amber-400 scrollbar-track-stone-100"
       >
       {visiblePredictions.map((monthData, idx) => {
         const isCurrentMonth = monthData.monthKey === currentActualMonthKey;
@@ -203,6 +155,7 @@ export function MonthWisePredictions({
             )}
 
             <div
+              id={`month-card-${monthData.monthKey}`}
               className={`bg-white/90 backdrop-blur-sm rounded-lg border shadow-3xs overflow-hidden ${
                 isCurrentMonth
                   ? 'border-l-4 border-l-amber-500 border-amber-300 ring-1 ring-amber-300/80 bg-amber-50/15'

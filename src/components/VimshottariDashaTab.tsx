@@ -83,8 +83,11 @@ export function VimshottariDashaTab({
     };
   });
 
-  // Selected Month for Monthly Planetary Changes & Guidance
-  const [selectedMonthKey, setSelectedMonthKey] = useState<string>('2026-09');
+  // Selected Month for Monthly Planetary Changes & Guidance (defaults to current month)
+  const [selectedMonthKey, setSelectedMonthKey] = useState<string>(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  });
 
   // Selected Mahadasha for Antardashas inspection
   const [selectedMahadashaPlanet, setSelectedMahadashaPlanet] = useState<GrahaName | null>(null);
