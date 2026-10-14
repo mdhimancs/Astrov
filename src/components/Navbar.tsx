@@ -26,6 +26,7 @@ import {
   GraduationCap,
   Users,
   Calculator,
+  Circle,
 } from 'lucide-react';
 import { UserProfile } from '../types';
 import { PlaceOfBirthInput, PlaceValue } from './PlaceOfBirthInput';
@@ -233,6 +234,7 @@ export function Navbar({
     { id: 'compatibility', label: 'Matching & Remedies', icon: HeartHandshake },
     { id: 'numerology', label: 'Numerology', icon: Calculator },
     { id: 'real-planets', label: 'Real Planets & Nakshatra', icon: Sparkles },
+    { id: 'natal-chart', label: 'Natal Zodiac Wheel', icon: Circle },
   ];
 
   return (

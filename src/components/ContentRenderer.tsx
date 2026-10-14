@@ -17,6 +17,7 @@ import { FamilyLineageTab } from './FamilyLineageTab';
 import { NumerologyTab } from './NumerologyTab';
 import { RealPlanetPositionsTab } from './RealPlanetPositionsTab';
 import { CelestialSkyMapWheel } from './CelestialSkyMapWheel';
+import { NatalZodiacWheel } from './NatalZodiacWheel';
 import { calculatePlanetaryPositions } from '../vedicMath';
 import { UserProfile } from '../types';
 import { VEDIC_RASIS } from '../data';
@@ -217,6 +218,16 @@ export function ContentRenderer({
           activeProfile={currentProfile}
           profiles={profiles}
         />
+      );
+    case 'natal-chart':
+      return (
+        <div className="flex justify-center p-4">
+          <NatalZodiacWheel
+            planets={natalCalc?.planets || []}
+            houses={natalHouses || []}
+            lagnaRasi={natalCalc?.lagnaRasi || 1}
+          />
+        </div>
       );
     default:
       return null;
