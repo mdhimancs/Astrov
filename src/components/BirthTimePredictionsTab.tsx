@@ -14,10 +14,15 @@ import {
   ShieldCheck,
   Activity,
   Globe,
+  Moon,
+  Heart,
+  AlertCircle,
+  ShieldAlert,
 } from 'lucide-react';
 import { NorthIndianChart } from './NorthIndianChart';
 import { SouthIndianChart } from './SouthIndianChart';
 import { CelestialSkyMapWheel } from './CelestialSkyMapWheel';
+import { NatalZodiacWheel } from './NatalZodiacWheel';
 import { AspectStrengthTrajectoryGraph } from './AspectStrengthTrajectoryGraph';
 import { ProfileSelector } from './ProfileSelector';
 import { PlaceValue } from './PlaceOfBirthInput';
@@ -32,6 +37,7 @@ import {
   calculateBhriguAndLalKitab,
   calculateNatalYogas,
   calculateVimshottariDasha,
+  calculateChandraEmotionalSignificance,
 } from '../vedicMath';
 import {
   HouseInfo,
@@ -40,6 +46,7 @@ import {
   BirthTimeHousePrediction,
   NatalYoga,
   VimshottariDashaInfo,
+  ChandraEmotionalSignificance,
 } from '../types';
 import { POPULAR_CITIES, VEDIC_RASIS } from '../data';
 import {
@@ -112,6 +119,7 @@ export function BirthTimePredictionsTab({
   const [shadbalaSubTab, setShadbalaSubTab] = useState<string>('chart');
   const [activeBirthSectionTab, setActiveBirthSectionTab] = useState<
     | 'kundali'
+    | 'moon-sign'
     | 'aspects'
     | 'coordinates'
     | 'shadbala'
@@ -132,7 +140,11 @@ export function BirthTimePredictionsTab({
   const [natalHouses, setNatalHouses] = useState<HouseInfo[]>([]);
   const [natalLagnaRasi, setNatalLagnaRasi] = useState<number>(5);
   const [natalMoonRasi, setNatalMoonRasi] = useState<number>(5);
+  const [natalMoonDeg, setNatalMoonDeg] = useState<number>(0);
+  const [natalMoonPada, setNatalMoonPada] = useState<number>(1);
   const [natalNakshatra, setNatalNakshatra] = useState<string>('Magha');
+  const [chandraEmotional, setChandraEmotional] = useState<ChandraEmotionalSignificance | null>(null);
+  const [selectedExplorationMoonSign, setSelectedExplorationMoonSign] = useState<number | null>(null);
 
   const [housePredictions, setHousePredictions] = useState<BirthTimeHousePrediction[]>([]);
   const [natalYogas, setNatalYogas] = useState<NatalYoga[]>([]);
@@ -166,8 +178,11 @@ export function BirthTimePredictionsTab({
     setNatalPlanets(natalCalc.planets);
     setNatalHouses(nHouses);
     setNatalLagnaRasi(natalCalc.lagnaRasi);
-    setNatalMoonRasi(natalMoon.rasiNumber);
-    setNatalNakshatra(natalMoon.nakshatra);
+    setNatalMoonRasi(natalCalc.moonRasi);
+    setNatalMoonDeg(natalCalc.moonDeg);
+    setNatalMoonPada(natalCalc.moonPada);
+    setNatalNakshatra(natalCalc.moonNakshatra);
+    setChandraEmotional(natalCalc.moonEmotionalSignificance);
     setHousePredictions(hPredictions);
     setNatalYogas(yogas);
     setVimshottariDasha(dasha);
@@ -329,17 +344,19 @@ export function BirthTimePredictionsTab({
         </div>
       </div>
 
-      {/* BIRTH CHARTS & READINGS — COMPACT DECK OF CARDS SELECTOR (10% smaller with standardized font) */}
-      <div
-        style={{ height: '24.1399px' }}
-        className="bg-white/90 backdrop-blur-sm rounded-lg border border-stone-200/90 px-2 py-0.5 shadow-3xs"
-      >
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1">
+      {/* BIRTH CHARTS & READINGS — COMPACT DECK OF CARDS SELECTOR */}
+      <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-stone-200/90 px-2 py-1 shadow-3xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1">
           {[
             {
               id: 'kundali',
               title: 'Janam Kundali (D1)',
               icon: Compass,
+            },
+            {
+              id: 'moon-sign',
+              title: 'Moon Sign (Chandra)',
+              icon: Moon,
             },
             {
               id: 'aspects',
@@ -375,21 +392,21 @@ export function BirthTimePredictionsTab({
                 onClick={() => {
                   setActiveBirthSectionTab(card.id as any);
                 }}
-                className={`group relative rounded-md px-1.5 py-0.5 transition-all duration-150 cursor-pointer border flex items-center justify-between gap-1 shadow-3xs ${
+                className={`group relative rounded-md px-1.5 py-1 transition-all duration-150 cursor-pointer border flex items-center justify-between gap-1 shadow-3xs ${
                   isActive
                     ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
                     : 'bg-white border-stone-200/70 hover:border-amber-300 hover:bg-[#FAF8F5]'
                 }`}
               >
                 <span
-                  className={`font-ui font-semibold text-[10px] leading-tight truncate ${
+                  className={`font-ui font-semibold text-[10px] sm:text-[10.5px] leading-tight truncate ${
                     isActive ? 'text-amber-950 font-bold' : 'text-stone-800'
                   }`}
                 >
                   {card.title}
                 </span>
                 <Icon
-                  className={`w-2.5 h-2.5 shrink-0 ${
+                  className={`w-3 h-3 shrink-0 ${
                     isActive ? 'text-amber-700' : 'text-stone-400 group-hover:text-amber-600'
                   }`}
                 />
@@ -461,12 +478,10 @@ export function BirthTimePredictionsTab({
                 />
               ) : (
                 <div className="w-full flex justify-center py-1 overflow-x-auto">
-                  <CelestialSkyMapWheel
-                    livePlanets={natalPlanets}
-                    natalPlanets={natalPlanets}
+                  <NatalZodiacWheel
+                    planets={natalPlanets}
+                    houses={natalHouses}
                     lagnaRasi={natalLagnaRasi}
-                    seekerName=""
-                    locationName={selectedCity.name}
                   />
                 </div>
               )}
@@ -477,15 +492,30 @@ export function BirthTimePredictionsTab({
               {/* Core Natal Vitals Bar (Ascendant, Moon Sign, Nakshatra, Current Dasha) */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                 {[
-                  { label: 'Ascendant', val: VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName, lord: VEDIC_RASIS[natalLagnaRasi - 1]?.lord, textColor: 'text-amber-800' },
-                  { label: 'Moon Sign', val: VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName, lord: VEDIC_RASIS[natalMoonRasi - 1]?.lord, textColor: 'text-sky-800' },
-                  { label: 'Nakshatra', val: natalNakshatra, lord: `Dasha: ${vimshottariDasha?.birthLord}`, textColor: 'text-emerald-800' },
-                  { label: 'Current Dasha', val: `${vimshottariDasha?.currentLord} Dasha`, lord: 'Active Phase', textColor: 'text-purple-800' },
+                  { id: 'lagna', label: 'Ascendant', val: VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName, lord: VEDIC_RASIS[natalLagnaRasi - 1]?.lord, textColor: 'text-amber-800' },
+                  { id: 'moon', label: 'Moon Sign', val: VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName, lord: `Chandra • ${chandraEmotional?.englishName || ''}`, textColor: 'text-sky-800', isClickable: true },
+                  { id: 'nakshatra', label: 'Nakshatra', val: natalNakshatra, lord: `Dasha: ${vimshottariDasha?.birthLord}`, textColor: 'text-emerald-800' },
+                  { id: 'dasha', label: 'Current Dasha', val: `${vimshottariDasha?.currentLord} Dasha`, lord: 'Active Phase', textColor: 'text-purple-800' },
                 ].map((item, idx) => (
-                  <div key={idx} className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/80 px-2.5 py-1.5 shadow-3xs">
-                    <span className={`text-[11px] font-black ${item.textColor} uppercase tracking-wider block`}>
-                      {item.label}
-                    </span>
+                  <div
+                    key={idx}
+                    onClick={() => {
+                      if (item.isClickable) setActiveBirthSectionTab('moon-sign');
+                    }}
+                    className={`bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/80 px-2.5 py-1.5 shadow-3xs transition-all ${
+                      item.isClickable ? 'cursor-pointer hover:border-sky-400 hover:bg-sky-50/50 group' : ''
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[11px] font-black ${item.textColor} uppercase tracking-wider block`}>
+                        {item.label}
+                      </span>
+                      {item.isClickable && (
+                        <span className="text-[9.5px] text-sky-600 font-bold group-hover:underline">
+                          Emotions →
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-baseline space-x-1 mt-0.5">
                       <span className="text-[14px] font-vedic font-bold text-stone-900 leading-snug">
                         {item.val}
@@ -538,6 +568,101 @@ export function BirthTimePredictionsTab({
                   ))}
                 </div>
               </div>
+
+              {/* Moon Sign (Chandra Rasi) & Emotional Significance Card */}
+              {chandraEmotional && (
+                <div className="bg-gradient-to-br from-sky-50/70 via-white to-amber-50/40 rounded-lg border border-sky-200/90 px-3 py-2.5 shadow-2xs space-y-2">
+                  <div className="flex items-center justify-between border-b border-sky-100 pb-1.5">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-7 h-7 rounded-md bg-sky-100 border border-sky-300 flex items-center justify-center text-sky-800 shadow-3xs">
+                        <Moon className="w-4 h-4 fill-sky-500 text-sky-700" />
+                      </div>
+                      <div>
+                        <h4 className="font-vedic font-bold text-stone-900 text-[14px] flex items-center space-x-1.5 leading-none">
+                          <span>Chandra Rasi: {chandraEmotional.sanskritName} ({chandraEmotional.englishName})</span>
+                        </h4>
+                        <span className="text-[11px] font-medium text-stone-500">
+                          {chandraEmotional.symbol} • {chandraEmotional.element} Element • Lord: {chandraEmotional.rulingPlanet}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded border shadow-3xs ${
+                        chandraEmotional.dignity.includes('Exalted') || chandraEmotional.dignity.includes('Own')
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          : chandraEmotional.dignity.includes('Debilitated')
+                          ? 'bg-rose-50 text-rose-800 border-rose-200'
+                          : 'bg-amber-50 text-amber-800 border-amber-200'
+                      }`}>
+                        {chandraEmotional.dignity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setActiveBirthSectionTab('moon-sign')}
+                        className="text-[11px] text-sky-800 hover:text-sky-950 font-bold hover:underline cursor-pointer flex items-center space-x-0.5"
+                      >
+                        <span>Deep Dossier →</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Archetype & Core Emotional Mindset */}
+                  <div className="bg-white/90 rounded-md border border-sky-100 p-2 space-y-1">
+                    <div className="flex items-center space-x-1.5">
+                      <Heart className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                      <span className="text-[12.5px] font-bold text-stone-900 font-ui">
+                        {chandraEmotional.coreEmotionalArchetype}
+                      </span>
+                    </div>
+                    <p className="text-[12.5px] text-stone-700 leading-snug">
+                      {chandraEmotional.emotionalMindset}
+                    </p>
+                  </div>
+
+                  {/* Emotional Strengths & Stress Triggers Mini Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11.5px]">
+                    <div className="space-y-1 bg-emerald-50/50 rounded-md border border-emerald-100 p-2">
+                      <span className="font-bold text-emerald-900 uppercase tracking-wide text-[10.5px] flex items-center space-x-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        <span>Emotional Strengths</span>
+                      </span>
+                      <ul className="space-y-0.5 text-stone-700">
+                        {chandraEmotional.emotionalStrengths.slice(0, 2).map((s, idx) => (
+                          <li key={idx} className="flex items-start space-x-1">
+                            <span className="text-emerald-600 leading-none">•</span>
+                            <span className="leading-tight">{s}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="space-y-1 bg-amber-50/50 rounded-md border border-amber-100 p-2">
+                      <span className="font-bold text-amber-900 uppercase tracking-wide text-[10.5px] flex items-center space-x-1">
+                        <AlertCircle className="w-3 h-3 text-amber-600" />
+                        <span>Emotional Triggers</span>
+                      </span>
+                      <ul className="space-y-0.5 text-stone-700">
+                        {chandraEmotional.stressTriggers.slice(0, 2).map((t, idx) => (
+                          <li key={idx} className="flex items-start space-x-1">
+                            <span className="text-amber-600 leading-none">•</span>
+                            <span className="leading-tight">{t}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Vedic Remedy Snippet */}
+                  <div className="text-[11.5px] text-stone-600 bg-stone-50/90 rounded-md border border-stone-200/80 px-2.5 py-1.5 flex items-start space-x-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-stone-800">Vedic Mind Remedy (Chandra Shanti):</strong>{' '}
+                      <span>{chandraEmotional.vedicPsychologicalRemedy}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -584,6 +709,278 @@ export function BirthTimePredictionsTab({
           <PlanetaryAspectsAndAlerts planets={natalPlanets} activeProfile={currentProfile} />
         </div>
       )}
+
+      {/* TAB: CHANDRA RASI (MOON SIGN) & SPECIFIC EMOTIONAL SIGNIFICANCE */}
+      {activeBirthSectionTab === 'moon-sign' && (() => {
+        const displayedSignNum = selectedExplorationMoonSign || natalMoonRasi;
+        const currentChandraData = calculateChandraEmotionalSignificance(displayedSignNum);
+        const isCurrentNative = displayedSignNum === natalMoonRasi;
+
+        return (
+          <div className="space-y-3">
+            {/* Header & Moon Sign Switcher Bar */}
+            <div className="bg-gradient-to-r from-sky-50/80 via-white to-amber-50/50 rounded-xl border border-sky-200/90 p-3 sm:p-4 shadow-2xs space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-sky-100 pb-2.5">
+                <div className="flex items-center space-x-2.5">
+                  <div className="w-10 h-10 rounded-xl bg-sky-100 border border-sky-300 flex items-center justify-center text-sky-800 shadow-3xs">
+                    <Moon className="w-6 h-6 fill-sky-500 text-sky-700" />
+                  </div>
+                  <div>
+                    <h3 className="font-vedic font-bold text-stone-900 text-base sm:text-lg flex items-center space-x-2">
+                      <span>Chandra Rasi (Moon Sign) &amp; Emotional Significance</span>
+                    </h3>
+                    <p className="text-[12px] text-stone-600">
+                      Vedic Psychological Blueprint • Manas (Mind), Chitta (Subconscious), &amp; Emotional Equilibrium
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  {selectedExplorationMoonSign && selectedExplorationMoonSign !== natalMoonRasi && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedExplorationMoonSign(null)}
+                      className="text-[11px] font-bold text-amber-800 bg-amber-100/70 hover:bg-amber-200 border border-amber-300 px-2.5 py-1 rounded-md transition-colors cursor-pointer"
+                    >
+                      ← Back to Natal Moon ({VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName})
+                    </button>
+                  )}
+                  <div className="text-[12px] font-bold text-sky-900 bg-sky-100/80 px-2.5 py-1 rounded-md border border-sky-200">
+                    Active Profile: {name}
+                  </div>
+                </div>
+              </div>
+
+              {/* 12 Zodiac Moon Signs Quick Navigation Pills */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-[11px] font-bold text-stone-600">
+                  <span>Explore Chandra Rasi Emotional Archetypes:</span>
+                  <span className="text-amber-800 font-semibold">★ indicates your natal Moon sign</span>
+                </div>
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-0.5 scrollbar-none">
+                  {VEDIC_RASIS.map((rasi) => {
+                    const isSelected = displayedSignNum === rasi.number;
+                    const isNatal = rasi.number === natalMoonRasi;
+
+                    return (
+                      <button
+                        key={rasi.number}
+                        type="button"
+                        onClick={() => setSelectedExplorationMoonSign(rasi.number)}
+                        className={`rounded-lg px-2.5 py-1 text-[11px] font-ui transition-all cursor-pointer flex items-center space-x-1.5 whitespace-nowrap shrink-0 border ${
+                          isSelected
+                            ? 'bg-sky-600 border-sky-700 text-white font-bold shadow-2xs scale-102'
+                            : isNatal
+                            ? 'bg-amber-50 border-amber-300 text-amber-950 font-semibold hover:bg-amber-100'
+                            : 'bg-white border-stone-200 text-stone-700 hover:border-sky-300 hover:bg-sky-50/40'
+                        }`}
+                      >
+                        <span>{rasi.sanskritName}</span>
+                        <span className={`text-[9.5px] ${isSelected ? 'text-sky-100' : 'text-stone-400'}`}>
+                          ({rasi.englishName.slice(0, 3)})
+                        </span>
+                        {isNatal && (
+                          <span className={`text-[10px] font-black ${isSelected ? 'text-amber-300' : 'text-amber-600'}`}>
+                            ★
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Moon Sign Hero Banner */}
+            <div className="bg-white rounded-xl border border-stone-200/90 p-4 shadow-sm space-y-3">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-stone-100 pb-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-100 to-amber-100 border border-sky-300 flex items-center justify-center text-sky-800 text-2xl font-bold shadow-3xs">
+                    {currentChandraData.symbol.split(' ')[0]}
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="font-vedic font-bold text-stone-950 text-xl leading-tight">
+                        {currentChandraData.sanskritName} Rasi ({currentChandraData.englishName})
+                      </h2>
+                      {isCurrentNative ? (
+                        <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                          ★ Your Natal Moon Sign
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-stone-100 text-stone-700 border border-stone-200">
+                          Comparative Exploration
+                        </span>
+                      )}
+                      <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${
+                        currentChandraData.dignity.includes('Exalted') || currentChandraData.dignity.includes('Own')
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          : currentChandraData.dignity.includes('Debilitated')
+                          ? 'bg-rose-50 text-rose-800 border-rose-200'
+                          : 'bg-amber-50 text-amber-800 border-amber-200'
+                      }`}>
+                        {currentChandraData.dignity}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[12px] text-stone-600">
+                      <span><strong>Element:</strong> {currentChandraData.element}</span>
+                      <span>•</span>
+                      <span><strong>Ruling Graha:</strong> {currentChandraData.rulingPlanet}</span>
+                      {isCurrentNative && (
+                        <>
+                          <span>•</span>
+                          <span><strong>Moon Longitude:</strong> {natalMoonDeg.toFixed(2)}°</span>
+                          <span>•</span>
+                          <span><strong>Nakshatra:</strong> {natalNakshatra} (Pada {natalMoonPada})</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-sky-50/60 border border-sky-200 rounded-lg p-2.5 max-w-sm shrink-0">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-sky-900 block">
+                    Core Emotional Archetype
+                  </span>
+                  <span className="text-[13px] font-vedic font-bold text-stone-900 leading-snug block mt-0.5">
+                    {currentChandraData.coreEmotionalArchetype}
+                  </span>
+                </div>
+              </div>
+
+              {/* Emotional Mindset Narrative */}
+              <div className="bg-[#FAF8F5] rounded-xl border border-amber-200/80 p-3.5 space-y-1.5">
+                <div className="flex items-center space-x-2">
+                  <Heart className="w-4 h-4 text-rose-500 shrink-0" />
+                  <h4 className="font-ui font-bold text-stone-950 text-sm">
+                    The Vedic Emotional Mindset (Manas &amp; Emotional Perception)
+                  </h4>
+                </div>
+                <p className="text-[13.5px] text-stone-700 leading-relaxed">
+                  {currentChandraData.emotionalMindset}
+                </p>
+              </div>
+
+              {/* Deep Psychological Pillars Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                {/* Pillar 1: Inner Psychological Needs */}
+                <div className="bg-white rounded-xl border border-stone-200 p-3.5 space-y-1.5 shadow-3xs">
+                  <div className="flex items-center space-x-2 border-b border-stone-100 pb-1.5">
+                    <Compass className="w-4 h-4 text-sky-600" />
+                    <h4 className="font-ui font-bold text-stone-900 text-sm">
+                      Inner Psychological Needs
+                    </h4>
+                  </div>
+                  <p className="text-[13px] text-stone-700 leading-snug">
+                    {currentChandraData.innerNeeds}
+                  </p>
+                </div>
+
+                {/* Pillar 2: Instinctive Stress Reactions */}
+                <div className="bg-white rounded-xl border border-stone-200 p-3.5 space-y-1.5 shadow-3xs">
+                  <div className="flex items-center space-x-2 border-b border-stone-100 pb-1.5">
+                    <AlertCircle className="w-4 h-4 text-amber-600" />
+                    <h4 className="font-ui font-bold text-stone-900 text-sm">
+                      Instinctive Reactions Under Pressure
+                    </h4>
+                  </div>
+                  <p className="text-[13px] text-stone-700 leading-snug">
+                    {currentChandraData.instinctiveReactions}
+                  </p>
+                </div>
+
+                {/* Pillar 3: Emotional Strengths & Virtues */}
+                <div className="bg-emerald-50/40 rounded-xl border border-emerald-200/80 p-3.5 space-y-2 shadow-3xs">
+                  <div className="flex items-center space-x-2 border-b border-emerald-200/60 pb-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                    <h4 className="font-ui font-bold text-emerald-950 text-sm">
+                      Emotional Strengths &amp; Gifts
+                    </h4>
+                  </div>
+                  <ul className="space-y-1.5 text-[12.5px] text-stone-800">
+                    {currentChandraData.emotionalStrengths.map((strength, idx) => (
+                      <li key={idx} className="flex items-start space-x-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                        <span>{strength}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Pillar 4: Stress Triggers & Pressure Points */}
+                <div className="bg-amber-50/40 rounded-xl border border-amber-200/80 p-3.5 space-y-2 shadow-3xs">
+                  <div className="flex items-center space-x-2 border-b border-amber-200/60 pb-1.5">
+                    <ShieldAlert className="w-4 h-4 text-amber-700" />
+                    <h4 className="font-ui font-bold text-amber-950 text-sm">
+                      Stress Triggers &amp; Pressure Points
+                    </h4>
+                  </div>
+                  <ul className="space-y-1.5 text-[12.5px] text-stone-800">
+                    {currentChandraData.stressTriggers.map((trigger, idx) => (
+                      <li key={idx} className="flex items-start space-x-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
+                        <span>{trigger}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Pillar 5: Shadow Patterns & Growth Edges */}
+                <div className="bg-rose-50/30 rounded-xl border border-rose-200/80 p-3.5 space-y-2 shadow-3xs">
+                  <div className="flex items-center space-x-2 border-b border-rose-200/60 pb-1.5">
+                    <AlertCircle className="w-4 h-4 text-rose-600" />
+                    <h4 className="font-ui font-bold text-rose-950 text-sm">
+                      Shadow Patterns &amp; Psychological Pitfalls
+                    </h4>
+                  </div>
+                  <ul className="space-y-1.5 text-[12.5px] text-stone-800">
+                    {currentChandraData.shadowPatterns.map((shadow, idx) => (
+                      <li key={idx} className="flex items-start space-x-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-400 mt-1.5 shrink-0" />
+                        <span>{shadow}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Pillar 6: Intimacy & Relationship Attachment */}
+                <div className="bg-sky-50/40 rounded-xl border border-sky-200/80 p-3.5 space-y-2 shadow-3xs">
+                  <div className="flex items-center space-x-2 border-b border-sky-200/60 pb-1.5">
+                    <Heart className="w-4 h-4 text-sky-600" />
+                    <h4 className="font-ui font-bold text-sky-950 text-sm">
+                      Intimacy &amp; Attachment Style
+                    </h4>
+                  </div>
+                  <p className="text-[13px] text-stone-700 leading-relaxed">
+                    {currentChandraData.intimacyAndAttachment}
+                  </p>
+                </div>
+              </div>
+
+              {/* Vedic Remedy & Harmonization Banner (Chandra Shanti) */}
+              <div className="bg-gradient-to-r from-stone-900 to-amber-950 text-white rounded-xl p-4 shadow-sm space-y-2">
+                <div className="flex items-center space-x-2 text-amber-300 font-bold text-sm">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Vedic Psychological Remedy (Chandra Shanti &amp; Mind Harmonization)</span>
+                </div>
+                <p className="text-[13px] text-stone-200 leading-relaxed">
+                  {currentChandraData.vedicPsychologicalRemedy}
+                </p>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 text-[11px] text-amber-200/80 border-t border-white/10">
+                  <span>Day: Monday (Somavara)</span>
+                  <span>•</span>
+                  <span>Metal: Pure Silver</span>
+                  <span>•</span>
+                  <span>Gem: Natural Pearl (Moti) or Moonstone</span>
+                  <span>•</span>
+                  <span>Mantra: Om Som Somaya Namaha</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* TAB 2: ASPECT DIPS & RISES (HEALTH, EDUCATION, WEALTH, CAREER, RELATIONSHIPS, MENTAL PEACE) */}
       {activeBirthSectionTab === 'aspects' && (

@@ -1,4 +1,4 @@
-import { BirthDetails, PlanetPosition, HouseInfo, VedicRasiName, GrahaName, TransitPrediction, PlanetaryMovementDetail, MonthWiseTransitPrediction, YearlyPrediction, TransitDosAndDonts, PlanetaryImpactRecord, BirthTimeHousePrediction, BhriguLalKitabSummary, NatalYoga, VimshottariDashaInfo, AntardashaInfo, DashaMonthlyPlanetaryGuidance, AshtakavargaPoints, TajikaSuite, TajikaSaham, TajikaYoga } from './types';
+import { BirthDetails, PlanetPosition, HouseInfo, VedicRasiName, GrahaName, TransitPrediction, PlanetaryMovementDetail, MonthWiseTransitPrediction, YearlyPrediction, TransitDosAndDonts, PlanetaryImpactRecord, BirthTimeHousePrediction, BhriguLalKitabSummary, NatalYoga, VimshottariDashaInfo, AntardashaInfo, DashaMonthlyPlanetaryGuidance, AshtakavargaPoints, TajikaSuite, TajikaSaham, TajikaYoga, ChandraEmotionalSignificance, NatalCalculationResult } from './types';
 import { VEDIC_RASIS, NAKSHATRAS, BHAVA_DETAILS } from './data';
 import { ALL_MONTH_WISE_PREDICTIONS } from './monthlyTransitData';
 export { ALL_MONTH_WISE_PREDICTIONS };
@@ -52,17 +52,406 @@ export const PLANET_INFO: { [key in GrahaName]: { english: string; symbol: strin
   Ketu: { english: 'Ketu (South Node)', symbol: 'Ke', avgSpeed: -0.053 },
 };
 
-// Calculate planetary longitudes (approximate sidereal positions)
+// Detailed Vedic Psychological & Emotional Significance for each Chandra Rasi (Moon Sign)
+export const CHANDRA_EMOTIONAL_PROFILES: Record<number, ChandraEmotionalSignificance> = {
+  1: {
+    rasiNumber: 1,
+    sanskritName: 'Mesha',
+    englishName: 'Aries',
+    element: 'Fire',
+    rulingPlanet: 'Mangal (Mars)',
+    dignity: 'Friendly (Mitra Kshetra)',
+    symbol: '♈ Ram',
+    coreEmotionalArchetype: 'The Fiery Pioneer & Instinctive Champion',
+    emotionalMindset: 'Courageous, spontaneous, direct, and action-oriented. Emotions are experienced as quick surges of physical vitality. You process feelings by taking immediate initiative rather than quietly stewing.',
+    innerNeeds: 'Unfettered autonomy, exciting challenges, physical freedom of movement, and feeling respected as an initiator.',
+    stressTriggers: [
+      'Forced delays, bureaucratic red tape, and inaction',
+      'Micromanagement and feeling controlled or restrained',
+      'Lingering emotional ambiguity without clear solutions',
+      'Feeling passive, helpless, or cornered'
+    ],
+    instinctiveReactions: 'Instant emotional discharge or fiery candor followed by swift recovery. Rarely holds lingering grudges once emotions are expressed.',
+    emotionalStrengths: [
+      'Fearless courage when protecting loved ones',
+      'Childlike enthusiasm and infectious optimism',
+      'Rapid emotional bounce-back after setbacks',
+      'Total authenticity—what you see is what you get'
+    ],
+    shadowPatterns: [
+      'Impatience and restless irritability during slow periods',
+      'Difficulty sitting with subtle or complex vulnerability',
+      'Impulsive remarks spoken in the heat of passion'
+    ],
+    intimacyAndAttachment: 'Direct, fervent, and passionate. Needs a companion who admires courage, keeps up with adventures, and gives space without playing emotional games.',
+    vedicPsychologicalRemedy: 'Practice cooling Sheetali pranayama, drink fennel or mint infusions to pacify excess Pitta heat, chant "Om Kram Kreem Kroum Sah Bhaumaya Namaha", and engage in rigorous morning exercise.'
+  },
+  2: {
+    rasiNumber: 2,
+    sanskritName: 'Vrishabha',
+    englishName: 'Taurus',
+    element: 'Earth',
+    rulingPlanet: 'Shukra (Venus)',
+    dignity: 'Exalted (Param Uchcha)',
+    symbol: '♉ Bull',
+    coreEmotionalArchetype: 'The Anchored Nurturer & Serene Preserver',
+    emotionalMindset: 'Deeply grounded, patient, sensory-attuned, and peace-loving. Moon is exalted here (Uchcha), conferring extraordinary emotional resilience (Sthira Manas) and contentment through beauty and stability.',
+    innerNeeds: 'Domestic tranquility, material security, dependable emotional consistency, tactile warmth, and soothing aesthetics.',
+    stressTriggers: [
+      'Sudden disruptions to established routines or home sanctuary',
+      'Financial volatility or feeling physically unstable',
+      'Erratic emotional temperaments in others',
+      'Being rushed into premature decisions'
+    ],
+    instinctiveReactions: 'Digging heels in with calm stubbornness, withdrawing to familiar comforts or nature, and waiting out the storm before responding.',
+    emotionalStrengths: [
+      'Rock-solid emotional fortitude under extreme crises',
+      'Profound calming presence that soothes anxious souls',
+      'Unswerving loyalty and devotion to lifelong bonds',
+      'Aesthetic grace and deep appreciation of life pleasures'
+    ],
+    shadowPatterns: [
+      'Sensory possessiveness and reluctance to release outworn attachments',
+      'Passive resistance and resistance to necessary evolution',
+      'Seeking comfort in food, luxury, or inertia when hurt'
+    ],
+    intimacyAndAttachment: 'Devoted, sensual, and steadfast. Expresses love through steady physical affection, wholesome nourishment, and lifelong commitment.',
+    vedicPsychologicalRemedy: 'Offer fresh white flowers or raw milk to Shiva Lingam on Mondays, spend silent time in lush gardens or soil, wear serene pearl or soothing white tones, and chant "Om Som Somaya Namaha".'
+  },
+  3: {
+    rasiNumber: 3,
+    sanskritName: 'Mithuna',
+    englishName: 'Gemini',
+    element: 'Air',
+    rulingPlanet: 'Budha (Mercury)',
+    dignity: 'Friendly (Mitra Kshetra)',
+    symbol: '♊ Twins',
+    coreEmotionalArchetype: 'The Inquisitive Intellect & Storyteller of the Mind',
+    emotionalMindset: 'Curious, versatile, communicative, and intellectually receptive. You process feelings by rationalizing, dissecting, and verbalizing them. Emotional comfort comes through conversation and new ideas.',
+    innerNeeds: 'Mental variety, lively dialogue, freedom to question everything, intellectual camaraderie, and multi-faceted social ties.',
+    stressTriggers: [
+      'Monotonous routines and cognitive stagnation',
+      'Heavy emotional silence or passive-aggressive sullenness',
+      'Information deprivation or enforced isolation',
+      'Being trapped in rigid, dogmatic environments'
+    ],
+    instinctiveReactions: 'Mental over-acceleration, rapid chatting, analyzing emotional problems as logic puzzles, and shifting focus quickly.',
+    emotionalStrengths: [
+      'Remarkable mental agility and adaptability',
+      'Wit and humor that reframes difficulties gracefully',
+      'Empathetic listening and open-minded communication',
+      'Youthful curiosity and lifelong eagerness to learn'
+    ],
+    shadowPatterns: [
+      'Nervous restlessness and overthinking sleep disruptions',
+      'Superficial emotional detachment to shield inner sensitivities',
+      'Scattered emotional energy across too many interests'
+    ],
+    intimacyAndAttachment: 'Flirtatious, intellectually playful, and communicative. Seeks a partner with a brilliant mind who enjoys endless late-night discussions and banter.',
+    vedicPsychologicalRemedy: 'Evening digital detox 1 hour before sleep, journaling stream-of-consciousness thoughts onto paper, Anulom-Vilom pranayama, and chanting the Budha Beej mantra "Om Bram Breem Broum Sah Budhaya Namaha".'
+  },
+  4: {
+    rasiNumber: 4,
+    sanskritName: 'Karka',
+    englishName: 'Cancer',
+    element: 'Water',
+    rulingPlanet: 'Chandra (Moon)',
+    dignity: 'Own Sign (Swakshetra)',
+    symbol: '♋ Crab',
+    coreEmotionalArchetype: 'The Ocean Mother & Intuitive Empath',
+    emotionalMindset: 'Profoundly intuitive, empathetic, protective, and cyclical like the lunar tides. Moon resides in its own home (Swakshetra), bestowing intense empathy and instinctive attunement to others feelings.',
+    innerNeeds: 'Emotional safety, unconditional warmth, a harmonious home sanctuary, and strong family or ancestral roots.',
+    stressTriggers: [
+      'Cold indifference, harsh tones, or critical rejection',
+      'Perceived discord in the domestic sanctuary',
+      'Disloyalty from loved ones you have nurtured',
+      'Feeling emotionally exposed or defenseless'
+    ],
+    instinctiveReactions: 'Retreating into your protective shell, temporary brooding silence, and fierce maternal/protective defensiveness.',
+    emotionalStrengths: [
+      'Extraordinary psychic intuition and emotional radar',
+      'Unmatched tenderness, nurturing, and empathetic holding',
+      'Tenacious devotion that never deserts those in distress',
+      'Deep ancestral wisdom and imaginative richness'
+    ],
+    shadowPatterns: [
+      'Hypersensitivity to perceived slights or subtle shifts in tone',
+      'Clinging to past grievances or nostalgic melancholy',
+      'Emotional mood swings dictated by lunar transit phases'
+    ],
+    intimacyAndAttachment: 'Soulful, deeply bonding, and protective. Loves with wholehearted devotion and seeks a loyal anchor who honors tender emotional depth.',
+    vedicPsychologicalRemedy: 'Drink water stored in a pure silver tumbler, observe fasting or light satvik meals on Purnima (full moon), chant the Chandra Gayatri mantra, and bless elders/maternal figures.'
+  },
+  5: {
+    rasiNumber: 5,
+    sanskritName: 'Simha',
+    englishName: 'Leo',
+    element: 'Fire',
+    rulingPlanet: 'Surya (Sun)',
+    dignity: 'Friendly (Mitra Kshetra)',
+    symbol: '♌ Lion',
+    coreEmotionalArchetype: 'The Magnanimous Sovereign & Radiant Heart',
+    emotionalMindset: 'Warm, generous, noble, proud, and heartfelt. You process emotions through the lens of honor, self-respect, and creative dignity. You take immense joy in encouraging, protecting, and elevating others.',
+    innerNeeds: 'Heartfelt appreciation, respect for personal dignity, authentic creative expression, and room to shine and lead.',
+    stressTriggers: [
+      'Public humiliation, belittlement, or being ignored',
+      'Betrayal of loyalty or ingratitude from those you elevated',
+      'Feeling mediocre, powerless, or unappreciated',
+      'Petty deceit and underhanded politics'
+    ],
+    instinctiveReactions: 'Hurt royal pride, proud withdrawal, roaring defense of dignity, or masking sorrow behind a brave face.',
+    emotionalStrengths: [
+      'Unbounded generosity of spirit and noble warmth',
+      'Radiant optimism that inspires morale in hopeless times',
+      'Fierce loyalty and steadfast protection of dependents',
+      'Courage to lead with heartfelt authenticity'
+    ],
+    shadowPatterns: [
+      'Ego sensitivity and vulnerability to subtle criticism',
+      'Difficulty admitting emotional defeat or private despair',
+      'Expecting others to mirror the same royal loyalty'
+    ],
+    intimacyAndAttachment: 'Ardent, demonstrative, and deeply romantic. Treats partners like royalty and expects genuine devotion, adoration, and mutual respect.',
+    vedicPsychologicalRemedy: 'Practice Surya Namaskar facing the morning sunrise, chant the Aditya Hridaya Stotram, practice humble anonymous charity, and wear warm golden-amber hues.'
+  },
+  6: {
+    rasiNumber: 6,
+    sanskritName: 'Kanya',
+    englishName: 'Virgo',
+    element: 'Earth',
+    rulingPlanet: 'Budha (Mercury)',
+    dignity: 'Friendly (Mitra Kshetra)',
+    symbol: '♍ Maiden',
+    coreEmotionalArchetype: 'The Mindful Healer & Devoted Service-Giver',
+    emotionalMindset: 'Pragmatic, observant, modest, and analytical. You achieve emotional serenity through order, self-improvement, and acts of tangible service. You notice details others miss and seek to bring order to chaos.',
+    innerNeeds: 'Predictability, clean and organized surroundings, feeling practically helpful, and intellectual refinement.',
+    stressTriggers: [
+      'Chaotic, noisy, or disorganized environments',
+      'Unfulfilled promises, sloppy execution, and broken systems',
+      'Health anxieties or somatic tension from stress',
+      'Feeling useless or unable to remedy a problem'
+    ],
+    instinctiveReactions: 'Meticulous organizing, nervous list-making, offering practical advice rather than emotional tears, and internal critical review.',
+    emotionalStrengths: [
+      'Incredible practical empathy that shows up with real solutions',
+      'Discriminative clarity (Viveka) in sorting truth from illusion',
+      'Attentive, patient caregiving in sickness or distress',
+      'Exceptional work ethic and quiet modesty'
+    ],
+    shadowPatterns: [
+      'Chronic self-criticism and perfectionistic exhaustion',
+      'Anxiety over micro-imperfections that derail peace of mind',
+      'Difficulty accepting help from others due to high standards'
+    ],
+    intimacyAndAttachment: 'Supportive, quietly attentive, and deeply thoughtful. Shows love through acts of devotion, helping with life burdens, and reliable companionship.',
+    vedicPsychologicalRemedy: 'Practice daily mindfulness, nourish gut health with warm herbal teas, release perfectionism through journaling self-forgiveness, and feed green grass to cows on Wednesdays.'
+  },
+  7: {
+    rasiNumber: 7,
+    sanskritName: 'Tula',
+    englishName: 'Libra',
+    element: 'Air',
+    rulingPlanet: 'Shukra (Venus)',
+    dignity: 'Neutral / Friendly (Sama Kshetra)',
+    symbol: '♎ Scales',
+    coreEmotionalArchetype: 'The Graceful Diplomat & Harmonizer of Souls',
+    emotionalMindset: 'Harmonious, gentle, socially conscious, and aesthetic. You process emotions through balance and relational resonance. Your well-being is tightly intertwined with peace in partnerships and environmental beauty.',
+    innerNeeds: 'Harmonious relationships, aesthetic symmetry, fairness, gentle companionship, and absence of crude conflict.',
+    stressTriggers: [
+      'Loud confrontations, aggression, and harsh hostility',
+      'Injustice, favoritism, or unfair treatment of anyone',
+      'Being forced into lonely isolation or sudden unilateral choices',
+      'Crude, vulgar, or unrefined surroundings'
+    ],
+    instinctiveReactions: 'Mediating and appeasing to restore balance, internal hesitation, weighing pros and cons endlessly, and masking irritation behind polite smiles.',
+    emotionalStrengths: [
+      'Incomparable diplomacy and conflict de-escalation',
+      'Keen sense of emotional justice and fairness',
+      'Natural grace, social charm, and aesthetic refinement',
+      'Ability to appreciate diverse viewpoints without prejudice'
+    ],
+    shadowPatterns: [
+      'Suppressing genuine anger or needs to avoid rocking the boat',
+      'Chronic indecision due to over-analyzing equal alternatives',
+      'Over-dependence on partner validation for inner peace'
+    ],
+    intimacyAndAttachment: 'Romantic, considerate, and partner-centric. Flourishes in reciprocal love where equality, shared culture, and affectionate gentleness reign.',
+    vedicPsychologicalRemedy: 'Practice balanced Bhramari pranayama to soothe the mind, decorate your living space with symmetrical art, wear clean white/pastel garments on Fridays, and donate curd or rice to cows or women in need.'
+  },
+  8: {
+    rasiNumber: 8,
+    sanskritName: 'Vrischika',
+    englishName: 'Scorpio',
+    element: 'Water',
+    rulingPlanet: 'Mangal & Ketu (Mars/Ketu)',
+    dignity: 'Debilitated (Param Neecha)',
+    symbol: '♏ Scorpion',
+    coreEmotionalArchetype: 'The Alchemical Transformer & Mystic Depth-Seeker',
+    emotionalMindset: 'Intense, piercing, fiercely guarded, and transformative. Moon is debilitated here (Neecha) because water is contained under subterranean pressure, creating emotional depths that must undergo repeated alchemical regeneration.',
+    innerNeeds: 'Absolute psychological truth, unshakeable trust, sacred privacy, emotional depth, and soul-level loyalty.',
+    stressTriggers: [
+      'Deception, superficiality, or betrayal of confidence',
+      'Invasion of personal privacy or vulnerability exposure',
+      'Power games, manipulation, or feeling cornered',
+      'Being dismissed or told your feelings are "too much"'
+    ],
+    instinctiveReactions: 'Immediate emotional armor, piercing silent scrutiny, probing deeply for hidden motives, and holding intense self-containment.',
+    emotionalStrengths: [
+      'Unconquerable emotional resilience through life crises',
+      'Profound psychological insight into hidden human nature',
+      'Capacity for deep spiritual and emotional rebirth',
+      'Fierce, unwavering loyalty to trusted confidantes'
+    ],
+    shadowPatterns: [
+      'Suspicion, hyper-vigilance, and anticipating worst-case scenarios',
+      'Holding onto deep grievances and grudge memory',
+      'Emotional all-or-nothing extremes that exhaust energy'
+    ],
+    intimacyAndAttachment: 'All-or-nothing soul union. Extremely cautious to let down walls, but once trust is consecrated, offers unshakeable, profound intimacy.',
+    vedicPsychologicalRemedy: 'Chant the Maha Mrityunjaya Mantra (108 times), offer water and raw milk on Shiva Lingam, practice deep belly breathing to release somatic trauma, and engage in energetic cord-cutting meditation.'
+  },
+  9: {
+    rasiNumber: 9,
+    sanskritName: 'Dhanu',
+    englishName: 'Sagittarius',
+    element: 'Fire',
+    rulingPlanet: 'Guru (Jupiter)',
+    dignity: 'Friendly (Mitra Kshetra)',
+    symbol: '♐ Centaur Archer',
+    coreEmotionalArchetype: 'The Philosophical Explorer & Joyful Truth-Seeker',
+    emotionalMindset: 'Expansive, optimistic, principled, and philosophically inclined. You process emotional challenges by seeking the higher spiritual purpose (Dharma) and finding wisdom in life lessons.',
+    innerNeeds: 'Spiritual and physical freedom, philosophical horizons, truthfulness, intellectual questing, and optimism.',
+    stressTriggers: [
+      'Confinement, claustrophobic routines, and pettiness',
+      'Dogmatic hypocrisy, dishonesty, and small-minded rules',
+      'Pessimism and emotional guilt trips from others',
+      'Being unable to speak your authentic truth'
+    ],
+    instinctiveReactions: 'Philosophical reframing, seeking broader perspective, physical travel or movement, outspoken frankness, and humor.',
+    emotionalStrengths: [
+      'Natural spiritual buoyancy that lifts everyone around you',
+      'Generous moral conviction and inspiring ethical vision',
+      'Enthusiastic mentorship and philosophical wisdom',
+      'Resilience rooted in faith that the universe has a higher plan'
+    ],
+    shadowPatterns: [
+      'Blunt honesty that unintentionally wounds delicate feelings',
+      'Emotional restlessness and running away from uncomfortable intimacy',
+      'Spiritual bypassing of genuine emotional sorrow'
+    ],
+    intimacyAndAttachment: 'Inspiring, companionate, and uplifting. Needs a partner who is a fellow pilgrim in life, respects independence, and shares philosophical enthusiasm.',
+    vedicPsychologicalRemedy: 'Read sacred texts (Bhagavad Gita or Upanishads), wear saffron or haldi (turmeric) tilak, chant Guru Beej mantra "Om Gram Greem Groum Sah Gurave Namaha", and honor mentors and teachers.'
+  },
+  10: {
+    rasiNumber: 10,
+    sanskritName: 'Makara',
+    englishName: 'Capricorn',
+    element: 'Earth',
+    rulingPlanet: 'Shani (Saturn)',
+    dignity: 'Neutral (Sama Kshetra)',
+    symbol: '♑ Sea-Goat',
+    coreEmotionalArchetype: 'The Stoic Architect & Duty-Bound Master',
+    emotionalMindset: 'Pragmatic, disciplined, stoic, and patient. You regulate emotions through responsibility, structure, and constructive duty. You view life through a long-term lens and pride yourself on emotional self-mastery.',
+    innerNeeds: 'Tangible milestones, structured stability, respect for integrity, self-sufficiency, and enduring purpose.',
+    stressTriggers: [
+      'Chaos, financial uncertainty, and unmanaged commitments',
+      'Public failure, loss of status, or looking incompetent',
+      'Irrational emotional outbursts that derail work',
+      'Feeling like a burden to others'
+    ],
+    instinctiveReactions: 'Emotional compartmentalization, doubling down on work, suppressing signs of vulnerability, and adopting a dry, pragmatic demeanor.',
+    emotionalStrengths: [
+      'Monumental emotional fortitude that carries families through trials',
+      'Unshakable dependability and reliability over decades',
+      'Wise, grounded counsel that grounds erratic panics',
+      'Supreme patience and quiet dignity in adversity'
+    ],
+    shadowPatterns: [
+      'Emotional coldness or pessimism when under prolonged strain',
+      'Over-identification with duties and neglect of joy and play',
+      'Difficulty acknowledging tears or asking for emotional comfort'
+    ],
+    intimacyAndAttachment: 'Expressed through steadfast loyalty, material safeguarding, and long-term provision rather than effusive declarations. Highly devoted.',
+    vedicPsychologicalRemedy: 'Perform Seva (service to underprivileged or elderly), practice warm sesame oil self-massage (Abhyanga), cultivate joyful play without goals, and chant "Om Sham Shanaishcharaya Namaha".'
+  },
+  11: {
+    rasiNumber: 11,
+    sanskritName: 'Kumbha',
+    englishName: 'Aquarius',
+    element: 'Air',
+    rulingPlanet: 'Shani & Rahu (Saturn/Rahu)',
+    dignity: 'Friendly (Mitra Kshetra)',
+    symbol: '♒ Water-Bearer',
+    coreEmotionalArchetype: 'The Cosmic Visionary & Egalitarian Thinker',
+    emotionalMindset: 'Objective, progressive, egalitarian, and humanitarian. You perceive emotions from a broad cosmic perspective. You empathize deeply with collective struggles while maintaining a cool, philosophical detachment.',
+    innerNeeds: 'Intellectual freedom, authentic individuality, egalitarian community, and alignment with forward-thinking ideals.',
+    stressTriggers: [
+      'Conformist dogma, prejudice, and outdated social hypocrisy',
+      'Excessive emotional melodrama or clingy possessiveness',
+      'Loss of mental autonomy and freedom of expression',
+      'Cruelty or injustice toward vulnerable communities'
+    ],
+    instinctiveReactions: 'Stepping back to analyze the situation panoramically, intellectualizing feelings, and channeling frustration into social or reformist action.',
+    emotionalStrengths: [
+      'Broad tolerance and absence of petty personal judgment',
+      'Visionary empathy for humanity and social progress',
+      'True loyalty as an egalitarian and faithful friend',
+      'Capacity to remain cool-headed in collective crises'
+    ],
+    shadowPatterns: [
+      'Aloof detachment that leaves intimates feeling emotionally distanced',
+      'Stubborn ideological resistance when personal views are challenged',
+      'Difficulty processing private raw grief or messy emotions'
+    ],
+    intimacyAndAttachment: 'Rooted in profound friendship, mutual freedom, and shared purpose. Desires a partner who is a soul friend, intellectual peer, and fellow visionary.',
+    vedicPsychologicalRemedy: 'Practice silent meditation (Mouna) to quiet excessive mental air, engage in community service or animal welfare, practice grounding yoga postures, and light a mustard oil lamp on Saturdays.'
+  },
+  12: {
+    rasiNumber: 12,
+    sanskritName: 'Meena',
+    englishName: 'Pisces',
+    element: 'Water',
+    rulingPlanet: 'Guru (Jupiter)',
+    dignity: 'Friendly (Mitra Kshetra)',
+    symbol: '♓ Twin Fishes',
+    coreEmotionalArchetype: 'The Ocean Mystic & Compassionate Dreamer',
+    emotionalMindset: 'Boundless, compassionate, transcendental, and deeply intuitive. The boundaries of your emotional self are porous, absorbing the feelings of the world. You seek union with the divine through creative and spiritual surrender.',
+    innerNeeds: 'Spiritual sanctuary, creative daydreaming, gentle kindness, emotional peace, and periodic periods of peaceful seclusion.',
+    stressTriggers: [
+      'Harsh cynicism, cruelty, and materialistic brutality',
+      'Sensory or emotional overload in crowded environments',
+      'Rigid deadlines that kill imagination and contemplation',
+      'Being mocked for your gentle sensitivity or ideals'
+    ],
+    instinctiveReactions: 'Escaping into fantasy, music, art, or sleep; self-sacrificing compassion, or porous absorption of everyone else’s pain.',
+    emotionalStrengths: [
+      'Unfathomable compassion and capacity for divine forgiveness',
+      'Deep poetic, artistic, and musical inspiration',
+      'Mystical intuition and prophetic dreams',
+      'Gentle, selfless warmth that dissolves boundaries'
+    ],
+    shadowPatterns: [
+      'Porous boundaries leading to emotional martyrdom or victimhood',
+      'Escapism when facing harsh practical realities',
+      'Difficulty saying no and absorbing negative collective energies'
+    ],
+    intimacyAndAttachment: 'Soulmate romanticism, transcendent empathy, and complete devotion. Craves deep spiritual resonance and tender emotional merger.',
+    vedicPsychologicalRemedy: 'Spend peaceful time by natural bodies of water, listen to sacred Vedic chants, practice energetic grounding (protecting your aura), chant "Om Gurave Namaha", and wear soft golden or yellow garments.'
+  }
+};
+
+export function calculateChandraEmotionalSignificance(rasiNumber: number): ChandraEmotionalSignificance {
+  const norm = ((rasiNumber - 1 + 12) % 12) + 1;
+  return CHANDRA_EMOTIONAL_PROFILES[norm] || CHANDRA_EMOTIONAL_PROFILES[4];
+}
+
+// Calculate planetary longitudes (sidereal positions)
 export function calculatePlanetaryPositions(
   date: Date,
   lat: number,
   lng: number,
   ayanamshaSystem: AyanamshaSystem = 'Lahiri'
-): {
-  planets: PlanetPosition[];
-  lagnaRasi: number;
-  lagnaDeg: number;
-} {
+): NatalCalculationResult {
   const jd = getJulianDay(date);
   const t = (jd - 2451545.0) / 36525; // Centuries since J2000
   const ayanamsha = getAyanamshaValue(date.getFullYear(), ayanamshaSystem);
@@ -173,7 +562,28 @@ export function calculatePlanetaryPositions(
     };
   });
 
-  return { planets, lagnaRasi, lagnaDeg };
+  // Calculate Moon (Chandra Rasi) details directly
+  const moonPlanet = planets.find((p) => p.name === 'Chandra') || planets[1];
+  const moonRasi = moonPlanet.rasiNumber;
+  const moonDeg = moonPlanet.degree + moonPlanet.minute / 60;
+  const moonSignName = moonPlanet.rasiName;
+  const moonSignEnglish = VEDIC_RASIS[moonRasi - 1]?.englishName || 'Aries';
+  const moonNakshatra = moonPlanet.nakshatra;
+  const moonPada = moonPlanet.pada;
+  const moonEmotionalSignificance = calculateChandraEmotionalSignificance(moonRasi);
+
+  return {
+    planets,
+    lagnaRasi,
+    lagnaDeg,
+    moonRasi,
+    moonDeg,
+    moonSignName,
+    moonSignEnglish,
+    moonNakshatra,
+    moonPada,
+    moonEmotionalSignificance,
+  };
 }
 
 // Shodashavarga Divisional Chart Types

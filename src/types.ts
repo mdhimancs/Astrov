@@ -498,3 +498,35 @@ export interface TajikaSuite {
   sahams: TajikaSaham[];
   tajikYogas: TajikaYoga[];
 }
+
+export interface ChandraEmotionalSignificance {
+  rasiNumber: number;
+  sanskritName: VedicRasiName;
+  englishName: string;
+  element: 'Fire' | 'Earth' | 'Air' | 'Water';
+  rulingPlanet: string;
+  dignity: string;
+  symbol: string;
+  coreEmotionalArchetype: string;
+  emotionalMindset: string;
+  innerNeeds: string;
+  stressTriggers: string[];
+  instinctiveReactions: string;
+  emotionalStrengths: string[];
+  shadowPatterns: string[];
+  intimacyAndAttachment: string;
+  vedicPsychologicalRemedy: string;
+}
+
+export interface NatalCalculationResult {
+  planets: PlanetPosition[];
+  lagnaRasi: number;
+  lagnaDeg: number;
+  moonRasi: number;
+  moonDeg: number;
+  moonSignName: VedicRasiName;
+  moonSignEnglish: string;
+  moonNakshatra: string;
+  moonPada: number;
+  moonEmotionalSignificance: ChandraEmotionalSignificance;
+}
