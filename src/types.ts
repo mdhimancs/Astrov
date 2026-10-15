@@ -362,6 +362,51 @@ export interface NatalYoga {
   effect: string;
 }
 
+export type DashaStrengthRating = 'Strong' | 'Moderate' | 'Weak';
+
+export interface DashaStrengthInfo {
+  score: number; // 0.0 to 10.0
+  rating: DashaStrengthRating;
+  label: string;
+  statusBadge: string;
+  colorClass: {
+    bg: string;
+    text: string;
+    border: string;
+    fineLine: string;
+    lineColor: string;
+  };
+  dignity: string;
+  housePlacement: string;
+  mutualHouseAngle?: string;
+  primaryEffect: string;
+  guidanceTip: string;
+}
+
+export interface PratyantardashaInfo {
+  planet: GrahaName;
+  durationDays: number;
+  durationStr: string;
+  startDate: string;
+  endDate: string;
+  isCurrent: boolean;
+  theme: string;
+  strengthInfo: DashaStrengthInfo;
+}
+
+export interface DashaPartInfo {
+  partNumber: 1 | 2 | 3;
+  partName: string;
+  stage: 'Arambha (Beginning)' | 'Madhya (Peak Fruition)' | 'Antya (Culmination / Chhidra)';
+  startDate: string;
+  endDate: string;
+  durationYearsStr: string;
+  isCurrent: boolean;
+  strengthInfo: DashaStrengthInfo;
+  description: string;
+  focusArea: string;
+}
+
 export interface VimshottariDashaInfo {
   birthLord: GrahaName;
   birthLordTotalYears: number;
@@ -375,6 +420,8 @@ export interface VimshottariDashaInfo {
     startMonthYear: string;
     endMonthYear: string;
     lifeTheme: string;
+    strengthInfo?: DashaStrengthInfo;
+    parts?: DashaPartInfo[];
   }[];
 }
 
@@ -388,6 +435,9 @@ export interface AntardashaInfo {
   endMonthYear: string;
   isCurrent: boolean;
   theme: string;
+  strengthInfo?: DashaStrengthInfo;
+  pratyantardashas?: PratyantardashaInfo[];
+  parts?: DashaPartInfo[];
 }
 
 export interface DashaMonthlyPlanetaryGuidance {

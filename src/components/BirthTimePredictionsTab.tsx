@@ -173,7 +173,7 @@ export function BirthTimePredictionsTab({
 
     // Calculate Moon total degree across 360
     const moonTotalDeg = (natalMoon.rasiNumber - 1) * 30 + natalMoon.degree + natalMoon.minute / 60;
-    const dasha = calculateVimshottariDasha(moonTotalDeg, targetDate);
+    const dasha = calculateVimshottariDasha(moonTotalDeg, targetDate, natalCalc.planets, natalCalc.lagnaRasi);
 
     setNatalPlanets(natalCalc.planets);
     setNatalHouses(nHouses);

@@ -1,4 +1,4 @@
-import { BirthDetails, PlanetPosition, HouseInfo, VedicRasiName, GrahaName, TransitPrediction, PlanetaryMovementDetail, MonthWiseTransitPrediction, YearlyPrediction, TransitDosAndDonts, PlanetaryImpactRecord, BirthTimeHousePrediction, BhriguLalKitabSummary, NatalYoga, VimshottariDashaInfo, AntardashaInfo, DashaMonthlyPlanetaryGuidance, AshtakavargaPoints, TajikaSuite, TajikaSaham, TajikaYoga, ChandraEmotionalSignificance, NatalCalculationResult } from './types';
+import { BirthDetails, PlanetPosition, HouseInfo, VedicRasiName, GrahaName, TransitPrediction, PlanetaryMovementDetail, MonthWiseTransitPrediction, YearlyPrediction, TransitDosAndDonts, PlanetaryImpactRecord, BirthTimeHousePrediction, BhriguLalKitabSummary, NatalYoga, VimshottariDashaInfo, AntardashaInfo, DashaMonthlyPlanetaryGuidance, AshtakavargaPoints, TajikaSuite, TajikaSaham, TajikaYoga, ChandraEmotionalSignificance, NatalCalculationResult, DashaStrengthRating, DashaStrengthInfo, PratyantardashaInfo, DashaPartInfo } from './types';
 import { VEDIC_RASIS, NAKSHATRAS, BHAVA_DETAILS } from './data';
 import { ALL_MONTH_WISE_PREDICTIONS } from './monthlyTransitData';
 export { ALL_MONTH_WISE_PREDICTIONS };
@@ -1801,10 +1801,224 @@ const VIMSHOTTARI_LORDS: { planet: GrahaName; years: number; lifeTheme: string }
   { planet: 'Budha', years: 17, lifeTheme: 'Intellectual brilliance, commercial trade, writing, communication, and business agility.' },
 ];
 
+// Calculate composite Vedic Dasha / Sub-Dasha Strength (Strong, Moderate, Weak)
+export function calculateDashaStrength(
+  planet: GrahaName,
+  lagnaRasi: number = 1,
+  natalPlanets: PlanetPosition[] = [],
+  parentLord?: GrahaName
+): DashaStrengthInfo {
+  const planetObj = natalPlanets.find((p) => p.name === planet);
+  const house = planetObj?.house || 1;
+  const rasiNumber = planetObj?.rasiNumber || 1;
+  const dignity = planetObj?.dignity || 'Friendly';
+
+  // 1. Base Score by Planet Nature & Functional Favorability
+  const favorability = getPlanetFavorability(planet, lagnaRasi);
+  let score = 5.0; // neutral base
+
+  if (favorability === 'favourable') score += 2.2;
+  else if (favorability === 'unfavourable') score -= 1.2;
+  else score += 0.5;
+
+  // Natural benefics boost
+  if (['Guru', 'Shukra', 'Budha'].includes(planet)) score += 0.8;
+  if (planet === 'Chandra') score += 0.5;
+
+  // 2. Dignity evaluation
+  if (dignity === 'Exalted' || dignity === 'Moolatrikona') score += 2.0;
+  else if (dignity === 'Own') score += 1.6;
+  else if (dignity === 'Friendly') score += 0.6;
+  else if (dignity === 'Enemy') score -= 1.0;
+  else if (dignity === 'Debilitated') score -= 2.2;
+
+  // 3. House Placement from Lagna
+  if ([1, 4, 7, 10].includes(house)) score += 1.4; // Kendra (Pillars)
+  if ([5, 9].includes(house)) score += 1.8; // Trikona (Fortune & Grace)
+  if (house === 11) score += 1.4; // Labha Sthana
+  if (house === 3) score += 0.5; // Upachaya initiative
+  if (house === 6) score -= 0.6; // Debts/resistance
+  if (house === 8) score -= 1.8; // Transformative hurdles
+  if (house === 12) score -= 1.2; // Dissipation/isolation
+
+  // 4. Mutual angle with parentLord (for Antardasha or Pratyantardasha)
+  let mutualHouseAngle: string | undefined;
+  if (parentLord) {
+    const parentObj = natalPlanets.find((p) => p.name === parentLord);
+    const parentHouse = parentObj?.house || 1;
+    const dist = ((house - parentHouse + 12) % 12) + 1;
+
+    if ([1, 7].includes(dist)) {
+      score += 1.2;
+      mutualHouseAngle = `1/7 Kendra Alignment (${dist}th)`;
+    } else if ([5, 9].includes(dist)) {
+      score += 1.6;
+      mutualHouseAngle = `5/9 Trikona Harmony (${dist}th)`;
+    } else if ([4, 10].includes(dist)) {
+      score += 1.2;
+      mutualHouseAngle = `4/10 Kendra Pillar (${dist}th)`;
+    } else if ([3, 11].includes(dist)) {
+      score += 1.0;
+      mutualHouseAngle = `3/11 Upachaya Gain (${dist}th)`;
+    } else if ([2, 12].includes(dist)) {
+      score -= 1.2;
+      mutualHouseAngle = `2/12 Dwi-Dwadasha Tension (${dist}th)`;
+    } else if ([6, 8].includes(dist)) {
+      score -= 1.8;
+      mutualHouseAngle = `6/8 Shadashtaka Friction (${dist}th)`;
+    } else {
+      mutualHouseAngle = `${dist}th House Angle`;
+    }
+  }
+
+  // Clamp score between 1.5 and 9.8
+  score = Math.max(1.5, Math.min(9.8, parseFloat(score.toFixed(1))));
+
+  let rating: DashaStrengthRating = 'Moderate';
+  let statusBadge = 'Moderate (Madhyama)';
+  let colorClass = {
+    bg: 'bg-amber-50',
+    text: 'text-amber-900',
+    border: 'border-amber-200',
+    fineLine: 'bg-amber-500',
+    lineColor: '#f59e0b',
+  };
+
+  if (score >= 7.2) {
+    rating = 'Strong';
+    statusBadge = 'Strong (Balavan)';
+    colorClass = {
+      bg: 'bg-emerald-50',
+      text: 'text-emerald-900',
+      border: 'border-emerald-200',
+      fineLine: 'bg-emerald-500',
+      lineColor: '#10b981',
+    };
+  } else if (score < 4.8) {
+    rating = 'Weak';
+    statusBadge = 'Weak / Sensitive (Nirbala)';
+    colorClass = {
+      bg: 'bg-rose-50',
+      text: 'text-rose-900',
+      border: 'border-rose-200',
+      fineLine: 'bg-rose-500',
+      lineColor: '#f43f5e',
+    };
+  }
+
+  const primaryEffect =
+    rating === 'Strong'
+      ? `${planet} radiates auspicious vitality in House ${house}, delivering constructive breakthroughs, high confidence, and auspicious returns.`
+      : rating === 'Moderate'
+      ? `${planet} provides steady, stable progression in House ${house}; rewards consistent daily discipline and structured planning.`
+      : `${planet} indicates sensitive karmic friction or delays in House ${house}; requires patience, emotional calm, and protective remedies.`;
+
+  const guidanceTip =
+    rating === 'Strong'
+      ? 'Favorable period to launch major ventures, sign agreements, and expand horizons.'
+      : rating === 'Moderate'
+      ? 'Consolidate ongoing affairs and maintain balanced expenditure and communication.'
+      : 'Avoid high-risk speculation; practice dedicated mantras and lifestyle safeguards.';
+
+  const label = `${rating} (${score}/10) • ${dignity} in H${house}${mutualHouseAngle ? ` • ${mutualHouseAngle}` : ''}`;
+
+  return {
+    score,
+    rating,
+    label,
+    statusBadge,
+    colorClass,
+    dignity,
+    housePlacement: `House ${house} (${VEDIC_RASIS[rasiNumber - 1]?.sanskritName || ''})`,
+    mutualHouseAngle,
+    primaryEffect,
+    guidanceTip,
+  };
+}
+
+// Calculate 9 Pratyantardashas (Parts / Sub-Sub-Periods of an Antardasha)
+export function calculatePratyantardashas(
+  mahadashaPlanet: GrahaName,
+  antardashaPlanet: GrahaName,
+  antardashaDurationMonths: number,
+  antardashaStartAge: number,
+  birthDateStr: string = '1990-05-18',
+  natalPlanets: PlanetPosition[] = [],
+  natalLagnaRasi: number = 1
+): PratyantardashaInfo[] {
+  const dateParts = birthDateStr.split('-').map(Number);
+  const birthYear = dateParts[0] || 1990;
+  const birthMonth = (dateParts[1] || 5) - 1;
+  const birthDay = dateParts[2] || 15;
+  const baseBirthDate = new Date(birthYear, birthMonth, birthDay);
+
+  const now = new Date();
+  const lordIndex = VIMSHOTTARI_LORDS.findIndex((item) => item.planet === antardashaPlanet);
+  const baseIdx = lordIndex >= 0 ? lordIndex : 0;
+
+  // Total Antardasha duration in days (approx 365.25 / 12 = 30.4375 days per month)
+  const totalDays = antardashaDurationMonths * 30.4375;
+  const pratyantars: PratyantardashaInfo[] = [];
+
+  // Start date of Antardasha in real time
+  const antarStartDate = new Date(baseBirthDate.getTime());
+  antarStartDate.setMonth(antarStartDate.getMonth() + Math.round(antardashaStartAge * 12));
+
+  let accumulatedDays = 0;
+
+  for (let i = 0; i < 9; i++) {
+    const subLordData = VIMSHOTTARI_LORDS[(baseIdx + i) % 9];
+    const pDays = (totalDays * subLordData.years) / 120;
+    const durationDays = Math.max(1, Math.round(pDays));
+
+    const pStartDate = new Date(antarStartDate.getTime() + accumulatedDays * 86400000);
+    const pEndDate = new Date(pStartDate.getTime() + durationDays * 86400000);
+
+    const isCurrent = now >= pStartDate && now < pEndDate;
+
+    const formatShortDate = (d: Date) => {
+      const day = d.getDate();
+      const m = d.toLocaleString('en-US', { month: 'short' });
+      const yr = d.getFullYear();
+      return `${day} ${m} ${yr}`;
+    };
+
+    const durationStr = durationDays >= 14
+      ? `${(durationDays / 7).toFixed(1)} wks (${durationDays}d)`
+      : `${durationDays} days`;
+
+    const strengthInfo = calculateDashaStrength(
+      subLordData.planet,
+      natalLagnaRasi,
+      natalPlanets,
+      antardashaPlanet
+    );
+
+    const theme = `${mahadashaPlanet}–${antardashaPlanet}–${subLordData.planet}: ${subLordData.planet} sub-portion activating ${strengthInfo.housePlacement}.`;
+
+    pratyantars.push({
+      planet: subLordData.planet,
+      durationDays,
+      durationStr,
+      startDate: formatShortDate(pStartDate),
+      endDate: formatShortDate(pEndDate),
+      isCurrent,
+      theme,
+      strengthInfo,
+    });
+
+    accumulatedDays += durationDays;
+  }
+
+  return pratyantars;
+}
+
 // Calculate Vimshottari Dasha periods based on Natal Moon position
 export function calculateVimshottariDasha(
   natalMoonDegreeTotal: number,
-  birthDateStr: string = '1990-05-18'
+  birthDateStr: string = '1990-05-18',
+  natalPlanets: PlanetPosition[] = [],
+  natalLagnaRasi: number = 1
 ): VimshottariDashaInfo {
   // Each Nakshatra spans 13° 20' = 13.3333°
   const nakshatraSpan = 360 / 27; // 13.333333 degrees
@@ -1844,6 +2058,7 @@ export function calculateVimshottariDasha(
 
   // First (birth) Mahadasha with balance
   const firstDuration = parseFloat(yearsRemaining.toFixed(1));
+  const birthStrength = calculateDashaStrength(birthLord, natalLagnaRasi, natalPlanets);
   cycle.push({
     planet: birthLord,
     durationYears: firstDuration,
@@ -1852,6 +2067,8 @@ export function calculateVimshottariDasha(
     startMonthYear: getMonthYearStr(baseBirthDate, 0),
     endMonthYear: getMonthYearStr(baseBirthDate, firstDuration),
     lifeTheme: birthLordData.lifeTheme,
+    strengthInfo: birthStrength,
+    parts: calculateMahadashaParts(birthLord, firstDuration, 0, baseBirthDate, natalLagnaRasi, natalPlanets),
   });
   cumAge = yearsRemaining;
 
@@ -1868,6 +2085,8 @@ export function calculateVimshottariDasha(
       currentActiveLord = nextLordData.planet;
     }
 
+    const mStrength = calculateDashaStrength(nextLordData.planet, natalLagnaRasi, natalPlanets);
+
     cycle.push({
       planet: nextLordData.planet,
       durationYears: nextLordData.years,
@@ -1876,6 +2095,8 @@ export function calculateVimshottariDasha(
       startMonthYear,
       endMonthYear,
       lifeTheme: nextLordData.lifeTheme,
+      strengthInfo: mStrength,
+      parts: calculateMahadashaParts(nextLordData.planet, nextLordData.years, startAge, baseBirthDate, natalLagnaRasi, natalPlanets),
     });
     cumAge += nextLordData.years;
   }
@@ -1889,12 +2110,80 @@ export function calculateVimshottariDasha(
   };
 }
 
-// Calculate 9 Antardashas (Sub-Periods) within a given Mahadasha
+// Calculate the 3 Classical Tri-Bhaga Parts of a Mahadasha (1st, 2nd, and 3rd Part)
+export function calculateMahadashaParts(
+  planet: GrahaName,
+  totalYears: number,
+  startAge: number,
+  baseBirthDate: Date,
+  natalLagnaRasi: number = 1,
+  natalPlanets: PlanetPosition[] = []
+): DashaPartInfo[] {
+  const partDuration = Math.max(0.1, totalYears / 3);
+  const now = new Date();
+  const diffMonths = (now.getFullYear() - baseBirthDate.getFullYear()) * 12 + (now.getMonth() - baseBirthDate.getMonth());
+  const currentAge = Math.max(0, diffMonths / 12);
+
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const getMonthYearStr = (date: Date, offsetYears: number) => {
+    const d = new Date(date.getTime());
+    d.setMonth(d.getMonth() + Math.round(offsetYears * 12));
+    return `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+  };
+
+  const planetObj = natalPlanets.find((p) => p.name === planet);
+  const house = planetObj?.house || 1;
+  const rasi = planetObj?.rasiName || 'Mesha';
+  const baseStrength = calculateDashaStrength(planet, natalLagnaRasi, natalPlanets);
+
+  return [
+    {
+      partNumber: 1,
+      partName: 'Prathama Bhaga (1st Part — Entry & Sign)',
+      stage: 'Arambha (Beginning)',
+      startDate: getMonthYearStr(baseBirthDate, startAge),
+      endDate: getMonthYearStr(baseBirthDate, startAge + partDuration),
+      durationYearsStr: `${partDuration.toFixed(1)} yrs`,
+      isCurrent: currentAge >= startAge && currentAge < startAge + partDuration,
+      strengthInfo: baseStrength,
+      description: `Opening phase: ${planet} acclimatizes the psyche to its occupied sign ${rasi} in House ${house}. Initial karmic shifts and behavioral patterns take shape.`,
+      focusArea: `Rasi ${rasi} & House ${house} Foundation`,
+    },
+    {
+      partNumber: 2,
+      partName: 'Madhyama Bhaga (2nd Part — Core Fruition & Peak)',
+      stage: 'Madhya (Peak Fruition)',
+      startDate: getMonthYearStr(baseBirthDate, startAge + partDuration),
+      endDate: getMonthYearStr(baseBirthDate, startAge + 2 * partDuration),
+      durationYearsStr: `${partDuration.toFixed(1)} yrs`,
+      isCurrent: currentAge >= startAge + partDuration && currentAge < startAge + 2 * partDuration,
+      strengthInfo: baseStrength,
+      description: `Peak operational phase: ${planet}'s essential dignity and Shadbala express at maximum intensity. Core career, financial, and personal breakthroughs materialize.`,
+      focusArea: `${planet} Essential Potency & Major Fruits`,
+    },
+    {
+      partNumber: 3,
+      partName: 'Antya Bhaga (3rd Part — Culmination & Chhidra Transition)',
+      stage: 'Antya (Culmination / Chhidra)',
+      startDate: getMonthYearStr(baseBirthDate, startAge + 2 * partDuration),
+      endDate: getMonthYearStr(baseBirthDate, startAge + 3 * partDuration),
+      durationYearsStr: `${partDuration.toFixed(1)} yrs`,
+      isCurrent: currentAge >= startAge + 2 * partDuration && currentAge <= startAge + 3 * partDuration,
+      strengthInfo: baseStrength,
+      description: `Closing transition (Chhidra Dasha): House lordships consolidate. Mind and circumstances prepare for the handover to the incoming planetary ruler.`,
+      focusArea: `House Lordships & Handover Transition`,
+    },
+  ];
+}
+
+// Calculate 9 Antardashas (Sub-Periods) within a given Mahadasha with Strength and Sub-Portions
 export function calculateAntardashas(
   mahadashaPlanet: GrahaName,
   mahadashaDuration: number,
   startAge: number,
-  birthDateStr: string = '1990-05-18'
+  birthDateStr: string = '1990-05-18',
+  natalPlanets: PlanetPosition[] = [],
+  natalLagnaRasi: number = 1
 ): AntardashaInfo[] {
   const dateParts = birthDateStr.split('-').map(Number);
   const birthYear = dateParts[0] || 1990;
@@ -1935,6 +2224,63 @@ export function calculateAntardashas(
 
     const theme = `${mahadashaPlanet}–${subLordData.planet}: ${subLordData.lifeTheme}`;
 
+    const strengthInfo = calculateDashaStrength(
+      subLordData.planet,
+      natalLagnaRasi,
+      natalPlanets,
+      mahadashaPlanet
+    );
+
+    const pratyantardashas = calculatePratyantardashas(
+      mahadashaPlanet,
+      subLordData.planet,
+      durationMonths,
+      curAge,
+      birthDateStr,
+      natalPlanets,
+      natalLagnaRasi
+    );
+
+    const antarPartDuration = subDurationYears / 3;
+    const antarParts: DashaPartInfo[] = [
+      {
+        partNumber: 1,
+        partName: `${subLordData.planet} Entry Phase (Arambha)`,
+        stage: 'Arambha (Beginning)',
+        startDate: getMonthYearStr(baseBirthDate, curAge),
+        endDate: getMonthYearStr(baseBirthDate, curAge + antarPartDuration),
+        durationYearsStr: `${(durationMonths / 3).toFixed(1)} mos`,
+        isCurrent: currentAge >= curAge && currentAge < curAge + antarPartDuration,
+        strengthInfo,
+        description: `Orientation phase: ${subLordData.planet} aligns with ${mahadashaPlanet} Mahadasha. Karmic seeds sprout.`,
+        focusArea: 'Initial Activation & Acclimatization',
+      },
+      {
+        partNumber: 2,
+        partName: `${subLordData.planet} Core Manifestation (Madhya)`,
+        stage: 'Madhya (Peak Fruition)',
+        startDate: getMonthYearStr(baseBirthDate, curAge + antarPartDuration),
+        endDate: getMonthYearStr(baseBirthDate, curAge + 2 * antarPartDuration),
+        durationYearsStr: `${(durationMonths / 3).toFixed(1)} mos`,
+        isCurrent: currentAge >= curAge + antarPartDuration && currentAge < curAge + 2 * antarPartDuration,
+        strengthInfo,
+        description: `Peak manifestation phase: Direct delivery of results for ${strengthInfo.housePlacement} under ${mahadashaPlanet}.`,
+        focusArea: 'Peak Karmic Fruition',
+      },
+      {
+        partNumber: 3,
+        partName: `${subLordData.planet} Transition Phase (Antya)`,
+        stage: 'Antya (Culmination / Chhidra)',
+        startDate: getMonthYearStr(baseBirthDate, curAge + 2 * antarPartDuration),
+        endDate: getMonthYearStr(baseBirthDate, subEndAge),
+        durationYearsStr: `${(durationMonths / 3).toFixed(1)} mos`,
+        isCurrent: currentAge >= curAge + 2 * antarPartDuration && currentAge <= subEndAge,
+        strengthInfo,
+        description: `Closing phase: Consolidation of gains, resolution of friction, and handover to the next sub-period lord.`,
+        focusArea: 'Consolidation & Transition',
+      },
+    ];
+
     antardashas.push({
       planet: subLordData.planet,
       durationMonths,
@@ -1945,6 +2291,9 @@ export function calculateAntardashas(
       endMonthYear,
       isCurrent,
       theme,
+      strengthInfo,
+      pratyantardashas,
+      parts: antarParts,
     });
 
     curAge = subEndAge;

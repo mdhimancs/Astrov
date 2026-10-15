@@ -1,4 +1,4 @@
-import { GrahaName, PlanetPosition } from '../types';
+import { GrahaName, PlanetPosition, VimshottariDashaInfo } from '../types';
 import { calculatePlanetaryPositions, calculateVimshottariDasha, calculateAntardashas } from '../vedicMath';
 import { VEDIC_RASIS } from '../data';
 
@@ -234,6 +234,7 @@ export function generateLifeMilestonesAndCriticalTransits(
   bestWealthPeriods: CriticalDashaTransitMilestone[];
   currentPeriod: CriticalDashaTransitMilestone | undefined;
   cheiroSummary: CheiroProfileSummary;
+  vimshottariDasha: VimshottariDashaInfo;
 } {
   const birthDateTime = new Date(`${birthDateStr}T${birthTimeStr}:00`);
   const natalCalc = calculatePlanetaryPositions(birthDateTime, latitude, longitude);
@@ -244,7 +245,12 @@ export function generateLifeMilestonesAndCriticalTransits(
   const natalLagnaRasi = natalCalc.lagnaRasi || 1;
 
   // 1. Calculate Vimshottari Mahadashas
-  const vimshottariDasha = calculateVimshottariDasha(natalMoonTotalDeg, birthDateStr);
+  const vimshottariDasha = calculateVimshottariDasha(
+    natalMoonTotalDeg,
+    birthDateStr,
+    natalCalc.planets,
+    natalLagnaRasi
+  );
   const cheiroSummary = getCheiroProfileSummary(birthDateStr);
 
   const dateParts = birthDateStr.split('-').map(Number);
@@ -254,7 +260,8 @@ export function generateLifeMilestonesAndCriticalTransits(
   const baseBirthDate = new Date(birthYear, birthMonth, birthDay);
 
   const now = new Date();
-  const currentAge = (now.getTime() - baseBirthDate.getTime()) / (365.25 * 24 * 3600 * 1000);
+  const diffMonths = (now.getFullYear() - baseBirthDate.getFullYear()) * 12 + (now.getMonth() - baseBirthDate.getMonth());
+  const currentAge = Math.max(0, diffMonths / 12);
 
   const milestones: CriticalDashaTransitMilestone[] = [];
 
@@ -265,7 +272,9 @@ export function generateLifeMilestonesAndCriticalTransits(
       maha.planet,
       maha.durationYears,
       maha.startAge,
-      birthDateStr
+      birthDateStr,
+      natalCalc.planets,
+      natalLagnaRasi
     );
 
     antardashas.forEach((antar, antarIdx) => {
@@ -290,9 +299,14 @@ export function generateLifeMilestonesAndCriticalTransits(
       const jupHouseFromMoon = ((jupRasi - natalMoonRasi + 12) % 12) + 1;
       const jupHouseFromLagna = ((jupRasi - natalLagnaRasi + 12) % 12) + 1;
 
-      const isCurrent = currentAge >= antar.startAge && currentAge < antar.endAge;
-      const isPast = antar.endAge <= currentAge;
-      const isFuture = antar.startAge > currentAge;
+      const isCurrent =
+        (antar.isCurrent || (currentAge >= antar.startAge && currentAge < antar.endAge)) &&
+        (maha.planet === vimshottariDasha.currentLord || (currentAge >= maha.startAge && currentAge < maha.endAge));
+      const isPast =
+        maha.planet !== vimshottariDasha.currentLord
+          ? maha.endAge <= currentAge
+          : antar.endAge <= currentAge;
+      const isFuture = !isCurrent && !isPast;
 
       // Evaluate Astrological Potency
       const isJupiterBenefic = [1, 2, 5, 7, 9, 11].includes(jupHouseFromMoon) || [1, 5, 9, 10, 11].includes(jupHouseFromLagna);
@@ -657,7 +671,21 @@ export function generateLifeMilestonesAndCriticalTransits(
     (m) => (m.primaryDomain === 'Wealth & Property' || m.secondaryDomain === 'Wealth & Property') && m.ratingStars >= 4.5
   );
 
-  const currentPeriod = milestones.find((m) => m.isCurrent);
+  let currentPeriod = milestones.find((m) => m.isCurrent);
+  if (!currentPeriod && milestones.length > 0) {
+    currentPeriod = milestones.find((m) => currentAge >= m.startAge && currentAge <= m.endAge);
+    if (!currentPeriod) {
+      currentPeriod = milestones.reduce((prev, curr) => {
+        const prevMid = (prev.startAge + prev.endAge) / 2;
+        const currMid = (curr.startAge + curr.endAge) / 2;
+        return Math.abs(currMid - currentAge) < Math.abs(prevMid - currentAge) ? curr : prev;
+      }, milestones[0]);
+    }
+    if (currentPeriod) {
+      currentPeriod.isCurrent = true;
+      currentPeriod.status = 'Current Best';
+    }
+  }
 
   return {
     milestones,
@@ -666,5 +694,6 @@ export function generateLifeMilestonesAndCriticalTransits(
     bestWealthPeriods,
     currentPeriod,
     cheiroSummary,
+    vimshottariDasha,
   };
 }

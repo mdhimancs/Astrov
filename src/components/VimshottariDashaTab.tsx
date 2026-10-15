@@ -92,8 +92,10 @@ export function VimshottariDashaTab({
   // Selected Mahadasha for Antardashas inspection
   const [selectedMahadashaPlanet, setSelectedMahadashaPlanet] = useState<GrahaName | null>(null);
 
-  // Deck of Cards selector for Dasha sections: 1. Dasha Interpretation, 2. Monthly Guidance, 3. Yogini Dasha
-  const [activeDashaDeck, setActiveDashaDeck] = useState<'interpretation' | 'monthly' | 'yogini'>('interpretation');
+  // Deck of Cards selector for Dasha sections: 1. Dasha Interpretation, 2. Parts & Sub-Periods (Strength), 3. Monthly Guidance, 4. Yogini Dasha
+  const [activeDashaDeck, setActiveDashaDeck] = useState<
+    'interpretation' | 'parts-subperiods' | 'monthly' | 'yogini'
+  >('interpretation');
 
   // Sync state when profile changes
   useEffect(() => {
@@ -124,7 +126,12 @@ export function VimshottariDashaTab({
   const natalNakshatra = natalMoon?.nakshatra || 'Rohini';
 
   // 2. Calculate Vimshottari Mahadashas & Yogini Dasha
-  const vimshottariDasha = calculateVimshottariDasha(natalMoonTotalDeg, birthDate);
+  const vimshottariDasha = calculateVimshottariDasha(
+    natalMoonTotalDeg,
+    birthDate,
+    natalCalc.planets,
+    natalLagnaRasi
+  );
   const yoginiDasha = calculateYoginiDasha(natalMoonTotalDeg, birthDate);
 
   // Default selected Mahadasha to currently active one
@@ -138,7 +145,9 @@ export function VimshottariDashaTab({
     activeDashaLord,
     currentMahadashaInfo.durationYears,
     currentMahadashaInfo.startAge,
-    birthDate
+    birthDate,
+    natalCalc.planets,
+    natalLagnaRasi
   );
 
   // Selected Antardasha planet (defaults to current Antardasha or first in list)
@@ -369,9 +378,9 @@ export function VimshottariDashaTab({
         </div>
       </div>
 
-      {/* SECTION 1: 9-PLANET MAHADASHA TIMELINE (COMPACT) */}
-      <div className="bg-white rounded-md border border-stone-100 px-2 py-1.5 space-y-1.5">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-50 pb-1">
+      {/* SECTION 1: 9-PLANET MAHADASHA TIMELINE (WITH STRENGTH FINE LINES & TRI-BHAGA PARTS) */}
+      <div className="bg-white rounded-md border border-stone-200/90 px-2.5 py-2 space-y-1.5 shadow-3xs">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-1.5">
           <div className="flex items-center space-x-2">
             <h2 className="font-vedic font-bold text-stone-950 text-[13px] uppercase tracking-wider flex items-center space-x-1.5 leading-tight">
               <ShieldCheck className="w-3.5 h-3.5 text-purple-700" />
@@ -382,17 +391,39 @@ export function VimshottariDashaTab({
             </span>
           </div>
 
-          <span className="px-1.5 py-0.5 rounded bg-purple-50 text-purple-950 border border-purple-200 text-[11px] font-bold">
-            Active: {vimshottariDasha.currentLord}
-          </span>
+          <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
+            <span className="font-bold text-stone-500 uppercase tracking-wider mr-0.5">Fine Lines:</span>
+            <span className="inline-flex items-center space-x-1 text-emerald-800 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+              <span className="w-2.5 h-[2px] bg-emerald-500 rounded-full inline-block" />
+              <span>Strong</span>
+            </span>
+            <span className="inline-flex items-center space-x-1 text-amber-800 font-semibold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+              <span className="w-2.5 h-[2px] bg-amber-500 rounded-full inline-block" />
+              <span>Moderate</span>
+            </span>
+            <span className="inline-flex items-center space-x-1 text-rose-800 font-semibold bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">
+              <span className="w-2.5 h-[2px] bg-rose-500 rounded-full inline-block" />
+              <span>Weak</span>
+            </span>
+            <span className="px-2 py-0.5 rounded bg-purple-50 text-purple-950 border border-purple-200 text-[11px] font-bold ml-1">
+              Active: {vimshottariDasha.currentLord}
+            </span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-1">
+        <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-1.5">
           {vimshottariDasha.cycle.map((d) => {
             const isCurrentlyActive = d.planet === vimshottariDasha.currentLord;
             const isSelected = (selectedMahadashaPlanet || vimshottariDasha.currentLord) === d.planet;
-            const fav = getPlanetFavorability(d.planet, natalLagnaRasi);
-            const lineBg = fav === 'favourable' ? 'bg-emerald-600' : fav === 'unfavourable' ? 'bg-rose-600' : 'bg-amber-300';
+            const rating = d.strengthInfo?.rating || 'Moderate';
+            const score = d.strengthInfo?.score ?? 5.5;
+            const fineLineColor = rating === 'Strong' ? 'bg-emerald-500' : rating === 'Weak' ? 'bg-rose-500' : 'bg-amber-500';
+            const badgeColor =
+              rating === 'Strong'
+                ? 'text-emerald-800 bg-emerald-50 border-emerald-200'
+                : rating === 'Weak'
+                ? 'text-rose-800 bg-rose-50 border-rose-200'
+                : 'text-amber-800 bg-amber-50 border-amber-200';
             const startDate = new Date(d.startMonthYear + '-01');
             const endDate = new Date(d.endMonthYear + '-01');
             const now = new Date();
@@ -404,24 +435,51 @@ export function VimshottariDashaTab({
               <div
                 key={`${d.planet}-${d.startMonthYear}`}
                 onClick={() => setSelectedMahadashaPlanet(d.planet)}
-                className={`px-1 py-1 rounded border transition-all duration-150 cursor-pointer flex flex-col items-center justify-center text-center overflow-hidden ${
+                className={`px-1.5 py-1.5 rounded-md border transition-all duration-150 cursor-pointer flex flex-col items-center justify-between text-center overflow-hidden ${
                   isSelected
                     ? 'bg-amber-50/95 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
                     : isCurrentlyActive
-                    ? 'bg-purple-50/50 border-purple-300'
+                    ? 'bg-purple-50/50 border-purple-300 shadow-3xs'
                     : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5]'
                 }`}
-                title={`Mahadasha Lord: ${d.planet} — Favorability: ${fav}`}
+                title={`Mahadasha Lord: ${d.planet} — Strength: ${rating} (${score}/10) • ${d.strengthInfo?.dignity || ''} in ${d.strengthInfo?.housePlacement || ''}`}
               >
-                <div className={`w-full h-[2px] rounded-t-sm mb-0.5 ${lineBg}`} />
-                <div className="flex items-center justify-center space-x-1 leading-none">
+                {/* Fine line indicator on top of Mahadasha card */}
+                <div className={`w-full h-[2.5px] rounded-t-sm mb-1 ${fineLineColor}`} />
+
+                <div className="flex items-center justify-center space-x-1 leading-none w-full">
                   <span className="font-vedic font-bold text-stone-950 text-[12px]">{d.planet}</span>
                   <span className="text-[10px] font-bold text-amber-800">({d.durationYears}y)</span>
                   {isCurrentlyActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />}
                 </div>
-                <span className="text-[10px] text-stone-600 leading-tight mt-0.5 truncate w-full">
+
+                {/* Strength Rating badge with fine line indicator */}
+                <div className="flex items-center justify-center space-x-1 my-1">
+                  <span className={`w-1.5 h-1.5 rounded-full ${fineLineColor}`} />
+                  <span className={`text-[9px] font-bold px-1 py-0.2 rounded border leading-tight ${badgeColor}`}>
+                    {rating} ({score})
+                  </span>
+                </div>
+
+                {/* 3 Tri-Bhaga Parts of this Mahadasha fine lines */}
+                <div className="w-full flex space-x-0.5 my-0.5 px-0.5" title="3 Tri-Bhaga Parts of this Dasha (Entry / Peak / Culmination)">
+                  {d.parts?.map((p) => {
+                    const pRating = p.strengthInfo?.rating || rating;
+                    const pCol = pRating === 'Strong' ? 'bg-emerald-500' : pRating === 'Weak' ? 'bg-rose-500' : 'bg-amber-500';
+                    return (
+                      <div
+                        key={p.partNumber}
+                        className={`h-[2px] flex-1 rounded-full ${pCol} ${p.isCurrent ? 'ring-1 ring-amber-400' : 'opacity-80'}`}
+                        title={`Part ${p.partNumber}: ${p.stage} (${p.durationYearsStr}) — ${pRating}`}
+                      />
+                    );
+                  })}
+                </div>
+
+                <span className="text-[9.5px] text-stone-600 leading-tight truncate w-full">
                   {d.startMonthYear}–{d.endMonthYear}
                 </span>
+
                 <div className="w-full bg-stone-100 rounded-sm h-1 mt-1 overflow-hidden shadow-inner">
                   <div className="bg-stone-400/60 h-full rounded-sm transition-all" style={{ width: `${progress}%` }} />
                 </div>
@@ -431,24 +489,47 @@ export function VimshottariDashaTab({
         </div>
       </div>
 
-      {/* SECTION 2: ANTARDASHA (SUB-PERIODS) BREAKDOWN (COMPACT) */}
-      <div className="bg-white rounded-lg border border-stone-200 px-2 py-1.5 shadow-3xs space-y-1.5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-stone-100 pb-1">
+      {/* SECTION 2: ANTARDASHA (SUB-PERIODS) BREAKDOWN (WITH STRENGTH FINE LINES & 9 SUB-PORTIONS) */}
+      <div className="bg-white rounded-lg border border-stone-200 px-2.5 py-2 shadow-3xs space-y-1.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-stone-100 pb-1.5">
           <div className="flex items-center space-x-2">
             <h2 className="font-vedic font-bold text-stone-950 text-[13px] uppercase tracking-wider">
-              {activeDashaLord} Sub-Periods
+              {activeDashaLord} Sub-Periods &amp; Strength Fine Lines
             </h2>
             <span className="text-[11px] text-stone-600 font-semibold">
               ({currentMahadashaInfo.startMonthYear} – {currentMahadashaInfo.endMonthYear})
             </span>
           </div>
+
+          <div className="flex items-center space-x-2 text-[10px]">
+            <span className="text-stone-500 font-medium">Sub-Period Fine Lines:</span>
+            <span className="inline-flex items-center space-x-1 text-emerald-800 font-semibold">
+              <span className="w-2.5 h-[2px] bg-emerald-500 rounded-full inline-block" />
+              <span>Strong</span>
+            </span>
+            <span className="inline-flex items-center space-x-1 text-amber-800 font-semibold">
+              <span className="w-2.5 h-[2px] bg-amber-500 rounded-full inline-block" />
+              <span>Moderate</span>
+            </span>
+            <span className="inline-flex items-center space-x-1 text-rose-800 font-semibold">
+              <span className="w-2.5 h-[2px] bg-rose-500 rounded-full inline-block" />
+              <span>Weak</span>
+            </span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-1">
+        <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-1.5">
           {antardashas.map((antar) => {
             const isSelectedAntar = activeAntardashaInfo?.planet === antar.planet;
-            const favAntar = getPlanetFavorability(antar.planet, natalLagnaRasi);
-            const lineBgAntar = favAntar === 'favourable' ? 'bg-emerald-600' : favAntar === 'unfavourable' ? 'bg-rose-600' : 'bg-amber-300';
+            const ratingAntar = antar.strengthInfo?.rating || 'Moderate';
+            const scoreAntar = antar.strengthInfo?.score ?? 5.5;
+            const fineLineColorAntar = ratingAntar === 'Strong' ? 'bg-emerald-500' : ratingAntar === 'Weak' ? 'bg-rose-500' : 'bg-amber-500';
+            const badgeColorAntar =
+              ratingAntar === 'Strong'
+                ? 'text-emerald-800 bg-emerald-50 border-emerald-200'
+                : ratingAntar === 'Weak'
+                ? 'text-rose-800 bg-rose-50 border-rose-200'
+                : 'text-amber-800 bg-amber-50 border-amber-200';
             const startDateAntar = new Date(antar.startMonthYear + '-01');
             const endDateAntar = new Date(antar.endMonthYear + '-01');
             const nowAntar = new Date();
@@ -460,24 +541,51 @@ export function VimshottariDashaTab({
               <div
                 key={`${activeDashaLord}-${antar.planet}-${antar.startMonthYear}`}
                 onClick={() => setSelectedAntardashaPlanet(antar.planet)}
-                className={`px-1 py-1 rounded border transition-all cursor-pointer flex flex-col items-center justify-center text-center overflow-hidden ${
+                className={`px-1.5 py-1.5 rounded-md border transition-all cursor-pointer flex flex-col items-center justify-between text-center overflow-hidden ${
                   isSelectedAntar
                     ? 'bg-amber-50/95 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
                     : antar.isCurrent
-                    ? 'bg-purple-50/50 border-purple-300'
+                    ? 'bg-purple-50/50 border-purple-300 shadow-3xs'
                     : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5]'
                 }`}
-                title={`Sub-Period Lord: ${antar.planet} — Favorability: ${favAntar}`}
+                title={`Sub-Period Lord: ${antar.planet} — Strength: ${ratingAntar} (${scoreAntar}/10) • ${antar.strengthInfo?.mutualHouseAngle || ''}`}
               >
-                <div className={`w-full h-[2px] rounded-t-sm mb-0.5 ${lineBgAntar}`} />
-                <div className="flex items-center justify-center space-x-1 leading-none">
+                {/* Fine line indicator on top of Sub-Period card */}
+                <div className={`w-full h-[2.5px] rounded-t-sm mb-1 ${fineLineColorAntar}`} />
+
+                <div className="flex items-center justify-center space-x-1 leading-none w-full">
                   <span className="font-vedic font-bold text-stone-950 text-[12px]">{antar.planet}</span>
                   <span className="text-[10px] font-bold text-amber-800">({antar.durationYearsStr})</span>
                   {antar.isCurrent && <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />}
                 </div>
-                <span className="text-[10px] text-stone-600 leading-tight mt-0.5 truncate w-full">
+
+                {/* Strength Rating badge with fine line indicator */}
+                <div className="flex items-center justify-center space-x-1 my-1">
+                  <span className={`w-1.5 h-1.5 rounded-full ${fineLineColorAntar}`} />
+                  <span className={`text-[9px] font-bold px-1 py-0.2 rounded border leading-tight ${badgeColorAntar}`}>
+                    {ratingAntar} ({scoreAntar})
+                  </span>
+                </div>
+
+                {/* 9 Sub-Portions (Pratyantardasha) Fine Lines Strip */}
+                <div className="w-full flex space-x-0.5 my-0.5 px-0.5" title="9 Sub-Portions (Pratyantardashas) of this Sub-Period">
+                  {antar.pratyantardashas?.map((prat, idx) => {
+                    const prRating = prat.strengthInfo.rating;
+                    const prCol = prRating === 'Strong' ? 'bg-emerald-500' : prRating === 'Weak' ? 'bg-rose-500' : 'bg-amber-500';
+                    return (
+                      <div
+                        key={idx}
+                        className={`h-[2px] flex-1 rounded-full ${prCol} ${prat.isCurrent ? 'ring-1 ring-amber-400' : 'opacity-80'}`}
+                        title={`${prat.planet}: ${prat.durationStr} — ${prRating}`}
+                      />
+                    );
+                  })}
+                </div>
+
+                <span className="text-[9.5px] text-stone-600 leading-tight truncate w-full">
                   {antar.startMonthYear}–{antar.endMonthYear}
                 </span>
+
                 <div className="w-full bg-stone-100 rounded-sm h-1 mt-1 overflow-hidden shadow-inner">
                   <div className="bg-stone-400/60 h-full rounded-sm transition-all" style={{ width: `${progressAntar}%` }} />
                 </div>
@@ -487,14 +595,19 @@ export function VimshottariDashaTab({
         </div>
       </div>
 
-      {/* DASHA SECTIONS — COMPACT 1-ROW DECK OF CARDS SELECTOR */}
-      <div className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/90 px-2 py-1.5 shadow-3xs">
-        <div className="grid grid-cols-3 gap-1.5">
+      {/* DASHA SECTIONS — COMPACT DECK OF CARDS SELECTOR */}
+      <div className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/90 px-2.5 py-1.5 shadow-3xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
           {[
             {
               id: 'interpretation',
               title: 'Dasha Interpretation',
               icon: BookOpen,
+            },
+            {
+              id: 'parts-subperiods',
+              title: 'Parts & Sub-Periods (Strength)',
+              icon: Activity,
             },
             {
               id: 'monthly',
@@ -512,7 +625,7 @@ export function VimshottariDashaTab({
             return (
               <div
                 key={card.id}
-                onClick={() => setActiveDashaDeck(card.id as 'interpretation' | 'monthly' | 'yogini')}
+                onClick={() => setActiveDashaDeck(card.id as any)}
                 className={`group relative rounded-md px-2.5 py-1.5 transition-all duration-150 cursor-pointer border flex items-center justify-between gap-1.5 ${
                   isActive
                     ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
@@ -658,6 +771,305 @@ export function VimshottariDashaTab({
             <p className="text-[12px] text-stone-800 leading-snug">
               {displayedDashaReading.vedicRemedy}
             </p>
+          </div>
+        </div>
+      </div>
+      )}
+
+      {/* CARD: PARTS OF THE DASHA & SUB-PERIODS (STRENGTH & FINE LINES ANALYSIS) */}
+      {activeDashaDeck === 'parts-subperiods' && (
+      <div className="bg-white rounded-lg border border-amber-300/90 p-3 shadow-3xs space-y-3">
+        {/* Header Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200/80 pb-2">
+          <div>
+            <div className="flex items-center space-x-1.5">
+              <Activity className="w-4 h-4 text-amber-700" />
+              <h2 className="font-vedic font-bold text-stone-950 text-[15px] tracking-tight">
+                Parts of the Dasha &amp; Sub-Periods — Strength Fine Lines
+              </h2>
+            </div>
+            <p className="text-[12px] text-stone-600 mt-0.5">
+              Classical Vedic Tri-Bhaga (3-part division) of Mahadashas &amp; 9-fold Sub-Portions (Pratyantardashas). Fine lines reveal Strong (Balavan), Moderate (Madhyama), and Weak (Nirbala) periods.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+            <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-950 border border-amber-200 text-[11px] font-bold">
+              Maha: {activeDashaLord} ({currentMahadashaInfo.strengthInfo?.rating || 'Moderate'})
+            </span>
+            <span className="px-2 py-0.5 rounded bg-purple-50 text-purple-950 border border-purple-200 text-[11px] font-bold">
+              Sub: {activeAntardashaInfo?.planet} ({activeAntardashaInfo?.strengthInfo?.rating || 'Moderate'})
+            </span>
+          </div>
+        </div>
+
+        {/* FINE LINES INTERPRETATION & STRENGTH GAUGE LEGEND */}
+        <div className="bg-stone-50/80 rounded-md border border-stone-200 p-2 space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="font-vedic font-bold text-[12px] uppercase tracking-wider text-stone-900 flex items-center space-x-1">
+              <Flame className="w-3.5 h-3.5 text-amber-600" />
+              <span>Cosmic Strength Fine-Line Guide</span>
+            </span>
+            <span className="text-[11px] text-stone-500 font-medium hidden sm:inline">
+              Based on Dignity, Kendra/Trikona placement &amp; Mutual Bhavas
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <div className="bg-white rounded border border-emerald-200/90 p-2 space-y-1 shadow-3xs">
+              <div className="flex items-center space-x-1.5">
+                <div className="w-3.5 h-[2.5px] bg-emerald-500 rounded-full" />
+                <span className="font-bold text-[12px] text-emerald-900">Fine Emerald Line: Strong (Balavan)</span>
+              </div>
+              <p className="text-[11px] text-stone-700 leading-snug">
+                Score 7.2–10.0 • Planet in Kendra (1,4,7,10) or Trikona (5,9,11), Exalted or Own sign, harmonious aspects. Unlocks high vitality, career breakthroughs, decisive actions, and auspicious fruits.
+              </p>
+            </div>
+
+            <div className="bg-white rounded border border-amber-200/90 p-2 space-y-1 shadow-3xs">
+              <div className="flex items-center space-x-1.5">
+                <div className="w-3.5 h-[2.5px] bg-amber-500 rounded-full" />
+                <span className="font-bold text-[12px] text-amber-900">Fine Amber Line: Moderate (Madhyama)</span>
+              </div>
+              <p className="text-[11px] text-stone-700 leading-snug">
+                Score 4.8–7.1 • Upachaya house (3rd), neutral dignity, balanced aspects. Demands steady daily discipline, methodical effort, and structured pacing to consolidate progressive gains.
+              </p>
+            </div>
+
+            <div className="bg-white rounded border border-rose-200/90 p-2 space-y-1 shadow-3xs">
+              <div className="flex items-center space-x-1.5">
+                <div className="w-3.5 h-[2.5px] bg-rose-500 rounded-full" />
+                <span className="font-bold text-[12px] text-rose-900">Fine Rose Line: Weak / Sensitive (Nirbala)</span>
+              </div>
+              <p className="text-[11px] text-stone-700 leading-snug">
+                Score 1.5–4.7 • Dusthana (6,8,12), debilitation, or Shadashtaka (6/8 friction) with Mahadasha lord. Requires emotional poise, reduced speculative risks, and protective Vedic remedies.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION A: 3 CLASSICAL PARTS (TRI-BHAGA) OF ACTIVE MAHADASHA */}
+        <div className="space-y-1.5 pt-1">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <div className="flex items-center space-x-1.5">
+              <Layers className="w-3.5 h-3.5 text-purple-700" />
+              <h3 className="font-vedic font-bold text-stone-950 text-[13px] uppercase tracking-wide">
+                3 Classical Parts (Tri-Bhaga) of {activeDashaLord} Mahadasha
+              </h3>
+            </div>
+            <span className="text-[11px] text-stone-600 font-semibold">
+              Total {currentMahadashaInfo.durationYears} Years • {currentMahadashaInfo.startMonthYear} – {currentMahadashaInfo.endMonthYear}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            {currentMahadashaInfo.parts?.map((p) => {
+              const pRating = p.strengthInfo.rating;
+              const pScore = p.strengthInfo.score;
+              const pColor = pRating === 'Strong' ? 'bg-emerald-500' : pRating === 'Weak' ? 'bg-rose-500' : 'bg-amber-500';
+              const pBadge =
+                pRating === 'Strong'
+                  ? 'text-emerald-800 bg-emerald-50 border-emerald-200'
+                  : pRating === 'Weak'
+                  ? 'text-rose-800 bg-rose-50 border-rose-200'
+                  : 'text-amber-800 bg-amber-50 border-amber-200';
+
+              return (
+                <div
+                  key={p.partNumber}
+                  className={`rounded-lg border p-2.5 transition-all flex flex-col justify-between space-y-2 ${
+                    p.isCurrent
+                      ? 'bg-amber-50/70 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
+                      : 'bg-[#FAF8F5] border-stone-200 hover:bg-white shadow-3xs'
+                  }`}
+                >
+                  <div className="space-y-1.5">
+                    {/* Fine line indicator on part card */}
+                    <div className={`w-full h-[2.5px] rounded-full ${pColor}`} />
+
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="font-vedic font-bold text-[13px] text-stone-900 leading-tight">
+                        Part {p.partNumber}: {p.stage}
+                      </span>
+                      {p.isCurrent && (
+                        <span className="bg-amber-500 text-white font-bold text-[9.5px] px-1.5 py-0.2 rounded-full uppercase tracking-wider shrink-0 animate-pulse">
+                          Current Phase
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-stone-600 border-b border-stone-200/70 pb-1">
+                      <span>{p.startDate} – {p.endDate}</span>
+                      <span className="font-semibold text-stone-800">({p.durationYearsStr})</span>
+                    </div>
+
+                    <div className="flex items-center space-x-1.5">
+                      <span className={`w-1.5 h-1.5 rounded-full ${pColor}`} />
+                      <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${pBadge}`}>
+                        {pRating} ({pScore}/10)
+                      </span>
+                      <span className="text-[10px] text-stone-500 font-medium truncate">
+                        {p.focusArea}
+                      </span>
+                    </div>
+
+                    <p className="text-[12px] text-stone-700 leading-snug">
+                      {p.description}
+                    </p>
+                  </div>
+
+                  <div className="text-[11px] font-semibold text-stone-800 bg-white/80 rounded px-2 py-1 border border-stone-200/60">
+                    <span className="text-amber-800 mr-1">Vedic Pacing:</span>
+                    {p.partNumber === 1
+                      ? 'Establish routines and adjust to the planetary frequency.'
+                      : p.partNumber === 2
+                      ? 'Drive key career, financial, and personal initiatives forward.'
+                      : 'Consolidate ongoing affairs and prepare for the next period.'}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* SECTION B: 9 SUB-PORTIONS (PRATYANTARDASHAS) OF ACTIVE SUB-PERIOD */}
+        <div className="space-y-1.5 pt-1.5 border-t border-stone-100">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <div className="flex items-center space-x-1.5">
+              <Compass className="w-3.5 h-3.5 text-amber-700" />
+              <h3 className="font-vedic font-bold text-stone-950 text-[13px] uppercase tracking-wide">
+                9 Sub-Portions (Pratyantardashas) of {activeDashaLord}–{activeAntardashaInfo?.planet}
+              </h3>
+            </div>
+            <span className="text-[11px] text-stone-600 font-semibold">
+              Sub-Period Span: {activeAntardashaInfo?.startMonthYear} – {activeAntardashaInfo?.endMonthYear} ({activeAntardashaInfo?.durationYearsStr})
+            </span>
+          </div>
+
+          <p className="text-[12px] text-stone-600 leading-snug">
+            Each sub-period is divided proportionally into 9 sub-portions. Each card displays its individual fine line, strength rating, natal house placement, and mutual angle.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {activeAntardashaInfo?.pratyantardashas?.map((prat, idx) => {
+              const prRating = prat.strengthInfo.rating;
+              const prScore = prat.strengthInfo.score;
+              const prFineLine =
+                prRating === 'Strong' ? 'bg-emerald-500' : prRating === 'Weak' ? 'bg-rose-500' : 'bg-amber-500';
+              const prBadge =
+                prRating === 'Strong'
+                  ? 'text-emerald-800 bg-emerald-50 border-emerald-200'
+                  : prRating === 'Weak'
+                  ? 'text-rose-800 bg-rose-50 border-rose-200'
+                  : 'text-amber-800 bg-amber-50 border-amber-200';
+
+              return (
+                <div
+                  key={`${activeDashaLord}-${activeAntardashaInfo.planet}-${prat.planet}-${idx}`}
+                  className={`rounded-lg border p-2.5 transition-all flex flex-col justify-between space-y-1.5 ${
+                    prat.isCurrent
+                      ? 'bg-amber-50/80 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
+                      : 'bg-[#FAF8F5] border-stone-200/90 hover:bg-white hover:border-amber-200 shadow-3xs'
+                  }`}
+                >
+                  <div className="space-y-1">
+                    {/* Fine line on sub-portion card */}
+                    <div className={`w-full h-[2.5px] rounded-full ${prFineLine}`} />
+
+                    <div className="flex items-center justify-between gap-1">
+                      <div className="flex items-center space-x-1.5">
+                        <span className="font-vedic font-bold text-stone-950 text-[13px]">
+                          {activeDashaLord}–{activeAntardashaInfo.planet}–{prat.planet}
+                        </span>
+                      </div>
+                      {prat.isCurrent && (
+                        <span className="bg-amber-500 text-white font-bold text-[9.5px] px-1.5 py-0.2 rounded-full uppercase tracking-wider shrink-0 animate-pulse">
+                          Active Now
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-stone-600 border-b border-stone-200/60 pb-1">
+                      <span>{prat.startDate} – {prat.endDate}</span>
+                      <span className="font-bold text-stone-800">{prat.durationStr}</span>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                      <div className="flex items-center space-x-1">
+                        <span className={`w-1.5 h-1.5 rounded-full ${prFineLine}`} />
+                        <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${prBadge}`}>
+                          {prRating} ({prScore}/10)
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-stone-600 font-medium">
+                        {prat.strengthInfo.dignity} • {prat.strengthInfo.housePlacement}
+                      </span>
+                    </div>
+
+                    {prat.strengthInfo.mutualHouseAngle && (
+                      <div className="text-[10px] font-semibold text-purple-900 bg-purple-50/70 border border-purple-200/60 px-1.5 py-0.5 rounded">
+                        Angle: {prat.strengthInfo.mutualHouseAngle}
+                      </div>
+                    )}
+
+                    <p className="text-[11.5px] text-stone-700 leading-snug pt-0.5">
+                      {prat.strengthInfo.primaryEffect}
+                    </p>
+                  </div>
+
+                  <div className="text-[10.5px] text-stone-800 bg-white/90 rounded px-2 py-1 border border-stone-200/70">
+                    <span className="font-bold text-amber-900 mr-1">Guidance:</span>
+                    {prat.strengthInfo.guidanceTip}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* SECTION C: SUB-PERIODS FINE-LINE SPECTRUM BAR */}
+        <div className="space-y-1.5 pt-1.5 border-t border-stone-100">
+          <div className="flex items-center justify-between">
+            <span className="font-vedic font-bold text-[12px] uppercase tracking-wide text-stone-900 flex items-center space-x-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+              <span>Full Sub-Period Fine-Line Spectrum ({activeDashaLord} Mahadasha)</span>
+            </span>
+            <span className="text-[11px] text-stone-500">
+              Click any segment to inspect its 9 sub-portions
+            </span>
+          </div>
+
+          <div className="w-full flex rounded-md overflow-hidden border border-stone-300 shadow-inner h-6">
+            {antardashas.map((antar) => {
+              const isSelectedAntar = activeAntardashaInfo?.planet === antar.planet;
+              const r = antar.strengthInfo?.rating || 'Moderate';
+              const col = r === 'Strong' ? 'bg-emerald-500' : r === 'Weak' ? 'bg-rose-500' : 'bg-amber-500';
+              const textCol = r === 'Strong' ? 'text-white' : r === 'Weak' ? 'text-white' : 'text-stone-950';
+
+              return (
+                <button
+                  type="button"
+                  key={`spectrum-${antar.planet}`}
+                  onClick={() => setSelectedAntardashaPlanet(antar.planet)}
+                  style={{ flex: antar.durationMonths }}
+                  className={`${col} ${textCol} h-full text-[11px] font-bold flex items-center justify-center transition-opacity cursor-pointer border-r border-white/40 last:border-r-0 relative group ${
+                    isSelectedAntar ? 'ring-2 ring-stone-900 z-10' : 'hover:opacity-90'
+                  }`}
+                  title={`${antar.planet} (${antar.durationYearsStr}) — ${r} (${antar.strengthInfo?.score ?? 5.5}/10)`}
+                >
+                  <span className="truncate px-0.5">{antar.planet}</span>
+                  {antar.isCurrent && (
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white ring-1 ring-stone-900" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center justify-between text-[10px] text-stone-500 pt-0.5">
+            <span>Start: {currentMahadashaInfo.startMonthYear}</span>
+            <span className="font-semibold text-stone-700">9 Antardasha Phases with Proportional Duration &amp; Strength Fine Lines</span>
+            <span>End: {currentMahadashaInfo.endMonthYear}</span>
           </div>
         </div>
       </div>

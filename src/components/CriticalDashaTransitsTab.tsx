@@ -84,21 +84,6 @@ export function CriticalDashaTransitsTab({
     }
   }, [currentProfile]);
 
-  // Filter States
-  const [selectedDomain, setSelectedDomain] = useState<LifeMilestoneDomain | 'All'>('All');
-  const [selectedTiming, setSelectedTiming] = useState<'All' | 'Past' | 'Current' | 'Future'>('All');
-
-  // Selected Milestone for Detailed Reading in the Reading Panel
-  const [selectedMilestoneId, setSelectedMilestoneId] = useState<string | null>(null);
-  const readingPanelRef = useRef<HTMLDivElement>(null);
-
-  const handleSelectMilestone = (id: string) => {
-    setSelectedMilestoneId(id);
-    if (typeof window !== 'undefined' && window.innerWidth < 1024 && readingPanelRef.current) {
-      readingPanelRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
   // Generate All Critical Transits and Life Milestones + Cheiro's Blueprint
   const {
     milestones,
@@ -107,6 +92,7 @@ export function CriticalDashaTransitsTab({
     bestWealthPeriods,
     currentPeriod,
     cheiroSummary,
+    vimshottariDasha,
   } = useMemo(() => {
     return generateLifeMilestonesAndCriticalTransits(
       birthDate,
@@ -115,6 +101,60 @@ export function CriticalDashaTransitsTab({
       selectedCity.lng
     );
   }, [birthDate, birthTime, selectedCity.lat, selectedCity.lng]);
+
+  // Find active Mahadasha cycle item and its Tri-Bhaga stage
+  const activeMahadashaCycleItem = useMemo(() => {
+    if (!vimshottariDasha || !currentPeriod) return null;
+    return vimshottariDasha.cycle.find((c) => c.planet === currentPeriod.mahadashaLord) || null;
+  }, [vimshottariDasha, currentPeriod]);
+
+  const activeDashaPart = useMemo(() => {
+    if (!activeMahadashaCycleItem?.parts) return null;
+    return activeMahadashaCycleItem.parts.find((p) => p.isCurrent) || activeMahadashaCycleItem.parts[0];
+  }, [activeMahadashaCycleItem]);
+
+  // Filter States
+  const [selectedDomain, setSelectedDomain] = useState<LifeMilestoneDomain | 'All'>('All');
+  const [selectedTiming, setSelectedTiming] = useState<'All' | 'Past' | 'Current' | 'Future'>('All');
+
+  // Selected Milestone for Detailed Reading in the Reading Panel (defaults to Current Active Dasha)
+  const [selectedMilestoneId, setSelectedMilestoneId] = useState<string | null>(() => currentPeriod?.id || null);
+  const readingPanelRef = useRef<HTMLDivElement>(null);
+  const activeYearTabRef = useRef<HTMLButtonElement>(null);
+  const horizontalTabsContainerRef = useRef<HTMLDivElement>(null);
+  const activeDeckCardRef = useRef<HTMLDivElement>(null);
+  const deckContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleSelectMilestone = (id: string) => {
+    setSelectedMilestoneId(id);
+    if (typeof window !== 'undefined' && window.innerWidth < 1024 && readingPanelRef.current) {
+      readingPanelRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleResetToActiveDasha = () => {
+    if (currentPeriod) {
+      setSelectedDomain('All');
+      setSelectedTiming('All');
+      handleSelectMilestone(currentPeriod.id);
+    }
+  };
+
+  // Sync state when profile changes
+  useEffect(() => {
+    if (currentProfile) {
+      setName(currentProfile.name);
+      setBirthDate(currentProfile.birthDate);
+      setBirthTime(currentProfile.birthTime);
+      setSelectedCity({
+        name: currentProfile.place,
+        lat: currentProfile.latitude ?? 28.6139,
+        lng: currentProfile.longitude ?? 77.209,
+        tz: currentProfile.timezone ?? 5.5,
+      });
+      setSelectedMilestoneId(null);
+    }
+  }, [currentProfile]);
 
   // Filtered Milestones
   const filteredMilestones = useMemo(() => {
@@ -135,19 +175,47 @@ export function CriticalDashaTransitsTab({
     });
   }, [milestones, selectedDomain, selectedTiming]);
 
-  // Set default selected milestone on load or filter change
+  // Ensure default selected milestone is always the Current Active Dasha
   useEffect(() => {
-    if (!selectedMilestoneId || !filteredMilestones.some((m) => m.id === selectedMilestoneId)) {
-      const active = filteredMilestones.find((m) => m.isCurrent) || filteredMilestones[0];
-      if (active) {
-        setSelectedMilestoneId(active.id);
+    if (currentPeriod?.id) {
+      if (!selectedMilestoneId || !filteredMilestones.some((m) => m.id === selectedMilestoneId)) {
+        setSelectedMilestoneId(currentPeriod.id);
       }
+    } else if (filteredMilestones.length > 0 && !selectedMilestoneId) {
+      setSelectedMilestoneId(filteredMilestones[0].id);
     }
-  }, [filteredMilestones, selectedMilestoneId]);
+  }, [currentPeriod?.id, filteredMilestones, selectedMilestoneId]);
+
+  // Auto-scroll horizontal tabs & vertical deck to current active dasha
+  useEffect(() => {
+    if (activeYearTabRef.current && horizontalTabsContainerRef.current) {
+      activeYearTabRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      });
+    }
+    if (activeDeckCardRef.current && deckContainerRef.current) {
+      activeDeckCardRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }, [currentPeriod?.id, selectedDomain, selectedTiming]);
 
   const activeMilestone = useMemo(() => {
-    return filteredMilestones.find((m) => m.id === selectedMilestoneId) || filteredMilestones[0];
-  }, [filteredMilestones, selectedMilestoneId]);
+    if (selectedMilestoneId) {
+      const found = milestones.find((m) => m.id === selectedMilestoneId);
+      if (found) return found;
+    }
+    return (
+      currentPeriod ||
+      milestones.find((m) => m.isCurrent) ||
+      filteredMilestones.find((m) => m.isCurrent) ||
+      filteredMilestones[0] ||
+      milestones[0]
+    );
+  }, [milestones, filteredMilestones, selectedMilestoneId, currentPeriod]);
 
   // Key Top Recommendations
   const topEducationEra = bestEducationPeriods[0];
@@ -197,6 +265,127 @@ export function CriticalDashaTransitsTab({
           )}
         </div>
       </div>
+
+      {/* 🌟 CURRENT ACTIVE DASHA — PROMINENT DEFAULT DISPLAY HERO SHOWCASE */}
+      {currentPeriod && (
+        <div className="bg-gradient-to-r from-amber-500/10 via-[#FAF7F0] to-purple-500/10 rounded-xl border-2 border-amber-400/90 p-3 shadow-2xs space-y-2 relative overflow-hidden">
+          {/* Fine Line indicator representing active Dasha potency */}
+          <div className="h-1 -mx-3 -mt-3 mb-2 flex">
+            <div
+              className={`h-full ${
+                currentPeriod.ratingStars >= 4.5
+                  ? 'bg-emerald-500'
+                  : currentPeriod.ratingStars >= 3.8
+                  ? 'bg-amber-500'
+                  : 'bg-rose-500'
+              } w-full transition-all`}
+            />
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-300/60 pb-2">
+            <div className="flex items-center space-x-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse ring-2 ring-emerald-300 shrink-0" />
+              <div className="flex items-center space-x-1.5 flex-wrap">
+                <h2 className="font-vedic font-bold text-amber-950 text-[14px] uppercase tracking-wider">
+                  Current Active Dasha &amp; Milestone
+                </h2>
+                <span className="bg-amber-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-3xs">
+                  Active Now
+                </span>
+                <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 text-[10px] font-bold px-1.5 py-0.2 rounded shadow-3xs">
+                  Default Display
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <span className="font-mono font-bold text-amber-950 bg-amber-100/90 border border-amber-300 px-2.5 py-0.5 rounded text-[11px] shadow-3xs">
+                {currentPeriod.periodStartMonthYear} – {currentPeriod.periodEndMonthYear} (Age {currentPeriod.startAge}–{currentPeriod.endAge})
+              </span>
+              <button
+                type="button"
+                onClick={() => handleSelectMilestone(currentPeriod.id)}
+                className={`px-2.5 py-1 text-[11px] font-bold rounded shadow-3xs transition-colors cursor-pointer flex items-center space-x-1 ${
+                  selectedMilestoneId === currentPeriod.id
+                    ? 'bg-emerald-700 text-white'
+                    : 'bg-amber-700 hover:bg-amber-800 text-white'
+                }`}
+              >
+                <span>{selectedMilestoneId === currentPeriod.id ? '● Reading Active' : 'Open Full Reading'}</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-2.5 items-start">
+            {/* Active Dasha Alignment & Predictions */}
+            <div className="lg:col-span-8 space-y-1.5">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-[13px] font-bold text-purple-950 bg-white/95 border border-purple-200 px-2.5 py-0.5 rounded shadow-3xs flex items-center space-x-1">
+                  <Crown className="w-3.5 h-3.5 text-amber-600 inline mr-1" />
+                  <span>{currentPeriod.mahadashaLord} Mahadasha • {currentPeriod.antardashaLord} Antardasha</span>
+                </span>
+                <span className="text-[11px] font-bold text-amber-900 bg-amber-100/80 border border-amber-300 px-2 py-0.5 rounded">
+                  {currentPeriod.primaryDomain} • {currentPeriod.ratingLabel}
+                </span>
+                {activeDashaPart && (
+                  <span className="text-[10.5px] font-semibold text-stone-700 bg-white/80 border border-stone-200 px-2 py-0.5 rounded">
+                    Stage: {activeDashaPart.stage}
+                  </span>
+                )}
+                {activeMahadashaCycleItem?.strengthInfo && (
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                    activeMahadashaCycleItem.strengthInfo.rating === 'Strong'
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                      : activeMahadashaCycleItem.strengthInfo.rating === 'Weak'
+                      ? 'bg-rose-50 text-rose-800 border-rose-300'
+                      : 'bg-amber-50 text-amber-800 border-amber-300'
+                  }`}>
+                    Strength: {activeMahadashaCycleItem.strengthInfo.rating} ({activeMahadashaCycleItem.strengthInfo.score}/10)
+                  </span>
+                )}
+              </div>
+
+              <h3 className="font-vedic font-bold text-stone-950 text-[15px] leading-snug">
+                {currentPeriod.verdictHeadline}
+              </h3>
+
+              <div className="space-y-1 text-[12px] text-stone-800">
+                {currentPeriod.predictivePoints.slice(0, 3).map((point, idx) => (
+                  <p key={idx} className="leading-snug bg-white/70 rounded px-2 py-1 border border-amber-100">
+                    {point}
+                  </p>
+                ))}
+              </div>
+            </div>
+
+            {/* Gochar Double Transit & Strategic Directive */}
+            <div className="lg:col-span-4 bg-white/95 rounded-lg border border-amber-200/90 p-2.5 space-y-1.5 shadow-3xs">
+              <div className="flex items-center space-x-1 text-amber-900 font-bold text-[11px] uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                <span>Gochar Double-Transit Lock</span>
+              </div>
+              <p className="text-[11px] text-stone-700 leading-snug">
+                {currentPeriod.doubleTransitVerdict}
+              </p>
+              <div className="border-t border-stone-200/70 pt-1 text-[11px] text-stone-800">
+                <span className="text-amber-800 font-bold">Strategic Directive: </span>
+                {currentPeriod.strategicAdvice}
+              </div>
+              {onNavigateToDasha && (
+                <button
+                  type="button"
+                  onClick={onNavigateToDasha}
+                  className="w-full mt-1 py-1 rounded bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 font-semibold text-[11px] text-center transition-colors cursor-pointer flex items-center justify-center space-x-1"
+                >
+                  <Layers className="w-3 h-3 text-purple-700" />
+                  <span>Inspect Sub-Periods &amp; Fine Lines in Dasha Tab</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* CHEIRO'S MASTER PREDICTIVE BLUEPRINT CARD */}
       <div className="bg-white/85 backdrop-blur-sm rounded-lg border border-amber-200 px-2.5 py-2 shadow-3xs space-y-1.5">
@@ -276,8 +465,23 @@ export function CriticalDashaTransitsTab({
           })}
         </div>
 
-        {/* Timing Filter Cards */}
-        <div className="flex items-center gap-1">
+        {/* Timing Filter Cards with Quick Jump to Current Active Dasha */}
+        <div className="flex flex-wrap items-center gap-1">
+          {currentPeriod && (
+            <button
+              type="button"
+              onClick={handleResetToActiveDasha}
+              className={`px-2.5 py-0.5 rounded text-[11px] font-vedic font-black shadow-3xs cursor-pointer flex items-center space-x-1.5 transition-all mr-1 ${
+                selectedMilestoneId === currentPeriod.id
+                  ? 'bg-amber-700 text-white ring-2 ring-amber-400'
+                  : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" />
+              <span>Current Dasha (Default)</span>
+            </button>
+          )}
+
           {(['All', 'Past', 'Current', 'Future'] as const).map((timing) => {
             const isActive = selectedTiming === timing;
             return (
@@ -311,8 +515,11 @@ export function CriticalDashaTransitsTab({
           </span>
         </div>
 
-        {/* Horizontal Year Tabs */}
-        <div className="flex items-center space-x-1 overflow-x-auto pb-1 scrollbar-thin">
+        {/* Horizontal Year Tabs with Auto-Scroll to Active Dasha */}
+        <div
+          ref={horizontalTabsContainerRef}
+          className="flex items-center space-x-1 overflow-x-auto pb-1 scrollbar-thin"
+        >
           {filteredMilestones.map((m) => {
             const isSelected = selectedMilestoneId === m.id;
             const startYear = m.periodStartMonthYear.split('-')[0];
@@ -320,22 +527,24 @@ export function CriticalDashaTransitsTab({
             return (
               <button
                 key={m.id}
+                ref={m.isCurrent ? activeYearTabRef : undefined}
                 type="button"
                 onClick={() => handleSelectMilestone(m.id)}
                 className={`px-2.5 py-1 rounded text-[11px] font-bold font-mono whitespace-nowrap transition-all cursor-pointer border flex items-center space-x-1 shrink-0 ${
                   isSelected
                     ? 'bg-amber-600 text-white border-amber-700 shadow-2xs ring-1 ring-amber-400'
                     : m.isCurrent
-                    ? 'bg-amber-100/80 text-amber-950 border-amber-300 hover:bg-amber-200/80'
+                    ? 'bg-amber-100 text-amber-950 border-amber-400 ring-2 ring-amber-300 shadow-3xs font-black'
                     : 'bg-[#FAF8F5] text-stone-700 border-stone-200 hover:border-amber-300 hover:bg-white'
                 }`}
               >
                 <span>{startYear}–{endYear}</span>
                 {m.isCurrent && (
-                  <span className={`text-[9px] px-1 py-0.1 rounded font-black uppercase ${
+                  <span className={`text-[9px] px-1 py-0.1 rounded font-black uppercase flex items-center space-x-0.5 ${
                     isSelected ? 'bg-amber-800 text-amber-100' : 'bg-amber-600 text-white'
                   }`}>
-                    Now
+                    <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse inline-block" />
+                    <span>Now</span>
                   </span>
                 )}
               </button>
@@ -374,7 +583,7 @@ export function CriticalDashaTransitsTab({
       {/* MASTER-DETAIL LAYOUT: VERTICAL DECK OF YEAR PERIOD CARDS (LEFT) + EXPANDED READING PANEL (RIGHT) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 items-start">
         {/* LEFT COLUMN: VERTICAL DECK OF YEARS & PERIOD CARDS */}
-        <div className="lg:col-span-5 space-y-1.5 max-h-[750px] overflow-y-auto pr-0.5 scrollbar-thin">
+        <div ref={deckContainerRef} className="lg:col-span-5 space-y-1.5 max-h-[750px] overflow-y-auto pr-0.5 scrollbar-thin">
           <div className="flex items-center justify-between px-1 text-[11px] text-stone-500 font-bold uppercase tracking-wider">
             <span>Vertical Deck of Years ({filteredMilestones.length})</span>
             <span>Select to open reading</span>
@@ -389,12 +598,13 @@ export function CriticalDashaTransitsTab({
             return (
               <div
                 key={m.id}
+                ref={m.isCurrent ? activeDeckCardRef : undefined}
                 onClick={() => handleSelectMilestone(m.id)}
                 className={`group rounded-lg border p-2.5 transition-all duration-150 cursor-pointer shadow-3xs space-y-1.5 relative ${
                   isSelected
                     ? 'bg-amber-50/95 border-amber-500 ring-2 ring-amber-400/90 shadow-xs'
                     : isCurrent
-                    ? 'bg-gradient-to-r from-amber-50/60 to-purple-50/50 border-amber-300 hover:border-amber-400'
+                    ? 'bg-gradient-to-r from-amber-100/70 via-white to-purple-100/60 border-2 border-amber-400 ring-1 ring-amber-300 shadow-2xs hover:border-amber-500'
                     : isFuture
                     ? 'bg-white border-stone-200 hover:border-amber-300 hover:bg-[#FAF8F5]'
                     : 'bg-[#FAF9F6] border-stone-200/80 hover:bg-white'
@@ -407,6 +617,8 @@ export function CriticalDashaTransitsTab({
                       className={`text-[13px] font-black font-vedic px-2 py-0.5 rounded border ${
                         isSelected
                           ? 'bg-amber-200 text-amber-950 border-amber-400 font-bold'
+                          : isCurrent
+                          ? 'bg-amber-200/90 text-amber-950 border-amber-400 font-black'
                           : 'bg-stone-100 text-stone-900 border-stone-200'
                       }`}
                     >
@@ -420,8 +632,9 @@ export function CriticalDashaTransitsTab({
                   {/* Status Badge */}
                   <div className="flex items-center space-x-1">
                     {isCurrent && (
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-600 text-white uppercase tracking-wider">
-                        Active Now
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-600 text-white uppercase tracking-wider flex items-center space-x-1 shadow-3xs">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse inline-block" />
+                        <span>Active Now</span>
                       </span>
                     )}
                     <span
@@ -500,6 +713,34 @@ export function CriticalDashaTransitsTab({
         <div className="lg:col-span-7" ref={readingPanelRef}>
           {activeMilestone ? (
             <div className="bg-white rounded-lg border border-amber-200/90 p-3 shadow-2xs space-y-3 sticky top-14">
+              {/* CURRENT ACTIVE DASHA STATUS BANNER IN READING PANEL */}
+              {activeMilestone.isCurrent ? (
+                <div className="bg-emerald-50 border border-emerald-300 rounded px-2.5 py-1.5 flex items-center justify-between text-[11px] shadow-3xs">
+                  <div className="flex items-center space-x-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse ring-2 ring-emerald-200" />
+                    <span className="font-vedic font-bold text-emerald-950 uppercase tracking-wide">
+                      Current Active Dasha — Default Display
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-black bg-emerald-700 text-white px-2 py-0.5 rounded uppercase tracking-wider">
+                    Live Period Now
+                  </span>
+                </div>
+              ) : currentPeriod ? (
+                <div className="bg-amber-50/70 border border-amber-200 rounded px-2.5 py-1.5 flex items-center justify-between text-[11px] shadow-3xs">
+                  <span className="text-stone-700">
+                    Viewing Selected Era: <strong>{activeMilestone.periodStartMonthYear.split('-')[0]}–{activeMilestone.periodEndMonthYear.split('-')[0]}</strong>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleResetToActiveDasha}
+                    className="font-bold text-amber-800 hover:text-amber-950 bg-amber-100/80 hover:bg-amber-200/90 px-2 py-0.5 rounded transition-colors cursor-pointer flex items-center space-x-1"
+                  >
+                    <span>← Return to Current Active Dasha</span>
+                  </button>
+                </div>
+              ) : null}
+
               {/* Reading Header Banner */}
               <div className="bg-gradient-to-r from-amber-50/90 via-white to-purple-50/80 rounded-md border border-amber-300 p-2.5 space-y-1">
                 <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-amber-200/70 pb-1">
