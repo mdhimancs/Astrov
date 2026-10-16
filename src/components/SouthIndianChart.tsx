@@ -7,6 +7,7 @@ interface SouthIndianChartProps {
   title?: string;
   subtitle?: string;
   isTransit?: boolean;
+  showTransitsTogether?: boolean;
   onSelectHouse?: (house: HouseInfo) => void;
   selectedHouseNumber?: number;
 }
@@ -42,6 +43,7 @@ export function SouthIndianChart({
   title = 'Lagna Kundali (Birth Chart)',
   subtitle = 'South Indian Fixed-Rasi Grid Layout',
   isTransit = false,
+  showTransitsTogether = false,
   onSelectHouse,
   selectedHouseNumber,
 }: SouthIndianChartProps) {
@@ -120,18 +122,29 @@ export function SouthIndianChart({
                 )}
               </div>
 
-              {/* Planets in this Rasi */}
-              <div className="flex flex-wrap gap-0.5 my-auto justify-center content-center">
+              {/* Planets in this Rasi (Natal + Transits if enabled) */}
+              <div className="flex flex-wrap gap-0.5 my-auto justify-center content-center max-h-[44px] overflow-hidden">
                 {house?.planets.map((p) => (
                   <span
                     key={p.name}
-                    title={`${p.name} (${p.degree}° ${p.minute}')`}
+                    title={`Natal: ${p.name} (${p.degree}° ${p.minute}')`}
                     className={`inline-flex items-center text-[10px] px-1 py-0.2 rounded border font-bold leading-none ${getPlanetBadgeColor(p.name)}`}
                   >
                     {p.symbol}
                     {p.isRetrograde && <span className="text-red-700 font-black ml-0.5">R</span>}
                   </span>
                 ))}
+                {showTransitsTogether &&
+                  house?.transitPlanets &&
+                  house.transitPlanets.map((tp) => (
+                    <span
+                      key={`tr-${tp.name}`}
+                      title={`Transit [G]: ${tp.name} (${tp.degree}° ${tp.minute}') currently transiting ${cell.rasiName}`}
+                      className="inline-flex items-center text-[9px] px-1 py-0.2 rounded border font-bold leading-none bg-amber-500 text-stone-950 border-amber-600 shadow-3xs"
+                    >
+                      [G]{tp.symbol}
+                    </span>
+                  ))}
               </div>
 
               {/* Sign Lord and degree snippet */}
@@ -157,7 +170,28 @@ export function SouthIndianChart({
           <span className="text-[10px] text-stone-600 font-semibold leading-tight">
             Fixed Zodiac (Rasi) Chakra
           </span>
+          {showTransitsTogether && (
+            <span className="text-[9px] font-bold text-amber-800 bg-amber-100/80 border border-amber-300 px-1.5 py-0.2 rounded">
+              Transits Overlaid [G]
+            </span>
+          )}
         </div>
+      </div>
+
+      {/* Legend & Instructions */}
+      <div className="w-full mt-1.5 flex flex-wrap items-center justify-between text-[11px] text-stone-500 border-t border-stone-200/80 pt-1 gap-1.5">
+        <div className="flex items-center space-x-2">
+          <span>Fixed Rasi Grid</span>
+          <span>•</span>
+          <span className="text-red-700 font-bold">ASC = Lagna</span>
+          {showTransitsTogether && (
+            <>
+              <span>•</span>
+              <span className="text-amber-800 font-bold">[G] = Live Transit</span>
+            </>
+          )}
+        </div>
+        <span className="italic text-stone-400">Click any house for details</span>
       </div>
     </div>
   );

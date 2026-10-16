@@ -981,7 +981,9 @@ export function buildHouseStructure(lagnaRasi: number, planets: PlanetPosition[]
     const houseMeta = BHAVA_DETAILS[h - 1];
 
     const positedPlanets = planets.filter((p) => p.house === h && p.name !== 'Lagna');
-    const positedTransits = transitPlanets ? transitPlanets.filter((p) => p.house === h && p.name !== 'Lagna') : undefined;
+    const positedTransits = transitPlanets
+      ? transitPlanets.filter((p) => (p.rasiNumber === rasiNumber || ((p.rasiNumber - lagnaRasi + 12) % 12) + 1 === h) && p.name !== 'Lagna')
+      : undefined;
 
     houses.push({
       houseNumber: h,
@@ -1976,11 +1978,17 @@ export function calculatePratyantardashas(
 
     const isCurrent = now >= pStartDate && now < pEndDate;
 
-    const formatShortDate = (d: Date) => {
-      const day = d.getDate();
-      const m = d.toLocaleString('en-US', { month: 'short' });
-      const yr = d.getFullYear();
-      return `${day} ${m} ${yr}`;
+    const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
+    const formatMmYy = (d: Date) => {
+      const mm = pad(d.getMonth() + 1);
+      const yy = String(d.getFullYear()).slice(-2);
+      return `${mm}-${yy}`;
+    };
+    const formatExactDate = (d: Date) => {
+      const day = pad(d.getDate());
+      const mm = pad(d.getMonth() + 1);
+      const yy = String(d.getFullYear()).slice(-2);
+      return `${day}/${mm}-${yy}`;
     };
 
     const durationStr = durationDays >= 14
@@ -2000,8 +2008,10 @@ export function calculatePratyantardashas(
       planet: subLordData.planet,
       durationDays,
       durationStr,
-      startDate: formatShortDate(pStartDate),
-      endDate: formatShortDate(pEndDate),
+      startDate: formatMmYy(pStartDate),
+      endDate: formatMmYy(pEndDate),
+      exactStartDate: formatExactDate(pStartDate),
+      exactEndDate: formatExactDate(pEndDate),
       isCurrent,
       theme,
       strengthInfo,
@@ -2045,10 +2055,21 @@ export function calculateVimshottariDasha(
   const diffMonths = (now.getFullYear() - baseBirthDate.getFullYear()) * 12 + (now.getMonth() - baseBirthDate.getMonth());
   const currentAge = Math.max(0, diffMonths / 12);
 
+  const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const getMonthYearStr = (date: Date, offsetYears: number) => {
+  const getOffsetDate = (date: Date, offsetYears: number) => {
     const d = new Date(date.getTime());
     d.setMonth(d.getMonth() + Math.round(offsetYears * 12));
+    return d;
+  };
+  const getMonthYearMmYy = (date: Date, offsetYears: number) => {
+    const d = getOffsetDate(date, offsetYears);
+    const mm = pad(d.getMonth() + 1);
+    const yy = String(d.getFullYear()).slice(-2);
+    return `${mm}-${yy}`;
+  };
+  const getMonthYearFull = (date: Date, offsetYears: number) => {
+    const d = getOffsetDate(date, offsetYears);
     return `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
   };
 
@@ -2064,8 +2085,10 @@ export function calculateVimshottariDasha(
     durationYears: firstDuration,
     startAge: 0,
     endAge: firstDuration,
-    startMonthYear: getMonthYearStr(baseBirthDate, 0),
-    endMonthYear: getMonthYearStr(baseBirthDate, firstDuration),
+    startMonthYear: getMonthYearMmYy(baseBirthDate, 0),
+    endMonthYear: getMonthYearMmYy(baseBirthDate, firstDuration),
+    startMonthYearFull: getMonthYearFull(baseBirthDate, 0),
+    endMonthYearFull: getMonthYearFull(baseBirthDate, firstDuration),
     lifeTheme: birthLordData.lifeTheme,
     strengthInfo: birthStrength,
     parts: calculateMahadashaParts(birthLord, firstDuration, 0, baseBirthDate, natalLagnaRasi, natalPlanets),
@@ -2078,8 +2101,10 @@ export function calculateVimshottariDasha(
     const nextLordData = VIMSHOTTARI_LORDS[(lordIndex + i) % 9];
     const startAge = parseFloat(cumAge.toFixed(1));
     const endAge = parseFloat((cumAge + nextLordData.years).toFixed(1));
-    const startMonthYear = getMonthYearStr(baseBirthDate, startAge);
-    const endMonthYear = getMonthYearStr(baseBirthDate, endAge);
+    const startMonthYear = getMonthYearMmYy(baseBirthDate, startAge);
+    const endMonthYear = getMonthYearMmYy(baseBirthDate, endAge);
+    const startMonthYearFull = getMonthYearFull(baseBirthDate, startAge);
+    const endMonthYearFull = getMonthYearFull(baseBirthDate, endAge);
 
     if (currentAge >= startAge && currentAge < endAge) {
       currentActiveLord = nextLordData.planet;
@@ -2094,6 +2119,8 @@ export function calculateVimshottariDasha(
       endAge,
       startMonthYear,
       endMonthYear,
+      startMonthYearFull,
+      endMonthYearFull,
       lifeTheme: nextLordData.lifeTheme,
       strengthInfo: mStrength,
       parts: calculateMahadashaParts(nextLordData.planet, nextLordData.years, startAge, baseBirthDate, natalLagnaRasi, natalPlanets),
@@ -2124,11 +2151,17 @@ export function calculateMahadashaParts(
   const diffMonths = (now.getFullYear() - baseBirthDate.getFullYear()) * 12 + (now.getMonth() - baseBirthDate.getMonth());
   const currentAge = Math.max(0, diffMonths / 12);
 
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const getMonthYearStr = (date: Date, offsetYears: number) => {
+  const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
+  const getOffsetDate = (date: Date, offsetYears: number) => {
     const d = new Date(date.getTime());
     d.setMonth(d.getMonth() + Math.round(offsetYears * 12));
-    return `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+    return d;
+  };
+  const getMonthYearMmYy = (date: Date, offsetYears: number) => {
+    const d = getOffsetDate(date, offsetYears);
+    const mm = pad(d.getMonth() + 1);
+    const yy = String(d.getFullYear()).slice(-2);
+    return `${mm}-${yy}`;
   };
 
   const planetObj = natalPlanets.find((p) => p.name === planet);
@@ -2141,8 +2174,8 @@ export function calculateMahadashaParts(
       partNumber: 1,
       partName: 'Prathama Bhaga (1st Part — Entry & Sign)',
       stage: 'Arambha (Beginning)',
-      startDate: getMonthYearStr(baseBirthDate, startAge),
-      endDate: getMonthYearStr(baseBirthDate, startAge + partDuration),
+      startDate: getMonthYearMmYy(baseBirthDate, startAge),
+      endDate: getMonthYearMmYy(baseBirthDate, startAge + partDuration),
       durationYearsStr: `${partDuration.toFixed(1)} yrs`,
       isCurrent: currentAge >= startAge && currentAge < startAge + partDuration,
       strengthInfo: baseStrength,
@@ -2153,8 +2186,8 @@ export function calculateMahadashaParts(
       partNumber: 2,
       partName: 'Madhyama Bhaga (2nd Part — Core Fruition & Peak)',
       stage: 'Madhya (Peak Fruition)',
-      startDate: getMonthYearStr(baseBirthDate, startAge + partDuration),
-      endDate: getMonthYearStr(baseBirthDate, startAge + 2 * partDuration),
+      startDate: getMonthYearMmYy(baseBirthDate, startAge + partDuration),
+      endDate: getMonthYearMmYy(baseBirthDate, startAge + 2 * partDuration),
       durationYearsStr: `${partDuration.toFixed(1)} yrs`,
       isCurrent: currentAge >= startAge + partDuration && currentAge < startAge + 2 * partDuration,
       strengthInfo: baseStrength,
@@ -2165,8 +2198,8 @@ export function calculateMahadashaParts(
       partNumber: 3,
       partName: 'Antya Bhaga (3rd Part — Culmination & Chhidra Transition)',
       stage: 'Antya (Culmination / Chhidra)',
-      startDate: getMonthYearStr(baseBirthDate, startAge + 2 * partDuration),
-      endDate: getMonthYearStr(baseBirthDate, startAge + 3 * partDuration),
+      startDate: getMonthYearMmYy(baseBirthDate, startAge + 2 * partDuration),
+      endDate: getMonthYearMmYy(baseBirthDate, startAge + 3 * partDuration),
       durationYearsStr: `${partDuration.toFixed(1)} yrs`,
       isCurrent: currentAge >= startAge + 2 * partDuration && currentAge <= startAge + 3 * partDuration,
       strengthInfo: baseStrength,
@@ -2191,10 +2224,21 @@ export function calculateAntardashas(
   const birthDay = dateParts[2] || 15;
   const baseBirthDate = new Date(birthYear, birthMonth, birthDay);
 
+  const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const getMonthYearStr = (date: Date, offsetYears: number) => {
+  const getOffsetDate = (date: Date, offsetYears: number) => {
     const d = new Date(date.getTime());
     d.setMonth(d.getMonth() + Math.round(offsetYears * 12));
+    return d;
+  };
+  const getMonthYearMmYy = (date: Date, offsetYears: number) => {
+    const d = getOffsetDate(date, offsetYears);
+    const mm = pad(d.getMonth() + 1);
+    const yy = String(d.getFullYear()).slice(-2);
+    return `${mm}-${yy}`;
+  };
+  const getMonthYearFull = (date: Date, offsetYears: number) => {
+    const d = getOffsetDate(date, offsetYears);
     return `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
   };
 
@@ -2218,8 +2262,10 @@ export function calculateAntardashas(
         ? `${subDurationYears.toFixed(1)} yrs`
         : `${Math.round(durationMonths)} mos`;
 
-    const startMonthYear = getMonthYearStr(baseBirthDate, curAge);
-    const endMonthYear = getMonthYearStr(baseBirthDate, subEndAge);
+    const startMonthYear = getMonthYearMmYy(baseBirthDate, curAge);
+    const endMonthYear = getMonthYearMmYy(baseBirthDate, subEndAge);
+    const startMonthYearFull = getMonthYearFull(baseBirthDate, curAge);
+    const endMonthYearFull = getMonthYearFull(baseBirthDate, subEndAge);
     const isCurrent = currentAge >= curAge && currentAge < subEndAge;
 
     const theme = `${mahadashaPlanet}–${subLordData.planet}: ${subLordData.lifeTheme}`;
@@ -2247,8 +2293,8 @@ export function calculateAntardashas(
         partNumber: 1,
         partName: `${subLordData.planet} Entry Phase (Arambha)`,
         stage: 'Arambha (Beginning)',
-        startDate: getMonthYearStr(baseBirthDate, curAge),
-        endDate: getMonthYearStr(baseBirthDate, curAge + antarPartDuration),
+        startDate: getMonthYearMmYy(baseBirthDate, curAge),
+        endDate: getMonthYearMmYy(baseBirthDate, curAge + antarPartDuration),
         durationYearsStr: `${(durationMonths / 3).toFixed(1)} mos`,
         isCurrent: currentAge >= curAge && currentAge < curAge + antarPartDuration,
         strengthInfo,
@@ -2259,8 +2305,8 @@ export function calculateAntardashas(
         partNumber: 2,
         partName: `${subLordData.planet} Core Manifestation (Madhya)`,
         stage: 'Madhya (Peak Fruition)',
-        startDate: getMonthYearStr(baseBirthDate, curAge + antarPartDuration),
-        endDate: getMonthYearStr(baseBirthDate, curAge + 2 * antarPartDuration),
+        startDate: getMonthYearMmYy(baseBirthDate, curAge + antarPartDuration),
+        endDate: getMonthYearMmYy(baseBirthDate, curAge + 2 * antarPartDuration),
         durationYearsStr: `${(durationMonths / 3).toFixed(1)} mos`,
         isCurrent: currentAge >= curAge + antarPartDuration && currentAge < curAge + 2 * antarPartDuration,
         strengthInfo,
@@ -2271,8 +2317,8 @@ export function calculateAntardashas(
         partNumber: 3,
         partName: `${subLordData.planet} Transition Phase (Antya)`,
         stage: 'Antya (Culmination / Chhidra)',
-        startDate: getMonthYearStr(baseBirthDate, curAge + 2 * antarPartDuration),
-        endDate: getMonthYearStr(baseBirthDate, subEndAge),
+        startDate: getMonthYearMmYy(baseBirthDate, curAge + 2 * antarPartDuration),
+        endDate: getMonthYearMmYy(baseBirthDate, subEndAge),
         durationYearsStr: `${(durationMonths / 3).toFixed(1)} mos`,
         isCurrent: currentAge >= curAge + 2 * antarPartDuration && currentAge <= subEndAge,
         strengthInfo,
@@ -2289,6 +2335,8 @@ export function calculateAntardashas(
       endAge: parseFloat(subEndAge.toFixed(1)),
       startMonthYear,
       endMonthYear,
+      startMonthYearFull,
+      endMonthYearFull,
       isCurrent,
       theme,
       strengthInfo,
@@ -2362,8 +2410,8 @@ export function calculateYoginiDasha(
         sanskrit: yog.sanskrit,
         lord: yog.lord,
         durationYears: yog.years,
-        startDate: sDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-        endDate: eDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        startDate: `${sDate.getMonth() + 1 < 10 ? '0' : ''}${sDate.getMonth() + 1}-${String(sDate.getFullYear()).slice(-2)}`,
+        endDate: `${eDate.getMonth() + 1 < 10 ? '0' : ''}${eDate.getMonth() + 1}-${String(eDate.getFullYear()).slice(-2)}`,
         isActive,
         theme: yog.theme,
       };
@@ -2511,10 +2559,12 @@ export function getDashaMonthlyPlanetaryGuidance(
   };
 }
 
-// Calculate Natal Yogas Formed at Birth
+// Calculate Natal Yogas Formed at Birth with Dasha Activation
 export function calculateNatalYogas(
   natalLagnaRasi: number,
-  natalPlanets: PlanetPosition[]
+  natalPlanets: PlanetPosition[],
+  currentMahaLord?: GrahaName,
+  currentAntarLord?: GrahaName
 ): NatalYoga[] {
   const yogas: NatalYoga[] = [];
 
@@ -2525,15 +2575,61 @@ export function calculateNatalYogas(
   const jupiter = natalPlanets.find((p) => p.name === 'Guru');
   const venus = natalPlanets.find((p) => p.name === 'Shukra');
   const saturn = natalPlanets.find((p) => p.name === 'Shani');
+  const rahu = natalPlanets.find((p) => p.name === 'Rahu');
+  const ketu = natalPlanets.find((p) => p.name === 'Ketu');
+
+  // Helper to determine house lord
+  const getHouseLord = (houseNum: number): GrahaName => {
+    const signNum = ((natalLagnaRasi - 1 + (houseNum - 1)) % 12) + 1;
+    return VEDIC_RASIS[signNum - 1].lord;
+  };
+
+  const getPlanet = (name: string) => natalPlanets.find((p) => p.name === name);
+
+  // Helper to attach Dasha activation status
+  const evaluateActivation = (planetsInvolved: string[]) => {
+    const isMahaMatch = currentMahaLord && planetsInvolved.includes(currentMahaLord);
+    const isAntarMatch = currentAntarLord && planetsInvolved.includes(currentAntarLord);
+
+    if (isMahaMatch) {
+      return {
+        isDashaActive: true,
+        activationStatus: 'Active Now (Mahadasha)' as const,
+        activatingPlanet: currentMahaLord,
+        activationExplanation: `Currently running the major ${currentMahaLord} Mahadasha${currentAntarLord ? ` with ${currentAntarLord} Antardasha` : ''}. This directly unlocks and energizes the full manifest fruits of this yoga in your current life chapter.`,
+      };
+    }
+
+    if (isAntarMatch) {
+      return {
+        isDashaActive: true,
+        activationStatus: 'Active Now (Antardasha)' as const,
+        activatingPlanet: currentAntarLord,
+        activationExplanation: `Currently running the ${currentAntarLord} Antardasha under ${currentMahaLord || 'active'} Mahadasha. This sub-period acts as a cosmic catalyst triggering the fruits of this yoga.`,
+      };
+    }
+
+    return {
+      isDashaActive: false,
+      activationStatus: 'Dormant (Awaiting Dasha)' as const,
+      activatingPlanet: planetsInvolved.join(', '),
+      activationExplanation: `Inherent natal blueprint. This yoga operates as an underlying talent and will reach its peak fruition when you enter a Mahadasha or Antardasha of ${planetsInvolved.join(' or ')}.`,
+    };
+  };
 
   // 1. Budhaditya Yoga (Sun + Mercury in same rasi)
   if (sun && mercury && sun.rasiNumber === mercury.rasiNumber) {
+    const involved = ['Surya', 'Budha'];
+    const act = evaluateActivation(involved);
     yogas.push({
       name: 'Budhaditya Yoga',
       sanskritName: 'बुधादित्य योग',
-      planetsInvolved: ['Surya', 'Budha'],
+      planetsInvolved: involved,
       auspiciousness: 'High Raja Yoga',
-      effect: `Formed by Sun and Mercury together in ${sun.rasiName} (House ${sun.house}). Confers sharp analytical acumen, rapid grasping power, eloquent communication, and high administrative skill.`,
+      category: 'Intellect & Speech',
+      significance: 'Sharp intellectual discrimination, executive eloquence, mathematical talent, and swift career advancement in advisory or administrative domains.',
+      effect: `Formed by Sun and Mercury conjunction in ${sun.rasiName} (House ${sun.house}). Confers sharp analytical acumen, rapid grasping power, eloquent communication, and high administrative skill.`,
+      ...act,
     });
   }
 
@@ -2541,60 +2637,402 @@ export function calculateNatalYogas(
   if (moon && jupiter) {
     const diff = ((jupiter.rasiNumber - moon.rasiNumber + 12) % 12) + 1;
     if ([1, 4, 7, 10].includes(diff)) {
+      const involved = ['Guru', 'Chandra'];
+      const act = evaluateActivation(involved);
       yogas.push({
         name: 'Gajakesari Yoga',
         sanskritName: 'गजकेसरी योग',
-        planetsInvolved: ['Guru', 'Chandra'],
+        planetsInvolved: involved,
         auspiciousness: 'High Raja Yoga',
-        effect: `Jupiter in Kendra (${diff}th) from natal Moon. A celebrated classical yoga granting spotless reputation, natural wisdom, commanding oratory, and lasting societal honor.`,
+        category: 'Raja Yoga',
+        significance: 'Royal dignity, spotless moral reputation, natural wisdom, commanding societal respect, and triumph over adversaries.',
+        effect: `Jupiter in Kendra (${diff}th house) from natal Moon. A celebrated classical yoga granting spotless reputation, natural wisdom, commanding oratory, lasting societal honor, and high financial protection.`,
+        ...act,
       });
     }
   }
 
-  // 3. Chandra-Mangal Yoga (Moon + Mars in same house or mutual aspect)
+  // 3. Chandra-Mangala Yoga (Moon + Mars in same house or mutual 7th aspect)
   if (moon && mars) {
-    if (moon.rasiNumber === mars.rasiNumber) {
+    const diff = ((mars.rasiNumber - moon.rasiNumber + 12) % 12) + 1;
+    if (diff === 1 || diff === 7) {
+      const involved = ['Chandra', 'Mangal'];
+      const act = evaluateActivation(involved);
       yogas.push({
-        name: 'Chandra-Mangal Yoga',
+        name: 'Chandra-Mangala Yoga',
         sanskritName: 'चन्द्र-मङ्गल योग',
-        planetsInvolved: ['Chandra', 'Mangal'],
+        planetsInvolved: involved,
         auspiciousness: 'Auspicious Dhana Yoga',
-        effect: `Conjunction of Moon and Mars in House ${moon.house}. Grants strong financial drive, swift commercial instinct, real estate blessings, and relentless competitive energy.`,
+        category: 'Dhana Yoga',
+        significance: 'Remarkable enterprise, real estate wealth, commercial acumen, unstoppable competitive drive, and high resourcefulness.',
+        effect: `Moon and Mars in ${diff === 1 ? 'conjunction in House ' + moon.house : 'mutual 7th aspect across Houses ' + moon.house + ' and ' + mars.house}. Bestows fierce financial drive, swift commercial instinct, property accumulation, and decisive execution.`,
+        ...act,
       });
     }
   }
 
-  // 4. Amala Yoga (Benefics Jupiter, Venus, or Mercury in 10th House from Lagna or Moon)
+  // 4. PANCHA MAHAPURUSHA YOGAS (Planets in Kendras 1, 4, 7, 10 in own sign or exaltation)
+  // 4a. Ruchaka Yoga (Mars in Kendra in Aries 1, Scorpio 8, Capricorn 10)
+  if (mars && [1, 4, 7, 10].includes(mars.house) && [1, 8, 10].includes(mars.rasiNumber)) {
+    const involved = ['Mangal'];
+    const act = evaluateActivation(involved);
+    yogas.push({
+      name: 'Ruchaka Yoga',
+      sanskritName: 'रुचक योग',
+      planetsInvolved: involved,
+      auspiciousness: 'Mahapurusha Yoga',
+      category: 'Mahapurusha Yoga',
+      significance: 'Pancha Mahapurusha Yoga of Mars: Fearless leadership, technical supremacy, military/police command, physical vitality, and triumph over rivals.',
+      effect: `Mars strongly posited in House ${mars.house} (${mars.rasiName}). Endows commanding physical stamina, strategic boldness, property ownership, and authoritative leadership.`,
+      ...act,
+    });
+  }
+
+  // 4b. Bhadra Yoga (Mercury in Kendra in Gemini 3, Virgo 6)
+  if (mercury && [1, 4, 7, 10].includes(mercury.house) && [3, 6].includes(mercury.rasiNumber)) {
+    const involved = ['Budha'];
+    const act = evaluateActivation(involved);
+    yogas.push({
+      name: 'Bhadra Yoga',
+      sanskritName: 'भद् योग',
+      planetsInvolved: involved,
+      auspiciousness: 'Mahapurusha Yoga',
+      category: 'Mahapurusha Yoga',
+      significance: 'Pancha Mahapurusha Yoga of Mercury: Genius intellectual capacity, mastery in trade and commerce, diplomatic charm, and enduring fame in letters and sciences.',
+      effect: `Mercury strongly posited in House ${mercury.house} (${mercury.rasiName}). Grants superior intellect, razor-sharp memory, commercial prosperity, and captivating eloquence.`,
+      ...act,
+    });
+  }
+
+  // 4c. Hamsa Yoga (Jupiter in Kendra in Cancer 4, Sagittarius 9, Pisces 12)
+  if (jupiter && [1, 4, 7, 10].includes(jupiter.house) && [4, 9, 12].includes(jupiter.rasiNumber)) {
+    const involved = ['Guru'];
+    const act = evaluateActivation(involved);
+    yogas.push({
+      name: 'Hamsa Yoga',
+      sanskritName: 'हंस योग',
+      planetsInvolved: involved,
+      auspiciousness: 'Mahapurusha Yoga',
+      category: 'Mahapurusha Yoga',
+      significance: 'Pancha Mahapurusha Yoga of Jupiter: Supreme spiritual wisdom, high judicial authority, philosophical mentorship, revered societal stature, and untainted character.',
+      effect: `Jupiter strongly posited in House ${jupiter.house} (${jupiter.rasiName}). Bestows saintly nobility, deep Vedic knowledge, widespread honor, and noble progeny.`,
+      ...act,
+    });
+  }
+
+  // 4d. Malavya Yoga (Venus in Kendra in Taurus 2, Libra 7, Pisces 12)
+  if (venus && [1, 4, 7, 10].includes(venus.house) && [2, 7, 12].includes(venus.rasiNumber)) {
+    const involved = ['Shukra'];
+    const act = evaluateActivation(involved);
+    yogas.push({
+      name: 'Malavya Yoga',
+      sanskritName: 'मालव्य योग',
+      planetsInvolved: involved,
+      auspiciousness: 'Mahapurusha Yoga',
+      category: 'Mahapurusha Yoga',
+      significance: 'Pancha Mahapurusha Yoga of Venus: Aesthetic genius, lavish comfort and luxury, artistic mastery, charismatic charm, and marital harmony.',
+      effect: `Venus strongly posited in House ${venus.house} (${venus.rasiName}). Bestows high aesthetic appreciation, access to fine conveyances, personal magnetism, and prosperous relationships.`,
+      ...act,
+    });
+  }
+
+  // 4e. Sasa Yoga (Saturn in Kendra in Libra 7, Capricorn 10, Aquarius 11)
+  if (saturn && [1, 4, 7, 10].includes(saturn.house) && [7, 10, 11].includes(saturn.rasiNumber)) {
+    const involved = ['Shani'];
+    const act = evaluateActivation(involved);
+    yogas.push({
+      name: 'Sasa Yoga',
+      sanskritName: 'शश योग',
+      planetsInvolved: involved,
+      auspiciousness: 'Mahapurusha Yoga',
+      category: 'Mahapurusha Yoga',
+      significance: 'Pancha Mahapurusha Yoga of Saturn: Grassroots leadership, political mastery, immense resilience, organizational supremacy, and mastery over land and resources.',
+      effect: `Saturn strongly posited in House ${saturn.house} (${saturn.rasiName}). Grants extraordinary endurance, mastery over large organizational hierarchies, loyal followers, and enduring institutional legacy.`,
+      ...act,
+    });
+  }
+
+  // 5. Amala Yoga (Benefics Jupiter, Venus, or Mercury in 10th House from Lagna or Moon)
   const planetsIn10th = natalPlanets.filter((p) => p.house === 10);
   const beneficIn10th = planetsIn10th.filter((p) => ['Guru', 'Shukra', 'Budha'].includes(p.name));
   if (beneficIn10th.length > 0) {
+    const involved = beneficIn10th.map((p) => p.name);
+    const act = evaluateActivation(involved);
     yogas.push({
       name: 'Amala Yoga',
       sanskritName: 'अमल योग',
-      planetsInvolved: beneficIn10th.map((p) => p.name),
+      planetsInvolved: involved,
       auspiciousness: 'High Raja Yoga',
-      effect: `Benefic planet (${beneficIn10th.map((p) => p.englishName).join(', ')}) occupying the 10th house of Karma. Confers spotless professional integrity, benevolent authority, and benevolent public standing.`,
+      category: 'Raja Yoga',
+      significance: 'Spotless professional reputation, philanthropic authority, righteous deeds, and lasting legacy without blemish.',
+      effect: `Benefic Graha (${beneficIn10th.map((p) => p.englishName).join(', ')}) occupying the 10th house of Karma. Confers noble professional status, public trust, and benevolent executive authority.`,
+      ...act,
     });
   }
 
-  // 5. Kendra-Trikona Raja Yoga (Lords of Kendra and Trikona harmoniously placed)
-  yogas.push({
-    name: 'Dharma-Karmadhipati Synergy',
-    sanskritName: 'धर्म-कर्माधिपति राजयोग',
-    planetsInvolved: ['Lagna Lord', '9th Lord', '10th Lord'],
-    auspiciousness: 'High Raja Yoga',
-    effect: `Harmonious interplay between the houses of Fortune (9th) and Profession (10th). Provides steady opportunities to convert dharmic vision into recognized vocational accomplishments.`,
-  });
+  // 6. Dharma-Karmadhipati Raja Yoga (9th Lord + 10th Lord association)
+  const lord9 = getHouseLord(9);
+  const lord10 = getHouseLord(10);
+  const planetLord9 = getPlanet(lord9);
+  const planetLord10 = getPlanet(lord10);
+  if (planetLord9 && planetLord10) {
+    const isConjunct = planetLord9.house === planetLord10.house;
+    const isMutualAspect = ((planetLord10.house - planetLord9.house + 12) % 12) + 1 === 7;
+    const isKendraTrikona = [1, 4, 5, 7, 9, 10].includes(planetLord9.house) && [1, 4, 5, 7, 9, 10].includes(planetLord10.house);
 
-  // 6. Saraswati Yoga or Lakshmi Yoga
-  if (jupiter && venus) {
+    if (isConjunct || isMutualAspect || isKendraTrikona) {
+      const involved = Array.from(new Set([lord9, lord10]));
+      const act = evaluateActivation(involved);
+      yogas.push({
+        name: 'Dharma-Karmadhipati Raja Yoga',
+        sanskritName: 'धर्म-कर्माधिपति राजयोग',
+        planetsInvolved: involved,
+        auspiciousness: 'High Raja Yoga',
+        category: 'Raja Yoga',
+        significance: 'Supreme Vedic Raja Yoga: Convergence of Dharma (9th House) and Karma (10th House). Bestows executive power, high purpose, recognition, and prosperity.',
+        effect: `Harmonious interplay between ${lord9} (9th Lord) in House ${planetLord9.house} and ${lord10} (10th Lord) in House ${planetLord10.house}. Transforms ethical vision into commanding worldly achievement and renown.`,
+        ...act,
+      });
+    }
+  }
+
+  // 7. Lakshmi Yoga (9th Lord in Kendra or Trikona in exaltation or own sign, Lagna Lord strong)
+  if (planetLord9 && [1, 4, 5, 7, 9, 10].includes(planetLord9.house)) {
+    const involved = Array.from(new Set([lord9, 'Guru', 'Shukra']));
+    const act = evaluateActivation(involved);
     yogas.push({
-      name: 'Saraswati & Shubha Yoga',
-      sanskritName: 'सरस्वती योग',
-      planetsInvolved: ['Guru', 'Shukra', 'Budha'],
-      auspiciousness: 'Spiritual Yoga',
-      effect: 'Fosters artistic appreciation, philosophical depth, refined speech, and lifelong devotion to spiritual and cultural learning.',
+      name: 'Lakshmi Yoga',
+      sanskritName: 'लक्ष्मी योग',
+      planetsInvolved: involved,
+      auspiciousness: 'Auspicious Dhana Yoga',
+      category: 'Dhana Yoga',
+      significance: 'Abundant prosperity, financial independence, refined elegance, real estate assets, and perpetual blessings of Goddess Lakshmi.',
+      effect: `9th Lord (${lord9}) auspiciously disposed in House ${planetLord9.house}. Grants steady inflow of legitimate wealth, cultural nobility, and domestic contentment.`,
+      ...act,
     });
+  }
+
+  // 8. Saraswati Yoga (Benefics Jupiter, Venus, Mercury in Kendras, Trikonas, or 2nd House)
+  if (jupiter && venus && mercury) {
+    const isJupWell = [1, 2, 4, 5, 7, 9, 10].includes(jupiter.house);
+    const isVenWell = [1, 2, 4, 5, 7, 9, 10].includes(venus.house);
+    const isMerWell = [1, 2, 4, 5, 7, 9, 10].includes(mercury.house);
+    if (isJupWell && (isVenWell || isMerWell)) {
+      const involved = ['Guru', 'Shukra', 'Budha'];
+      const act = evaluateActivation(involved);
+      yogas.push({
+        name: 'Saraswati Yoga',
+        sanskritName: 'सरस्वती योग',
+        planetsInvolved: involved,
+        auspiciousness: 'Spiritual Yoga',
+        category: 'Intellect & Speech',
+        significance: 'Supreme mastery of arts, literature, oratory, diplomacy, and spiritual philosophy. Honored across scholarly circles.',
+        effect: `Jupiter, Venus, and Mercury occupying auspicious Kendras/Trikonas. Bestows poetic inspiration, academic brilliance, refined speech, and lifelong devotion to truth and wisdom.`,
+        ...act,
+      });
+    }
+  }
+
+  // 9. Viparita Raja Yogas (Dusthana lords in Dusthanas 6, 8, 12 without malefic aspect)
+  const lord6 = getHouseLord(6);
+  const lord8 = getHouseLord(8);
+  const lord12 = getHouseLord(12);
+  const planetLord6 = getPlanet(lord6);
+  const planetLord8 = getPlanet(lord8);
+  const planetLord12 = getPlanet(lord12);
+
+  // Harsha Yoga: 6th Lord in 6, 8, or 12
+  if (planetLord6 && [6, 8, 12].includes(planetLord6.house)) {
+    const involved = [lord6];
+    const act = evaluateActivation(involved);
+    yogas.push({
+      name: 'Harsha Viparita Raja Yoga',
+      sanskritName: 'हर्ष योग',
+      planetsInvolved: involved,
+      auspiciousness: 'Viparita Raja Yoga',
+      category: 'Raja Yoga',
+      significance: 'Turning crises into monumental breakthroughs: Immunity against litigation, health resilience, defeat of competitors, and joyful spirit.',
+      effect: `6th Lord (${lord6}) situated in House ${planetLord6.house}. Confers uncanny ability to profit from sudden market shifts, overcome fierce rivals, and emerge unharmed from disputes.`,
+      ...act,
+    });
+  }
+
+  // Sarala Yoga: 8th Lord in 6, 8, or 12
+  if (planetLord8 && [6, 8, 12].includes(planetLord8.house)) {
+    const involved = [lord8];
+    const act = evaluateActivation(involved);
+    yogas.push({
+      name: 'Sarala Viparita Raja Yoga',
+      sanskritName: 'सरल योग',
+      planetsInvolved: involved,
+      auspiciousness: 'Viparita Raja Yoga',
+      category: 'Raja Yoga',
+      significance: 'Longevity, fearless decision-making, sudden windfalls, intellectual mastery of confidential subjects, and steadfast courage under pressure.',
+      effect: `8th Lord (${lord8}) posited in House ${planetLord8.house}. Endows research acumen, occult protection, unearned gains, and psychological fearlessness.`,
+      ...act,
+    });
+  }
+
+  // Vimala Yoga: 12th Lord in 6, 8, or 12
+  if (planetLord12 && [6, 8, 12].includes(planetLord12.house)) {
+    const involved = [lord12];
+    const act = evaluateActivation(involved);
+    yogas.push({
+      name: 'Vimala Viparita Raja Yoga',
+      sanskritName: 'विमल योग',
+      planetsInvolved: involved,
+      auspiciousness: 'Viparita Raja Yoga',
+      category: 'Raja Yoga',
+      significance: 'Virtuous wealth accumulation, noble independence, spiritual liberation (Moksha), and immunity against secret enemies.',
+      effect: `12th Lord (${lord12}) posited in House ${planetLord12.house}. Minimizes wasteful expenditures and transforms foreign connections into enduring prosperity.`,
+      ...act,
+    });
+  }
+
+  // 10. Lunar Yogas: Sunapha, Anapha, Durudhara
+  if (moon) {
+    const planetsIn2ndFromMoon = natalPlanets.filter(
+      (p) => !['Surya', 'Chandra', 'Rahu', 'Ketu', 'Lagna'].includes(p.name) &&
+        ((p.rasiNumber - moon.rasiNumber + 12) % 12) + 1 === 2
+    );
+    const planetsIn12thFromMoon = natalPlanets.filter(
+      (p) => !['Surya', 'Chandra', 'Rahu', 'Ketu', 'Lagna'].includes(p.name) &&
+        ((p.rasiNumber - moon.rasiNumber + 12) % 12) + 1 === 12
+    );
+
+    if (planetsIn2ndFromMoon.length > 0 && planetsIn12thFromMoon.length > 0) {
+      const involved = Array.from(new Set([...planetsIn2ndFromMoon.map((p) => p.name), ...planetsIn12thFromMoon.map((p) => p.name), 'Chandra']));
+      const act = evaluateActivation(involved);
+      yogas.push({
+        name: 'Durudhara Yoga',
+        sanskritName: 'दुरुधरा योग',
+        planetsInvolved: involved,
+        auspiciousness: 'Auspicious Dhana Yoga',
+        category: 'Dhana Yoga',
+        significance: 'Balanced mind, generosity, steady affluence, vehicles, social esteem, and bountiful comforts in life.',
+        effect: `Planets flanking natal Moon in both 2nd (${planetsIn2ndFromMoon.map((p) => p.name).join(', ')}) and 12th (${planetsIn12thFromMoon.map((p) => p.name).join(', ')}) houses. Ensures psychological equilibrium and multifaceted financial security.`,
+        ...act,
+      });
+    } else if (planetsIn2ndFromMoon.length > 0) {
+      const involved = Array.from(new Set([...planetsIn2ndFromMoon.map((p) => p.name), 'Chandra']));
+      const act = evaluateActivation(involved);
+      yogas.push({
+        name: 'Sunapha Yoga',
+        sanskritName: 'सुनफा योग',
+        planetsInvolved: involved,
+        auspiciousness: 'Auspicious Yoga',
+        category: 'Dhana Yoga',
+        significance: 'Self-earned wealth, intellectual stature, good health, and orderly career rise.',
+        effect: `Graha (${planetsIn2ndFromMoon.map((p) => p.name).join(', ')}) posited in the 2nd house from natal Moon. Confers self-made fortunes and sound judgment.`,
+        ...act,
+      });
+    } else if (planetsIn12thFromMoon.length > 0) {
+      const involved = Array.from(new Set([...planetsIn12thFromMoon.map((p) => p.name), 'Chandra']));
+      const act = evaluateActivation(involved);
+      yogas.push({
+        name: 'Anapha Yoga',
+        sanskritName: 'अनफा योग',
+        planetsInvolved: involved,
+        auspiciousness: 'Auspicious Yoga',
+        category: 'Spiritual & Protection',
+        significance: 'Polite demeanor, freedom from severe diseases, moral discipline, and generous personality.',
+        effect: `Graha (${planetsIn12thFromMoon.map((p) => p.name).join(', ')}) occupying the 12th house from natal Moon. Promotes peace of mind and contentment.`,
+        ...act,
+      });
+    }
+  }
+
+  // 11. Solar Yogas: Veshi, Vasi, Ubhayachari
+  if (sun) {
+    const planetsIn2ndFromSun = natalPlanets.filter(
+      (p) => !['Chandra', 'Surya', 'Rahu', 'Ketu', 'Lagna'].includes(p.name) &&
+        ((p.rasiNumber - sun.rasiNumber + 12) % 12) + 1 === 2
+    );
+    const planetsIn12thFromSun = natalPlanets.filter(
+      (p) => !['Chandra', 'Surya', 'Rahu', 'Ketu', 'Lagna'].includes(p.name) &&
+        ((p.rasiNumber - sun.rasiNumber + 12) % 12) + 1 === 12
+    );
+
+    if (planetsIn2ndFromSun.length > 0 && planetsIn12thFromSun.length > 0) {
+      const involved = Array.from(new Set([...planetsIn2ndFromSun.map((p) => p.name), ...planetsIn12thFromSun.map((p) => p.name), 'Surya']));
+      const act = evaluateActivation(involved);
+      yogas.push({
+        name: 'Ubhayachari Yoga',
+        sanskritName: 'उभयचरी योग',
+        planetsInvolved: involved,
+        auspiciousness: 'High Raja Yoga',
+        category: 'Raja Yoga',
+        significance: 'King-like majesty, eloquent speech, widespread administrative authority, and all-round auspiciousness.',
+        effect: `Sun flanked on both sides by planets (${planetsIn2ndFromSun.map((p) => p.name).join(', ')} and ${planetsIn12thFromSun.map((p) => p.name).join(', ')}). Bestows dignity, physical vigor, and leadership renown.`,
+        ...act,
+      });
+    } else if (planetsIn2ndFromSun.length > 0) {
+      const involved = Array.from(new Set([...planetsIn2ndFromSun.map((p) => p.name), 'Surya']));
+      const act = evaluateActivation(involved);
+      yogas.push({
+        name: 'Veshi Yoga',
+        sanskritName: 'वेशी योग',
+        planetsInvolved: involved,
+        auspiciousness: 'Auspicious Yoga',
+        category: 'Raja Yoga',
+        significance: 'Truthful speech, pleasant memory, steady fortune, and executive reliability.',
+        effect: `Planet (${planetsIn2ndFromSun.map((p) => p.name).join(', ')}) occupying the 2nd house from Sun. Grants commanding speech and steady professional support.`,
+        ...act,
+      });
+    } else if (planetsIn12thFromSun.length > 0) {
+      const involved = Array.from(new Set([...planetsIn12thFromSun.map((p) => p.name), 'Surya']));
+      const act = evaluateActivation(involved);
+      yogas.push({
+        name: 'Vasi Yoga',
+        sanskritName: 'वाशि योग',
+        planetsInvolved: involved,
+        auspiciousness: 'Auspicious Yoga',
+        category: 'Spiritual & Protection',
+        significance: 'Industry, charitable generosity, wide knowledge, and respectful social standing.',
+        effect: `Planet (${planetsIn12thFromSun.map((p) => p.name).join(', ')}) in 12th from Sun. Confers spiritual insight, diligence, and charitable inclination.`,
+        ...act,
+      });
+    }
+  }
+
+  // 12. Parvata Yoga (Benefics in Kendras and 6th/8th houses free from malefics)
+  const beneficsInKendras = natalPlanets.filter(
+    (p) => ['Guru', 'Shukra', 'Budha'].includes(p.name) && [1, 4, 7, 10].includes(p.house)
+  );
+  if (beneficsInKendras.length >= 2) {
+    const involved = beneficsInKendras.map((p) => p.name);
+    const act = evaluateActivation(involved);
+    yogas.push({
+      name: 'Parvata Yoga',
+      sanskritName: 'पर्वत योग',
+      planetsInvolved: involved,
+      auspiciousness: 'High Raja Yoga',
+      category: 'Raja Yoga',
+      significance: 'Immovable wealth (like a mountain / Parvata), village/city leadership, political prestige, and philanthropic legacy.',
+      effect: `Benefics (${involved.join(', ')}) strongly anchor the Kendra quadrants. Grants enduring prosperity, civic leadership, and stable lifelong assets.`,
+      ...act,
+    });
+  }
+
+  // 13. Kahala Yoga (4th Lord and Jupiter in mutual Kendras)
+  const lord4 = getHouseLord(4);
+  const planetLord4 = getPlanet(lord4);
+  if (planetLord4 && jupiter) {
+    const diff = ((jupiter.house - planetLord4.house + 12) % 12) + 1;
+    if ([1, 4, 7, 10].includes(diff)) {
+      const involved = Array.from(new Set([lord4, 'Guru']));
+      const act = evaluateActivation(involved);
+      yogas.push({
+        name: 'Kahala Yoga',
+        sanskritName: 'काहल योग',
+        planetsInvolved: involved,
+        auspiciousness: 'Auspicious Yoga',
+        category: 'Raja Yoga',
+        significance: 'Courage, organizational prowess, tenacity to manage large teams, and material prosperity.',
+        effect: `4th Lord (${lord4}) and Jupiter in mutual Kendras. Bestows high executive drive, courage to lead projects, and real estate wealth.`,
+        ...act,
+      });
+    }
   }
 
   return yogas;

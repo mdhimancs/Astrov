@@ -358,8 +358,14 @@ export interface NatalYoga {
   name: string;
   sanskritName: string;
   planetsInvolved: string[];
-  auspiciousness: 'High Raja Yoga' | 'Auspicious Dhana Yoga' | 'Spiritual Yoga' | 'Viparita Raja Yoga' | 'Auspicious Yoga';
+  auspiciousness: 'High Raja Yoga' | 'Auspicious Dhana Yoga' | 'Spiritual Yoga' | 'Viparita Raja Yoga' | 'Auspicious Yoga' | 'Mahapurusha Yoga' | 'Dhana Yoga';
+  category?: 'Raja Yoga' | 'Dhana Yoga' | 'Mahapurusha Yoga' | 'Intellect & Speech' | 'Spiritual & Protection';
+  significance?: string;
   effect: string;
+  isDashaActive?: boolean;
+  activationStatus?: 'Active Now (Mahadasha)' | 'Active Now (Antardasha)' | 'Dormant (Awaiting Dasha)';
+  activatingPlanet?: string;
+  activationExplanation?: string;
 }
 
 export type DashaStrengthRating = 'Strong' | 'Moderate' | 'Weak';
@@ -387,8 +393,10 @@ export interface PratyantardashaInfo {
   planet: GrahaName;
   durationDays: number;
   durationStr: string;
-  startDate: string;
-  endDate: string;
+  startDate: string; // Compact mm-yy format (e.g. "05-24")
+  endDate: string;   // Compact mm-yy format (e.g. "07-24")
+  exactStartDate?: string; // Exact day/month-year format (e.g. "15/05-24")
+  exactEndDate?: string;   // Exact day/month-year format (e.g. "04/07-24")
   isCurrent: boolean;
   theme: string;
   strengthInfo: DashaStrengthInfo;
@@ -417,8 +425,10 @@ export interface VimshottariDashaInfo {
     durationYears: number;
     startAge: number;
     endAge: number;
-    startMonthYear: string;
-    endMonthYear: string;
+    startMonthYear: string; // Compact mm-yy format (e.g. "05-90", "05-10")
+    endMonthYear: string;   // Compact mm-yy format (e.g. "05-10", "05-24")
+    startMonthYearFull?: string; // Full format (e.g. "May 1990")
+    endMonthYearFull?: string;   // Full format (e.g. "May 2010")
     lifeTheme: string;
     strengthInfo?: DashaStrengthInfo;
     parts?: DashaPartInfo[];
@@ -431,8 +441,10 @@ export interface AntardashaInfo {
   durationYearsStr: string;
   startAge: number;
   endAge: number;
-  startMonthYear: string;
-  endMonthYear: string;
+  startMonthYear: string; // Compact mm-yy format (e.g. "05-24")
+  endMonthYear: string;   // Compact mm-yy format (e.g. "08-26")
+  startMonthYearFull?: string;
+  endMonthYearFull?: string;
   isCurrent: boolean;
   theme: string;
   strengthInfo?: DashaStrengthInfo;

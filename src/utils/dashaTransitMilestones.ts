@@ -39,6 +39,9 @@ export interface CriticalDashaTransitMilestone {
   // Dasha breakdown
   mahadashaLord: GrahaName;
   antardashaLord: GrahaName;
+  mahadashaStartMonthYear: string; // Compact mm-yy format (e.g. "05-24")
+  mahadashaEndMonthYear: string;   // Compact mm-yy format (e.g. "05-40")
+  mahadashaDurationYears: number;
   dashaDescription: string;
 
   // Critical Gochar Transits during this window
@@ -631,7 +634,10 @@ export function generateLifeMilestonesAndCriticalTransits(
         isCurrent,
         mahadashaLord: maha.planet,
         antardashaLord: antar.planet,
-        dashaDescription: `${maha.planet} Mahadasha • ${antar.planet} Antardasha`,
+        mahadashaStartMonthYear: maha.startMonthYear,
+        mahadashaEndMonthYear: maha.endMonthYear,
+        mahadashaDurationYears: maha.durationYears,
+        dashaDescription: `${maha.planet} Mahadasha (${maha.startMonthYear} – ${maha.endMonthYear}) • ${antar.planet} Antardasha (${antar.startMonthYear} – ${antar.endMonthYear})`,
         criticalTransits: {
           saturnTransit: saturnSummary,
           saturnHouseFromMoon: satHouseFromMoon,

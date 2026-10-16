@@ -178,8 +178,16 @@ export function CriticalDashaTransitsTab({
   // Ensure default selected milestone is always the Current Active Dasha
   useEffect(() => {
     if (currentPeriod?.id) {
-      if (!selectedMilestoneId || !filteredMilestones.some((m) => m.id === selectedMilestoneId)) {
+      if (!selectedMilestoneId) {
         setSelectedMilestoneId(currentPeriod.id);
+      } else if (!filteredMilestones.some((m) => m.id === selectedMilestoneId)) {
+        // If current selected milestone is not in current filter, pick currentPeriod if available in filter, otherwise first in filter
+        const currentInFilter = filteredMilestones.find((m) => m.id === currentPeriod.id);
+        if (currentInFilter) {
+          setSelectedMilestoneId(currentPeriod.id);
+        } else if (filteredMilestones.length > 0) {
+          setSelectedMilestoneId(filteredMilestones[0].id);
+        }
       }
     } else if (filteredMilestones.length > 0 && !selectedMilestoneId) {
       setSelectedMilestoneId(filteredMilestones[0].id);
@@ -299,8 +307,8 @@ export function CriticalDashaTransitsTab({
             </div>
 
             <div className="flex items-center space-x-2">
-              <span className="font-mono font-bold text-amber-950 bg-amber-100/90 border border-amber-300 px-2.5 py-0.5 rounded text-[11px] shadow-3xs">
-                {currentPeriod.periodStartMonthYear} – {currentPeriod.periodEndMonthYear} (Age {currentPeriod.startAge}–{currentPeriod.endAge})
+              <span className="font-mono font-bold text-amber-950 bg-amber-100/90 border border-amber-300 px-2.5 py-0.5 rounded text-[11px] shadow-3xs" title="Current Active Sub-Period (mm-yy) & Mahadasha (mm-yy)">
+                Sub: {currentPeriod.periodStartMonthYear} – {currentPeriod.periodEndMonthYear} • Maha: {currentPeriod.mahadashaStartMonthYear} – {currentPeriod.mahadashaEndMonthYear} (Age {currentPeriod.startAge}–{currentPeriod.endAge})
               </span>
               <button
                 type="button"
@@ -323,7 +331,7 @@ export function CriticalDashaTransitsTab({
               <div className="flex flex-wrap items-center gap-1.5">
                 <span className="text-[13px] font-bold text-purple-950 bg-white/95 border border-purple-200 px-2.5 py-0.5 rounded shadow-3xs flex items-center space-x-1">
                   <Crown className="w-3.5 h-3.5 text-amber-600 inline mr-1" />
-                  <span>{currentPeriod.mahadashaLord} Mahadasha • {currentPeriod.antardashaLord} Antardasha</span>
+                  <span>{currentPeriod.mahadashaLord} Mahadasha ({currentPeriod.mahadashaStartMonthYear} – {currentPeriod.mahadashaEndMonthYear}) • {currentPeriod.antardashaLord} Antardasha ({currentPeriod.periodStartMonthYear} – {currentPeriod.periodEndMonthYear})</span>
                 </span>
                 <span className="text-[11px] font-bold text-amber-900 bg-amber-100/80 border border-amber-300 px-2 py-0.5 rounded">
                   {currentPeriod.primaryDomain} • {currentPeriod.ratingLabel}
@@ -522,25 +530,27 @@ export function CriticalDashaTransitsTab({
         >
           {filteredMilestones.map((m) => {
             const isSelected = selectedMilestoneId === m.id;
-            const startYear = m.periodStartMonthYear.split('-')[0];
-            const endYear = m.periodEndMonthYear.split('-')[0];
             return (
               <button
                 key={m.id}
                 ref={m.isCurrent ? activeYearTabRef : undefined}
                 type="button"
                 onClick={() => handleSelectMilestone(m.id)}
-                className={`px-2.5 py-1 rounded text-[11px] font-bold font-mono whitespace-nowrap transition-all cursor-pointer border flex items-center space-x-1 shrink-0 ${
+                className={`px-2.5 py-1 rounded text-[11px] font-bold font-mono whitespace-nowrap transition-all cursor-pointer border flex items-center space-x-1.5 shrink-0 ${
                   isSelected
                     ? 'bg-amber-600 text-white border-amber-700 shadow-2xs ring-1 ring-amber-400'
                     : m.isCurrent
                     ? 'bg-amber-100 text-amber-950 border-amber-400 ring-2 ring-amber-300 shadow-3xs font-black'
                     : 'bg-[#FAF8F5] text-stone-700 border-stone-200 hover:border-amber-300 hover:bg-white'
                 }`}
+                title={`Sub-Period: ${m.periodStartMonthYear} – ${m.periodEndMonthYear} (mm-yy) • Maha: ${m.mahadashaStartMonthYear} – ${m.mahadashaEndMonthYear} • ${m.mahadashaLord}–${m.antardashaLord} (Age ${m.startAge}–${m.endAge})`}
               >
-                <span>{startYear}–{endYear}</span>
+                <span>{m.periodStartMonthYear} – {m.periodEndMonthYear}</span>
+                <span className={`text-[9.5px] px-1 py-0.2 rounded font-sans font-semibold ${isSelected ? 'bg-amber-700 text-amber-100' : 'bg-stone-200/80 text-stone-700'}`}>
+                  {m.mahadashaLord.slice(0, 3)}–{m.antardashaLord.slice(0, 3)}
+                </span>
                 {m.isCurrent && (
-                  <span className={`text-[9px] px-1 py-0.1 rounded font-black uppercase flex items-center space-x-0.5 ${
+                  <span className={`text-[9px] px-1.5 py-0.2 rounded font-black uppercase flex items-center space-x-0.5 ${
                     isSelected ? 'bg-amber-800 text-amber-100' : 'bg-amber-600 text-white'
                   }`}>
                     <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse inline-block" />
@@ -556,8 +566,8 @@ export function CriticalDashaTransitsTab({
         {activeMilestone && (
           <div className="bg-gradient-to-r from-amber-50/95 via-[#FDFBF7] to-purple-50/70 border border-amber-200/80 rounded-md p-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-3xs">
             <div className="flex items-start sm:items-center space-x-2 min-w-0">
-              <span className="px-2 py-0.5 rounded bg-amber-800 text-white font-mono font-bold text-[11px] shrink-0 shadow-3xs">
-                {activeMilestone.periodStartMonthYear.split('-')[0]} – {activeMilestone.periodEndMonthYear.split('-')[0]} Brief
+              <span className="px-2 py-0.5 rounded bg-amber-800 text-white font-mono font-bold text-[11px] shrink-0 shadow-3xs" title="Sub-Period Interval (mm-yy)">
+                {activeMilestone.periodStartMonthYear} – {activeMilestone.periodEndMonthYear}
               </span>
               <div className="min-w-0 text-[12px] text-stone-800 leading-snug">
                 <strong className="text-stone-950 font-vedic mr-1">
@@ -571,6 +581,9 @@ export function CriticalDashaTransitsTab({
             <div className="flex items-center space-x-1.5 shrink-0 text-[11px]">
               <span className="font-semibold text-purple-900 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded">
                 {activeMilestone.mahadashaLord} – {activeMilestone.antardashaLord}
+              </span>
+              <span className="font-mono text-stone-600 bg-stone-100 border border-stone-200 px-2 py-0.5 rounded text-[10px]" title="Maha Dasha Interval (mm-yy)">
+                Maha: {activeMilestone.mahadashaStartMonthYear} – {activeMilestone.mahadashaEndMonthYear}
               </span>
               <span className="font-bold text-amber-900 bg-amber-100/80 border border-amber-200 px-2 py-0.5 rounded">
                 Age {activeMilestone.startAge}–{activeMilestone.endAge}
@@ -612,17 +625,21 @@ export function CriticalDashaTransitsTab({
               >
                 {/* Year Header & Badges */}
                 <div className="flex items-center justify-between gap-1 leading-none">
-                  <div className="flex items-center space-x-1.5">
+                  <div className="flex items-center space-x-1.5 flex-wrap gap-y-1">
                     <span
-                      className={`text-[13px] font-black font-vedic px-2 py-0.5 rounded border ${
+                      className={`text-[12px] font-bold font-mono px-2 py-0.5 rounded border ${
                         isSelected
-                          ? 'bg-amber-200 text-amber-950 border-amber-400 font-bold'
+                          ? 'bg-amber-200 text-amber-950 border-amber-400 font-black'
                           : isCurrent
                           ? 'bg-amber-200/90 text-amber-950 border-amber-400 font-black'
                           : 'bg-stone-100 text-stone-900 border-stone-200'
                       }`}
+                      title="Sub-Period Interval (mm-yy)"
                     >
-                      {m.periodStartMonthYear.split('-')[0]} – {m.periodEndMonthYear.split('-')[0]}
+                      {m.periodStartMonthYear} – {m.periodEndMonthYear}
+                    </span>
+                    <span className="text-[10px] font-mono text-stone-600 bg-stone-100 px-1.5 py-0.5 rounded border border-stone-200" title="Maha Dasha Interval (mm-yy)">
+                      Maha: {m.mahadashaStartMonthYear}–{m.mahadashaEndMonthYear}
                     </span>
                     <span className="text-[11px] font-semibold text-stone-500">
                       Age {m.startAge}–{m.endAge}
@@ -729,7 +746,7 @@ export function CriticalDashaTransitsTab({
               ) : currentPeriod ? (
                 <div className="bg-amber-50/70 border border-amber-200 rounded px-2.5 py-1.5 flex items-center justify-between text-[11px] shadow-3xs">
                   <span className="text-stone-700">
-                    Viewing Selected Era: <strong>{activeMilestone.periodStartMonthYear.split('-')[0]}–{activeMilestone.periodEndMonthYear.split('-')[0]}</strong>
+                    Viewing Selected Period: <strong className="font-mono">{activeMilestone.periodStartMonthYear} – {activeMilestone.periodEndMonthYear}</strong>
                   </span>
                   <button
                     type="button"
@@ -744,11 +761,14 @@ export function CriticalDashaTransitsTab({
               {/* Reading Header Banner */}
               <div className="bg-gradient-to-r from-amber-50/90 via-white to-purple-50/80 rounded-md border border-amber-300 p-2.5 space-y-1">
                 <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-amber-200/70 pb-1">
-                  <div className="flex items-center space-x-2">
-                    <span className="px-2 py-0.5 rounded bg-amber-800 text-white font-black text-[13px] font-mono">
-                      {activeMilestone.periodStartMonthYear} – {activeMilestone.periodEndMonthYear}
+                  <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+                    <span className="px-2 py-0.5 rounded bg-amber-800 text-white font-black text-[12px] font-mono" title="Sub-Period Interval (mm-yy)">
+                      Sub: {activeMilestone.periodStartMonthYear} – {activeMilestone.periodEndMonthYear}
                     </span>
-                    <span className="text-[12px] font-bold text-stone-700">
+                    <span className="px-2 py-0.5 rounded bg-purple-100 text-purple-900 border border-purple-200 font-bold text-[11px] font-mono" title="Maha Dasha Interval (mm-yy)">
+                      Maha: {activeMilestone.mahadashaStartMonthYear} – {activeMilestone.mahadashaEndMonthYear}
+                    </span>
+                    <span className="text-[11.5px] font-bold text-stone-700">
                       (Age {activeMilestone.startAge} – {activeMilestone.endAge})
                     </span>
                   </div>

@@ -134,6 +134,15 @@ export function VimshottariDashaTab({
   );
   const yoginiDasha = calculateYoginiDasha(natalMoonTotalDeg, birthDate);
 
+  // Exact current age for accurate dasha progress calculation
+  const currentAge = useMemo(() => {
+    const parts = birthDate.split('-').map(Number);
+    const bDate = new Date(parts[0] || 1990, (parts[1] || 5) - 1, parts[2] || 15);
+    const now = new Date();
+    const diffMonths = (now.getFullYear() - bDate.getFullYear()) * 12 + (now.getMonth() - bDate.getMonth());
+    return Math.max(0, diffMonths / 12);
+  }, [birthDate]);
+
   // Default selected Mahadasha to currently active one
   const activeDashaLord = selectedMahadashaPlanet || vimshottariDasha.currentLord;
   const currentMahadashaInfo =
@@ -424,12 +433,9 @@ export function VimshottariDashaTab({
                 : rating === 'Weak'
                 ? 'text-rose-800 bg-rose-50 border-rose-200'
                 : 'text-amber-800 bg-amber-50 border-amber-200';
-            const startDate = new Date(d.startMonthYear + '-01');
-            const endDate = new Date(d.endMonthYear + '-01');
-            const now = new Date();
-            const totalMs = endDate.getTime() - startDate.getTime();
-            const elapsedMs = now.getTime() - startDate.getTime();
-            const progress = totalMs > 0 ? Math.max(0, Math.min(100, (elapsedMs / totalMs) * 100)) : (now >= endDate ? 100 : 0);
+            const totalYears = d.endAge - d.startAge;
+            const elapsedYears = currentAge - d.startAge;
+            const progress = totalYears > 0 ? Math.max(0, Math.min(100, (elapsedYears / totalYears) * 100)) : (currentAge >= d.endAge ? 100 : 0);
 
             return (
               <div
@@ -442,7 +448,7 @@ export function VimshottariDashaTab({
                     ? 'bg-purple-50/50 border-purple-300 shadow-3xs'
                     : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5]'
                 }`}
-                title={`Mahadasha Lord: ${d.planet} — Strength: ${rating} (${score}/10) • ${d.strengthInfo?.dignity || ''} in ${d.strengthInfo?.housePlacement || ''}`}
+                title={`Mahadasha Lord: ${d.planet} — Interval: ${d.startMonthYear} – ${d.endMonthYear} (mm-yy) • Strength: ${rating} (${score}/10) • ${d.strengthInfo?.dignity || ''} in ${d.strengthInfo?.housePlacement || ''}`}
               >
                 {/* Fine line indicator on top of Mahadasha card */}
                 <div className={`w-full h-[2.5px] rounded-t-sm mb-1 ${fineLineColor}`} />
@@ -470,14 +476,14 @@ export function VimshottariDashaTab({
                       <div
                         key={p.partNumber}
                         className={`h-[2px] flex-1 rounded-full ${pCol} ${p.isCurrent ? 'ring-1 ring-amber-400' : 'opacity-80'}`}
-                        title={`Part ${p.partNumber}: ${p.stage} (${p.durationYearsStr}) — ${pRating}`}
+                        title={`Part ${p.partNumber}: ${p.stage} (${p.durationYearsStr}) — ${p.startDate} – ${p.endDate} — ${pRating}`}
                       />
                     );
                   })}
                 </div>
 
-                <span className="text-[9.5px] text-stone-600 leading-tight truncate w-full">
-                  {d.startMonthYear}–{d.endMonthYear}
+                <span className="text-[10px] font-mono font-semibold text-stone-700 leading-tight truncate w-full" title={`Maha Dasha Interval: ${d.startMonthYear} – ${d.endMonthYear} (mm-yy)`}>
+                  {d.startMonthYear} – {d.endMonthYear}
                 </span>
 
                 <div className="w-full bg-stone-100 rounded-sm h-1 mt-1 overflow-hidden shadow-inner">
@@ -530,12 +536,9 @@ export function VimshottariDashaTab({
                 : ratingAntar === 'Weak'
                 ? 'text-rose-800 bg-rose-50 border-rose-200'
                 : 'text-amber-800 bg-amber-50 border-amber-200';
-            const startDateAntar = new Date(antar.startMonthYear + '-01');
-            const endDateAntar = new Date(antar.endMonthYear + '-01');
-            const nowAntar = new Date();
-            const totalMsAntar = endDateAntar.getTime() - startDateAntar.getTime();
-            const elapsedMsAntar = nowAntar.getTime() - startDateAntar.getTime();
-            const progressAntar = totalMsAntar > 0 ? Math.max(0, Math.min(100, (elapsedMsAntar / totalMsAntar) * 100)) : (nowAntar >= endDateAntar ? 100 : 0);
+            const totalAntarYears = antar.endAge - antar.startAge;
+            const elapsedAntarYears = currentAge - antar.startAge;
+            const progressAntar = totalAntarYears > 0 ? Math.max(0, Math.min(100, (elapsedAntarYears / totalAntarYears) * 100)) : (currentAge >= antar.endAge ? 100 : 0);
 
             return (
               <div
@@ -548,7 +551,7 @@ export function VimshottariDashaTab({
                     ? 'bg-purple-50/50 border-purple-300 shadow-3xs'
                     : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5]'
                 }`}
-                title={`Sub-Period Lord: ${antar.planet} — Strength: ${ratingAntar} (${scoreAntar}/10) • ${antar.strengthInfo?.mutualHouseAngle || ''}`}
+                title={`Sub-Period Lord: ${antar.planet} — Interval: ${antar.startMonthYear} – ${antar.endMonthYear} (mm-yy) • Strength: ${ratingAntar} (${scoreAntar}/10) • ${antar.strengthInfo?.mutualHouseAngle || ''}`}
               >
                 {/* Fine line indicator on top of Sub-Period card */}
                 <div className={`w-full h-[2.5px] rounded-t-sm mb-1 ${fineLineColorAntar}`} />
@@ -576,14 +579,14 @@ export function VimshottariDashaTab({
                       <div
                         key={idx}
                         className={`h-[2px] flex-1 rounded-full ${prCol} ${prat.isCurrent ? 'ring-1 ring-amber-400' : 'opacity-80'}`}
-                        title={`${prat.planet}: ${prat.durationStr} — ${prRating}`}
+                        title={`${prat.planet}: ${prat.durationStr} (${prat.startDate} – ${prat.endDate}) — ${prRating}`}
                       />
                     );
                   })}
                 </div>
 
-                <span className="text-[9.5px] text-stone-600 leading-tight truncate w-full">
-                  {antar.startMonthYear}–{antar.endMonthYear}
+                <span className="text-[10px] font-mono font-semibold text-stone-700 leading-tight truncate w-full" title={`Sub-Period Interval: ${antar.startMonthYear} – ${antar.endMonthYear} (mm-yy)`}>
+                  {antar.startMonthYear} – {antar.endMonthYear}
                 </span>
 
                 <div className="w-full bg-stone-100 rounded-sm h-1 mt-1 overflow-hidden shadow-inner">
