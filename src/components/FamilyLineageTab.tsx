@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Users,
   Heart,
@@ -18,9 +18,16 @@ import {
   Sun,
   Moon,
   ArrowRight,
-  Compass
+  Compass,
+  GraduationCap,
+  Clock,
+  TrendingUp,
+  Brain,
+  Home
 } from 'lucide-react';
 import { UserProfile, PlanetPosition, VedicRasiName } from '../types';
+import { calculatePlanetaryPositions, buildHouseStructure } from '../vedicMath';
+import { VEDIC_RASIS } from '../data';
 
 interface FamilyLineageTabProps {
   activeProfile?: UserProfile;
@@ -75,6 +82,461 @@ const RASI_LORDS: Record<string, string> = {
   Meena: 'Guru'
 };
 
+// =========================================================================
+// 6 LIFE PILLARS CALCULATION ENGINE (Bhavat Bhavam: Wealth, Education,
+// Marriage, Property, Mental Condition, Life Expectancy)
+// =========================================================================
+function getMemberSixPillars(
+  memberKey: 'father' | 'mother' | 'siblings' | 'spouse' | 'children' | 'inlaws',
+  houses: any[],
+  planets: PlanetPosition[],
+  profileName?: string
+) {
+  const rootHouseNum =
+    memberKey === 'father'
+      ? 9
+      : memberKey === 'mother'
+      ? 4
+      : memberKey === 'spouse'
+      ? 7
+      : memberKey === 'children'
+      ? 5
+      : memberKey === 'siblings'
+      ? 3
+      : 8; // In-Laws & Extended Kin (8th house)
+
+  const memberName =
+    memberKey === 'father'
+      ? (profileName ? `${profileName}'s Father (Pitru)` : 'Father (Pitru)')
+      : memberKey === 'mother'
+      ? (profileName ? `${profileName}'s Mother (Matru)` : 'Mother (Matru)')
+      : memberKey === 'spouse'
+      ? (profileName ? `${profileName}'s Spouse (Kalatra)` : 'Spouse (Kalatra)')
+      : memberKey === 'children'
+      ? (profileName ? `${profileName}'s Children (Putra / Santan)` : 'Children (Putra / Santan)')
+      : memberKey === 'siblings'
+      ? (profileName ? `${profileName}'s Siblings (Sahodara)` : 'Siblings (Sahodara)')
+      : (profileName ? `${profileName}'s In-Laws & Extended Kin` : 'In-Laws & Extended Kin');
+
+  const shortMemberName =
+    memberKey === 'father'
+      ? 'Father'
+      : memberKey === 'mother'
+      ? 'Mother'
+      : memberKey === 'spouse'
+      ? 'Spouse'
+      : memberKey === 'children'
+      ? 'Children'
+      : memberKey === 'siblings'
+      ? 'Siblings'
+      : 'In-Laws';
+
+  const getH = (n: number) => {
+    return (
+      houses.find((h) => h.houseNumber === n) || {
+        houseNumber: n,
+        rasiName: RASI_ORDER[(n - 1) % 12],
+        rasiNumber: ((n - 1) % 12) + 1,
+        signLord: RASI_LORDS[RASI_ORDER[(n - 1) % 12]] || 'Surya',
+        planets: [],
+      }
+    );
+  };
+
+  const getDerivedH = (count: number) => {
+    const num = ((rootHouseNum - 1 + count - 1) % 12) + 1;
+    return getH(num);
+  };
+
+  const rootHouse = getH(rootHouseNum);
+
+  // 1. Wealth: 2nd from root
+  const wealthH = getDerivedH(2);
+  // 2. Education: 4th (Vidya / Early) & 5th (Buddhi / Higher) from root
+  const eduH4 = getDerivedH(4);
+  const eduH5 = getDerivedH(5);
+  // 3. Marriage: 7th from root
+  const marriageH = getDerivedH(7);
+  // 4. Property & Vehicles: 4th from root
+  const propertyH = getDerivedH(4);
+  // 5. Mental Condition & Mind: 5th from root & Moon
+  const mentalH = getDerivedH(5);
+  // 6. Life Expectancy & Longevity: 8th from root (Ayur Bhava)
+  const ayurH = getDerivedH(8);
+
+  // Scoring Helper based on natural benefics/malefics and sign dignity
+  const assessHouse = (h: any, naturalBenefics: string[] = ['Guru', 'Shukra', 'Budha', 'Chandra']) => {
+    let score = 67;
+    const occupants = h.planets || [];
+    occupants.forEach((p: any) => {
+      if (naturalBenefics.includes(p.name)) score += 9;
+      if (['Shani', 'Mangal', 'Rahu', 'Ketu'].includes(p.name)) score -= 7;
+      if (p.name === h.signLord) score += 6; // Swakshetra (Own House)
+    });
+    const element = RASI_ELEMENTS[h.rasiName] || 'Earth';
+    return {
+      score: Math.min(96, Math.max(48, score)),
+      element,
+      occupants,
+      occupantSummary: occupants.length > 0
+        ? occupants.map((p: any) => p.name).join(', ')
+        : 'Unoccupied (Directly governed by lord ' + h.signLord + ')',
+    };
+  };
+
+  // 1. WEALTH (2nd from Root: Dhana & Kosh)
+  const wealthAss = assessHouse(wealthH, ['Guru', 'Shukra', 'Budha']);
+  const wealthRating =
+    wealthAss.score >= 80 ? 'Exceptional Prosperity & Abundance' : wealthAss.score >= 65 ? 'Stable & Progressive Accumulation' : 'Moderate / Fluctuating Inflow';
+  const wealthDetails = `${shortMemberName}'s treasury, liquid assets, and economic stability are governed by the ${wealthH.houseNumber}th house (${wealthH.rasiName}, ruled by ${wealthH.signLord}) as the 2nd house from ${shortMemberName}'s radical Lagna. Planetary disposition (${wealthAss.occupantSummary}) indicates steady asset preservation, sound financial management, and ethical wealth generation. The native experiences positive generational wealth alignment and financial dependability.`;
+
+  // 2. EDUCATION & INTELLECT (4th & 5th from Root: Vidya & Buddhi)
+  const eduAss = assessHouse(eduH5, ['Budha', 'Guru', 'Shukra']);
+  const eduRating =
+    eduAss.score >= 80 ? 'Distinguished, Scholarly & Visionary' : eduAss.score >= 65 ? 'Sharp Analytical & Practical Acumen' : 'Practical & Applied Skills Focus';
+  const eduDetails = `${shortMemberName}'s academic foundation, mental sharpness, and intellectual wisdom are evaluated via the ${eduH4.houseNumber}th and ${eduH5.houseNumber}th houses (${eduH5.rasiName}, ruled by ${eduH5.signLord}). Bestows quick cognitive synthesis, sound judgment in critical moments, and strong aptitude for specialized technical, administrative, or strategic knowledge with high respect in peer circles.`;
+
+  // 3. MARRIAGE & PARTNERSHIPS (7th from Root: Vivaha & Dampatya)
+  const marriageAss = assessHouse(marriageH, ['Shukra', 'Guru', 'Chandra']);
+  const marriageRating =
+    marriageAss.score >= 76 ? 'Harmonious, Devoted & Blessed' : marriageAss.score >= 62 ? 'Enduring, Loyal & Practical Union' : 'Dynamic / Requires Patience & Adjustment';
+  const marriageDetails = `Conjugal happiness, marital durability, and relationship dynamics are mapped under the ${marriageH.houseNumber}th house (${marriageH.rasiName}, ruled by ${marriageH.signLord}) as the 7th house from ${shortMemberName}'s radical Lagna. Reflects a steadfast, committed marital partner who provides deep emotional anchoring, domestic respectability, and mutual loyalty over the long life journey.`;
+
+  // 4. PROPERTY, REAL ESTATE & VEHICLES (4th from Root: Bhumi & Vahana)
+  const propAss = assessHouse(propertyH, ['Mangal', 'Shukra', 'Guru']);
+  const propRating =
+    propAss.score >= 76 ? 'Substantial Land, Homes & Vehicles' : propAss.score >= 62 ? 'Owned Residential Security & Comfort' : 'Gradual & Steady Asset Buildup';
+  const propDetails = `Immovable land, ancestral property, residential ownership, and vehicles (Vahana Sukha) are ruled by the ${propertyH.houseNumber}th house (${propertyH.rasiName}, ruled by ${propertyH.signLord}). Promotes peaceful residential living, favorable real estate appreciation, and reliable vehicular safety with positive domestic Vastu vibrations.`;
+
+  // 5. MENTAL CONDITION & PEACE (5th from Root & Moon: Manasika Sukha)
+  const mentalAss = assessHouse(mentalH, ['Chandra', 'Guru', 'Budha']);
+  const mentalRating =
+    mentalAss.score >= 76 ? 'Serene, Highly Resilient & Wise' : mentalAss.score >= 62 ? 'Sharp Memory & Emotional Endurance' : 'Prone to Stress / Active Overthinking';
+  const mentalDetails = `Psychological constitution, serenity (Chitta Vritti), and emotional fortitude are ruled by the ${mentalH.houseNumber}th house (${mentalH.rasiName}, ruled by ${mentalH.signLord}) and Chandra. Demonstrates inner psychological endurance, deep reflective poise, and the ability to maintain composure during stressful family or professional transitions.`;
+
+  // 6. LIFE EXPECTANCY & LONGEVITY (8th from Root: Ayur & Maraka Vigyan)
+  const ayurAss = assessHouse(ayurH, ['Guru', 'Shani', 'Surya']);
+  let longevityClass: 'Purnayu (Long Life: 75+ yrs)' | 'Madhyayu (Moderate Life: 60-75 yrs)' | 'Alpayu (Sensitive Longevity)' =
+    'Purnayu (Long Life: 75+ yrs)';
+  if (ayurAss.score < 60) {
+    longevityClass = 'Alpayu (Sensitive Longevity)';
+  } else if (ayurAss.score < 75) {
+    longevityClass = 'Madhyayu (Moderate Life: 60-75 yrs)';
+  }
+  const ayurRatingColor =
+    ayurAss.score >= 75
+      ? 'text-emerald-800 bg-emerald-50 border-emerald-300'
+      : ayurAss.score >= 60
+      ? 'text-amber-800 bg-amber-50 border-amber-300'
+      : 'text-rose-800 bg-rose-50 border-rose-300';
+
+  const ayurDetails = `The Ayur Bhava (longevity axis) rests in the ${ayurH.houseNumber}th house (${ayurH.rasiName}, ruled by ${ayurH.signLord}) with Saturn as natural Ayush Karaka. Constitutional vitality falls under ${longevityClass}. The vital life-force is safeguarded by disciplined daily routine, mindful dietary habits, and ancestral blessings.`;
+
+  const ayurRemedy =
+    memberKey === 'father'
+      ? 'Offer water (Surya Arghya) to the rising Sun daily with the Gayatri Mantra and recite the Maha Mrityunjaya Mantra on Sundays to ensure radiant paternal vitality and longevity.'
+      : memberKey === 'mother'
+      ? 'Chant the Gauri Mantra and offer milk or white flowers on Mondays to enhance maternal health, physical vigor, and emotional tranquility.'
+      : memberKey === 'spouse'
+      ? 'Worship Goddess Lakshmi and Lord Vishnu on Fridays; light a pure cow-ghee lamp in the evening for marital harmony, health, and partner longevity.'
+      : memberKey === 'children'
+      ? 'Recite the Santan Gopal Stotram and donate yellow fruits on Thursdays for the robust physical protection, vitality, and long life of children.'
+      : memberKey === 'siblings'
+      ? 'Worship Lord Hanuman on Tuesdays with vermilion and chant the Hanuman Chalisa for sibling vitality, courage, and physical safety.'
+      : 'Recite the Maha Mrityunjaya Mantra on Mondays and offer prayers to Lord Shiva for the health, prosperity, and longevity of in-laws and extended relations.';
+
+  return {
+    memberName,
+    shortMemberName,
+    rootHouseNum,
+    rootHouse,
+    wealth: {
+      derivedHouse: wealthH.houseNumber,
+      houseName: `${wealthH.houseNumber}th House (${wealthH.rasiName})`,
+      score: wealthAss.score,
+      rating: wealthRating,
+      sign: wealthH.rasiName,
+      lord: wealthH.signLord,
+      occupants: wealthAss.occupantSummary,
+      details: wealthDetails,
+    },
+    education: {
+      derivedHouse: eduH5.houseNumber,
+      houseName: `${eduH5.houseNumber}th & ${eduH4.houseNumber}th Houses (${eduH5.rasiName})`,
+      score: eduAss.score,
+      rating: eduRating,
+      sign: eduH5.rasiName,
+      lord: eduH5.signLord,
+      occupants: eduAss.occupantSummary,
+      details: eduDetails,
+    },
+    marriage: {
+      derivedHouse: marriageH.houseNumber,
+      houseName: `${marriageH.houseNumber}th House (${marriageH.rasiName})`,
+      score: marriageAss.score,
+      rating: marriageRating,
+      sign: marriageH.rasiName,
+      lord: marriageH.signLord,
+      occupants: marriageAss.occupantSummary,
+      details: marriageDetails,
+    },
+    property: {
+      derivedHouse: propertyH.houseNumber,
+      houseName: `${propertyH.houseNumber}th House (${propertyH.rasiName})`,
+      score: propAss.score,
+      rating: propRating,
+      sign: propertyH.rasiName,
+      lord: propertyH.signLord,
+      occupants: propAss.occupantSummary,
+      details: propDetails,
+    },
+    mentalCondition: {
+      derivedHouse: mentalH.houseNumber,
+      houseName: `${mentalH.houseNumber}th House (${mentalH.rasiName})`,
+      score: mentalAss.score,
+      rating: mentalRating,
+      sign: mentalH.rasiName,
+      lord: mentalH.signLord,
+      occupants: mentalAss.occupantSummary,
+      details: mentalDetails,
+    },
+    lifeExpectancy: {
+      derivedHouse: ayurH.houseNumber,
+      houseName: `${ayurH.houseNumber}th House (${ayurH.rasiName})`,
+      score: ayurAss.score,
+      classification: longevityClass,
+      ratingColor: ayurRatingColor,
+      sign: ayurH.rasiName,
+      lord: ayurH.signLord,
+      occupants: ayurAss.occupantSummary,
+      details: ayurDetails,
+      remedy: ayurRemedy,
+    },
+  };
+}
+
+// 6 Life Pillars Display Component with Interactive Filter & Deep Dive
+function MemberSixPillarsGrid({
+  pillars,
+  memberName,
+  profileName,
+}: {
+  pillars: any;
+  memberName: string;
+  profileName?: string;
+}) {
+  const [activeFilter, setActiveFilter] = useState<'all' | 'wealth' | 'education' | 'marriage' | 'property' | 'mental' | 'longevity'>('all');
+
+  const items = [
+    {
+      id: 'wealth',
+      filterKey: 'wealth',
+      title: 'Wealth & Financial Status',
+      sanskrit: 'Dhana & Kosh (2nd from Lagna)',
+      icon: TrendingUp,
+      data: pillars.wealth,
+      badgeBg: 'bg-amber-100 text-amber-900 border-amber-300',
+      accentColor: 'border-amber-400',
+    },
+    {
+      id: 'education',
+      filterKey: 'education',
+      title: 'Education & Intellect',
+      sanskrit: 'Vidya & Buddhi (4th/5th from Lagna)',
+      icon: GraduationCap,
+      data: pillars.education,
+      badgeBg: 'bg-indigo-100 text-indigo-900 border-indigo-300',
+      accentColor: 'border-indigo-400',
+    },
+    {
+      id: 'marriage',
+      filterKey: 'marriage',
+      title: 'Marriage & Partnerships',
+      sanskrit: 'Vivaha & Dampatya (7th from Lagna)',
+      icon: Heart,
+      data: pillars.marriage,
+      badgeBg: 'bg-rose-100 text-rose-900 border-rose-300',
+      accentColor: 'border-rose-400',
+    },
+    {
+      id: 'property',
+      filterKey: 'property',
+      title: 'Property & Real Estate',
+      sanskrit: 'Bhumi, Vahana & Griha (4th from Lagna)',
+      icon: Home,
+      data: pillars.property,
+      badgeBg: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+      accentColor: 'border-emerald-400',
+    },
+    {
+      id: 'mental',
+      filterKey: 'mental',
+      title: 'Mental Condition & Peace',
+      sanskrit: 'Manasika Sukha & Chitta (5th & Moon)',
+      icon: Brain,
+      data: pillars.mentalCondition,
+      badgeBg: 'bg-sky-100 text-sky-900 border-sky-300',
+      accentColor: 'border-sky-400',
+    },
+    {
+      id: 'longevity',
+      filterKey: 'longevity',
+      title: 'Life Expectancy & Longevity',
+      sanskrit: 'Ayur & Maraka Vigyan (8th from Lagna)',
+      icon: Clock,
+      data: pillars.lifeExpectancy,
+      badgeBg: pillars.lifeExpectancy.ratingColor,
+      isLongevity: true,
+      accentColor: 'border-purple-400',
+    },
+  ];
+
+  const visibleItems = activeFilter === 'all'
+    ? items
+    : items.filter((it) => it.filterKey === activeFilter);
+
+  return (
+    <div className="bg-gradient-to-b from-[#FFFDF9] via-[#FAF6ED] to-[#F5ECE0] p-4 sm:p-5 rounded-2xl border-2 border-amber-300/80 shadow-md space-y-4">
+      {/* Header Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-200/80 pb-3">
+        <div className="flex items-center space-x-2.5">
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-600 to-amber-900 text-amber-50 shadow-xs">
+            <Sparkles className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-200">
+                Bhavat Bhavam Prediction
+              </span>
+              {profileName && (
+                <span className="text-[11px] font-semibold text-stone-600">
+                  Profile: <strong className="text-stone-900">{profileName}</strong>
+                </span>
+              )}
+            </div>
+            <h3 className="font-vedic font-black text-stone-950 text-[16px] sm:text-[18px] leading-tight mt-0.5">
+              {memberName}&apos;s 6 Life Pillars Analysis
+            </h3>
+            <p className="text-[12px] text-stone-600">
+              Wealth • Education • Marriage • Property • Mental Condition • Life Expectancy (Radical Lagna: House {pillars.rootHouseNum}: {pillars.rootHouse.rasiName} • Lord: {pillars.rootHouse.signLord})
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-2 text-[11px] font-bold text-amber-900 bg-amber-100/90 px-3 py-1.5 rounded-lg border border-amber-300 shrink-0 self-start sm:self-center">
+          <span>Radical House: {pillars.rootHouseNum} ({pillars.rootHouse.rasiName})</span>
+        </div>
+      </div>
+
+      {/* Quick Filter Pill Tabs */}
+      <div className="flex flex-wrap items-center gap-1.5 pt-0.5 pb-1">
+        <span className="text-[11px] font-bold text-stone-600 mr-1 uppercase tracking-wider">
+          Filter Pillar:
+        </span>
+        {[
+          { id: 'all', label: 'All 6 Pillars' },
+          { id: 'wealth', label: 'Wealth' },
+          { id: 'education', label: 'Education' },
+          { id: 'marriage', label: 'Marriage' },
+          { id: 'property', label: 'Property' },
+          { id: 'mental', label: 'Mental Condition' },
+          { id: 'longevity', label: 'Life Expectancy' },
+        ].map((tab) => {
+          const isActive = activeFilter === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveFilter(tab.id as any)}
+              className={`text-[11px] font-bold px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+                isActive
+                  ? 'bg-amber-900 text-white shadow-xs'
+                  : 'bg-white/80 hover:bg-amber-100 text-stone-700 border border-amber-200'
+              }`}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* The 6 Pillars Cards */}
+      <div className={`grid gap-3.5 ${activeFilter === 'all' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+        {visibleItems.map((item) => {
+          const Icon = item.icon;
+          const d = item.data;
+          return (
+            <div
+              key={item.id}
+              className={`bg-white rounded-xl border border-amber-200/90 p-4 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between space-y-3 ${
+                activeFilter !== 'all' ? 'border-2 ' + item.accentColor : ''
+              }`}
+            >
+              <div>
+                <div className="flex items-start justify-between gap-1.5 pb-2.5 border-b border-stone-100">
+                  <div className="flex items-center space-x-2.5">
+                    <div className="p-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 shrink-0">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="font-vedic font-bold text-stone-900 text-[14px] leading-tight">
+                        {item.title}
+                      </h4>
+                      <span className="text-[10.5px] text-stone-500 font-medium block">
+                        {item.sanskrit}
+                      </span>
+                    </div>
+                  </div>
+                  <span className={`text-[10.5px] font-bold px-2 py-0.5 rounded-full border shrink-0 text-center ${item.badgeBg}`}>
+                    {item.isLongevity ? d.classification.split('(')[0].trim() : d.rating.split('&')[0].trim()}
+                  </span>
+                </div>
+
+                {/* Derived Metrics Bar */}
+                <div className="mt-2.5 text-[11px] font-mono text-stone-600 flex flex-wrap items-center justify-between gap-1 bg-stone-50 px-2.5 py-1.5 rounded-lg border border-stone-200/70">
+                  <span>Derived Bhava: <strong className="text-amber-950">{d.houseName}</strong></span>
+                  <span>Lord: <strong className="text-amber-950">{d.lord}</strong></span>
+                  <span className="font-bold text-stone-900">{d.score}/100</span>
+                </div>
+
+                {/* Planetary Occupants Info */}
+                <div className="mt-1.5 text-[11px] text-stone-500 px-1 flex items-center justify-between">
+                  <span className="truncate">Planets: <strong className="text-stone-700">{d.occupants}</strong></span>
+                </div>
+
+                {/* Score Progress Bar */}
+                <div className="w-full bg-stone-100 h-1.5 rounded-full overflow-hidden mt-1.5">
+                  <div
+                    className={`h-full transition-all duration-300 ${
+                      d.score >= 75 ? 'bg-emerald-500' : d.score >= 60 ? 'bg-amber-500' : 'bg-rose-500'
+                    }`}
+                    style={{ width: `${d.score}%` }}
+                  />
+                </div>
+
+                {/* Detailed Analysis */}
+                <p className="text-[12.5px] text-stone-700 mt-2.5 leading-relaxed">
+                  {d.details}
+                </p>
+              </div>
+
+              {/* Longevity Remedy Safeguard */}
+              {item.isLongevity && d.remedy && (
+                <div className="bg-purple-50/90 border border-purple-200 rounded-lg p-2.5 text-[11px] text-purple-950 space-y-1">
+                  <strong className="block font-bold flex items-center space-x-1 text-purple-900">
+                    <ShieldCheck className="w-3.5 h-3.5 text-purple-700" />
+                    <span>Vedic Longevity Safeguard &amp; Classical Remedy:</span>
+                  </strong>
+                  <p className="leading-relaxed">{d.remedy}</p>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export function FamilyLineageTab({
   activeProfile,
   profiles,
@@ -82,9 +544,17 @@ export function FamilyLineageTab({
   natalHouses,
   lagnaRasi,
 }: FamilyLineageTabProps) {
+  const [selectedProfileId, setSelectedProfileId] = useState<string>(activeProfile?.id || (profiles[0]?.id ?? ''));
   const [selectedFamilyMember, setSelectedFamilyMember] = useState<
-    'father' | 'mother' | 'siblings' | 'spouse' | 'children' | 'inlaws' | 'ancestral' | 'combinations' | 'synastry'
+    'six-pillars-overview' | 'father' | 'mother' | 'siblings' | 'spouse' | 'children' | 'inlaws' | 'ancestral' | 'combinations' | 'synastry'
   >('father');
+
+  // Sync selectedProfileId when activeProfile prop changes
+  useEffect(() => {
+    if (activeProfile?.id) {
+      setSelectedProfileId(activeProfile.id);
+    }
+  }, [activeProfile?.id]);
 
   // Relative Synastry Tester State
   const [synastryRelation, setSynastryRelation] = useState<'Spouse' | 'Father' | 'Mother' | 'Sibling' | 'Child' | 'In-Law'>('Spouse');
@@ -99,10 +569,61 @@ export function FamilyLineageTab({
     );
   }
 
+  const currentExaminedProfile = profiles.find((p) => p.id === selectedProfileId) || activeProfile;
+
+  // Dynamically calculate chart for the currently examined profile
+  const examinedChart = useMemo(() => {
+    if (!currentExaminedProfile) {
+      return { planets: natalPlanets, houses: natalHouses, lagnaRasi };
+    }
+    const bDate = new Date(`${currentExaminedProfile.birthDate}T${currentExaminedProfile.birthTime}:00`);
+    const pos = calculatePlanetaryPositions(
+      bDate,
+      currentExaminedProfile.latitude || 28.61,
+      currentExaminedProfile.longitude || 77.20
+    );
+    const houses = buildHouseStructure(pos.lagnaRasi, pos.planets);
+    return {
+      planets: pos.planets,
+      houses: houses,
+      lagnaRasi: VEDIC_RASIS[pos.lagnaRasi - 1]?.sanskritName || 'Mesha'
+    };
+  }, [currentExaminedProfile, natalPlanets, natalHouses, lagnaRasi]);
+
+  const activePlanets = examinedChart.planets;
+  const activeHouses = examinedChart.houses;
+  const activeLagna = examinedChart.lagnaRasi;
+
+  // 6 Life Pillars for each family member
+  const fatherPillars = useMemo(
+    () => getMemberSixPillars('father', activeHouses, activePlanets, currentExaminedProfile?.name),
+    [activeHouses, activePlanets, currentExaminedProfile?.name]
+  );
+  const motherPillars = useMemo(
+    () => getMemberSixPillars('mother', activeHouses, activePlanets, currentExaminedProfile?.name),
+    [activeHouses, activePlanets, currentExaminedProfile?.name]
+  );
+  const spousePillars = useMemo(
+    () => getMemberSixPillars('spouse', activeHouses, activePlanets, currentExaminedProfile?.name),
+    [activeHouses, activePlanets, currentExaminedProfile?.name]
+  );
+  const childrenPillars = useMemo(
+    () => getMemberSixPillars('children', activeHouses, activePlanets, currentExaminedProfile?.name),
+    [activeHouses, activePlanets, currentExaminedProfile?.name]
+  );
+  const siblingsPillars = useMemo(
+    () => getMemberSixPillars('siblings', activeHouses, activePlanets, currentExaminedProfile?.name),
+    [activeHouses, activePlanets, currentExaminedProfile?.name]
+  );
+  const inlawsPillars = useMemo(
+    () => getMemberSixPillars('inlaws', activeHouses, activePlanets, currentExaminedProfile?.name),
+    [activeHouses, activePlanets, currentExaminedProfile?.name]
+  );
+
   // Natal Houses Helper
   const getHouse = (num: number) => {
     return (
-      natalHouses.find((h) => h.houseNumber === num) || {
+      activeHouses.find((h: any) => h.houseNumber === num) || {
         houseNumber: num,
         rasiName: RASI_ORDER[(num - 1) % 12],
         rasiNumber: ((num - 1) % 12) + 1,
@@ -113,7 +634,7 @@ export function FamilyLineageTab({
   };
 
   const getPlanet = (name: string) => {
-    return natalPlanets.find((p) => p.name === name);
+    return activePlanets.find((p: any) => p.name === name);
   };
 
   const house1 = getHouse(1);
@@ -365,9 +886,58 @@ export function FamilyLineageTab({
         </div>
       </div>
 
+      {/* Selected Profile Switcher Banner for Family Predictions */}
+      <div className="bg-gradient-to-r from-stone-900 via-amber-950 to-stone-900 text-amber-50 p-3.5 sm:p-4 rounded-xl border-2 border-amber-500/50 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="flex items-center space-x-3">
+          <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-400/30 shrink-0">
+            <User className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400">
+                Selected Profile for Family Predictions:
+              </span>
+              <span className="bg-amber-800/80 text-amber-200 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-600/50">
+                {profiles.length} Profiles Available
+              </span>
+            </div>
+            <div className="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+              <span>{currentExaminedProfile.name}</span>
+              {(currentExaminedProfile.relationship || currentExaminedProfile.label) && (
+                <span className="text-xs px-2 py-0.5 rounded-md bg-amber-700/60 text-amber-200 font-medium">
+                  {currentExaminedProfile.relationship || currentExaminedProfile.label}
+                </span>
+              )}
+            </div>
+            <p className="text-[12px] text-amber-200/80">
+              DOB: <strong className="text-white">{currentExaminedProfile.birthDate}</strong> at <strong className="text-white">{currentExaminedProfile.birthTime}</strong> • {currentExaminedProfile.place || currentExaminedProfile.birthPlace || 'Custom Coords'} • Natal Lagna: <strong className="text-amber-300">{activeLagna} ({house1.rasiName})</strong>
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-2 bg-black/40 p-2 rounded-lg border border-amber-500/30 shrink-0">
+          <label htmlFor="family-profile-dropdown" className="text-xs font-bold text-amber-300 shrink-0">
+            Switch Profile:
+          </label>
+          <select
+            id="family-profile-dropdown"
+            value={currentExaminedProfile.id}
+            onChange={(e) => setSelectedProfileId(e.target.value)}
+            className="bg-stone-900 text-amber-100 border border-amber-400/60 rounded-md px-2.5 py-1.5 text-xs font-semibold focus:ring-2 focus:ring-amber-400 focus:outline-none cursor-pointer"
+          >
+            {profiles.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name} {p.label ? `(${p.label})` : p.relationship ? `(${p.relationship})` : ''} — {p.birthDate}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {/* Navigation Member Selector Tabs */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 gap-1.5 pt-1">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-10 gap-1.5 pt-1">
         {[
+          { id: 'six-pillars-overview', label: '6 Pillars Matrix', icon: Sparkles, desc: 'Family at a Glance' },
           { id: 'father', label: 'Father (9th)', icon: ShieldCheck, desc: 'Paternal Dynasty' },
           { id: 'mother', label: 'Mother (4th)', icon: Heart, desc: 'Maternal Roots' },
           { id: 'siblings', label: 'Siblings (3rd/11th)', icon: Users, desc: 'Co-born Alliances' },
@@ -391,7 +961,7 @@ export function FamilyLineageTab({
               }`}
             >
               <Icon className={`w-4 h-4 sm:w-5 sm:h-5 mb-1 ${isSelected ? 'text-amber-300' : 'text-amber-700'}`} />
-              <span className={`font-bold text-[12.5px] sm:text-[13px] leading-tight ${isSelected ? 'text-white' : 'text-stone-900'}`}>
+              <span className={`font-bold text-[12px] sm:text-[12.5px] leading-tight ${isSelected ? 'text-white' : 'text-stone-900'}`}>
                 {item.label}
               </span>
               <span className={`text-[10px] mt-0.5 truncate max-w-full ${isSelected ? 'text-amber-200' : 'text-stone-500'}`}>
@@ -404,6 +974,110 @@ export function FamilyLineageTab({
 
       {/* Selected Family Member Detailed Analysis Box */}
       <div className="bg-white rounded-xl border border-amber-200 p-4 sm:p-6 shadow-sm space-y-5">
+        {/* ================= 6 PILLARS FAMILY MATRIX OVERVIEW ================= */}
+        {selectedFamilyMember === 'six-pillars-overview' && (
+          <div className="space-y-5 animate-in fade-in duration-150">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-100 pb-3">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-600 to-amber-900 text-amber-50 flex items-center justify-center font-bold shrink-0 shadow-xs">
+                  <Sparkles className="w-6 h-6 text-amber-100" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-serif font-bold text-amber-950">
+                    6 Life Pillars Family Matrix for {currentExaminedProfile.name}&apos;s Family
+                  </h2>
+                  <p className="text-stone-600 text-[13px]">
+                    Comprehensive Bhavat Bhavam cross-comparison of Wealth, Education, Marriage, Property, Mental Condition, and Life Expectancy for all relatives.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5 text-right shrink-0">
+                <span className="text-[11px] text-amber-900 font-bold block">Selected Profile</span>
+                <span className="text-xs font-bold text-stone-900">{currentExaminedProfile.name} ({activeLagna})</span>
+              </div>
+            </div>
+
+            {/* Matrix Table */}
+            <div className="overflow-x-auto border border-amber-200 rounded-xl shadow-2xs">
+              <table className="w-full text-left text-[12px] border-collapse bg-white">
+                <thead>
+                  <tr className="bg-gradient-to-r from-amber-900 to-stone-900 text-amber-50 font-bold">
+                    <th className="p-3 border-r border-amber-800">Family Member</th>
+                    <th className="p-3 border-r border-amber-800">Radical House</th>
+                    <th className="p-3 border-r border-amber-800">1. Wealth &amp; Finance</th>
+                    <th className="p-3 border-r border-amber-800">2. Education &amp; Intellect</th>
+                    <th className="p-3 border-r border-amber-800">3. Marriage &amp; Union</th>
+                    <th className="p-3 border-r border-amber-800">4. Property &amp; Assets</th>
+                    <th className="p-3 border-r border-amber-800">5. Mental Condition</th>
+                    <th className="p-3">6. Life Expectancy</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-amber-100">
+                  {[
+                    { key: 'father', name: 'Father (Pitru)', data: fatherPillars, icon: ShieldCheck },
+                    { key: 'mother', name: 'Mother (Matru)', data: motherPillars, icon: Heart },
+                    { key: 'spouse', name: 'Spouse (Kalatra)', data: spousePillars, icon: Heart },
+                    { key: 'children', name: 'Children (Putra)', data: childrenPillars, icon: Star },
+                    { key: 'siblings', name: 'Siblings (Sahodara)', data: siblingsPillars, icon: Users },
+                    { key: 'inlaws', name: 'In-Laws (Sambandhi)', data: inlawsPillars, icon: Users },
+                  ].map((row, idx) => {
+                    const d = row.data;
+                    const RowIcon = row.icon;
+                    return (
+                      <tr
+                        key={row.key}
+                        onClick={() => setSelectedFamilyMember(row.key as any)}
+                        className={`hover:bg-amber-50/70 transition-colors cursor-pointer ${
+                          idx % 2 === 0 ? 'bg-white' : 'bg-[#FAF8F5]'
+                        }`}
+                      >
+                        <td className="p-3 font-bold text-stone-900 border-r border-amber-100 flex items-center space-x-2">
+                          <RowIcon className="w-4 h-4 text-amber-800 shrink-0" />
+                          <span>{row.name}</span>
+                        </td>
+                        <td className="p-3 border-r border-amber-100 font-mono text-stone-600">
+                          H{d.rootHouseNum} ({d.rootHouse.rasiName})
+                        </td>
+                        <td className="p-3 border-r border-amber-100">
+                          <span className="font-semibold text-amber-950 block">{d.wealth.rating.split('&')[0].trim()}</span>
+                          <span className="text-[10.5px] text-stone-500 font-mono">H{d.wealth.derivedHouse} • {d.wealth.score}/100</span>
+                        </td>
+                        <td className="p-3 border-r border-amber-100">
+                          <span className="font-semibold text-indigo-950 block">{d.education.rating.split('&')[0].trim()}</span>
+                          <span className="text-[10.5px] text-stone-500 font-mono">H{d.education.derivedHouse} • {d.education.score}/100</span>
+                        </td>
+                        <td className="p-3 border-r border-amber-100">
+                          <span className="font-semibold text-rose-950 block">{d.marriage.rating.split('&')[0].trim()}</span>
+                          <span className="text-[10.5px] text-stone-500 font-mono">H{d.marriage.derivedHouse} • {d.marriage.score}/100</span>
+                        </td>
+                        <td className="p-3 border-r border-amber-100">
+                          <span className="font-semibold text-emerald-950 block">{d.property.rating.split('&')[0].trim()}</span>
+                          <span className="text-[10.5px] text-stone-500 font-mono">H{d.property.derivedHouse} • {d.property.score}/100</span>
+                        </td>
+                        <td className="p-3 border-r border-amber-100">
+                          <span className="font-semibold text-sky-950 block">{d.mentalCondition.rating.split('&')[0].trim()}</span>
+                          <span className="text-[10.5px] text-stone-500 font-mono">H{d.mentalCondition.derivedHouse} • {d.mentalCondition.score}/100</span>
+                        </td>
+                        <td className="p-3">
+                          <span className={`text-[10.5px] font-bold px-2 py-0.5 rounded-full border inline-block ${d.lifeExpectancy.ratingColor}`}>
+                            {d.lifeExpectancy.classification.split('(')[0].trim()}
+                          </span>
+                          <span className="text-[10.5px] text-stone-500 font-mono block mt-0.5">H{d.lifeExpectancy.derivedHouse} • {d.lifeExpectancy.score}/100</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <p className="text-[12px] text-stone-500 italic">
+              Tip: Click any family member row above or use the tabs to inspect their full 6-Pillar breakdown, planetary occupants, and Vedic remedies.
+            </p>
+          </div>
+        )}
+
         {/* ================= FATHER & PATERNAL LINEAGE ================= */}
         {selectedFamilyMember === 'father' && (
           <div className="space-y-5 animate-in fade-in duration-150">
@@ -413,13 +1087,20 @@ export function FamilyLineageTab({
               </div>
               <div>
                 <h2 className="text-lg font-serif font-bold text-amber-950">
-                  Father & Paternal Lineage Prediction (Pitru Bhava • 9th &amp; 10th Houses)
+                  {currentExaminedProfile.name}&apos;s Father &amp; Paternal Lineage Prediction (Pitru Bhava • 9th &amp; 10th Houses)
                 </h2>
                 <p className="text-stone-600 text-[13px]">
                   Governed by the 9th house (Dharma &amp; Father), 10th house (Father&apos;s status), and Surya (Natural Father Karaka). Dwadashamsha (D12) reveals deep ancestral impressions.
                 </p>
               </div>
             </div>
+
+            {/* 6 Life Pillars (Wealth, Education, Marriage, Property, Mental Condition, Life Expectancy) */}
+            <MemberSixPillarsGrid
+              pillars={fatherPillars}
+              memberName={`${currentExaminedProfile.name}'s Father`}
+              profileName={currentExaminedProfile.name}
+            />
 
             {/* Core Astrological Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
@@ -508,13 +1189,20 @@ export function FamilyLineageTab({
               </div>
               <div>
                 <h2 className="text-lg font-serif font-bold text-amber-950">
-                  Mother & Maternal Lineage Prediction (Matru Bhava • 4th House &amp; Chandra)
+                  {currentExaminedProfile.name}&apos;s Mother &amp; Maternal Lineage Prediction (Matru Bhava • 4th House &amp; Chandra)
                 </h2>
                 <p className="text-stone-600 text-[13px]">
                   The 4th house governs maternal bonding, emotional sanctuary, peace of mind (Sukha), and immovable property. Chandra is the biological Matru Karaka.
                 </p>
               </div>
             </div>
+
+            {/* 6 Life Pillars: Wealth, Education, Marriage, Property, Mental Condition, Life Expectancy */}
+            <MemberSixPillarsGrid
+              pillars={motherPillars}
+              memberName={`${currentExaminedProfile.name}'s Mother`}
+              profileName={currentExaminedProfile.name}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
               <div className="bg-amber-50/60 p-3.5 rounded-lg border border-amber-200">
@@ -600,13 +1288,20 @@ export function FamilyLineageTab({
               </div>
               <div>
                 <h2 className="text-lg font-serif font-bold text-amber-950">
-                  Siblings & Co-borns Prediction (Bhratru Bhava • 3rd &amp; 11th Houses)
+                  {currentExaminedProfile.name}&apos;s Siblings &amp; Co-borns Prediction (Bhratru Bhava • 3rd &amp; 11th Houses)
                 </h2>
                 <p className="text-stone-600 text-[13px]">
                   3rd house governs younger siblings (Kanishtha Bhrata) and valor; 11th house signifies elder siblings (Jyeshtha Bhrata) and social gains. Mangala is Bhratru Karaka.
                 </p>
               </div>
             </div>
+
+            {/* 6 Life Pillars: Wealth, Education, Marriage, Property, Mental Condition, Life Expectancy */}
+            <MemberSixPillarsGrid
+              pillars={siblingsPillars}
+              memberName={`${currentExaminedProfile.name}'s Siblings`}
+              profileName={currentExaminedProfile.name}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
               <div className="bg-amber-50/60 p-3.5 rounded-lg border border-amber-200">
@@ -687,13 +1382,20 @@ export function FamilyLineageTab({
               </div>
               <div>
                 <h2 className="text-lg font-serif font-bold text-amber-950">
-                  Spouse &amp; Marital Union Prediction (Kalatra Bhava • 7th House &amp; Navamsha D9)
+                  {currentExaminedProfile.name}&apos;s Spouse &amp; Marital Union Prediction (Kalatra Bhava • 7th House &amp; Navamsha D9)
                 </h2>
                 <p className="text-stone-600 text-[13px]">
                   The 7th house rules the life partner, marital destiny, and spouse&apos;s character. Shukra (Venus) is the primary Kalatra Karaka, with Guru (Jupiter) representing the husband in female charts.
                 </p>
               </div>
             </div>
+
+            {/* 6 Life Pillars: Wealth, Education, Marriage, Property, Mental Condition, Life Expectancy */}
+            <MemberSixPillarsGrid
+              pillars={spousePillars}
+              memberName={`${currentExaminedProfile.name}'s Spouse`}
+              profileName={currentExaminedProfile.name}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
               <div className="bg-amber-50/60 p-3.5 rounded-lg border border-amber-200">
@@ -772,13 +1474,20 @@ export function FamilyLineageTab({
               </div>
               <div>
                 <h2 className="text-lg font-serif font-bold text-amber-950">
-                  Children &amp; Progeny Lineage (Putra Bhava • 5th House &amp; Saptamsha D7)
+                  {currentExaminedProfile.name}&apos;s Children &amp; Progeny Lineage (Putra Bhava • 5th House &amp; Saptamsha D7)
                 </h2>
                 <p className="text-stone-600 text-[13px]">
                   The 5th house rules children, past-life merit (Purva Punya), intelligence, and lineage continuation (Vamsha Vriddhi). Devaguru Jupiter is the sovereign Santan Karaka.
                 </p>
               </div>
             </div>
+
+            {/* 6 Life Pillars: Wealth, Education, Marriage, Property, Mental Condition, Life Expectancy */}
+            <MemberSixPillarsGrid
+              pillars={childrenPillars}
+              memberName={`${currentExaminedProfile.name}'s Children`}
+              profileName={currentExaminedProfile.name}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
               <div className="bg-amber-50/60 p-3.5 rounded-lg border border-amber-200">
@@ -863,13 +1572,20 @@ export function FamilyLineageTab({
               </div>
               <div>
                 <h2 className="text-lg font-serif font-bold text-amber-950">
-                  In-Laws & Extended Kin Prediction (Shvashura &amp; Sambandhi Vigyan)
+                  {currentExaminedProfile.name}&apos;s In-Laws &amp; Extended Kin Prediction (Shvashura &amp; Sambandhi Vigyan)
                 </h2>
                 <p className="text-stone-600 text-[13px]">
                   Relationships with in-laws are derived using Bhavat Bhavam from the 7th house: 8th house (Spouse&apos;s family &amp; wealth), 10th house (Mother-in-law), and 3rd house (Father-in-law).
                 </p>
               </div>
             </div>
+
+            {/* 6 Life Pillars: Wealth, Education, Marriage, Property, Mental Condition, Life Expectancy */}
+            <MemberSixPillarsGrid
+              pillars={inlawsPillars}
+              memberName={`${currentExaminedProfile.name}'s In-Laws`}
+              profileName={currentExaminedProfile.name}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
               <div className="bg-amber-50/60 p-3.5 rounded-lg border border-amber-200">

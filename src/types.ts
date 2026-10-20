@@ -120,6 +120,8 @@ export interface UserProfile {
   timezone: number;
   gender?: 'Male' | 'Female' | 'Other';
   notes?: string;
+  relationship?: string;
+  birthPlace?: string;
   updatedAt?: string;
   personalityTraits?: string[];
   wholeLifeReading?: string;

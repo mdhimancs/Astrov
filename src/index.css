@@ -16,57 +16,65 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* 1. Main Page Headings: Majestic Classical Vedic Display (Cinzel Serif) */
+  /* 1. Main Page Headings: Majestic Classical Vedic Display (point 16 = 16px with colors) */
   h1, .heading-1, .font-h1 {
     font-family: 'Cinzel', Georgia, serif;
     font-weight: 700;
-    font-size: 17px;
-    line-height: 1.25;
+    font-size: 16px;
+    line-height: 1.3;
     letter-spacing: -0.01em;
-    color: #1C1917;
+    color: #9A3412; /* Rich Terracotta / Deep Warm Amber */
   }
 
   h2, .heading-2, .font-h2 {
     font-family: 'Cinzel', Georgia, serif;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.3;
     letter-spacing: -0.01em;
-    color: #1C1917;
+    color: #B45309; /* Radiant Ochre / Amber */
   }
 
-  /* 2. Standardized Subheadings & Card Titles: Clean, Modern, Ultra-Legible Plus Jakarta Sans */
+  /* 2. Standardized Subheadings & Card Titles: point 16 = 16px with distinct colors */
   h3, .heading-3, .font-h3 {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.35;
     letter-spacing: -0.005em;
-    color: #1C1917;
+    color: #C2410C; /* Saffron / Warm Orange-Copper */
   }
 
   h4, .heading-4, .font-h4 {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-weight: 600;
-    font-size: 13px;
+    font-weight: 700;
+    font-size: 16px;
     line-height: 1.35;
-    color: #292524;
+    color: #B91C1C; /* Ruby / Garnet */
   }
 
-  h5, h6, .heading-5, .font-h5, .font-h6 {
+  h5, .heading-5, .font-h5 {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 16px;
     line-height: 1.35;
-    color: #44403C;
+    color: #7C2D12; /* Warm Cinnamon / Mahogany */
   }
 
-  /* 3. Standardized Body Copy */
+  h6, .heading-6, .font-h6 {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.35;
+    color: #854D0E; /* Golden Bronze */
+  }
+
+  /* 3. Standardized Body Copy: point 14 = 14px and black (#000000) */
   p, .text-body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.5;
-    color: #292524;
+    color: #000000;
   }
 
   /* 4. Standardized Interactive Controls */
@@ -101,47 +109,154 @@ h6.font-vedic {
   font-family: 'Cinzel', Georgia, serif;
 }
 
-/* Standardized Typography Hierarchy Utility Classes */
+/* Standardized Typography Hierarchy Utility Classes: point 16 for headings, point 14 for text */
 .text-page-title {
   font-family: 'Cinzel', Georgia, serif;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1.25;
-  color: #1C1917;
+  color: #9A3412;
   letter-spacing: -0.01em;
 }
 
 .text-section-title {
   font-family: 'Cinzel', Georgia, serif;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1.3;
-  color: #1C1917;
+  color: #B45309;
   letter-spacing: -0.01em;
 }
 
 .text-card-title {
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1.35;
-  color: #1C1917;
+  color: #C2410C;
 }
 
 .text-subheading {
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.4;
-  color: #57534E;
+  color: #7C2D12;
 }
 
 .text-caption {
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 500;
   line-height: 1.35;
-  color: #78716C;
+  color: #000000;
+}
+
+/* =========================================================================
+   USER SPECIFICATION: BELOW TOP BUTTON SELECTORS (INSIDE MAIN)
+   1. All headings as point 16 (16px) with distinct colors
+   2. All text as point 14 (14px) and black (#000000)
+   ========================================================================= */
+
+/* All headings below top button selectors: point 16 (16px) */
+main h1, main .heading-1, main .font-h1, main .text-page-title,
+main h2, main .heading-2, main .font-h2, main .text-section-title,
+main h3, main .heading-3, main .font-h3, main .text-card-title,
+main h4, main .heading-4, main .font-h4,
+main h5, main .heading-5, main .font-h5,
+main h6, main .heading-6, main .font-h6 {
+  font-size: 16px !important;
+  line-height: 1.35 !important;
+}
+
+/* Distinct rich Vedic colors for each heading level below top button selectors */
+main h1, main .heading-1, main .font-h1, main .text-page-title {
+  color: #9A3412 !important; /* Rich Terracotta / Deep Warm Amber */
+}
+
+main h2, main .heading-2, main .font-h2, main .text-section-title {
+  color: #B45309 !important; /* Radiant Ochre / Amber */
+}
+
+main h3, main .heading-3, main .font-h3, main .text-card-title {
+  color: #C2410C !important; /* Saffron / Warm Orange-Copper */
+}
+
+main h4, main .heading-4, main .font-h4 {
+  color: #B91C1C !important; /* Ruby / Garnet */
+}
+
+main h5, main .heading-5, main .font-h5 {
+  color: #7C2D12 !important; /* Warm Cinnamon / Mahogany */
+}
+
+main h6, main .heading-6, main .font-h6 {
+  color: #854D0E !important; /* Golden Bronze */
+}
+
+/* For headings in dark banners, render in vibrant radiant warm gold */
+main [class*="bg-amber-950"] h1, main [class*="from-amber-950"] h1, main [class*="bg-stone-900"] h1,
+main [class*="bg-amber-950"] h2, main [class*="from-amber-950"] h2, main [class*="bg-stone-900"] h2,
+main [class*="bg-amber-950"] h3, main [class*="from-amber-950"] h3, main [class*="bg-stone-900"] h3,
+main [class*="bg-amber-950"] h4, main [class*="from-amber-950"] h4, main [class*="bg-stone-900"] h4 {
+  color: #FBBF24 !important; /* Radiant Warm Gold */
+}
+
+/* All text below top button selectors: point 14 (14px) and black (#000000) */
+main p,
+main li,
+main .text-body,
+main .body-text,
+main td,
+main th,
+main label,
+main dd,
+main dt,
+main blockquote {
+  font-size: 14px !important;
+  color: #000000 !important;
+}
+
+/* Ensure descriptive spans and text inside cards and details below selectors are 14px and black */
+main .prose,
+main .prose p,
+main p.text-stone-700,
+main p.text-stone-600,
+main p.text-stone-800,
+main p.text-stone-500,
+main p.text-stone-900,
+main p.text-gray-600,
+main p.text-gray-700,
+main p.text-gray-800,
+main span.text-stone-700,
+main span.text-stone-600,
+main span.text-stone-800,
+main span.text-stone-900,
+main span.text-gray-700,
+main span.text-gray-800,
+main div.text-stone-700,
+main div.text-stone-600,
+main div.text-stone-800,
+main div.text-stone-900 {
+  font-size: 14px !important;
+  color: #000000 !important;
+}
+
+/* Retain high-contrast light text inside dark background badges/banners */
+main [class*="bg-amber-950"] p,
+main [class*="from-amber-950"] p,
+main [class*="bg-stone-900"] p,
+main [class*="bg-black"] p,
+main [class*="bg-amber-900"] p {
+  color: #FEF3C7 !important;
+  font-size: 14px !important;
+}
+main [class*="bg-amber-950"] span.text-amber-200,
+main [class*="from-amber-950"] span.text-amber-200,
+main [class*="from-amber-950"] span.text-amber-300,
+main [class*="bg-stone-900"] span.text-amber-200 {
+  color: #FDE68A !important;
+  font-size: 14px !important;
 }
 
 /* Tabular figures for stats and metrics */

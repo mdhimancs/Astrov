@@ -457,7 +457,7 @@ export function BirthTimePredictionsTab({
                 ))}
               </div>
               <div className="mt-2">
-                <ShadbalaD3Chart natalPlanets={natalPlanets} />
+                <ShadbalaD3Chart planets={natalPlanets} />
               </div>
             </div>
 
