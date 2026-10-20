@@ -314,23 +314,24 @@ export function Navbar({
                 <button
                   type="button"
                   onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                  className="flex items-center space-x-1.5 sm:space-x-2 bg-gradient-to-r from-amber-50/95 via-amber-50/80 to-[#FAF6EE] hover:from-amber-100 hover:to-amber-50 border border-amber-300 rounded-md px-2 py-0.5 text-left transition-all shadow-3xs cursor-pointer group max-w-[200px] sm:max-w-[310px] md:max-w-[360px]"
+                  className="flex items-center space-x-1 sm:space-x-1.5 bg-gradient-to-r from-amber-50/95 via-amber-50/80 to-[#FAF6EE] hover:from-amber-100 hover:to-amber-50 border border-amber-300 rounded-md px-1.5 py-0 text-left transition-all shadow-3xs cursor-pointer group max-w-[200px] sm:max-w-[310px] md:max-w-[360px]"
+                  style={{ height: '23.8px', fontSize: '9px' }}
                   title="Switch Active Profile"
                 >
-                  <div className="w-5 h-5 sm:w-5.5 sm:h-5.5 rounded bg-gradient-to-br from-amber-700 via-orange-700 to-amber-900 text-amber-100 flex items-center justify-center font-bold text-xs shadow-3xs shrink-0 border border-amber-400/40">
-                    <User className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                  <div className="w-4 h-4 rounded bg-gradient-to-br from-amber-700 via-orange-700 to-amber-900 text-amber-100 flex items-center justify-center font-bold text-[8px] shadow-3xs shrink-0 border border-amber-400/40">
+                    <User className="w-2.5 h-2.5" />
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <div className="flex items-center space-x-1 leading-tight truncate">
-                      <span className="font-sans font-bold text-amber-950 text-[12.5px] sm:text-[13px] tracking-tight truncate max-w-[95px] sm:max-w-[130px]">
+                    <div className="flex items-center space-x-0.5 leading-tight truncate">
+                      <span className="font-sans font-bold text-amber-950 truncate max-w-[95px] sm:max-w-[130px]" style={{ fontSize: '11px' }}>
                         {currentProfile.name && /profile\s*1\s*\(primary\s*\/\s*self\)/i.test(currentProfile.name) ? 'Munish Sharma' : currentProfile.name}
                       </span>
-                      <span className="text-amber-400 font-bold select-none text-[11px]">—</span>
-                      <span className="text-stone-800 font-semibold text-[11px] sm:text-[11.5px] truncate max-w-[85px] sm:max-w-[120px]">
+                      <span className="text-amber-400 font-bold select-none" style={{ fontSize: '10.5px' }}>—</span>
+                      <span className="text-stone-800 font-semibold truncate max-w-[85px] sm:max-w-[120px]" style={{ fontSize: '10.5px' }}>
                         {formatProfileDoc(currentProfile.birthDate, currentProfile.birthTime)}
                       </span>
-                      <span className="text-amber-400 font-bold select-none hidden xl:inline text-[11px]">—</span>
-                      <span className="text-stone-600 font-medium text-[11px] sm:text-[11.5px] truncate max-w-[90px] hidden xl:inline">
+                      <span className="text-amber-400 font-bold select-none hidden xl:inline" style={{ fontSize: '10.5px' }}>—</span>
+                      <span className="text-stone-600 font-medium truncate max-w-[90px] hidden xl:inline" style={{ fontSize: '10.5px' }}>
                         {currentProfile.place}
                       </span>
                     </div>

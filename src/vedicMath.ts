@@ -4990,6 +4990,17 @@ export function getPlanetFavorability(planet: GrahaName, lagnaRasi: number): 'fa
   return 'neutral';
 }
 
+export function calculateShadbala(planet: GrahaName, natalPlanets: PlanetPosition[]): number {
+  // Foundational Shadbala: Placeholder implementation for 6-fold strength (Digbala, Kalabala, etc.)
+  // In a production applet, this requires deep ephemeris calculations.
+  return Math.random() * 50 + 50; // Returns score 50-100
+}
+
+export function calculateAspectStrength(planetA: GrahaName, planetB: GrahaName, natalPlanets: PlanetPosition[]): number {
+  // Foundational Aspect strength placeholder
+  return Math.random() * 10; // Returns score 0-10
+}
+
 export function generateProfileInsights(birthDate: string, birthTime: string, lat: number, lng: number) {
   const birthDateTime = new Date(`${birthDate}T${birthTime}:00`);
   const calc = calculatePlanetaryPositions(birthDateTime, lat, lng);

@@ -80,11 +80,11 @@ export function ProfileSelector({
   };
 
   return (
-    <div className="bg-white/75 backdrop-blur-sm rounded-lg border border-stone-200/80 px-2 py-1 shadow-3xs space-y-1">
-      <div className="flex items-center justify-between border-b border-stone-100 pb-0.5">
-        <div className="flex items-center space-x-1">
-          <User className="w-3 h-3 text-amber-700" />
-          <h3 className="font-vedic font-black text-stone-900 text-[11px] uppercase tracking-wider">
+    <div className="bg-white/75 backdrop-blur-sm rounded-lg border border-stone-200/80 px-1.5 py-0.5 shadow-3xs space-y-0.5">
+      <div className="flex items-center justify-between border-b border-stone-100 pb-0">
+        <div className="flex items-center space-x-0.5">
+          <User className="w-2.5 h-2.5 text-amber-700" />
+          <h3 className="font-vedic font-black text-stone-900 text-[9px] uppercase tracking-wider">
             Person&apos;s Profile
           </h3>
         </div>
@@ -92,36 +92,36 @@ export function ProfileSelector({
         <button
           type="button"
           onClick={handleAddNew}
-          className="text-[10px] font-black uppercase tracking-wider text-amber-800 hover:text-amber-950 flex items-center space-x-0.5 transition-colors cursor-pointer"
+          className="text-[9px] font-black uppercase tracking-wider text-amber-800 hover:text-amber-950 flex items-center space-x-0.5 transition-colors cursor-pointer"
         >
-          <Plus className="w-2.5 h-2.5" />
+          <Plus className="w-2 h-2" />
           <span>New</span>
         </button>
       </div>
 
       {/* Profiles Deck of Cards — Compact 1-Row Cards without Card Numbers */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-0.5">
         {profiles.map((profile) => {
           const isActive = profile.id === activeProfileId;
           return (
             <div
               key={profile.id}
               onClick={() => onSelectProfile(profile)}
-              className={`group relative rounded px-1.5 py-0.5 transition-all duration-150 cursor-pointer border flex items-center justify-between gap-1 shadow-3xs ${
+              className={`group relative rounded px-1 py-0 transition-all duration-150 cursor-pointer border flex items-center justify-between gap-0.5 shadow-3xs ${
                 isActive
                   ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
                   : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5]'
               }`}
             >
-              <div className="flex items-center space-x-1 min-w-0">
+              <div className="flex items-center space-x-0.5 min-w-0">
                 <span
-                  className={`font-ui font-semibold text-[10px] truncate leading-none ${
+                  className={`font-ui font-semibold text-[9px] truncate leading-none ${
                     isActive ? 'text-amber-950 font-bold' : 'text-stone-900'
                   }`}
                 >
                   {profile.name}
                 </span>
-                <span className="text-[9px] text-stone-500 font-medium shrink-0 leading-none">
+                <span className="text-[8px] text-stone-500 font-medium shrink-0 leading-none">
                   ({formatDateDdMmYyyy(profile.birthDate)})
                 </span>
               </div>

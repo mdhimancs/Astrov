@@ -38,6 +38,7 @@ import {
   calculateNatalYogas,
   calculateVimshottariDasha,
   calculateChandraEmotionalSignificance,
+  calculateShadbala,
 } from '../vedicMath';
 import {
   HouseInfo,
@@ -128,6 +129,7 @@ export function BirthTimePredictionsTab({
     | 'bhava-deck'
     | 'bhrigu-samhita'
     | 'lal-kitab'
+    | 'analytical-metrics'
   >('kundali');
 
   // AI Birth Reading state
@@ -383,6 +385,11 @@ export function BirthTimePredictionsTab({
               title: 'Bhava Deck',
               icon: Layers,
             },
+            {
+              id: 'analytical-metrics',
+              title: 'Planets, Shadbala & Metrics',
+              icon: Activity,
+            },
           ].map((card) => {
             const Icon = card.icon;
             const isActive = activeBirthSectionTab === card.id || (card.id === 'shadbala' && activeBirthSectionTab === 'coordinates');
@@ -415,6 +422,53 @@ export function BirthTimePredictionsTab({
           })}
         </div>
       </div>
+
+      {/* TAB: ANALYTICAL METRICS */}
+      {activeBirthSectionTab === 'analytical-metrics' && (
+        <div className="bg-white rounded-lg border border-stone-200 p-4 shadow-3xs space-y-4">
+          <h2 className="font-vedic font-bold text-stone-950 text-[16px] uppercase tracking-wider flex items-center space-x-2">
+            <Activity className="w-5 h-5 text-amber-700" />
+            <span>Planets, Shadbala &amp; Analytical Metrics</span>
+          </h2>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Planets (Grahas) */}
+            <div className="p-3 bg-stone-50 rounded border border-stone-200">
+              <h3 className="font-bold text-amber-900 mb-2">Grahas (Planets)</h3>
+              <div className="text-[13px] text-stone-700 space-y-1">
+                {natalPlanets.map(p => (
+                  <div key={p.name} className="flex justify-between items-center">
+                    <span className="font-semibold">{p.name}</span>
+                    <span className="text-[11px] bg-stone-200 px-1.5 rounded">{p.rasiName} / H{p.house}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Shadbala */}
+            <div className="p-3 bg-stone-50 rounded border border-stone-200">
+              <h3 className="font-bold text-amber-900 mb-2">Shadbala (Planetary Strength)</h3>
+              <div className="text-[13px] text-stone-700 space-y-1">
+                {natalPlanets.map(p => (
+                  <div key={p.name} className="flex justify-between">
+                    <span>{p.name}</span>
+                    <span className="font-mono font-bold">{calculateShadbala(p.name, natalPlanets).toFixed(1)} pts</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-2">
+                <ShadbalaD3Chart natalPlanets={natalPlanets} />
+              </div>
+            </div>
+
+            {/* Aspects */}
+            <div className="p-3 bg-stone-50 rounded border border-stone-200">
+              <h3 className="font-bold text-amber-900 mb-2">Aspect Strengths (Drishti)</h3>
+              <p className="text-[12px] text-stone-600 italic">Inter-planetary influence metrics...</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* TAB 1: JANAM KUNDALI (D1) OVERVIEW */}
       {activeBirthSectionTab === 'kundali' && (

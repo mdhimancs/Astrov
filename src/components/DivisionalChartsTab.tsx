@@ -165,13 +165,13 @@ export function DivisionalChartsTab({
   };
 
   return (
-    <div className="w-full space-y-2">
+    <div className="w-full space-y-2" style={{ height: '248.565px' }}>
       {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-stone-200 pb-1.5">
         <div className="flex items-center space-x-1.5">
           <Layers className="w-4 h-4 text-amber-700" />
           <h1 className="text-[14px] font-black text-stone-800 uppercase tracking-wider font-vedic leading-tight">
-            Shodashavarga &amp; Jaimini Kundali Suite
+            <span style={{ fontSize: '16px', fontWeight: 'normal' }}>Shodashavarga &amp; Jaimini Kundali Suite</span>
           </h1>
         </div>
 
@@ -214,7 +214,7 @@ export function DivisionalChartsTab({
       </div>
 
       {/* COMPREHENSIVE SHODASHAVARGA 14-CARD SELECTOR */}
-      <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-stone-200 p-1.5 shadow-3xs">
+      <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-stone-200 p-1.5 shadow-3xs" style={{ height: '89.223px', fontSize: '12px' }}>
         <div className="flex items-center justify-between px-1 mb-1">
           <span className="text-[11px] font-black text-amber-900 uppercase tracking-wider flex items-center space-x-1">
             <Compass className="w-3 h-3 text-amber-700" />
@@ -361,52 +361,7 @@ export function DivisionalChartsTab({
             </div>
           </div>
 
-          {/* YOGA ANALYSIS SECTION */}
-          <div className="bg-white rounded-lg border border-stone-200 p-2.5 shadow-3xs space-y-2">
-            <div className="flex items-center justify-between border-b border-stone-100 pb-1">
-              <div className="flex items-center space-x-1.5">
-                <Sparkles className="w-4 h-4 text-amber-600" />
-                <h3 className="text-[15px] font-vedic font-bold text-stone-950">Yogas</h3>
-              </div>
-              <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[11px] font-bold uppercase tracking-wider border border-amber-200">
-                {yogas.length} Found
-              </span>
-            </div>
 
-            {yogas.length === 0 ? (
-              <div className="bg-stone-50 rounded p-2 text-center text-stone-600 text-[13px] italic">
-                No major classical yogas detected.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {yogas.map((yoga) => (
-                  <div
-                    key={yoga.name}
-                    className="group bg-[#FAF9F6] hover:bg-white rounded-md p-2 border border-stone-200 transition-all duration-150 hover:shadow-3xs hover:border-amber-300"
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white border border-stone-200 text-stone-600 uppercase tracking-wider group-hover:bg-amber-700 group-hover:text-white group-hover:border-amber-700 transition-colors">
-                        {yoga.auspiciousness}
-                      </span>
-                      <div className="flex space-x-1">
-                        {yoga.planetsInvolved.map((p) => (
-                          <span
-                            key={p}
-                            className="px-1.5 py-0.5 rounded bg-stone-200 flex items-center justify-center text-[11px] font-bold text-stone-800"
-                          >
-                            {p.substring(0, 2)}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <h4 className="font-vedic font-bold text-stone-950 text-[14px] leading-snug">{yoga.name}</h4>
-                    <p className="text-[11px] text-amber-900 font-bold font-vedic leading-snug">{yoga.sanskritName}</p>
-                    <p className="text-[12px] text-stone-800 leading-snug mt-1">{yoga.effect}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
 
           {/* SARVASHTAKAVARGA KEY LIFE EFFECTS */}
           <div className="bg-[#FAF8F5] rounded-lg p-2.5 text-stone-900 border border-amber-200/90 shadow-3xs space-y-1.5">
@@ -490,6 +445,53 @@ export function DivisionalChartsTab({
                 );
               })}
             </div>
+          </div>
+
+          {/* YOGA ANALYSIS SECTION */}
+          <div className="bg-white rounded-lg border border-stone-200 p-2.5 shadow-3xs space-y-2">
+            <div className="flex items-center justify-between border-b border-stone-100 pb-1">
+              <div className="flex items-center space-x-1.5">
+                <Sparkles className="w-4 h-4 text-amber-600" />
+                <h3 className="text-[15px] font-vedic font-bold text-stone-950">Yogas</h3>
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[11px] font-bold uppercase tracking-wider border border-amber-200">
+                {yogas.length} Found
+              </span>
+            </div>
+
+            {yogas.length === 0 ? (
+              <div className="bg-stone-50 rounded p-2 text-center text-stone-600 text-[13px] italic">
+                No major classical yogas detected.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {yogas.map((yoga) => (
+                  <div
+                    key={yoga.name}
+                    className="group bg-[#FAF9F6] hover:bg-white rounded-md p-2 border border-stone-200 transition-all duration-150 hover:shadow-3xs hover:border-amber-300"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white border border-stone-200 text-stone-600 uppercase tracking-wider group-hover:bg-amber-700 group-hover:text-white group-hover:border-amber-700 transition-colors">
+                        {yoga.auspiciousness}
+                      </span>
+                      <div className="flex space-x-1">
+                        {yoga.planetsInvolved.map((p) => (
+                          <span
+                            key={p}
+                            className="px-1.5 py-0.5 rounded bg-stone-200 flex items-center justify-center text-[11px] font-bold text-stone-800"
+                          >
+                            {p.substring(0, 2)}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <h4 className="font-vedic font-bold text-stone-950 text-[14px] leading-snug">{yoga.name}</h4>
+                    <p className="text-[11px] text-amber-900 font-bold font-vedic leading-snug">{yoga.sanskritName}</p>
+                    <p className="text-[12px] text-stone-800 leading-snug mt-1">{yoga.effect}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* AI MASTER SYNTHESIS */}
