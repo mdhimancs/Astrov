@@ -3,6 +3,7 @@ import { User, Plus, Edit2, Trash2, Check, X, Calendar, Clock, MapPin, Sparkles 
 import { UserProfile } from '../types';
 import { POPULAR_CITIES } from '../data';
 import { PlaceOfBirthInput } from './PlaceOfBirthInput';
+import { generateProfileInsights } from '../vedicMath';
 
 interface ProfileSelectorProps {
   profiles: UserProfile[];
@@ -23,6 +24,17 @@ export function ProfileSelector({
   const [editForm, setEditForm] = useState<UserProfile | null>(null);
 
   const activeProfile = profiles.find((p) => p.id === activeProfileId) || profiles[0];
+
+  const insights = React.useMemo(() => {
+    const target = editForm || activeProfile;
+    if (!target) return null;
+    return generateProfileInsights(
+      target.birthDate || '1990-05-18',
+      target.birthTime || '12:00',
+      target.latitude ?? 28.6139,
+      target.longitude ?? 77.2090
+    );
+  }, [editForm, activeProfile]);
 
   const handleStartEdit = (profileToEdit?: UserProfile) => {
     const target = profileToEdit || activeProfile;
@@ -58,12 +70,21 @@ export function ProfileSelector({
     setEditForm(null);
   };
 
+  const formatDateDdMmYyyy = (dateStr: string) => {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    return dateStr;
+  };
+
   return (
-    <div className="bg-white/75 backdrop-blur-sm rounded-lg border border-stone-200/80 px-2.5 py-1.5 shadow-3xs space-y-1.5">
-      <div className="flex items-center justify-between border-b border-stone-100 pb-1">
-        <div className="flex items-center space-x-1.5">
-          <User className="w-3.5 h-3.5 text-amber-700" />
-          <h3 className="font-vedic font-black text-stone-900 text-[13px] uppercase tracking-wider">
+    <div className="bg-white/75 backdrop-blur-sm rounded-lg border border-stone-200/80 px-2 py-1 shadow-3xs space-y-1">
+      <div className="flex items-center justify-between border-b border-stone-100 pb-0.5">
+        <div className="flex items-center space-x-1">
+          <User className="w-3 h-3 text-amber-700" />
+          <h3 className="font-vedic font-black text-stone-900 text-[11px] uppercase tracking-wider">
             Person&apos;s Profile
           </h3>
         </div>
@@ -71,37 +92,37 @@ export function ProfileSelector({
         <button
           type="button"
           onClick={handleAddNew}
-          className="text-[12px] font-black uppercase tracking-wider text-amber-800 hover:text-amber-950 flex items-center space-x-1 transition-colors cursor-pointer"
+          className="text-[10px] font-black uppercase tracking-wider text-amber-800 hover:text-amber-950 flex items-center space-x-0.5 transition-colors cursor-pointer"
         >
-          <Plus className="w-3 h-3" />
+          <Plus className="w-2.5 h-2.5" />
           <span>New</span>
         </button>
       </div>
 
-      {/* Profiles Deck of Cards — Compact 1-Row Cards without Card Numbers (10% smaller with standardized font) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1.5">
+      {/* Profiles Deck of Cards — Compact 1-Row Cards without Card Numbers */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1">
         {profiles.map((profile) => {
           const isActive = profile.id === activeProfileId;
           return (
             <div
               key={profile.id}
               onClick={() => onSelectProfile(profile)}
-              className={`group relative rounded-md px-2 py-0.5 transition-all duration-150 cursor-pointer border flex items-center justify-between gap-1 shadow-3xs ${
+              className={`group relative rounded px-1.5 py-0.5 transition-all duration-150 cursor-pointer border flex items-center justify-between gap-1 shadow-3xs ${
                 isActive
                   ? 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
                   : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5]'
               }`}
             >
-              <div className="flex items-center space-x-1.5 min-w-0">
+              <div className="flex items-center space-x-1 min-w-0">
                 <span
-                  className={`font-ui font-semibold text-[12px] truncate leading-none ${
+                  className={`font-ui font-semibold text-[10px] truncate leading-none ${
                     isActive ? 'text-amber-950 font-bold' : 'text-stone-900'
                   }`}
                 >
                   {profile.name}
                 </span>
-                <span className="text-[10.5px] text-stone-500 font-medium shrink-0 leading-none">
-                  ({profile.birthDate.split('-')[0]})
+                <span className="text-[9px] text-stone-500 font-medium shrink-0 leading-none">
+                  ({formatDateDdMmYyyy(profile.birthDate)})
                 </span>
               </div>
 
@@ -235,6 +256,48 @@ export function ProfileSelector({
               />
             </div>
           </div>
+
+          {insights && (
+            <div className="space-y-2 bg-white rounded-lg border border-amber-200 p-3">
+              <div className="flex items-center space-x-1.5 text-amber-950 border-b border-stone-200 pb-1">
+                <Sparkles className="w-4 h-4 text-amber-700" />
+                <h5 className="font-vedic font-bold text-[15px]">
+                  Personality Traits &amp; Whole Life Reading Synthesis
+                </h5>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[13px]">
+                <div className="bg-amber-50/50 rounded p-2 border border-amber-200/60 space-y-1">
+                  <span className="font-bold text-amber-950 uppercase text-[11px] block">
+                    Personality Traits &amp; Temperament
+                  </span>
+                  <p className="text-stone-800 leading-snug">
+                    {insights.personality.coreTemperament}
+                  </p>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    <span className="px-2 py-0.5 rounded bg-purple-100 text-purple-900 text-[10px] font-semibold">
+                      Element: {insights.personality.element}
+                    </span>
+                    <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-900 text-[10px] font-semibold">
+                      Ruling Planet: {insights.personality.rulingPlanet}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="bg-purple-50/50 rounded p-2 border border-purple-200/60 space-y-1">
+                  <span className="font-bold text-purple-950 uppercase text-[11px] block">
+                    Whole Life Reading &amp; Trajectory
+                  </span>
+                  <p className="text-stone-800 leading-snug">
+                    {insights.wholeLife.lifePathSummary}
+                  </p>
+                  <p className="text-stone-800 leading-snug text-[12px] italic mt-1">
+                    {insights.wholeLife.careerWealthTrajectory}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="flex items-center justify-between pt-1.5 border-t border-amber-200">
             {profiles.length > 1 ? (

@@ -2073,6 +2073,14 @@ export function calculateVimshottariDasha(
     return `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
   };
 
+  const getDdMmYyyy = (date: Date, offsetYears: number) => {
+    const d = getOffsetDate(date, offsetYears);
+    const day = pad(d.getDate());
+    const mm = pad(d.getMonth() + 1);
+    const yy = String(d.getFullYear());
+    return `${day}-${mm}-${yy}`;
+  };
+
   // Build lifetime sequence of dashas
   const cycle: VimshottariDashaInfo['cycle'] = [];
   let cumAge = 0;
@@ -2089,6 +2097,8 @@ export function calculateVimshottariDasha(
     endMonthYear: getMonthYearMmYy(baseBirthDate, firstDuration),
     startMonthYearFull: getMonthYearFull(baseBirthDate, 0),
     endMonthYearFull: getMonthYearFull(baseBirthDate, firstDuration),
+    startDate: getDdMmYyyy(baseBirthDate, 0),
+    endDate: getDdMmYyyy(baseBirthDate, firstDuration),
     lifeTheme: birthLordData.lifeTheme,
     strengthInfo: birthStrength,
     parts: calculateMahadashaParts(birthLord, firstDuration, 0, baseBirthDate, natalLagnaRasi, natalPlanets),
@@ -2121,6 +2131,8 @@ export function calculateVimshottariDasha(
       endMonthYear,
       startMonthYearFull,
       endMonthYearFull,
+      startDate: getDdMmYyyy(baseBirthDate, startAge),
+      endDate: getDdMmYyyy(baseBirthDate, endAge),
       lifeTheme: nextLordData.lifeTheme,
       strengthInfo: mStrength,
       parts: calculateMahadashaParts(nextLordData.planet, nextLordData.years, startAge, baseBirthDate, natalLagnaRasi, natalPlanets),
@@ -2242,6 +2254,14 @@ export function calculateAntardashas(
     return `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
   };
 
+  const getDdMmYyyy = (date: Date, offsetYears: number) => {
+    const d = getOffsetDate(date, offsetYears);
+    const day = pad(d.getDate());
+    const mm = pad(d.getMonth() + 1);
+    const yy = String(d.getFullYear());
+    return `${day}-${mm}-${yy}`;
+  };
+
   const now = new Date();
   const diffMonths = (now.getFullYear() - baseBirthDate.getFullYear()) * 12 + (now.getMonth() - baseBirthDate.getMonth());
   const currentAge = Math.max(0, diffMonths / 12);
@@ -2337,6 +2357,8 @@ export function calculateAntardashas(
       endMonthYear,
       startMonthYearFull,
       endMonthYearFull,
+      startDate: getDdMmYyyy(baseBirthDate, curAge),
+      endDate: getDdMmYyyy(baseBirthDate, subEndAge),
       isCurrent,
       theme,
       strengthInfo,
@@ -4967,6 +4989,59 @@ export function getPlanetFavorability(planet: GrahaName, lagnaRasi: number): 'fa
   }
   return 'neutral';
 }
+
+export function generateProfileInsights(birthDate: string, birthTime: string, lat: number, lng: number) {
+  const birthDateTime = new Date(`${birthDate}T${birthTime}:00`);
+  const calc = calculatePlanetaryPositions(birthDateTime, lat, lng);
+  const moon = calc.planets.find(p => p.name === 'Chandra');
+  const lagnaRasi = calc.lagnaRasi || 1;
+  const moonRasi = moon?.rasiNumber || 1;
+  const nakshatra = moon?.nakshatra || 'Rohini';
+
+  const rasiNames = ['Mesha', 'Vrishabha', 'Mithuna', 'Karka', 'Simha', 'Kanya', 'Tula', 'Vrischika', 'Dhanu', 'Makara', 'Kumbha', 'Meena'];
+  const lagnaName = rasiNames[lagnaRasi - 1] || 'Mesha';
+  const moonName = rasiNames[moonRasi - 1] || 'Mesha';
+
+  const coreTemperament = `Born with Lagna in ${lagnaName} and Moon in ${moonName} (${nakshatra} Nakshatra), you possess a dynamic blend of intuitive emotional depth and outward resilience. Your mind naturally seeks higher wisdom, purposeful action, and meaningful interpersonal harmony.`;
+  const strengths = [
+    'Deep intuitive discernment and emotional intelligence',
+    'High resilience and endurance through karmic challenges',
+    'Natural leadership, advisory capacity, and dharmic integrity',
+    'Strong analytical problem-solving and communicative skillsets'
+  ];
+  const karmicLessons = [
+    'Balancing ambition with inner peace and detachment',
+    'Mastering patience during Shani/Rahu transit phases',
+    'Cultivating unconditional service (Seva) without personal expectations'
+  ];
+
+  const lifePathSummary = `Your life path is structured around self-realization, career eminence, and spiritual awakening. The interplay between your Lagna and planetary lordships indicates major milestones in career consolidation, financial compounding, and inner transformation.`;
+  const careerWealthTrajectory = `Professional growth accelerates during favorable Jupiter, Mercury, and Venus Dasha phases, with particular strength in advisory, technical, creative, or institutional leadership roles. Wealth accumulation follows disciplined investments and ethical enterprise.`;
+  const spiritualPurpose = `A deep yearning for truth, devotion (Bhakti), and inner liberation (Moksha) marks your spiritual journey. Through self-inquiry, meditation, and charity, you dissolve past-life debts (Rina) and elevate your consciousness.`;
+  const karmicMilestones = [
+    'Early career foundation & education stabilization (Ages 18-28)',
+    'Major career breakthrough & family expansion window (Ages 29-38)',
+    'Mid-life spiritual awakening & financial maturity (Ages 39-52)',
+    'Vested wisdom, legacy creation, and peaceful liberation (Age 53+)'
+  ];
+
+  return {
+    personality: {
+      coreTemperament,
+      strengths,
+      karmicLessons,
+      element: [1, 5, 9].includes(lagnaRasi) ? 'Fire (Tejas)' : [2, 6, 10].includes(lagnaRasi) ? 'Earth (Prithvi)' : [3, 7, 11].includes(lagnaRasi) ? 'Air (Vayu)' : 'Water (Jala)',
+      rulingPlanet: [1, 8].includes(lagnaRasi) ? 'Mangal' : [2, 7].includes(lagnaRasi) ? 'Shukra' : [3, 6].includes(lagnaRasi) ? 'Budha' : [4].includes(lagnaRasi) ? 'Chandra' : [5].includes(lagnaRasi) ? 'Surya' : [10, 11].includes(lagnaRasi) ? 'Shani' : 'Guru'
+    },
+    wholeLife: {
+      lifePathSummary,
+      careerWealthTrajectory,
+      spiritualPurpose,
+      karmicMilestones
+    }
+  };
+}
+
 
 
 

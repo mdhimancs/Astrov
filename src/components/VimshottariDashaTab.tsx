@@ -143,6 +143,45 @@ export function VimshottariDashaTab({
     return Math.max(0, diffMonths / 12);
   }, [birthDate]);
 
+  // Interactive Timeline Slider state (Age 0 to 100, defaults to currentAge)
+  const [sliderAge, setSliderAge] = useState<number>(Math.round(currentAge * 10) / 10);
+
+  const sliderMahadasha = useMemo(() => {
+    return (
+      vimshottariDasha.cycle.find((c) => sliderAge >= c.startAge && sliderAge < c.endAge) ||
+      vimshottariDasha.cycle[vimshottariDasha.cycle.length - 1]
+    );
+  }, [vimshottariDasha, sliderAge]);
+
+  const sliderAntardashas = useMemo(() => {
+    return calculateAntardashas(
+      sliderMahadasha.planet,
+      sliderMahadasha.durationYears,
+      sliderMahadasha.startAge,
+      birthDate,
+      natalCalc.planets,
+      natalLagnaRasi
+    );
+  }, [sliderMahadasha, birthDate, natalCalc.planets, natalLagnaRasi]);
+
+  const sliderAntardasha = useMemo(() => {
+    return (
+      sliderAntardashas.find((a) => sliderAge >= a.startAge && sliderAge < a.endAge) ||
+      sliderAntardashas[0]
+    );
+  }, [sliderAntardashas, sliderAge]);
+
+  const currentMahadasha = vimshottariDasha.cycle.find((c) => c.planet === vimshottariDasha.currentLord) || vimshottariDasha.cycle[0];
+  const currentAntardashasList = calculateAntardashas(
+    vimshottariDasha.currentLord,
+    currentMahadasha.durationYears,
+    currentMahadasha.startAge,
+    birthDate,
+    natalCalc.planets,
+    natalLagnaRasi
+  );
+  const currentAntardasha = currentAntardashasList.find((a) => a.isCurrent) || currentAntardashasList[0];
+
   // Default selected Mahadasha to currently active one
   const activeDashaLord = selectedMahadashaPlanet || vimshottariDasha.currentLord;
   const currentMahadashaInfo =
@@ -366,7 +405,7 @@ export function VimshottariDashaTab({
             <span className="p-1 rounded bg-purple-100 text-purple-900 border border-purple-200 font-bold">
               <Layers className="w-3.5 h-3.5" />
             </span>
-            <h1 className="text-[18px] font-vedic font-bold text-stone-900 leading-tight">
+            <h1 className="text-[14px] font-vedic font-normal text-stone-900 leading-tight">
               Vimshottari Dasha
             </h1>
           </div>
@@ -384,6 +423,54 @@ export function VimshottariDashaTab({
               <span>Eras</span>
             </button>
           )}
+        </div>
+      </div>
+
+
+
+      {/* INTERACTIVE TIMELINE SLIDER */}
+      <div className="bg-white rounded-lg border border-stone-200 p-3 space-y-2 shadow-3xs">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-1.5">
+            <Clock className="w-4 h-4 text-purple-700" />
+            <h3 className="font-vedic font-bold text-stone-950 text-[13px] uppercase tracking-wider">
+              Interactive Dasha Age &amp; Time Slider
+            </h3>
+          </div>
+          <span className="px-2.5 py-0.5 rounded bg-purple-50 text-purple-950 border border-purple-200 font-mono font-bold text-[12px]">
+            Age: {sliderAge.toFixed(1)} yrs ({sliderMahadasha.planet} / {sliderAntardasha?.planet})
+          </span>
+        </div>
+
+        <div className="space-y-1">
+          <input
+            type="range"
+            min="0"
+            max="100"
+            step="0.5"
+            value={sliderAge}
+            onChange={(e) => setSliderAge(parseFloat(e.target.value))}
+            className="w-full accent-purple-700 cursor-pointer h-2 bg-stone-200 rounded-lg"
+          />
+          <div className="flex justify-between text-[10px] text-stone-500 font-mono">
+            <span>Age 0 (Birth)</span>
+            <span>Age 25</span>
+            <span>Age 50</span>
+            <span>Age 75</span>
+            <span>Age 100</span>
+          </div>
+        </div>
+
+        <div className="bg-[#FAF8F5] rounded border border-stone-200 px-3 py-2 text-[12px] flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center space-x-2">
+            <span className="font-bold text-stone-800">Slider Target Period:</span>
+            <span className="text-purple-950 font-bold">
+              {sliderMahadasha.planet} Maha / {sliderAntardasha?.planet} Antar
+            </span>
+          </div>
+          <div className="font-mono text-stone-700 text-[11px]">
+            Interval: {sliderAntardasha?.startDate || sliderAntardasha?.startMonthYear} to {sliderAntardasha?.endDate || sliderAntardasha?.endMonthYear}
+          </div>
         </div>
       </div>
 
@@ -482,8 +569,8 @@ export function VimshottariDashaTab({
                   })}
                 </div>
 
-                <span className="text-[10px] font-mono font-semibold text-stone-700 leading-tight truncate w-full" title={`Maha Dasha Interval: ${d.startMonthYear} – ${d.endMonthYear} (mm-yy)`}>
-                  {d.startMonthYear} – {d.endMonthYear}
+                <span className="text-[10px] font-mono font-semibold text-stone-700 leading-tight truncate w-full" title={`Maha Dasha Interval: ${d.startDate || d.startMonthYear} to ${d.endDate || d.endMonthYear} (dd-mm-yyyy)`}>
+                  {d.startDate && d.endDate ? `${d.startDate} - ${d.endDate}` : `${d.startMonthYear} – ${d.endMonthYear}`}
                 </span>
 
                 <div className="w-full bg-stone-100 rounded-sm h-1 mt-1 overflow-hidden shadow-inner">
@@ -585,8 +672,8 @@ export function VimshottariDashaTab({
                   })}
                 </div>
 
-                <span className="text-[10px] font-mono font-semibold text-stone-700 leading-tight truncate w-full" title={`Sub-Period Interval: ${antar.startMonthYear} – ${antar.endMonthYear} (mm-yy)`}>
-                  {antar.startMonthYear} – {antar.endMonthYear}
+                <span className="text-[10px] font-mono font-semibold text-stone-700 leading-tight truncate w-full" title={`Sub-Period Interval: ${antar.startDate || antar.startMonthYear} to ${antar.endDate || antar.endMonthYear} (dd-mm-yyyy)`}>
+                  {antar.startDate && antar.endDate ? `${antar.startDate} - ${antar.endDate}` : `${antar.startMonthYear} – ${antar.endMonthYear}`}
                 </span>
 
                 <div className="w-full bg-stone-100 rounded-sm h-1 mt-1 overflow-hidden shadow-inner">

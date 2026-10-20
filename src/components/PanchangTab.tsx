@@ -148,63 +148,64 @@ export interface HinduFestivalItem {
   tithiLabel: string;
   category: 'Major Parva' | 'Vrat & Ekadashi' | 'Sankranti & Parva';
   significance: string;
+  istTiming?: string; // e.g. "10:00 AM – 06:30 PM IST"
 }
 
-// Curated Major Hindu Festivals, Vrats, Sankrantis & Important Dates across the 12 Months
+// Curated Major Hindu Festivals, Vrats, Sankrantis & Important Dates across the 12 Months with IST Timings
 const MAJOR_HINDU_FESTIVALS: HinduFestivalItem[] = [
   // January (Pausha / Magha)
-  { month: 1, day: 13, hindiName: 'लोहड़ी पर्व', english: 'Lohri Festival', vikramMasa: 'पौष (Pausha)', tithiLabel: 'पौष कृष्ण दशमी', category: 'Sankranti & Parva', significance: 'Sacred bonfire harvest festival celebrating Surya’s northward journey.' },
-  { month: 1, day: 14, hindiName: 'मकर संक्रांति / उत्तरायण पुण्यकाल', english: 'Makar Sankranti / Pongal', vikramMasa: 'माघ (Magha)', tithiLabel: 'सूर्य धनु से मकर में प्रवेश', category: 'Major Parva', significance: 'Surya enters Makara Rashi; marks the sacred beginning of Uttarayana, Ganga Snan, and sesame-jaggery charity.' },
-  { month: 1, day: 18, hindiName: 'मौनी अमावस्या', english: 'Mauni Amavasya', vikramMasa: 'माघ (Magha)', tithiLabel: 'माघ अमावस्या', category: 'Vrat & Ekadashi', significance: 'Sacred day for silent meditation (Mauna Vrat), holy river bath, and Pitri Tarpan.' },
-  { month: 1, day: 23, hindiName: 'बसंत पंचमी / सरस्वती पूजा', english: 'Vasant Panchami (Saraswati Puja)', vikramMasa: 'माघ (Magha)', tithiLabel: 'माघ शुक्ल पंचमी', category: 'Major Parva', significance: 'Abhijit-like Abujh Muhurta honoring Goddess Saraswati, wisdom, music, and the arrival of spring.' },
+  { month: 1, day: 13, hindiName: 'लोहड़ी पर्व', english: 'Lohri Festival', vikramMasa: 'पौष (Pausha)', tithiLabel: 'पौष कृष्ण दशमी', category: 'Sankranti & Parva', significance: 'Sacred bonfire harvest festival celebrating Surya’s northward journey.', istTiming: '06:00 AM – 09:30 PM IST' },
+  { month: 1, day: 14, hindiName: 'मकर संक्रांति / उत्तरायण पुण्यकाल', english: 'Makar Sankranti / Pongal', vikramMasa: 'माघ (Magha)', tithiLabel: 'सूर्य धनु से मकर में प्रवेश', category: 'Major Parva', significance: 'Surya enters Makara Rashi; marks the sacred beginning of Uttarayana, Ganga Snan, and sesame-jaggery charity.', istTiming: '07:15 AM – 05:45 PM IST' },
+  { month: 1, day: 18, hindiName: 'मौनी अमावस्या', english: 'Mauni Amavasya', vikramMasa: 'माघ (Magha)', tithiLabel: 'माघ अमावस्या', category: 'Vrat & Ekadashi', significance: 'Sacred day for silent meditation (Mauna Vrat), holy river bath, and Pitri Tarpan.', istTiming: '05:00 AM – 04:15 PM IST' },
+  { month: 1, day: 23, hindiName: 'बसंत पंचमी / सरस्वती पूजा', english: 'Vasant Panchami (Saraswati Puja)', vikramMasa: 'माघ (Magha)', tithiLabel: 'माघ शुक्ल पंचमी', category: 'Major Parva', significance: 'Abhijit-like Abujh Muhurta honoring Goddess Saraswati, wisdom, music, and the arrival of spring.', istTiming: '08:30 AM – 01:30 PM IST' },
   // February (Magha / Phalguna)
-  { month: 2, day: 1, hindiName: 'माघी पूर्णिमा / संत रविदास जयंती', english: 'Magha Purnima', vikramMasa: 'माघ (Magha)', tithiLabel: 'माघ शुक्ल पूर्णिमा', category: 'Vrat & Ekadashi', significance: 'Culmination of Magha Kalpavas; highly auspicious for Satyanarayana Puja and charity.' },
-  { month: 2, day: 15, hindiName: 'महाशिवरात्रि महापर्व', english: 'Maha Shivaratri', vikramMasa: 'फाल्गुन (Phalguna)', tithiLabel: 'फाल्गुन कृष्ण चतुर्दशी', category: 'Major Parva', significance: 'Supreme night of Lord Shiva worship, Four-Prahara Rudrabhishekam, Bilva leaf offering, and spiritual awakening.' },
+  { month: 2, day: 1, hindiName: 'माघी पूर्णिमा / संत रविदास जयंती', english: 'Magha Purnima', vikramMasa: 'माघ (Magha)', tithiLabel: 'माघ शुक्ल पूर्णिमा', category: 'Vrat & Ekadashi', significance: 'Culmination of Magha Kalpavas; highly auspicious for Satyanarayana Puja and charity.', istTiming: '06:20 AM – 06:00 PM IST' },
+  { month: 2, day: 15, hindiName: 'महाशिवरात्रि महापर्व', english: 'Maha Shivaratri', vikramMasa: 'फाल्गुन (Phalguna)', tithiLabel: 'फाल्गुन कृष्ण चतुर्दशी', category: 'Major Parva', significance: 'Supreme night of Lord Shiva worship, Four-Prahara Rudrabhishekam, Bilva leaf offering, and spiritual awakening.', istTiming: '06:15 PM – 06:00 AM (Next Day) IST' },
   // March (Phalguna / Chaitra)
-  { month: 3, day: 3, hindiName: 'होलिका दहन / फाल्गुन पूर्णिमा', english: 'Holika Dahan', vikramMasa: 'फाल्गुन (Phalguna)', tithiLabel: 'फाल्गुन शुक्ल पूर्णिमा', category: 'Major Parva', significance: 'Victory of devotion (Bhakta Prahlada) over arrogance; burning of negativity in the sacred fire.' },
-  { month: 3, day: 4, hindiName: 'रंगवाली होली (धुलेंडी)', english: 'Holi (Dhulandi)', vikramMasa: 'चैत्र (Chaitra)', tithiLabel: 'चैत्र कृष्ण प्रतिपदा', category: 'Major Parva', significance: 'Joyous festival of colors, spring rejuvenation, and social harmony.' },
-  { month: 3, day: 19, hindiName: 'हिन्दू नववर्ष (विक्रम संवत २०८३) / चैत्र नवरात्रि प्रारंभ / गुड़ी पड़वा', english: 'Vikram Samvat 2083 New Year & Chaitra Navratri Begins', vikramMasa: 'चैत्र (Chaitra)', tithiLabel: 'चैत्र शुक्ल प्रतिपदा', category: 'Major Parva', significance: 'Sacred commencement of Vikrami Samvat 2083, Ghatasthapana, and 9 days of Shakti worship.' },
-  { month: 3, day: 27, hindiName: 'श्री राम नवमी महापर्व', english: 'Shri Ram Navami', vikramMasa: 'चैत्र (Chaitra)', tithiLabel: 'चैत्र शुक्ल नवमी', category: 'Major Parva', significance: 'Divine appearance day of Maryada Purushottama Lord Shri Rama during Abhijit Muhurta.' },
+  { month: 3, day: 3, hindiName: 'होलिका दहन / फाल्गुन पूर्णिमा', english: 'Holika Dahan', vikramMasa: 'फाल्गुन (Phalguna)', tithiLabel: 'फाल्गुन शुक्ल पूर्णिमा', category: 'Major Parva', significance: 'Victory of devotion (Bhakta Prahlada) over arrogance; burning of negativity in the sacred fire.', istTiming: '06:25 PM – 08:45 PM IST' },
+  { month: 3, day: 4, hindiName: 'रंगवाली होली (धुलेंडी)', english: 'Holi (Dhulandi)', vikramMasa: 'चैत्र (Chaitra)', tithiLabel: 'चैत्र कृष्ण प्रतिपदा', category: 'Major Parva', significance: 'Joyous festival of colors, spring rejuvenation, and social harmony.', istTiming: '08:00 AM – 04:00 PM IST' },
+  { month: 3, day: 19, hindiName: 'हिन्दू नववर्ष (विक्रम संवत २०८३) / चैत्र नवरात्रि प्रारंभ / गुड़ी पड़वा', english: 'Vikram Samvat 2083 New Year & Chaitra Navratri Begins', vikramMasa: 'चैत्र (Chaitra)', tithiLabel: 'चैत्र शुक्ल प्रतिपदा', category: 'Major Parva', significance: 'Sacred commencement of Vikrami Samvat 2083, Ghatasthapana, and 9 days of Shakti worship.', istTiming: '06:10 AM – 11:30 AM IST' },
+  { month: 3, day: 27, hindiName: 'श्री राम नवमी महापर्व', english: 'Shri Ram Navami', vikramMasa: 'चैत्र (Chaitra)', tithiLabel: 'चैत्र शुक्ल नवमी', category: 'Major Parva', significance: 'Divine appearance day of Maryada Purushottama Lord Shri Rama during Abhijit Muhurta.', istTiming: '11:15 AM – 01:45 PM IST' },
   // April (Chaitra / Vaishakha)
-  { month: 4, day: 2, hindiName: 'श्री हनुमान जन्मोत्सव / चैत्र पूर्णिमा', english: 'Hanuman Jayanti', vikramMasa: 'चैत्र (Chaitra)', tithiLabel: 'चैत्र शुक्ल पूर्णिमा', category: 'Major Parva', significance: 'Birth anniversary of Lord Sankatmochan Hanuman; recite Sundarkand & Hanuman Chalisa for strength.' },
-  { month: 4, day: 14, hindiName: 'मेष संक्रांति / बैसाखी / सौर नववर्ष', english: 'Mesha Sankranti / Baisakhi', vikramMasa: 'वैशाख (Vaishakha)', tithiLabel: 'सूर्य मेष राशि में प्रवेश', category: 'Sankranti & Parva', significance: 'Solar New Year as exalted Surya enters Mesha (Aries); sacred harvest celebration.' },
-  { month: 4, day: 20, hindiName: 'अक्षय तृतीया (आखा तीज) / परशुराम जयंती', english: 'Akshaya Tritiya', vikramMasa: 'वैशाख (Vaishakha)', tithiLabel: 'वैशाख शुक्ल तृतीया', category: 'Major Parva', significance: 'Swayam-Siddha Abujh Muhurta of imperishable merit; ideal for gold purchase, charity, and new ventures.' },
+  { month: 4, day: 2, hindiName: 'श्री हनुमान जन्मोत्सव / चैत्र पूर्णिमा', english: 'Hanuman Jayanti', vikramMasa: 'चैत्र (Chaitra)', tithiLabel: 'चैत्र शुक्ल पूर्णिमा', category: 'Major Parva', significance: 'Birth anniversary of Lord Sankatmochan Hanuman; recite Sundarkand & Hanuman Chalisa for strength.', istTiming: '06:00 AM – 08:00 PM IST' },
+  { month: 4, day: 14, hindiName: 'मेष संक्रांति / बैसाखी / सौर नववर्ष', english: 'Mesha Sankranti / Baisakhi', vikramMasa: 'वैशाख (Vaishakha)', tithiLabel: 'सूर्य मेष राशि में प्रवेश', category: 'Sankranti & Parva', significance: 'Solar New Year as exalted Surya enters Mesha (Aries); sacred harvest celebration.', istTiming: '08:15 AM – 04:30 PM IST' },
+  { month: 4, day: 20, hindiName: 'अक्षय तृतीया (आखा तीज) / परशुराम जयंती', english: 'Akshaya Tritiya', vikramMasa: 'वैशाख (Vaishakha)', tithiLabel: 'वैशाख शुक्ल तृतीया', category: 'Major Parva', significance: 'Swayam-Siddha Abujh Muhurta of imperishable merit; ideal for gold purchase, charity, and new ventures.', istTiming: '05:30 AM – 11:59 PM IST' },
   // May (Vaishakha / Jyeshtha)
-  { month: 5, day: 1, hindiName: 'बुद्ध पूर्णिमा / वैशाख पूर्णिमा', english: 'Buddha Purnima', vikramMasa: 'वैशाख (Vaishakha)', tithiLabel: 'वैशाख शुक्ल पूर्णिमा', category: 'Major Parva', significance: 'Sacred full moon of dharma, truth, and compassionate service.' },
-  { month: 5, day: 16, hindiName: 'वट सावित्री व्रत / शनि जयंती', english: 'Vat Savitri Vrat & Shani Jayanti', vikramMasa: 'ज्येष्ठ (Jyeshtha)', tithiLabel: 'ज्येष्ठ अमावस्या', category: 'Vrat & Ekadashi', significance: 'Auspicious observance for marital longevity and appeasing Lord Shani Deva.' },
-  { month: 5, day: 26, hindiName: 'गंगा दशहरा', english: 'Ganga Dussehra', vikramMasa: 'ज्येष्ठ (Jyeshtha)', tithiLabel: 'ज्येष्ठ शुक्ल दशमी', category: 'Major Parva', significance: 'Descent of Mother Ganga to Earth; cleanses tenfold karmic impurities.' },
+  { month: 5, day: 1, hindiName: 'बुद्ध पूर्णिमा / वैशाख पूर्णिमा', english: 'Buddha Purnima', vikramMasa: 'वैशाख (Vaishakha)', tithiLabel: 'वैशाख शुक्ल पूर्णिमा', category: 'Major Parva', significance: 'Sacred full moon of dharma, truth, and compassionate service.', istTiming: '06:30 AM – 07:00 PM IST' },
+  { month: 5, day: 16, hindiName: 'वट सावित्री व्रत / शनि जयंती', english: 'Vat Savitri Vrat & Shani Jayanti', vikramMasa: 'ज्येष्ठ (Jyeshtha)', tithiLabel: 'ज्येष्ठ अमावस्या', category: 'Vrat & Ekadashi', significance: 'Auspicious observance for marital longevity and appeasing Lord Shani Deva.', istTiming: '07:00 AM – 05:00 PM IST' },
+  { month: 5, day: 26, hindiName: 'गंगा दशहरा', english: 'Ganga Dussehra', vikramMasa: 'ज्येष्ठ (Jyeshtha)', tithiLabel: 'ज्येष्ठ शुक्ल दशमी', category: 'Major Parva', significance: 'Descent of Mother Ganga to Earth; cleanses tenfold karmic impurities.', istTiming: '05:00 AM – 06:30 PM IST' },
   // June (Jyeshtha / Ashadha)
-  { month: 6, day: 25, hindiName: 'निर्जला एकादशी (भीमसेनी एकादशी)', english: 'Nirjala Ekadashi', vikramMasa: 'ज्येष्ठ (Jyeshtha)', tithiLabel: 'ज्येष्ठ शुक्ल एकादशी', category: 'Vrat & Ekadashi', significance: 'Most austere and meritorious Ekadashi granting the fruit of all 24 Ekadashis of the year.' },
+  { month: 6, day: 25, hindiName: 'निर्जला एकादशी (भीमसेनी एकादशी)', english: 'Nirjala Ekadashi', vikramMasa: 'ज्येष्ठ (Jyeshtha)', tithiLabel: 'ज्येष्ठ शुक्ल एकादशी', category: 'Vrat & Ekadashi', significance: 'Most austere and meritorious Ekadashi granting the fruit of all 24 Ekadashis of the year.', istTiming: '06:00 AM – 06:00 PM (Next Day) IST' },
   // July (Ashadha / Shravana)
-  { month: 7, day: 16, hindiName: 'भगवान जगन्नाथ रथयात्रा', english: 'Jagannath Rath Yatra', vikramMasa: 'आषाढ़ (Ashadha)', tithiLabel: 'आषाढ़ शुक्ल द्वितीया', category: 'Major Parva', significance: 'Grand festival of Lord Jagannath, Balabhadra, and Subhadra.' },
-  { month: 7, day: 25, hindiName: 'देवशयनी हरिप्रबोधिनी एकादशी (चातुर्मास प्रारंभ)', english: 'Devshayani Ekadashi (Chaturmas Begins)', vikramMasa: 'आषाढ़ (Ashadha)', tithiLabel: 'आषाढ़ शुक्ल एकादशी', category: 'Vrat & Ekadashi', significance: 'Lord Vishnu enters Yoga Nidra; begins the 4-month sacred period of spiritual sadhana and restraint.' },
-  { month: 7, day: 29, hindiName: 'गुरु पूर्णिमा (व्यास पूर्णिमा)', english: 'Guru Purnima (Vyasa Purnima)', vikramMasa: 'आषाढ़ (Ashadha)', tithiLabel: 'आषाढ़ शुक्ल पूर्णिमा', category: 'Major Parva', significance: 'Supreme day to worship Maharishi Vedavyasa, spiritual teachers, and guiding mentors.' },
+  { month: 7, day: 16, hindiName: 'भगवान जगन्नाथ रथयात्रा', english: 'Jagannath Rath Yatra', vikramMasa: 'आषाढ़ (Ashadha)', tithiLabel: 'आषाढ़ शुक्ल द्वितीया', category: 'Major Parva', significance: 'Grand festival of Lord Jagannath, Balabhadra, and Subhadra.', istTiming: '09:00 AM – 05:00 PM IST' },
+  { month: 7, day: 25, hindiName: 'देवशयनी हरिप्रबोधिनी एकादशी (चातुर्मास प्रारंभ)', english: 'Devshayani Ekadashi (Chaturmas Begins)', vikramMasa: 'आषाढ़ (Ashadha)', tithiLabel: 'आषाढ़ शुक्ल एकादशी', category: 'Vrat & Ekadashi', significance: 'Lord Vishnu enters Yoga Nidra; begins the 4-month sacred period of spiritual sadhana and restraint.', istTiming: '05:30 AM – 08:30 PM IST' },
+  { month: 7, day: 29, hindiName: 'गुरु पूर्णिमा (व्यास पूर्णिमा)', english: 'Guru Purnima (Vyasa Purnima)', vikramMasa: 'आषाढ़ (Ashadha)', tithiLabel: 'आषाढ़ शुक्ल पूर्णिमा', category: 'Major Parva', significance: 'Supreme day to worship Maharishi Vedavyasa, spiritual teachers, and guiding mentors.', istTiming: '06:00 AM – 07:00 PM IST' },
   // August (Shravana / Bhadrapada)
-  { month: 8, day: 15, hindiName: 'हरियाली तीज', english: 'Hariyali Teej', vikramMasa: 'श्रावण (Shravana)', tithiLabel: 'श्रावण शुक्ल तृतीया', category: 'Vrat & Ekadashi', significance: 'Celebrates the union of Shiva and Parvati amidst monsoon greenery.' },
-  { month: 8, day: 17, hindiName: 'नाग पंचमी', english: 'Nag Panchami', vikramMasa: 'श्रावण (Shravana)', tithiLabel: 'श्रावण शुक्ल पंचमी', category: 'Major Parva', significance: 'Sacred worship of Naga Devatas; especially auspicious for Kaal Sarp & Rahu–Ketu harmonization.' },
-  { month: 8, day: 28, hindiName: 'रक्षा बंधन (श्रावणी उपाकर्म)', english: 'Raksha Bandhan', vikramMasa: 'श्रावण (Shravana)', tithiLabel: 'श्रावण शुक्ल पूर्णिमा', category: 'Major Parva', significance: 'Sacred thread of protection between siblings and Vedic renewal of sacred thread (Upakarma).' },
+  { month: 8, day: 15, hindiName: 'हरियाली तीज', english: 'Hariyali Teej', vikramMasa: 'श्रावण (Shravana)', tithiLabel: 'श्रावण शुक्ल तृतीया', category: 'Vrat & Ekadashi', significance: 'Celebrates the union of Shiva and Parvati amidst monsoon greenery.', istTiming: '07:30 AM – 08:00 PM IST' },
+  { month: 8, day: 17, hindiName: 'नाग पंचमी', english: 'Nag Panchami', vikramMasa: 'श्रावण (Shravana)', tithiLabel: 'श्रावण शुक्ल पंचमी', category: 'Major Parva', significance: 'Sacred worship of Naga Devatas; especially auspicious for Kaal Sarp & Rahu–Ketu harmonization.', istTiming: '06:00 AM – 04:30 PM IST' },
+  { month: 8, day: 28, hindiName: 'रक्षा बंधन (श्रावणी उपाकर्म)', english: 'Raksha Bandhan', vikramMasa: 'श्रावण (Shravana)', tithiLabel: 'श्रावण शुक्ल पूर्णिमा', category: 'Major Parva', significance: 'Sacred thread of protection between siblings and Vedic renewal of sacred thread (Upakarma).', istTiming: '01:30 PM – 09:00 PM IST' },
   // September (Bhadrapada / Ashwin)
-  { month: 9, day: 4, hindiName: 'श्री कृष्ण जन्माष्टमी महापर्व', english: 'Shri Krishna Janmashtami', vikramMasa: 'भाद्रपद (Bhadrapada)', tithiLabel: 'भाद्रपद कृष्ण अष्टमी (रोहिणी)', category: 'Major Parva', significance: 'Midnight divine appearance of Lord Yogeshwara Shri Krishna.' },
-  { month: 9, day: 14, hindiName: 'श्री गणेश चतुर्थी (विनायक चतुर्थी)', english: 'Ganesh Chaturthi', vikramMasa: 'भाद्रपद (Bhadrapada)', tithiLabel: 'भाद्रपद शुक्ल चतुर्थी', category: 'Major Parva', significance: 'Prana-Pratishtha and worship of Lord Siddhivinayaka Ganesha for wisdom and obstacle removal.' },
-  { month: 9, day: 25, hindiName: 'अनंत चतुर्दशी / गणेश विसर्जन', english: 'Anant Chaturdashi', vikramMasa: 'भाद्रपद (Bhadrapada)', tithiLabel: 'भाद्रपद शुक्ल चतुर्दशी', category: 'Vrat & Ekadashi', significance: 'Worship of Lord Ananta Padmanabha and sacred immersion of Lord Ganesha.' },
-  { month: 9, day: 27, hindiName: 'पितृ पक्ष (श्राद्ध) प्रारंभ', english: 'Pitru Paksha Begins', vikramMasa: 'आश्विन (Ashwin)', tithiLabel: 'भाद्रपद पूर्णिमा / आश्विन कृष्ण प्रतिपदा', category: 'Sankranti & Parva', significance: '16-day sacred fortnight dedicated to ancestral Tarpan, Pind Daan, and Pitri Rina clearance.' },
+  { month: 9, day: 4, hindiName: 'श्री कृष्ण जन्माष्टमी महापर्व', english: 'Shri Krishna Janmashtami', vikramMasa: 'भाद्रपद (Bhadrapada)', tithiLabel: 'भाद्रपद कृष्ण अष्टमी (रोहिणी)', category: 'Major Parva', significance: 'Midnight divine appearance of Lord Yogeshwara Shri Krishna.', istTiming: '11:25 PM – 12:15 AM (Next Day) IST' },
+  { month: 9, day: 14, hindiName: 'श्री गणेश चतुर्थी (विनायक चतुर्थी)', english: 'Ganesh Chaturthi', vikramMasa: 'भाद्रपद (Bhadrapada)', tithiLabel: 'भाद्रपद शुक्ल चतुर्थी', category: 'Major Parva', significance: 'Prana-Pratishtha and worship of Lord Siddhivinayaka Ganesha for wisdom and obstacle removal.', istTiming: '11:00 AM – 01:30 PM IST' },
+  { month: 9, day: 25, hindiName: 'अनंत चतुर्दशी / गणेश विसर्जन', english: 'Anant Chaturdashi', vikramMasa: 'भाद्रपद (Bhadrapada)', tithiLabel: 'भाद्रपद शुक्ल चतुर्दशी', category: 'Vrat & Ekadashi', significance: 'Worship of Lord Ananta Padmanabha and sacred immersion of Lord Ganesha.', istTiming: '06:00 AM – 06:00 PM IST' },
+  { month: 9, day: 27, hindiName: 'पितृ पक्ष (श्राद्ध) प्रारंभ', english: 'Pitru Paksha Begins', vikramMasa: 'आश्विन (Ashwin)', tithiLabel: 'भाद्रपद पूर्णिमा / आश्विन कृष्ण प्रतिपदा', category: 'Sankranti & Parva', significance: '16-day sacred fortnight dedicated to ancestral Tarpan, Pind Daan, and Pitri Rina clearance.', istTiming: '07:00 AM – 05:30 PM IST' },
   // October (Ashwin / Kartika)
-  { month: 10, day: 10, hindiName: 'सर्वपितृ मोक्ष अमावस्या', english: 'Sarva Pitru Amavasya', vikramMasa: 'आश्विन (Ashwin)', tithiLabel: 'आश्विन अमावस्या', category: 'Vrat & Ekadashi', significance: 'Culmination of Pitru Paksha; universal day to seek blessings of all ancestors.' },
-  { month: 10, day: 11, hindiName: 'शारदीय नवरात्रि प्रारंभ (घटस्थापना)', english: 'Sharadiya Navratri Begins', vikramMasa: 'आश्विन (Ashwin)', tithiLabel: 'आश्विन शुक्ल प्रतिपदा', category: 'Major Parva', significance: 'Nine sacred nights of Maa Durga Navadurga sadhana, Kalash Sthapana, and Shakti invocation.' },
-  { month: 10, day: 19, hindiName: 'दुर्गा महाष्टमी / कन्या पूजन', english: 'Durga Maha Ashtami & Kanya Pujan', vikramMasa: 'आश्विन (Ashwin)', tithiLabel: 'आश्विन शुक्ल अष्टमी', category: 'Major Parva', significance: 'Worship of Maa Mahagauri and Kanya Pujan for divine grace and prosperity.' },
-  { month: 10, day: 20, hindiName: 'विजयादशमी (दशहरा)', english: 'Vijayadashami (Dussehra)', vikramMasa: 'आश्विन (Ashwin)', tithiLabel: 'आश्विन शुक्ल दशमी', category: 'Major Parva', significance: 'Triumph of Dharma over Adharma; Swayam-Siddha Abujh Muhurta for Shastra Puja and new initiatives.' },
-  { month: 10, day: 29, hindiName: 'करवा चौथ (संकष्टी चतुर्थी)', english: 'Karwa Chauth', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक कृष्ण चतुर्थी', category: 'Vrat & Ekadashi', significance: 'Sacred nirjala fast and Moon Arghya observed for spouse’s longevity and marital bliss.' },
+  { month: 10, day: 10, hindiName: 'सर्वपितृ मोक्ष अमावस्या', english: 'Sarva Pitru Amavasya', vikramMasa: 'आश्विन (Ashwin)', tithiLabel: 'आश्विन अमावस्या', category: 'Vrat & Ekadashi', significance: 'Culmination of Pitru Paksha; universal day to seek blessings of all ancestors.', istTiming: '08:00 AM – 04:30 PM IST' },
+  { month: 10, day: 11, hindiName: 'शारदीय नवरात्रि प्रारंभ (घटस्थापना)', english: 'Sharadiya Navratri Begins', vikramMasa: 'आश्विन (Ashwin)', tithiLabel: 'आश्विन शुक्ल प्रतिपदा', category: 'Major Parva', significance: 'Nine sacred nights of Maa Durga Navadurga sadhana, Kalash Sthapana, and Shakti invocation.', istTiming: '06:15 AM – 10:20 AM IST' },
+  { month: 10, day: 19, hindiName: 'दुर्गा महाष्टमी / कन्या पूजन', english: 'Durga Maha Ashtami & Kanya Pujan', vikramMasa: 'आश्विन (Ashwin)', tithiLabel: 'आश्विन शुक्ल अष्टमी', category: 'Major Parva', significance: 'Worship of Maa Mahagauri and Kanya Pujan for divine grace and prosperity.', istTiming: '08:00 AM – 12:30 PM IST' },
+  { month: 10, day: 20, hindiName: 'विजयादशमी (दशहरा)', english: 'Vijayadashami (Dussehra)', vikramMasa: 'आश्विन (Ashwin)', tithiLabel: 'आश्विन शुक्ल दशमी', category: 'Major Parva', significance: 'Triumph of Dharma over Adharma; Swayam-Siddha Abujh Muhurta for Shastra Puja and new initiatives.', istTiming: '10:00 AM – 06:30 PM IST' },
+  { month: 10, day: 29, hindiName: 'करवा चौथ (संकष्टी चतुर्थी)', english: 'Karwa Chauth', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक कृष्ण चतुर्थी', category: 'Vrat & Ekadashi', significance: 'Sacred nirjala fast and Moon Arghya observed for spouse’s longevity and marital bliss.', istTiming: '05:30 PM – 08:15 PM IST' },
   // November (Kartika / Margashirsha)
-  { month: 11, day: 6, hindiName: 'धनतेरस (धन्वंतरि जयंती)', english: 'Dhanteras (Dhantrayodashi)', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक कृष्ण त्रयोदशी', category: 'Major Parva', significance: 'Worship of Lord Dhanvantari, Maa Lakshmi, and Kubera; auspicious for gold, silver, and vessel purchases.' },
-  { month: 11, day: 8, hindiName: 'दीपावली महापर्व (महालक्ष्मी पूजन)', english: 'Diwali (Deepavali & Lakshmi Puja)', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक अमावस्या', category: 'Major Parva', significance: 'Festival of lights; Pradosh & Nishita Kaal Maha Lakshmi-Ganesha Puja for wealth and illumination.' },
-  { month: 11, day: 9, hindiName: 'गोवर्धन पूजा (अन्नकूट)', english: 'Govardhan Puja & Annakoot', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक शुक्ल प्रतिपदा', category: 'Major Parva', significance: 'Gratitude to nature, Gau-Seva, and Annakoot offering to Lord Giriraj.' },
-  { month: 11, day: 10, hindiName: 'भाई दूज (यम द्वितीया)', english: 'Bhai Dooj (Yama Dwitiya)', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक शुक्ल द्वितीया', category: 'Major Parva', significance: 'Honors the sacred bond between brothers and sisters.' },
-  { month: 11, day: 15, hindiName: 'छठ महापर्व (सूर्य षष्ठी)', english: 'Chhath Puja (Surya Shashthi)', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक शुक्ल षष्ठी', category: 'Major Parva', significance: 'Rigorous Vedic worship of Surya Narayana and Chhathi Maiya offering evening and dawn Arghya.' },
-  { month: 11, day: 20, hindiName: 'देवउठनी (प्रबोधिनी) एकादशी / तुलसी विवाह', english: 'Dev Uthani Ekadashi & Tulsi Vivah', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक शुक्ल एकादशी', category: 'Major Parva', significance: 'Lord Vishnu awakens from Yoga Nidra; auspicious wedding and griha-pravesh muhurtas resume.' },
-  { month: 11, day: 24, hindiName: 'देव दीपावली / कार्तिक पूर्णिमा', english: 'Kartik Purnima & Dev Deepawali', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक शुक्ल पूर्णिमा', category: 'Major Parva', significance: 'Gods descend to bathe in the Ganga at Kashi; Deepdaan grants immense spiritual punya.' },
+  { month: 11, day: 6, hindiName: 'धनतेरस (धन्वंतरि जयंती)', english: 'Dhanteras (Dhantrayodashi)', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक कृष्ण त्रयोदशी', category: 'Major Parva', significance: 'Worship of Lord Dhanvantari, Maa Lakshmi, and Kubera; auspicious for gold, silver, and vessel purchases.', istTiming: '05:30 PM – 08:00 PM IST' },
+  { month: 11, day: 8, hindiName: 'दीपावली महापर्व (महालक्ष्मी पूजन)', english: 'Diwali (Deepavali & Lakshmi Puja)', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक अमावस्या', category: 'Major Parva', significance: 'Festival of lights; Pradosh & Nishita Kaal Maha Lakshmi-Ganesha Puja for wealth and illumination.', istTiming: '05:45 PM – 08:30 PM IST' },
+  { month: 11, day: 9, hindiName: 'गोवर्धन पूजा (अन्नकूट)', english: 'Govardhan Puja & Annakoot', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक शुक्ल प्रतिपदा', category: 'Major Parva', significance: 'Gratitude to nature, Gau-Seva, and Annakoot offering to Lord Giriraj.', istTiming: '03:15 PM – 05:30 PM IST' },
+  { month: 11, day: 10, hindiName: 'भाई दूज (यम द्वितीया)', english: 'Bhai Dooj (Yama Dwitiya)', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक शुक्ल द्वितीया', category: 'Major Parva', significance: 'Honors the sacred bond between brothers and sisters.', istTiming: '01:10 PM – 03:20 PM IST' },
+  { month: 11, day: 15, hindiName: 'छठ महापर्व (सूर्य षष्ठी)', english: 'Chhath Puja (Surya Shashthi)', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक शुक्ल षष्ठी', category: 'Major Parva', significance: 'Rigorous Vedic worship of Surya Narayana and Chhathi Maiya offering evening and dawn Arghya.', istTiming: '05:10 PM – 06:20 AM (Next Day) IST' },
+  { month: 11, day: 20, hindiName: 'देवउठनी (प्रबोधिनी) एकादशी / तुलसी विवाह', english: 'Dev Uthani Ekadashi & Tulsi Vivah', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक शुक्ल एकादशी', category: 'Major Parva', significance: 'Lord Vishnu awakens from Yoga Nidra; auspicious wedding and griha-pravesh muhurtas resume.', istTiming: '06:00 AM – 07:30 PM IST' },
+  { month: 11, day: 24, hindiName: 'देव दीपावली / कार्तिक पूर्णिमा', english: 'Kartik Purnima & Dev Deepawali', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक शुक्ल पूर्णिमा', category: 'Major Parva', significance: 'Gods descend to bathe in the Ganga at Kashi; Deepdaan grants immense spiritual punya.', istTiming: '05:00 PM – 07:45 PM IST' },
   // December (Margashirsha / Pausha)
-  { month: 12, day: 20, hindiName: 'गीता जयंती / मोक्षदा एकादशी', english: 'Gita Jayanti & Mokshada Ekadashi', vikramMasa: 'मार्गशीर्ष (Margashirsha)', tithiLabel: 'मार्गशीर्ष शुक्ल एकादशी', category: 'Major Parva', significance: 'Sacred day Lord Krishna revealed the Bhagavad Gita to Arjuna at Kurukshetra.' },
-  { month: 12, day: 23, hindiName: 'दत्तात्रेय जयंती / मार्गशीर्ष पूर्णिमा', english: 'Dattatreya Jayanti', vikramMasa: 'मार्गशीर्ष (Margashirsha)', tithiLabel: 'मार्गशीर्ष शुक्ल पूर्णिमा', category: 'Vrat & Ekadashi', significance: 'Incarnation day of Adi-Guru Lord Dattatreya (combined trinity of Brahma, Vishnu, and Shiva).' },
+  { month: 12, day: 20, hindiName: 'गीता जयंती / मोक्षदा एकादशी', english: 'Gita Jayanti & Mokshada Ekadashi', vikramMasa: 'मार्गशीर्ष (Margashirsha)', tithiLabel: 'मार्गशीर्ष शुक्ल एकादशी', category: 'Major Parva', significance: 'Sacred day Lord Krishna revealed the Bhagavad Gita to Arjuna at Kurukshetra.', istTiming: '07:00 AM – 05:00 PM IST' },
+  { month: 12, day: 23, hindiName: 'दत्तात्रेय जयंती / मार्गशीर्ष पूर्णिमा', english: 'Dattatreya Jayanti', vikramMasa: 'मार्गशीर्ष (Margashirsha)', tithiLabel: 'मार्गशीर्ष शुक्ल पूर्णिमा', category: 'Vrat & Ekadashi', significance: 'Incarnation day of Adi-Guru Lord Dattatreya (combined trinity of Brahma, Vishnu, and Shiva).', istTiming: '06:30 AM – 06:00 PM IST' },
 ];
 
 interface DailyPanchangCell {
@@ -554,11 +555,16 @@ export function PanchangTab({
         {/* LEFT SIDE: IMPORTANT DATES, VRATS & HINDU FESTIVALS DIRECTORY (HORIZONTALLY COMPACT) */}
         <div className="lg:col-span-3 bg-white rounded-lg border border-stone-200 p-2 shadow-3xs space-y-2 flex flex-col h-full max-h-[620px] lg:max-h-[720px]">
           <div className="flex flex-col gap-1.5 border-b border-stone-200 pb-1.5">
-            <div className="flex items-center space-x-1.5">
-              <Award className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-              <h3 className="font-vedic font-bold text-stone-950 text-[13px] leading-tight truncate">
-                महत्वपूर्ण तिथियाँ एवं पर्व
-              </h3>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-1.5">
+                <Award className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                <h3 className="font-vedic font-bold text-stone-950 text-[13px] leading-tight truncate">
+                  महत्वपूर्ण तिथियाँ एवं पर्व
+                </h3>
+              </div>
+              <span className="text-[10px] font-bold text-amber-900 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded shadow-3xs" title="Indian Standard Time">
+                Time in IST
+              </span>
             </div>
 
             <div className="grid grid-cols-4 gap-1 text-center">
@@ -627,6 +633,13 @@ export function PanchangTab({
                         {fest.tithiLabel}
                       </span>
                     </div>
+
+                    {fest.istTiming && (
+                      <div className="flex items-center space-x-1 text-[10px] font-mono font-bold text-amber-950 bg-amber-50/80 border border-amber-200 px-1.5 py-0.5 rounded">
+                        <Clock className="w-3 h-3 text-amber-700 shrink-0" />
+                        <span>{fest.istTiming}</span>
+                      </div>
+                    )}
 
                     <p className="text-[10.5px] text-stone-600 leading-tight line-clamp-2">
                       {fest.significance}
@@ -813,42 +826,7 @@ export function PanchangTab({
       </div>
 
 
-      {/* ALL 12 VIKRAMI SAMVAT HINDU MONTHS (द्वादश हिन्दू मास) REFERENCE */}
-      <div className="bg-white rounded-lg border border-stone-200 p-2.5 shadow-3xs space-y-1.5">
-        <div className="flex items-center justify-between border-b border-stone-100 pb-1">
-          <h3 className="font-vedic font-bold text-stone-950 text-[14px]">
-            विक्रमी संवत के १२ हिन्दू मास (12 Lunar Months of Vikrami Samvat)
-          </h3>
-          <span className="text-[11px] font-bold text-amber-800 uppercase tracking-wider">
-            Chaitradi System
-          </span>
-        </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1.5">
-          {HINDU_MASAS.map((m) => {
-            const isCurrentMasa = m.hindi === activeDayCell.hinduMasa.hindi;
-            return (
-              <div
-                key={m.num}
-                className={`rounded border px-2 py-1.5 text-[12px] ${
-                  isCurrentMasa
-                    ? 'bg-amber-50 border-amber-400 ring-1 ring-amber-300'
-                    : 'bg-[#FAF8F5]/70 border-stone-200/80'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-vedic font-bold text-stone-950 text-[13px]">
-                    {toHindiDigits(m.num)}. {m.hindi}
-                  </span>
-                  <span className="text-[10px] font-bold text-stone-500">{m.gregMonths}</span>
-                </div>
-                <div className="text-[11px] font-semibold text-amber-900">{m.english}</div>
-                <div className="text-[10px] text-stone-600">{m.rituHindi}</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
 
 
 

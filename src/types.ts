@@ -429,6 +429,8 @@ export interface VimshottariDashaInfo {
     endMonthYear: string;   // Compact mm-yy format (e.g. "05-10", "05-24")
     startMonthYearFull?: string; // Full format (e.g. "May 1990")
     endMonthYearFull?: string;   // Full format (e.g. "May 2010")
+    startDate?: string;     // dd-mm-yyyy format
+    endDate?: string;       // dd-mm-yyyy format
     lifeTheme: string;
     strengthInfo?: DashaStrengthInfo;
     parts?: DashaPartInfo[];
@@ -445,6 +447,8 @@ export interface AntardashaInfo {
   endMonthYear: string;   // Compact mm-yy format (e.g. "08-26")
   startMonthYearFull?: string;
   endMonthYearFull?: string;
+  startDate?: string;     // dd-mm-yyyy format
+  endDate?: string;       // dd-mm-yyyy format
   isCurrent: boolean;
   theme: string;
   strengthInfo?: DashaStrengthInfo;
