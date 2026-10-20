@@ -165,13 +165,16 @@ export function DivisionalChartsTab({
   };
 
   return (
-    <div className="w-full space-y-2" style={{ height: '248.565px' }}>
+    <div className="w-full space-y-2 rounded-lg p-2" style={{ height: '228.552px', backgroundColor: '#cbe7a6' }}>
       {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-stone-200 pb-1.5">
         <div className="flex items-center space-x-1.5">
           <Layers className="w-4 h-4 text-amber-700" />
-          <h1 className="text-[14px] font-black text-stone-800 uppercase tracking-wider font-vedic leading-tight">
-            <span style={{ fontSize: '16px', fontWeight: 'normal' }}>Shodashavarga &amp; Jaimini Kundali Suite</span>
+          <h1
+            className="font-vedic uppercase tracking-wider text-stone-800 leading-tight"
+            style={{ height: '23.9811px', fontSize: '15px', fontWeight: 'normal' }}
+          >
+            <span style={{ fontSize: '15px', fontWeight: 'normal' }}>Shodashavarga &amp; Jaimini Kundali Suite</span>
           </h1>
         </div>
 
@@ -214,7 +217,7 @@ export function DivisionalChartsTab({
       </div>
 
       {/* COMPREHENSIVE SHODASHAVARGA 14-CARD SELECTOR */}
-      <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-stone-200 p-1.5 shadow-3xs" style={{ height: '89.223px', fontSize: '12px' }}>
+      <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-stone-200 p-1.5 shadow-3xs" style={{ height: '85.223px', fontSize: '12px' }}>
         <div className="flex items-center justify-between px-1 mb-1">
           <span className="text-[11px] font-black text-amber-900 uppercase tracking-wider flex items-center space-x-1">
             <Compass className="w-3 h-3 text-amber-700" />

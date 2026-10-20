@@ -142,8 +142,9 @@ export function AspectStrengthTrajectoryGraph({
   const [viewType, setViewType] = useState<'trajectory' | 'radar'>('trajectory');
   const [activeModuleSection, setActiveModuleSection] = useState<'all' | 'trajectory' | 'probabilities' | 'guidance'>('all');
   // 21-Month Rolling Window: 10 Months Previous, Current Month (Index 10), 10 Months Forthcoming
-  const [activeMonthIndex, setActiveMonthIndex] = useState<number>(10); // default to current month (index 10: offset 0)
-  // Scope mode: 'from_selected' (adjusts graph to show rest of months from selected month) or 'all' (all 21 months)
+  const [activeMonthIndex, setActiveMonthIndex] = useState<number>(12); // default to center
+  const [baseDate, setBaseDate] = useState<Date>(new Date());
+  // Scope mode: 'from_selected' (adjusts graph to show rest of months from selected month) or 'all' (all 25 months)
   const [graphScopeMode, setGraphScopeMode] = useState<'from_selected' | 'all'>('from_selected');
 
   // 1. Calculate Base Natal Strength (0-100) for each aspect based on natal kundali
@@ -193,14 +194,13 @@ export function AspectStrengthTrajectoryGraph({
     return scores;
   }, [natalPlanets, natalHouses]);
 
-  // 2. Generate 21-Month Dynamic Trajectory: 10 Months Previous, Current Month (Now), 10 Months Forthcoming
+  // 2. Generate 25-Month Dynamic Trajectory: 12 Months Previous, Selected Month, 12 Months Forthcoming
   const monthsData = useMemo(() => {
-    const now = new Date();
-    const curYear = now.getFullYear();
-    const curMonth = now.getMonth(); // 0-indexed month
+    const curYear = baseDate.getFullYear();
+    const curMonth = baseDate.getMonth(); // 0-indexed month
 
-    // 21 relative monthly offsets centered at 0 (current month)
-    const offsets = Array.from({ length: 21 }, (_, i) => i - 10);
+    // 25 relative monthly offsets centered at 0 (baseDate)
+    const offsets = Array.from({ length: 25 }, (_, i) => i - 12);
 
     // Natal Moon Rasi
     const moon = natalPlanets.find((p) => p.name === 'Chandra') || natalPlanets[1];
@@ -229,8 +229,7 @@ export function AspectStrengthTrajectoryGraph({
       }
 
       // Harmonic wave components modeling realistic transit passages
-      // centered at offset 0 (current month)
-      const normalizedWave = (offset / 10) * Math.PI;
+      const normalizedWave = (offset / 12) * Math.PI;
       const midCycleSurge = Math.cos(normalizedWave * 0.8) * 14;
       const seasonalHarmonic = Math.sin(normalizedWave * 1.2) * 8;
       const marsFluctuation = Math.sin(offset * 1.6) * 10;
@@ -253,24 +252,9 @@ export function AspectStrengthTrajectoryGraph({
       if (isCurrent) {
         mainTrigger = `Live Gochar Transit • Active Sun, Jupiter & Saturn Positions (${fullMonthName})`;
         dipOrRiseReason = `Current real-time planetary alignment establishes active benchmark across all 6 life quadrants with Ashtakavarga support.`;
-      } else if (offset === -6 || offset === -5) {
-        mainTrigger = `Historical Gochar Foundation • 5-6 Months Ago (${fullMonthName})`;
-        dipOrRiseReason = `Foundational transit baseline; previous Saturn retrograde and planetary shifts solidified inner discipline.`;
-      } else if (offset === -4 || offset === -3) {
-        mainTrigger = `Past Mars-Saturn Aspect Flow • 3-4 Months Ago (${fullMonthName})`;
-        dipOrRiseReason = `Earlier energetic friction created temporary swings in vitality and patience, resolving into clarity.`;
-      } else if (offset === -2 || offset === -1) {
-        mainTrigger = `Recent Benefic Transits • 1-2 Months Ago (${fullMonthName})`;
-        dipOrRiseReason = `Favorable Mercury and Venus ingress brought intellectual sharpness, professional consolidation, and financial flow.`;
-      } else if (offset === 1 || offset === 2) {
-        mainTrigger = `Imminent Benefic Ingress • Next 1-2 Months Forthcoming (${fullMonthName})`;
-        dipOrRiseReason = `Approaching solar and planetary ingresses activate wealth and karma quadrants (H2/H10); optimal for new commitments.`;
-      } else if (offset === 3 || offset === 4) {
-        mainTrigger = `Devaguru Jupiter Expansion Window • 3-4 Months Forthcoming (${fullMonthName})`;
-        dipOrRiseReason = `Jupiter's progressive trines elevate Education, Progeny, and Dharma alignment (Peak Rise Window).`;
       } else {
-        mainTrigger = `Long-Range Forthcoming Transit • 5-6 Months Forthcoming (${fullMonthName})`;
-        dipOrRiseReason = `Cumulative Gochar movements bring culmination to long-term plans, yielding material expansion and peace.`;
+        mainTrigger = `${periodTag} • ${fullMonthName}`;
+        dipOrRiseReason = `Transit flux influences overall strength by ${Math.abs(overallVal - 65)}% relative to natal baseline.`;
       }
 
       return {
@@ -294,10 +278,10 @@ export function AspectStrengthTrajectoryGraph({
         dipOrRiseReason,
       };
     });
-  }, [natalStrengths, natalPlanets, lagnaRasi]);
+  }, [natalStrengths, natalPlanets, lagnaRasi, baseDate]);
 
   // Active month object for detailed inspection
-  const activeMonthData = monthsData[activeMonthIndex] || monthsData[10] || monthsData[0];
+  const activeMonthData = monthsData[activeMonthIndex] || monthsData[12] || monthsData[0];
 
   // Adjust graph to show rest of the months according to the selected month
   const chartVisibleMonths = useMemo(() => {
@@ -357,7 +341,7 @@ export function AspectStrengthTrajectoryGraph({
             </h3>
           </div>
           <p className="text-[12px] text-stone-600">
-            Rolling 13-Month Window: <strong className="text-stone-800">6 Months Previous</strong> (Historical Foundation) • <strong className="text-amber-900">Current Month</strong> (Active Gochar) • <strong className="text-emerald-800">6 Months Forthcoming</strong> (Transit Projections).
+            Rolling 25-Month Window: <strong className="text-stone-800">12 Months Previous</strong> (Historical Foundation) • <strong className="text-amber-900">Current Month</strong> (Active Gochar) • <strong className="text-emerald-800">12 Months Forthcoming</strong> (Transit Projections).
           </p>
         </div>
 
@@ -394,7 +378,7 @@ export function AspectStrengthTrajectoryGraph({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-amber-50/60 p-1.5 rounded-lg border border-amber-200/80">
         {[
           { id: 'all', label: 'Reading & Synthesis', icon: Layers },
-          { id: 'trajectory', label: '21-Month Trajectory', icon: Activity },
+          { id: 'trajectory', label: '25-Month Trajectory', icon: Activity },
           { id: 'probabilities', label: 'Analysis / Impact', icon: Sparkles },
           { id: 'guidance', label: 'Prediction / Guidance', icon: Compass },
         ].map((tab) => {
@@ -427,13 +411,13 @@ export function AspectStrengthTrajectoryGraph({
           <div className="flex items-center space-x-2">
             <Calendar className="w-3.5 h-3.5 text-amber-800" />
             <span className="uppercase tracking-wider text-amber-950 font-black text-[11.5px]">
-              21-Month Timeline Navigator (10 Mo. Previous ← Current → 10 Mo. Forthcoming)
+              25-Month Timeline Navigator (12 Mo. Previous ← Current → 12 Mo. Forthcoming)
             </span>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-3 text-[10.5px]">
             <span className="flex items-center space-x-1 text-stone-500 font-semibold">
               <span className="w-2 h-2 rounded-full bg-stone-400 shrink-0" />
-              <span>10 Mo. Previous</span>
+              <span>12 Mo. Previous</span>
             </span>
             <span className="flex items-center space-x-1 text-amber-900 font-black">
               <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse shrink-0" />
@@ -441,7 +425,7 @@ export function AspectStrengthTrajectoryGraph({
             </span>
             <span className="flex items-center space-x-1 text-emerald-800 font-bold">
               <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-              <span>10 Mo. Forthcoming</span>
+              <span>12 Mo. Forthcoming</span>
             </span>
           </div>
         </div>
@@ -449,7 +433,7 @@ export function AspectStrengthTrajectoryGraph({
         {/* 21 Month Buttons Strip */}
         <div
           className="grid gap-1 overflow-x-auto pb-0.5"
-          style={{ gridTemplateColumns: 'repeat(21, minmax(32px, 1fr))' }}
+          style={{ gridTemplateColumns: 'repeat(25, minmax(32px, 1fr))' }}
         >
           {monthsData.map((m, i) => {
             const isSelected = activeMonthIndex === i;
@@ -458,7 +442,15 @@ export function AspectStrengthTrajectoryGraph({
                 key={m.month}
                 type="button"
                 onClick={() => {
-                  setActiveMonthIndex(i);
+                  const parts = m.fullMonthName.split(' ');
+                  const monthName = parts[0];
+                  const year = parseInt(parts[1], 10);
+                  const monthIndex = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                  ].indexOf(monthName);
+                  setBaseDate(new Date(year, monthIndex, 1));
+                  setActiveMonthIndex(12);
                   setGraphScopeMode('from_selected');
                 }}
                 className={`py-1 px-1 rounded-md text-center transition-all cursor-pointer border flex flex-col items-center justify-center ${

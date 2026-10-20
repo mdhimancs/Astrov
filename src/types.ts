@@ -121,6 +121,8 @@ export interface UserProfile {
   gender?: 'Male' | 'Female' | 'Other';
   notes?: string;
   updatedAt?: string;
+  personalityTraits?: string[];
+  wholeLifeReading?: string;
 }
 
 export interface PlanetaryMovementDetail {

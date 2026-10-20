@@ -92,15 +92,22 @@ export function saveProfiles(profiles: UserProfile[]): void {
   }
 }
 
+import { generateProfileInsights } from './profileInsights';
+
 export function upsertProfile(profile: UserProfile): UserProfile[] {
   const profiles = getSavedProfiles();
   const index = profiles.findIndex((p) => p.id === profile.id);
+  
+  // Generate insights
+  const { personalityTraits, wholeLifeReading } = generateProfileInsights(profile);
+  const profileWithInsights = { ...profile, personalityTraits, wholeLifeReading, updatedAt: new Date().toISOString() };
+  
   let updated: UserProfile[];
   if (index >= 0) {
     updated = [...profiles];
-    updated[index] = { ...profile, updatedAt: new Date().toISOString() };
+    updated[index] = profileWithInsights;
   } else {
-    updated = [...profiles, { ...profile, updatedAt: new Date().toISOString() }];
+    updated = [...profiles, profileWithInsights];
   }
   saveProfiles(updated);
   return updated;

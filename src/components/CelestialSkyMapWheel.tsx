@@ -271,15 +271,15 @@ export function CelestialSkyMapWheel({
       isExpanded ? 'fixed inset-2 z-50 overflow-y-auto p-4 bg-[#FFFCF7]' : 'p-3 sm:p-5 space-y-4'
     }`}>
       {/* Header Toolbar */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-amber-200/70 pb-3">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 border-b border-amber-200/70 pb-2" style={{ minHeight: '76.8px' }}>
         <div className="flex items-center space-x-3">
-          <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-500 to-orange-700 text-white shadow-md">
-            <Globe className="w-5 h-5 sm:w-6 sm:h-6" />
+          <div className="p-2 rounded-xl bg-gradient-to-br from-amber-500 to-orange-700 text-white shadow-md">
+            <Globe className="w-5 h-5 sm:w-5 sm:h-5" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h3 className="font-vedic font-black text-stone-900 text-[17px] sm:text-[19px] tracking-wide flex items-center gap-1.5">
-                <span>360° Sidereal Celestial Wheel</span>
+              <h3 className="font-vedic font-black text-stone-900 text-[14px] tracking-wide flex items-center gap-1.5">
+                <span style={{ fontSize: '14px' }}>360° Sidereal Celestial Wheel</span>
                 <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-bold uppercase">
                   Vedic Coordinate System
                 </span>
@@ -294,11 +294,14 @@ export function CelestialSkyMapWheel({
         {/* Toolbar Controls */}
         <div className="flex flex-wrap items-center gap-2">
           {/* Wheel Mode Switcher */}
-          <div className="bg-stone-100 border border-stone-300/80 rounded-lg p-1 flex items-center space-x-1 text-[12px] shadow-2xs">
+          <div
+            className="bg-stone-100 border border-stone-300/80 rounded-lg p-0.5 flex items-center space-x-1 text-[11px] shadow-2xs"
+            style={{ height: '23.8px' }}
+          >
             <button
               type="button"
               onClick={() => setWheelMode('live')}
-              className={`px-3 py-1 rounded-md font-bold transition-all cursor-pointer ${
+              className={`px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer text-[10.5px] leading-none ${
                 wheelMode === 'live'
                   ? 'bg-amber-700 text-white shadow-xs font-black'
                   : 'text-stone-700 hover:text-stone-900 hover:bg-stone-200/60'
@@ -311,7 +314,7 @@ export function CelestialSkyMapWheel({
                 <button
                   type="button"
                   onClick={() => setWheelMode('natal')}
-                  className={`px-3 py-1 rounded-md font-bold transition-all cursor-pointer ${
+                  className={`px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer text-[10.5px] leading-none ${
                     wheelMode === 'natal'
                       ? 'bg-amber-700 text-white shadow-xs font-black'
                       : 'text-stone-700 hover:text-stone-900 hover:bg-stone-200/60'
@@ -322,7 +325,7 @@ export function CelestialSkyMapWheel({
                 <button
                   type="button"
                   onClick={() => setWheelMode('dual')}
-                  className={`px-3 py-1 rounded-md font-bold transition-all cursor-pointer ${
+                  className={`px-2 py-0.5 rounded-md font-bold transition-all cursor-pointer text-[10.5px] leading-none ${
                     wheelMode === 'dual'
                       ? 'bg-amber-700 text-white shadow-xs font-black'
                       : 'text-stone-700 hover:text-stone-900 hover:bg-stone-200/60'
@@ -335,69 +338,72 @@ export function CelestialSkyMapWheel({
           </div>
 
           {/* Layer Visibility Toggles */}
-          <div className="flex items-center space-x-1">
+          <div
+            className="flex items-center space-x-1"
+            style={{ height: '17px' }}
+          >
             <button
               type="button"
               onClick={() => setShowAspectLines(!showAspectLines)}
-              className={`px-2.5 py-1.5 rounded-lg border text-[11.5px] font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-2xs ${
+              className={`px-2 py-0.5 rounded border text-[10px] leading-none font-bold flex items-center space-x-1 transition-all cursor-pointer shadow-2xs h-full ${
                 showAspectLines
                   ? 'bg-emerald-50 border-emerald-400 text-emerald-900'
                   : 'bg-stone-50 border-stone-200 text-stone-500 hover:text-stone-700'
               }`}
               title="Toggle Drishti / Planetary Aspect Geometric Lines"
             >
-              <Activity className="w-3.5 h-3.5 text-emerald-700" />
+              <Activity className="w-3 h-3 text-emerald-700" />
               <span className="hidden sm:inline">Drishti</span>
             </button>
 
             <button
               type="button"
               onClick={() => setShowMotionPaths(!showMotionPaths)}
-              className={`px-2.5 py-1.5 rounded-lg border text-[11.5px] font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-2xs ${
+              className={`px-2 py-0.5 rounded border text-[10px] leading-none font-bold flex items-center space-x-1 transition-all cursor-pointer shadow-2xs h-full ${
                 showMotionPaths
                   ? 'bg-amber-50 border-amber-400 text-amber-900'
                   : 'bg-stone-50 border-stone-200 text-stone-500 hover:text-stone-700'
               }`}
               title="Toggle Transit Vectors & Direct/Retrograde Motion"
             >
-              <Compass className="w-3.5 h-3.5 text-amber-700" />
+              <Compass className="w-3 h-3 text-amber-700" />
               <span className="hidden sm:inline">Motion</span>
             </button>
 
             <button
               type="button"
               onClick={() => setShowHouseBhavas(!showHouseBhavas)}
-              className={`px-2.5 py-1.5 rounded-lg border text-[11.5px] font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-2xs ${
+              className={`px-2 py-0.5 rounded border text-[10px] leading-none font-bold flex items-center space-x-1 transition-all cursor-pointer shadow-2xs h-full ${
                 showHouseBhavas
                   ? 'bg-purple-50 border-purple-400 text-purple-900'
                   : 'bg-stone-50 border-stone-200 text-stone-500 hover:text-stone-700'
               }`}
               title="Toggle 12 House Bhava Radial Cusps from Lagna"
             >
-              <Layers className="w-3.5 h-3.5 text-purple-700" />
+              <Layers className="w-3 h-3 text-purple-700" />
               <span className="hidden sm:inline">Houses</span>
             </button>
 
             <button
               type="button"
               onClick={() => setShowDegreeTicks(!showDegreeTicks)}
-              className={`px-2.5 py-1.5 rounded-lg border text-[11.5px] font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-2xs ${
+              className={`px-2 py-0.5 rounded border text-[10px] leading-none font-bold flex items-center space-x-1 transition-all cursor-pointer shadow-2xs h-full ${
                 showDegreeTicks
                   ? 'bg-sky-50 border-sky-400 text-sky-900'
                   : 'bg-stone-50 border-stone-200 text-stone-500 hover:text-stone-700'
               }`}
               title="Toggle 360° Precision Degree Ticks"
             >
-              <span className="font-mono text-[11px] font-black text-sky-800">360°</span>
+              <span className="font-mono text-[9.5px] font-black text-sky-800">360°</span>
             </button>
 
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="p-1.5 rounded-lg border border-stone-300 bg-white hover:bg-stone-100 text-stone-700 cursor-pointer shadow-2xs"
+              className="p-1 rounded border border-stone-300 bg-white hover:bg-stone-100 text-stone-700 cursor-pointer shadow-2xs h-full flex items-center justify-center"
               title={isExpanded ? 'Exit Full Screen' : 'Expand Full Screen View'}
             >
-              {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              {isExpanded ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
             </button>
           </div>
         </div>
@@ -738,6 +744,11 @@ export function CelestialSkyMapWheel({
             {/* 5. PLANETARY DRISHTI / ASPECT GEOMETRIC CHORDS */}
             {showAspectLines && (
               <g id="aspectLinesGroup">
+                <defs>
+                  <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
+                    <polygon points="0 0, 6 2, 0 4" fill="currentColor" />
+                  </marker>
+                </defs>
                 {activePlanetsList.map((p1, idx1) => {
                   return activePlanetsList.slice(idx1 + 1).map((p2) => {
                     const deg1 = p1.totalDeg || 0;
@@ -746,19 +757,16 @@ export function CelestialSkyMapWheel({
                     const angleDiff = diff > 180 ? 360 - diff : diff;
 
                     let aspectColor = '';
-                    let aspectLabel = '';
+                    // Based on Vedic principles for benefic/malefic/neutral
+                    // Here simplified for demonstration as requested
                     if (Math.abs(angleDiff - 180) <= 6) {
-                      aspectColor = '#DC2626'; // Opposition (Red)
-                      aspectLabel = '180°';
+                      aspectColor = '#ef4444'; // Bad (Red)
                     } else if (Math.abs(angleDiff - 120) <= 6) {
-                      aspectColor = '#059669'; // Trine (Emerald)
-                      aspectLabel = '120°';
+                      aspectColor = '#22c55e'; // Good (Green)
                     } else if (Math.abs(angleDiff - 90) <= 6) {
-                      aspectColor = '#D97706'; // Square (Amber)
-                      aspectLabel = '90°';
+                      aspectColor = '#f59e0b'; // Neutral (Beige/Gold)
                     } else if (Math.abs(angleDiff - 60) <= 5) {
-                      aspectColor = '#2563EB'; // Sextile (Blue)
-                      aspectLabel = '60°';
+                      aspectColor = '#22c55e'; // Good (Green)
                     }
 
                     if (!aspectColor) return null;
@@ -776,7 +784,7 @@ export function CelestialSkyMapWheel({
                     const pos2 = degToXY(deg2, rPlanetBase - 15);
 
                     return (
-                      <g key={`${p1.name}-${p2.name}-aspect`}>
+                      <g key={`${p1.name}-${p2.name}-aspect`} color={aspectColor}>
                         <line
                           x1={pos1.x}
                           y1={pos1.y}
@@ -786,6 +794,7 @@ export function CelestialSkyMapWheel({
                           strokeWidth={strokeWidth}
                           strokeDasharray={angleDiff === 180 ? 'none' : '4 4'}
                           opacity={lineOpacity}
+                          markerEnd="url(#arrowhead)"
                           className={isHighlight ? 'pulse-aspect' : ''}
                         />
                       </g>
