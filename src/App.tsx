@@ -88,7 +88,7 @@ export default function App() {
         onDeleteProfile={handleDeleteProfile}
       />
 
-      <main className="flex-1 w-full max-w-6xl mx-auto px-2 sm:px-3 py-3">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-2 sm:px-3 py-1 sm:py-1.5">
         <ContentRenderer
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -103,7 +103,7 @@ export default function App() {
         />
       </main>
 
-      <footer className="border-t border-[#E8DEC8] bg-[#F7F2E7] py-2 text-[12px] text-stone-700">
+      <footer className="border-t border-[#E8DEC8] bg-[#F7F2E7] py-1 text-[11px] text-stone-700">
         <div className="w-full max-w-6xl mx-auto px-2 sm:px-3 flex flex-col md:flex-row items-center justify-between gap-1">
           <div className="flex items-center space-x-2">
             <div className="w-6 h-6 rounded-md bg-gradient-to-br from-amber-600 via-orange-700 to-red-900 text-amber-100 flex items-center justify-center font-serif font-bold text-[13px] shadow-2xs border border-amber-400/50">
