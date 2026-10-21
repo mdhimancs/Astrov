@@ -507,82 +507,89 @@ export function VimshottariDashaTab({
           </div>
         </div>
 
-        <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-1.5">
-          {vimshottariDasha.cycle.map((d) => {
-            const isCurrentlyActive = d.planet === vimshottariDasha.currentLord;
-            const isSelected = (selectedMahadashaPlanet || vimshottariDasha.currentLord) === d.planet;
-            const rating = d.strengthInfo?.rating || 'Moderate';
-            const score = d.strengthInfo?.score ?? 5.5;
-            const fineLineColor = rating === 'Strong' ? 'bg-emerald-500' : rating === 'Weak' ? 'bg-rose-500' : 'bg-amber-500';
-            const badgeColor =
-              rating === 'Strong'
-                ? 'text-emerald-800 bg-emerald-50 border-emerald-200'
-                : rating === 'Weak'
-                ? 'text-rose-800 bg-rose-50 border-rose-200'
-                : 'text-amber-800 bg-amber-50 border-amber-200';
-            const totalYears = d.endAge - d.startAge;
-            const elapsedYears = currentAge - d.startAge;
-            const progress = totalYears > 0 ? Math.max(0, Math.min(100, (elapsedYears / totalYears) * 100)) : (currentAge >= d.endAge ? 100 : 0);
+        <div className="overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-purple-300 scrollbar-track-stone-100">
+          <div className="flex items-stretch space-x-2.5 min-w-max">
+            {vimshottariDasha.cycle.map((d) => {
+              const isCurrentlyActive = d.planet === vimshottariDasha.currentLord;
+              const isSelected = (selectedMahadashaPlanet || vimshottariDasha.currentLord) === d.planet;
+              const rating = d.strengthInfo?.rating || 'Moderate';
+              const score = d.strengthInfo?.score ?? 5.5;
+              const fineLineColor = rating === 'Strong' ? 'bg-emerald-500' : rating === 'Weak' ? 'bg-rose-500' : 'bg-amber-500';
+              const badgeColor =
+                rating === 'Strong'
+                  ? 'text-emerald-800 bg-emerald-50 border-emerald-200'
+                  : rating === 'Weak'
+                  ? 'text-rose-800 bg-rose-50 border-rose-200'
+                  : 'text-amber-800 bg-amber-50 border-amber-200';
+              const totalYears = d.endAge - d.startAge;
+              const elapsedYears = currentAge - d.startAge;
+              const progress = totalYears > 0 ? Math.max(0, Math.min(100, (elapsedYears / totalYears) * 100)) : (currentAge >= d.endAge ? 100 : 0);
 
-            return (
-              <div
-                key={`${d.planet}-${d.startMonthYear}`}
-                onClick={() => setSelectedMahadashaPlanet(d.planet)}
-                className={`px-1.5 py-1.5 rounded-md border transition-all duration-150 cursor-pointer flex flex-col items-center justify-between text-center overflow-hidden ${
-                  isSelected
-                    ? 'bg-amber-50/95 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
-                    : isCurrentlyActive
-                    ? 'bg-purple-50/50 border-purple-300 shadow-3xs'
-                    : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5]'
-                }`}
-                title={`Mahadasha Lord: ${d.planet} — Interval: ${d.startMonthYear} – ${d.endMonthYear} (mm-yy) • Strength: ${rating} (${score}/10) • ${d.strengthInfo?.dignity || ''} in ${d.strengthInfo?.housePlacement || ''}`}
-              >
-                {/* Fine line indicator on top of Mahadasha card */}
-                <div className={`w-full h-[2.5px] rounded-t-sm mb-1 ${fineLineColor}`} />
+              return (
+                <div
+                  key={`${d.planet}-${d.startMonthYear}`}
+                  onClick={() => setSelectedMahadashaPlanet(d.planet)}
+                  className={`w-[180px] sm:w-[190px] shrink-0 px-2.5 py-2 rounded-lg border transition-all duration-150 cursor-pointer flex flex-col justify-between overflow-hidden ${
+                    isSelected
+                      ? 'bg-amber-50/95 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
+                      : isCurrentlyActive
+                      ? 'bg-purple-50/50 border-purple-300 shadow-3xs'
+                      : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5]'
+                  }`}
+                  title={`Mahadasha Lord: ${d.planet} — Interval: ${d.startMonthYear} – ${d.endMonthYear} (mm-yy) • Strength: ${rating} (${score}/10) • ${d.strengthInfo?.dignity || ''} in ${d.strengthInfo?.housePlacement || ''}`}
+                >
+                  {/* Fine line indicator on top of Mahadasha card */}
+                  <div>
+                    <div className={`w-full h-[3px] rounded-t-sm mb-1.5 ${fineLineColor}`} />
 
-                <div className="flex items-center justify-center space-x-1 leading-none w-full">
-                  <span className="font-vedic font-bold text-stone-950 text-[12px]">{d.planet}</span>
-                  <span className="text-[10px] font-bold text-amber-800">({d.durationYears}y)</span>
-                  {isCurrentlyActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />}
+                    <div className="flex items-center justify-between leading-none w-full mb-1">
+                      <span className="font-vedic font-bold text-stone-950 text-[13px]">{d.planet} Mahadasha</span>
+                      <span className="text-[11px] font-bold text-amber-800">({d.durationYears} yrs)</span>
+                      {isCurrentlyActive && <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />}
+                    </div>
+
+                    {/* Strength Rating badge */}
+                    <div className="flex items-center justify-between my-1">
+                      <span className="text-[11px] text-stone-600 font-medium">Strength:</span>
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border leading-tight ${badgeColor}`}>
+                        {rating} ({score}/10)
+                      </span>
+                    </div>
+
+                    {/* 3 Tri-Bhaga Parts of this Mahadasha fine lines */}
+                    <div className="w-full flex space-x-1 my-1.5" title="3 Tri-Bhaga Parts of this Dasha (Entry / Peak / Culmination)">
+                      {d.parts?.map((p) => {
+                        const pRating = p.strengthInfo?.rating || rating;
+                        const pCol = pRating === 'Strong' ? 'bg-emerald-500' : pRating === 'Weak' ? 'bg-rose-500' : 'bg-amber-500';
+                        return (
+                          <div
+                            key={p.partNumber}
+                            className={`h-[3px] flex-1 rounded-full ${pCol} ${p.isCurrent ? 'ring-1 ring-amber-400' : 'opacity-80'}`}
+                            title={`Part ${p.partNumber}: ${p.stage} (${p.durationYearsStr}) — ${p.startDate} – ${p.endDate} — ${pRating}`}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Interval Start and End Dates */}
+                  <div className="mt-1.5 pt-1.5 border-t border-stone-200/60 bg-stone-50/80 rounded px-2 py-1 text-center">
+                    <span className="text-[9.5px] text-stone-500 font-bold uppercase tracking-wider block">Interval Dates</span>
+                    <span className="text-[11px] font-mono font-bold text-stone-900 leading-snug block">
+                      {d.startDate && d.endDate ? `${d.startDate} to ${d.endDate}` : `${d.startMonthYear} – ${d.endMonthYear}`}
+                    </span>
+                    <div className="w-full bg-stone-200 rounded-sm h-1.5 mt-1 overflow-hidden shadow-inner">
+                      <div className="bg-purple-600 h-full rounded-sm transition-all" style={{ width: `${progress}%` }} />
+                    </div>
+                  </div>
                 </div>
-
-                {/* Strength Rating badge with fine line indicator */}
-                <div className="flex items-center justify-center space-x-1 my-1">
-                  <span className={`w-1.5 h-1.5 rounded-full ${fineLineColor}`} />
-                  <span className={`text-[9px] font-bold px-1 py-0.2 rounded border leading-tight ${badgeColor}`}>
-                    {rating} ({score})
-                  </span>
-                </div>
-
-                {/* 3 Tri-Bhaga Parts of this Mahadasha fine lines */}
-                <div className="w-full flex space-x-0.5 my-0.5 px-0.5" title="3 Tri-Bhaga Parts of this Dasha (Entry / Peak / Culmination)">
-                  {d.parts?.map((p) => {
-                    const pRating = p.strengthInfo?.rating || rating;
-                    const pCol = pRating === 'Strong' ? 'bg-emerald-500' : pRating === 'Weak' ? 'bg-rose-500' : 'bg-amber-500';
-                    return (
-                      <div
-                        key={p.partNumber}
-                        className={`h-[2px] flex-1 rounded-full ${pCol} ${p.isCurrent ? 'ring-1 ring-amber-400' : 'opacity-80'}`}
-                        title={`Part ${p.partNumber}: ${p.stage} (${p.durationYearsStr}) — ${p.startDate} – ${p.endDate} — ${pRating}`}
-                      />
-                    );
-                  })}
-                </div>
-
-                <span className="text-[10px] font-mono font-semibold text-stone-700 leading-tight truncate w-full" title={`Maha Dasha Interval: ${d.startDate || d.startMonthYear} to ${d.endDate || d.endMonthYear} (dd-mm-yyyy)`}>
-                  {d.startDate && d.endDate ? `${d.startDate} - ${d.endDate}` : `${d.startMonthYear} – ${d.endMonthYear}`}
-                </span>
-
-                <div className="w-full bg-stone-100 rounded-sm h-1 mt-1 overflow-hidden shadow-inner">
-                  <div className="bg-stone-400/60 h-full rounded-sm transition-all" style={{ width: `${progress}%` }} />
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* SECTION 2: ANTARDASHA (SUB-PERIODS) BREAKDOWN (WITH STRENGTH FINE LINES & 9 SUB-PORTIONS) */}
+      {/* SECTION 2: ANTARDASHA (SUB-PERIODS) BREAKDOWN */}
       <div className="bg-white rounded-lg border border-stone-200 px-2.5 py-2 shadow-3xs space-y-1.5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-stone-100 pb-1.5">
           <div className="flex items-center space-x-2">
@@ -611,77 +618,84 @@ export function VimshottariDashaTab({
           </div>
         </div>
 
-        <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-1.5">
-          {antardashas.map((antar) => {
-            const isSelectedAntar = activeAntardashaInfo?.planet === antar.planet;
-            const ratingAntar = antar.strengthInfo?.rating || 'Moderate';
-            const scoreAntar = antar.strengthInfo?.score ?? 5.5;
-            const fineLineColorAntar = ratingAntar === 'Strong' ? 'bg-emerald-500' : ratingAntar === 'Weak' ? 'bg-rose-500' : 'bg-amber-500';
-            const badgeColorAntar =
-              ratingAntar === 'Strong'
-                ? 'text-emerald-800 bg-emerald-50 border-emerald-200'
-                : ratingAntar === 'Weak'
-                ? 'text-rose-800 bg-rose-50 border-rose-200'
-                : 'text-amber-800 bg-amber-50 border-amber-200';
-            const totalAntarYears = antar.endAge - antar.startAge;
-            const elapsedAntarYears = currentAge - antar.startAge;
-            const progressAntar = totalAntarYears > 0 ? Math.max(0, Math.min(100, (elapsedAntarYears / totalAntarYears) * 100)) : (currentAge >= antar.endAge ? 100 : 0);
+        <div className="overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-purple-300 scrollbar-track-stone-100">
+          <div className="flex items-stretch space-x-2.5 min-w-max">
+            {antardashas.map((antar) => {
+              const isSelectedAntar = activeAntardashaInfo?.planet === antar.planet;
+              const ratingAntar = antar.strengthInfo?.rating || 'Moderate';
+              const scoreAntar = antar.strengthInfo?.score ?? 5.5;
+              const fineLineColorAntar = ratingAntar === 'Strong' ? 'bg-emerald-500' : ratingAntar === 'Weak' ? 'bg-rose-500' : 'bg-amber-500';
+              const badgeColorAntar =
+                ratingAntar === 'Strong'
+                  ? 'text-emerald-800 bg-emerald-50 border-emerald-200'
+                  : ratingAntar === 'Weak'
+                  ? 'text-rose-800 bg-rose-50 border-rose-200'
+                  : 'text-amber-800 bg-amber-50 border-amber-200';
+              const totalAntarYears = antar.endAge - antar.startAge;
+              const elapsedAntarYears = currentAge - antar.startAge;
+              const progressAntar = totalAntarYears > 0 ? Math.max(0, Math.min(100, (elapsedAntarYears / totalAntarYears) * 100)) : (currentAge >= antar.endAge ? 100 : 0);
 
-            return (
-              <div
-                key={`${activeDashaLord}-${antar.planet}-${antar.startMonthYear}`}
-                onClick={() => setSelectedAntardashaPlanet(antar.planet)}
-                className={`px-1.5 py-1.5 rounded-md border transition-all cursor-pointer flex flex-col items-center justify-between text-center overflow-hidden ${
-                  isSelectedAntar
-                    ? 'bg-amber-50/95 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
-                    : antar.isCurrent
-                    ? 'bg-purple-50/50 border-purple-300 shadow-3xs'
-                    : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5]'
-                }`}
-                title={`Sub-Period Lord: ${antar.planet} — Interval: ${antar.startMonthYear} – ${antar.endMonthYear} (mm-yy) • Strength: ${ratingAntar} (${scoreAntar}/10) • ${antar.strengthInfo?.mutualHouseAngle || ''}`}
-              >
-                {/* Fine line indicator on top of Sub-Period card */}
-                <div className={`w-full h-[2.5px] rounded-t-sm mb-1 ${fineLineColorAntar}`} />
+              return (
+                <div
+                  key={`${activeDashaLord}-${antar.planet}-${antar.startMonthYear}`}
+                  onClick={() => setSelectedAntardashaPlanet(antar.planet)}
+                  className={`w-[180px] sm:w-[190px] shrink-0 px-2.5 py-2 rounded-lg border transition-all cursor-pointer flex flex-col justify-between overflow-hidden ${
+                    isSelectedAntar
+                      ? 'bg-amber-50/95 border-amber-400 ring-1 ring-amber-300 shadow-2xs'
+                      : antar.isCurrent
+                      ? 'bg-purple-50/50 border-purple-300 shadow-3xs'
+                      : 'bg-white border-stone-200/80 hover:border-amber-300 hover:bg-[#FAF8F5]'
+                  }`}
+                  title={`Sub-Period Lord: ${antar.planet} — Interval: ${antar.startMonthYear} – ${antar.endMonthYear} (mm-yy) • Strength: ${ratingAntar} (${scoreAntar}/10) • ${antar.strengthInfo?.mutualHouseAngle || ''}`}
+                >
+                  <div>
+                    {/* Fine line indicator on top of Sub-Period card */}
+                    <div className={`w-full h-[3px] rounded-t-sm mb-1.5 ${fineLineColorAntar}`} />
 
-                <div className="flex items-center justify-center space-x-1 leading-none w-full">
-                  <span className="font-vedic font-bold text-stone-950 text-[12px]">{antar.planet}</span>
-                  <span className="text-[10px] font-bold text-amber-800">({antar.durationYearsStr})</span>
-                  {antar.isCurrent && <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />}
+                    <div className="flex items-center justify-between leading-none w-full mb-1">
+                      <span className="font-vedic font-bold text-stone-950 text-[13px]">{antar.planet} Antar</span>
+                      <span className="text-[11px] font-bold text-amber-800">({antar.durationYearsStr})</span>
+                      {antar.isCurrent && <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />}
+                    </div>
+
+                    {/* Strength Rating badge */}
+                    <div className="flex items-center justify-between my-1">
+                      <span className="text-[11px] text-stone-600 font-medium">Strength:</span>
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border leading-tight ${badgeColorAntar}`}>
+                        {ratingAntar} ({scoreAntar}/10)
+                      </span>
+                    </div>
+
+                    {/* 9 Sub-Portions (Pratyantardasha) Fine Lines Strip */}
+                    <div className="w-full flex space-x-0.5 my-1.5" title="9 Sub-Portions (Pratyantardashas) of this Sub-Period">
+                      {antar.pratyantardashas?.map((prat, idx) => {
+                        const prRating = prat.strengthInfo.rating;
+                        const prCol = prRating === 'Strong' ? 'bg-emerald-500' : prRating === 'Weak' ? 'bg-rose-500' : 'bg-amber-500';
+                        return (
+                          <div
+                            key={idx}
+                            className={`h-[3px] flex-1 rounded-full ${prCol} ${prat.isCurrent ? 'ring-1 ring-amber-400' : 'opacity-80'}`}
+                            title={`${prat.planet}: ${prat.durationStr} (${prat.startDate} – ${prat.endDate}) — ${prRating}`}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Interval Start and End Dates */}
+                  <div className="mt-1.5 pt-1.5 border-t border-stone-200/60 bg-stone-50/80 rounded px-2 py-1 text-center">
+                    <span className="text-[9.5px] text-stone-500 font-bold uppercase tracking-wider block">Interval Dates</span>
+                    <span className="text-[11px] font-mono font-bold text-stone-900 leading-snug block">
+                      {antar.startDate && antar.endDate ? `${antar.startDate} to ${antar.endDate}` : `${antar.startMonthYear} – ${antar.endMonthYear}`}
+                    </span>
+                    <div className="w-full bg-stone-200 rounded-sm h-1.5 mt-1 overflow-hidden shadow-inner">
+                      <div className="bg-purple-600 h-full rounded-sm transition-all" style={{ width: `${progressAntar}%` }} />
+                    </div>
+                  </div>
                 </div>
-
-                {/* Strength Rating badge with fine line indicator */}
-                <div className="flex items-center justify-center space-x-1 my-1">
-                  <span className={`w-1.5 h-1.5 rounded-full ${fineLineColorAntar}`} />
-                  <span className={`text-[9px] font-bold px-1 py-0.2 rounded border leading-tight ${badgeColorAntar}`}>
-                    {ratingAntar} ({scoreAntar})
-                  </span>
-                </div>
-
-                {/* 9 Sub-Portions (Pratyantardasha) Fine Lines Strip */}
-                <div className="w-full flex space-x-0.5 my-0.5 px-0.5" title="9 Sub-Portions (Pratyantardashas) of this Sub-Period">
-                  {antar.pratyantardashas?.map((prat, idx) => {
-                    const prRating = prat.strengthInfo.rating;
-                    const prCol = prRating === 'Strong' ? 'bg-emerald-500' : prRating === 'Weak' ? 'bg-rose-500' : 'bg-amber-500';
-                    return (
-                      <div
-                        key={idx}
-                        className={`h-[2px] flex-1 rounded-full ${prCol} ${prat.isCurrent ? 'ring-1 ring-amber-400' : 'opacity-80'}`}
-                        title={`${prat.planet}: ${prat.durationStr} (${prat.startDate} – ${prat.endDate}) — ${prRating}`}
-                      />
-                    );
-                  })}
-                </div>
-
-                <span className="text-[10px] font-mono font-semibold text-stone-700 leading-tight truncate w-full" title={`Sub-Period Interval: ${antar.startDate || antar.startMonthYear} to ${antar.endDate || antar.endMonthYear} (dd-mm-yyyy)`}>
-                  {antar.startDate && antar.endDate ? `${antar.startDate} - ${antar.endDate}` : `${antar.startMonthYear} – ${antar.endMonthYear}`}
-                </span>
-
-                <div className="w-full bg-stone-100 rounded-sm h-1 mt-1 overflow-hidden shadow-inner">
-                  <div className="bg-stone-400/60 h-full rounded-sm transition-all" style={{ width: `${progressAntar}%` }} />
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
 
