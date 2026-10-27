@@ -21,25 +21,25 @@ export function UnifiedPlanetaryImpactTable({
     switch (tone) {
       case 'Auspicious':
         return (
-          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
             Auspicious
           </span>
         );
       case 'Caution':
         return (
-          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-semibold bg-amber-100 text-amber-800 border border-amber-300">
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-300">
             Caution
           </span>
         );
       case 'Transformative':
         return (
-          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-semibold bg-purple-100 text-purple-800 border border-purple-300">
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-100 text-purple-800 border border-purple-300">
             Transformative
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-semibold bg-stone-100 text-stone-700 border border-stone-200">
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-stone-100 text-stone-700 border border-stone-200">
             Balanced
           </span>
         );
@@ -89,39 +89,39 @@ export function UnifiedPlanetaryImpactTable({
 
       {/* The Single Master Unified Table */}
       <div className="overflow-x-auto w-full">
-        <table className="w-full text-left text-[13px] border-collapse">
+        <table className="w-full text-left text-[11px] border-collapse table-fixed">
           <thead>
-            <tr className="bg-stone-100/80 text-stone-800 border-b border-stone-200 text-[12px] uppercase tracking-wider font-semibold">
-              <th className="py-1 px-2 sticky left-0 bg-stone-100/95 z-10 min-w-[110px]">
+            <tr className="bg-stone-100/80 text-stone-800 border-b border-stone-200 text-[10.5px] uppercase tracking-wider font-semibold">
+              <th className="py-1 px-2 sticky left-0 bg-stone-100/95 z-10 w-[95px] break-words">
                 Planet
               </th>
 
               {(activeFilter === 'all' || activeFilter === 'health') && (
-                <th className="py-1 px-2 min-w-[140px]">Health</th>
+                <th className="py-1 px-2 min-w-[120px] break-words">Health</th>
               )}
 
               {(activeFilter === 'all' || activeFilter === 'job') && (
-                <th className="py-1 px-2 min-w-[140px]">Job</th>
+                <th className="py-1 px-2 min-w-[120px] break-words">Job</th>
               )}
 
               {(activeFilter === 'all' || activeFilter === 'business') && (
-                <th className="py-1 px-2 min-w-[140px]">Wealth</th>
+                <th className="py-1 px-2 min-w-[120px] break-words">Wealth</th>
               )}
 
               {(activeFilter === 'all' || activeFilter === 'relation') && (
-                <th className="py-1 px-2 min-w-[140px]">Relation</th>
+                <th className="py-1 px-2 min-w-[120px] break-words">Relation</th>
               )}
 
               {(activeFilter === 'all' || activeFilter === 'education') && (
-                <th className="py-1 px-2 min-w-[140px]">Education</th>
+                <th className="py-1 px-2 min-w-[120px] break-words">Education</th>
               )}
 
               {(activeFilter === 'all' || activeFilter === 'mentalState') && (
-                <th className="py-1 px-2 min-w-[140px]">Mental State</th>
+                <th className="py-1 px-2 min-w-[120px] break-words">Mental State</th>
               )}
 
               {activeFilter === 'all' && (
-                <th className="py-1 px-2 min-w-[160px]">Effect</th>
+                <th className="py-1 px-2 min-w-[140px] break-words">Effect</th>
               )}
             </tr>
           </thead>
@@ -129,53 +129,53 @@ export function UnifiedPlanetaryImpactTable({
           <tbody className="divide-y divide-stone-200">
             {records.map((rec) => (
               <tr key={rec.planet} className="group hover:bg-[#FAF6EE] transition-colors">
-                <td className="py-1.5 px-2 align-top sticky left-0 bg-white group-hover:bg-[#FAF6EE] z-10 border-r border-stone-200/80 shadow-2xs">
-                  <div className="flex items-center space-x-1.5">
+                <td className="py-1 px-2 align-top sticky left-0 bg-white group-hover:bg-[#FAF6EE] z-10 border-r border-stone-200/80 shadow-2xs break-words">
+                  <div className="flex items-center space-x-1">
                     <span className="text-amber-800 font-bold">{rec.symbol}</span>
-                    <span className="font-semibold text-stone-950 text-[13px]">{rec.englishName}</span>
+                    <span className="font-semibold text-stone-950 text-[11px] break-words">{rec.englishName}</span>
                   </div>
-                  <div className="text-[12px] text-stone-500">H{rec.houseFromMoon}M • H{rec.houseFromLagna}L</div>
+                  <div className="text-[9.5px] text-stone-500 break-words">H{rec.houseFromMoon}M • H{rec.houseFromLagna}L</div>
                 </td>
 
                 {(activeFilter === 'all' || activeFilter === 'health') && (
-                  <td className="py-1.5 px-2 align-top text-stone-800 leading-snug border-r border-stone-100">
-                    <p>{rec.healthEffect}</p>
+                  <td className="py-1 px-2 align-top text-stone-800 leading-snug border-r border-stone-100 break-words whitespace-normal">
+                    <p className="break-words">{rec.healthEffect}</p>
                   </td>
                 )}
 
                 {(activeFilter === 'all' || activeFilter === 'job') && (
-                  <td className="py-1.5 px-2 align-top text-stone-800 leading-snug border-r border-stone-100">
-                    <p>{rec.jobEffect}</p>
+                  <td className="py-1 px-2 align-top text-stone-800 leading-snug border-r border-stone-100 break-words whitespace-normal">
+                    <p className="break-words">{rec.jobEffect}</p>
                   </td>
                 )}
 
                 {(activeFilter === 'all' || activeFilter === 'business') && (
-                  <td className="py-1.5 px-2 align-top text-stone-800 leading-snug border-r border-stone-100">
-                    <p>{rec.businessEffect}</p>
+                  <td className="py-1 px-2 align-top text-stone-800 leading-snug border-r border-stone-100 break-words whitespace-normal">
+                    <p className="break-words">{rec.businessEffect}</p>
                   </td>
                 )}
 
                 {(activeFilter === 'all' || activeFilter === 'relation') && (
-                  <td className="py-1.5 px-2 align-top text-stone-800 leading-snug border-r border-stone-100">
-                    <p>{rec.relationEffect}</p>
+                  <td className="py-1 px-2 align-top text-stone-800 leading-snug border-r border-stone-100 break-words whitespace-normal">
+                    <p className="break-words">{rec.relationEffect}</p>
                   </td>
                 )}
 
                 {(activeFilter === 'all' || activeFilter === 'education') && (
-                  <td className="py-1.5 px-2 align-top text-stone-800 leading-snug border-r border-stone-100">
-                    <p>{rec.educationEffect}</p>
+                  <td className="py-1 px-2 align-top text-stone-800 leading-snug border-r border-stone-100 break-words whitespace-normal">
+                    <p className="break-words">{rec.educationEffect}</p>
                   </td>
                 )}
 
                 {(activeFilter === 'all' || activeFilter === 'mentalState') && (
-                  <td className="py-1.5 px-2 align-top text-stone-800 leading-snug border-r border-stone-100">
-                    <p>{rec.mentalStateEffect}</p>
+                  <td className="py-1 px-2 align-top text-stone-800 leading-snug border-r border-stone-100 break-words whitespace-normal">
+                    <p className="break-words">{rec.mentalStateEffect}</p>
                   </td>
                 )}
 
                 {activeFilter === 'all' && (
-                  <td className="py-1.5 px-2 align-top text-stone-950 leading-snug bg-stone-50/40">
-                    <p>{rec.specificEffect}</p>
+                  <td className="py-1 px-2 align-top text-stone-950 leading-snug bg-stone-50/40 break-words whitespace-normal">
+                    <p className="break-words">{rec.specificEffect}</p>
                   </td>
                 )}
               </tr>
@@ -185,21 +185,21 @@ export function UnifiedPlanetaryImpactTable({
       </div>
 
       {/* Footer Info Strip */}
-      <div className="bg-[#FAF8F5] px-2.5 py-1.5 border-t border-stone-200 flex flex-wrap items-center justify-between gap-2 text-[14px] text-stone-600">
-        <span>
+      <div className="bg-[#FAF8F5] px-2 py-1 border-t border-stone-200 flex flex-wrap items-center justify-between gap-1 text-[10.5px] text-stone-600">
+        <span className="break-words">
           Calculated via Parashari Hora Shastra Gochar from Janma Rasi (Moon) & Lagna (Ascendant)
         </span>
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 text-[10px]">
           <span className="flex items-center space-x-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
             <span>Auspicious</span>
           </span>
           <span className="flex items-center space-x-1">
-            <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block" />
             <span>Caution</span>
           </span>
           <span className="flex items-center space-x-1">
-            <span className="w-2 h-2 rounded-full bg-purple-500 inline-block" />
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-500 inline-block" />
             <span>Transformative</span>
           </span>
         </div>

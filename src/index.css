@@ -8,19 +8,19 @@
 
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: 11.5px;
+    line-height: 1.45;
     background-color: #FDFBF7; /* Clean, light off-white/warm canvas */
     color: #1C1917;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
 
-  /* 1. Main Page Headings: Majestic Classical Vedic Display (point 15 = 15px with colors) */
+  /* 1. Main Page Headings: Majestic Classical Vedic Display (reduced font size) */
   h1, .heading-1, .font-h1 {
     font-family: 'Cinzel', Georgia, serif;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 13.5px;
     line-height: 1.3;
     letter-spacing: -0.01em;
     color: #9A3412; /* Rich Terracotta / Deep Warm Amber */
@@ -29,18 +29,18 @@
   h2, .heading-2, .font-h2 {
     font-family: 'Cinzel', Georgia, serif;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 13px;
     line-height: 1.3;
     letter-spacing: -0.01em;
     color: #B45309; /* Radiant Ochre / Amber */
   }
 
-  /* 2. Standardized Subheadings & Card Titles: point 15 = 15px with distinct colors */
+  /* 2. Standardized Subheadings & Card Titles */
   h3, .heading-3, .font-h3 {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-weight: 700;
-    font-size: 15px;
-    line-height: 1.35;
+    font-size: 12.5px;
+    line-height: 1.3;
     letter-spacing: -0.005em;
     color: #C2410C; /* Saffron / Warm Orange-Copper */
   }
@@ -48,32 +48,32 @@
   h4, .heading-4, .font-h4 {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-weight: 700;
-    font-size: 15px;
-    line-height: 1.35;
+    font-size: 12px;
+    line-height: 1.3;
     color: #B91C1C; /* Ruby / Garnet */
   }
 
   h5, .heading-5, .font-h5 {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-weight: 600;
-    font-size: 15px;
-    line-height: 1.35;
+    font-size: 11.5px;
+    line-height: 1.3;
     color: #7C2D12; /* Warm Cinnamon / Mahogany */
   }
 
   h6, .heading-6, .font-h6 {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-weight: 600;
-    font-size: 15px;
-    line-height: 1.35;
+    font-size: 11px;
+    line-height: 1.3;
     color: #854D0E; /* Golden Bronze */
   }
 
-  /* 3. Standardized Body Copy: point 13 = 13px and black (#000000) */
+  /* 3. Standardized Body Copy: point 11 = 11px and black (#000000) */
   p, .text-body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: 11px;
+    line-height: 1.45;
     color: #000000;
   }
 
@@ -158,22 +158,26 @@ h6.font-vedic {
    2. All text as point 13 (13px) and black (#000000)
    ========================================================================= */
 
-/* All headings below top button selectors: point 14 (14px) */
+/* All headings below top button selectors: reduced font size */
 main h1, main .heading-1, main .font-h1, main .text-page-title,
-main h2, main .heading-2, main .font-h2, main .text-section-title,
+main h2, main .heading-2, main .font-h2, main .text-section-title {
+  font-size: 13px !important;
+  line-height: 1.3 !important;
+}
+
 main h3, main .heading-3, main .font-h3, main .text-card-title,
 main h4, main .heading-4, main .font-h4,
 main h5, main .heading-5, main .font-h5,
 main h6, main .heading-6, main .font-h6 {
-  font-size: 14px !important;
-  line-height: 1.35 !important;
+  font-size: 12px !important;
+  line-height: 1.3 !important;
 }
 
-/* Ensure any nested spans or text within headings inherit point 14 and the heading color */
+/* Ensure any nested spans or text within headings inherit font size and the heading color */
 main h1 *, main h2 *, main h3 *, main h4 *, main h5 *, main h6 *,
 main .heading-1 *, main .heading-2 *, main .heading-3 *, main .heading-4 *, main .heading-5 *, main .heading-6 *,
 main .text-page-title *, main .text-section-title *, main .text-card-title * {
-  font-size: 14px !important;
+  font-size: inherit !important;
   color: inherit !important;
   line-height: inherit !important;
 }
@@ -211,7 +215,7 @@ main [class*="bg-amber-950"] h4, main [class*="from-amber-950"] h4, main [class*
   color: #FBBF24 !important; /* Radiant Warm Gold */
 }
 
-/* All text below top button selectors: point 12 (12px) and black (#000000) */
+/* All text below top button selectors: point 11 (11px) and black (#000000) */
 main p,
 main p *,
 main li,
@@ -227,11 +231,11 @@ main dt,
 main blockquote,
 main small,
 main summary {
-  font-size: 12px !important;
+  font-size: 11px !important;
   color: #000000 !important;
 }
 
-/* Ensure descriptive spans and text inside cards and details below selectors are 12px and black */
+/* Ensure descriptive spans and text inside cards and details below selectors are 11px and black */
 main .prose,
 main .prose p,
 main p.text-stone-700,
@@ -259,7 +263,7 @@ main div.text-stone-700,
 main div.text-stone-600,
 main div.text-stone-800,
 main div.text-stone-900 {
-  font-size: 12px !important;
+  font-size: 11px !important;
   color: #000000 !important;
 }
 
@@ -275,14 +279,27 @@ main [class*="bg-black"] p *,
 main [class*="bg-amber-900"] p,
 main [class*="bg-amber-900"] p * {
   color: #FEF3C7 !important;
-  font-size: 12px !important;
+  font-size: 11px !important;
 }
 main [class*="bg-amber-950"] span.text-amber-200,
 main [class*="from-amber-950"] span.text-amber-200,
 main [class*="from-amber-950"] span.text-amber-300,
 main [class*="bg-stone-900"] span.text-amber-200 {
   color: #FDE68A !important;
-  font-size: 12px !important;
+  font-size: 11px !important;
+}
+
+/* Universal Word Wrap & Responsive Text Flow */
+html, body, main, p, span, div, h1, h2, h3, h4, h5, h6, td, th, li, a, button {
+  overflow-wrap: break-word !important;
+  word-wrap: break-word !important;
+}
+
+main table th,
+main table td {
+  overflow-wrap: break-word !important;
+  word-wrap: break-word !important;
+  white-space: normal !important;
 }
 
 /* Tabular figures for stats and metrics */

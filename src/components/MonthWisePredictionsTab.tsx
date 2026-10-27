@@ -223,16 +223,16 @@ export function MonthWisePredictionsTab({
       <div className="bg-amber-50/50 border border-amber-200/80 rounded-lg px-2.5 py-1.5 flex flex-wrap items-center justify-between gap-2 shadow-3xs">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center space-x-1.5">
-            <Calendar className="w-4 h-4 text-amber-700" />
-            <span className="text-[14px] font-black text-stone-800 uppercase tracking-wider font-vedic leading-tight">
+            <Calendar className="w-3.5 h-3.5 text-amber-700" />
+            <span className="text-[12.5px] font-black text-stone-800 uppercase tracking-wider font-vedic leading-tight break-words">
               Monthly &amp; Yearly Readings
             </span>
           </div>
 
-          <div className="h-3.5 w-px bg-amber-300/80 hidden sm:block" />
+          <div className="h-3 w-px bg-amber-300/80 hidden sm:block" />
 
           {/* Lagna & Moon Sign Badges on the Same Header Bar */}
-          <div className="flex items-center space-x-3 text-[13px] font-bold uppercase tracking-wider">
+          <div className="flex items-center space-x-2.5 text-[11.5px] font-bold uppercase tracking-wider">
             <div className="text-amber-800">
               Lagna <span className="text-stone-950 font-black">{VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName}</span>
             </div>
@@ -247,7 +247,7 @@ export function MonthWisePredictionsTab({
             <button
               type="button"
               onClick={onNavigateToBirthTime}
-              className="text-[13px] font-black uppercase tracking-wider text-amber-800 hover:text-amber-950 flex items-center space-x-1 transition-colors cursor-pointer"
+              className="text-[11.5px] font-black uppercase tracking-wider text-amber-800 hover:text-amber-950 flex items-center space-x-1 transition-colors cursor-pointer"
             >
               <span>Birth Charts</span>
               <ArrowRight className="w-3.5 h-3.5" />

@@ -49,6 +49,16 @@ export interface OccupationOption {
   rationale: string;
 }
 
+export interface BusinessSectorItem {
+  sector: string;
+  sanskritTitle: string;
+  rulingPlanets: string[];
+  suitabilityScore: number;
+  verdict: string;
+  rationale: string;
+  optimalLaunchTiming: string;
+}
+
 export interface CareerTransitionWindow {
   window: string;
   type: 'Promotion & Recognition' | 'Strategic Job Switch' | 'Department / City Transfer' | 'Salary Revision' | 'Favour from Seniors & Mentors' | 'Job Change / New Job';
@@ -115,6 +125,7 @@ export interface LifeGuidanceProfile {
     primaryVocation: string;
     careerArchetype: string;
     occupationOptions: OccupationOption[];
+    businessSectors: BusinessSectorItem[];
     workCultureSuitability: string;
     independentVsJobRatio: { business: number; salariedJob: number };
   };
@@ -140,6 +151,15 @@ export interface LifeGuidanceProfile {
     essentialTraits: string[];
     criticalRedFlags: string[];
     partnershipSuccessScore: number;
+  };
+  financialRiskGuidance: {
+    partnershipVerdict: string;
+    partnershipSuccessScore: number;
+    loanAndDebtGuidance: string;
+    debtRiskLevel: string;
+    guarantorWarning: string;
+    optimalFinancialActions: string[];
+    criticalFinancialRisks: string[];
   };
   atmakarakaMission: {
     planet: string;
@@ -877,6 +897,7 @@ export function computePersonalizedLifeGuidance(
   };
 
   const sunHouse = getHouseOfPlanet('Surya');
+  const moonHouse = getHouseOfPlanet('Chandra');
   const mercHouse = getHouseOfPlanet('Budha');
   const jupHouse = getHouseOfPlanet('Guru');
   const marsHouse = getHouseOfPlanet('Mangal');
@@ -957,6 +978,51 @@ export function computePersonalizedLifeGuidance(
     },
   ];
   occupationOptions.sort((a, b) => b.alignmentScore - a.alignmentScore);
+
+  const propScore = ([1, 4, 9, 10, 11].includes(marsHouse) || [1, 4, 10, 11].includes(satHouse)) ? 91 : 76;
+  const ironScore = ([3, 6, 10, 11].includes(satHouse) || [3, 6, 10].includes(marsHouse)) ? 88 : 72;
+  const furnScore = ([2, 4, 7, 10, 11].includes(venHouse) || [2, 4].includes(satHouse)) ? 86 : 70;
+  const oilScore = ([2, 4, 7, 10, 11].includes(moonHouse) || [2, 4, 11].includes(venHouse)) ? 84 : 68;
+
+  const businessSectors: BusinessSectorItem[] = [
+    {
+      sector: 'Property, Real Estate & Land Development',
+      sanskritTitle: 'भूमि व अचल सम्पत्ति व्यापार (Bhoomi Vyapar)',
+      rulingPlanets: ['Mangal', 'Shani', '4th Lord'],
+      suitabilityScore: propScore,
+      verdict: propScore >= 85 ? 'Highly Favorable: Exceptional returns in land plotting, commercial real estate, and residential construction.' : 'Favorable with disciplined capital allocation and legal due diligence.',
+      rationale: 'Governed by Mars (Bhoomi Karaka) and Saturn (structures) operating through the 4th house. Yields massive long-term asset appreciation.',
+      optimalLaunchTiming: 'During Mars or Saturn transits over the 4th or 11th house, on Tuesdays or Saturdays.',
+    },
+    {
+      sector: 'Iron, Steel, Heavy Metals & Hardware',
+      sanskritTitle: 'लोहा, धातु व भारी मशीनरी व्यापार (Loha & Yantra)',
+      rulingPlanets: ['Shani', 'Mangal', 'Rahu'],
+      suitabilityScore: ironScore,
+      verdict: ironScore >= 85 ? 'Strong Metal & Heavy Industry Yoga: Highly profitable in steel manufacturing, hardware distribution, and industrial scrap.' : 'Profitable in niche hardware or industrial components supply.',
+      rationale: 'Saturn and Mars govern heavy metals, raw ores, and mechanical fabrication. Success is driven by high-volume B2B contract execution.',
+      optimalLaunchTiming: 'During Saturn or Mars sub-dashas, on Saturdays or Tuesdays in Shukla Paksha.',
+    },
+    {
+      sector: 'Furniture, Timber & Interior Decor',
+      sanskritTitle: 'काष्ठकला, फर्नीचर व गृह सज्जा (Kashta & Griha Sajja)',
+      rulingPlanets: ['Shukra', 'Shani', '4th Bhava'],
+      suitabilityScore: furnScore,
+      verdict: furnScore >= 85 ? 'Excellent Timber & Luxury Furniture Enterprise: High demand in custom interior modular solutions and wholesale timber.' : 'Stable retail and commercial furnishing enterprise.',
+      rationale: 'Venus governs luxury and decor, while Saturn rules wood and timber (Kashta). Combines aesthetic appeal with durable structural craftsmanship.',
+      optimalLaunchTiming: 'During Venus sub-periods or on Fridays during Shukla Paksha.',
+    },
+    {
+      sector: 'Edible Oil, Food Commodities & FMCG',
+      sanskritTitle: 'खाद्य तेल, कृषि उपज व एफएमसीजी (Taila & Anna Vyapar)',
+      rulingPlanets: ['Chandra', 'Shukra', '2nd Bhava'],
+      suitabilityScore: oilScore,
+      verdict: oilScore >= 85 ? 'Lucrative Liquid Commodity & Food Trading: High turnover and steady cash flow in edible oils, grains, and FMCG.' : 'Viable retail food and commodity distribution with steady margins.',
+      rationale: 'Moon governs liquids, food, and mass consumption, while Venus rules wholesale luxury commodities and consumer markets.',
+      optimalLaunchTiming: 'During Moon or Venus antardashas, on Mondays or Fridays during Shukla Paksha.',
+    },
+  ];
+  businessSectors.sort((a, b) => b.suitabilityScore - a.suitabilityScore);
 
   // 3. LONG TERM STAY — FOREIGN VS MOTHERLAND
   let foreignScore = 45;
@@ -1167,6 +1233,32 @@ export function computePersonalizedLifeGuidance(
     ? natalPlanets.reduce((prev, curr) => ((curr.degree || 0) > (prev.degree || 0) ? curr : prev), natalPlanets[0])
     : defaultPlanet;
 
+  const pScore = Math.min(94, Math.round(60 + dhanaMultiplier * 8));
+  const debtScore = ([6, 8, 12].includes(satHouse) || [6, 8, 12].includes(marsHouse)) ? 62 : 38;
+  const debtRiskLevel = debtScore >= 55 ? 'Moderate (Strict Discipline Required)' : 'Low (Safe for Leverage)';
+
+  const financialRiskGuidance = {
+    partnershipVerdict: pScore >= 75
+      ? 'Favorable for strategic partnerships provided equity split and dispute resolution clauses are legally registered in writing.'
+      : 'Solopreneurship or majority-control (70%+) equity structure is strongly recommended to prevent partner friction or equity disputes.',
+    partnershipSuccessScore: pScore,
+    loanAndDebtGuidance: debtScore >= 50
+      ? 'Caution with large unsecured debt during Saturn or Rahu dasha transits. Leverage debt strictly for revenue-generating productive fixed assets (real estate, core equipment) rather than speculative trading.'
+      : 'Healthy credit standing. Strategic debt leverage for asset expansion and business compounding can be effectively utilized under Jupiter/Mercury benefic transits.',
+    debtRiskLevel,
+    guarantorWarning: 'CRITICAL VEDIC WARNING: Never stand as financial guarantor, surety, or co-signer for friends or associates. The 6th/8th house karmic footprint indicates high probability of third-party debt default transferring onto your balance sheet.',
+    optimalFinancialActions: [
+      'Execute all partnership deeds and loan agreements on Wednesdays or Thursdays during Shukla Paksha.',
+      'Maintain a minimum 3-to-6 month cash liquidity treasury before undertaking commercial credit.',
+      'Audit accounts quarterly to prevent hidden leakage or partner oversight.',
+    ],
+    criticalFinancialRisks: [
+      'Standing guarantor or co-signing unverified loans for others',
+      'Entering verbal business partnerships without notarized shareholder agreements',
+      'Over-leveraging short-term credit for volatile speculative assets',
+    ],
+  };
+
   return {
     education: {
       recommendedStream: streamOptions[0].stream,
@@ -1179,6 +1271,7 @@ export function computePersonalizedLifeGuidance(
       primaryVocation: occupationOptions[0].role,
       careerArchetype: occupationOptions[0].archetype,
       occupationOptions,
+      businessSectors,
       workCultureSuitability: 'High-autonomy meritocracy with clear executive accountability and direct P&L ownership.',
       independentVsJobRatio: {
         business: Math.min(75, Math.round(40 + (dhanaMultiplier - 2) * 15)),
@@ -1225,6 +1318,7 @@ export function computePersonalizedLifeGuidance(
       ],
       partnershipSuccessScore: Math.min(94, Math.round(60 + dhanaMultiplier * 8)),
     },
+    financialRiskGuidance,
     atmakarakaMission: {
       planet: atmakarakaPlanet.name,
       soulLesson: 'Cultivating detachment from ego while executing supreme excellence in worldly responsibility (Karma Yoga).',

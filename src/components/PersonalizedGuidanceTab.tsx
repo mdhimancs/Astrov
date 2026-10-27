@@ -77,11 +77,11 @@ export function PersonalizedGuidanceTab({
               </span>
             </div>
 
-            <h1 className="font-vedic font-black text-xl sm:text-2xl text-white tracking-tight flex items-center space-x-2">
+            <h1 className="font-vedic font-black text-base sm:text-lg text-white tracking-tight flex items-center space-x-2 break-words">
               <span>Personalized Guidance</span>
             </h1>
 
-            <p className="text-[13px] text-blue-200/80 max-w-2xl leading-relaxed">
+            <p className="text-[11px] text-blue-200/80 max-w-2xl leading-relaxed break-words">
               Tailored astrological counsel for educational streams, vocational calling, foreign vs motherland settlement, promotion roadmap, and interactive Max Wealth compounding calculator.
             </p>
           </div>
@@ -91,9 +91,9 @@ export function PersonalizedGuidanceTab({
             <button
               type="button"
               onClick={onNavigateToLifeEvents}
-              className="self-start md:self-center bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-amber-950 font-bold px-3.5 py-2 rounded-lg text-[12.5px] flex items-center space-x-1.5 shadow-md cursor-pointer transition-all shrink-0 border border-amber-300"
+              className="self-start md:self-center bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-amber-950 font-bold px-3 py-1.5 rounded-lg text-[11px] flex items-center space-x-1.5 shadow-md cursor-pointer transition-all shrink-0 border border-amber-300"
             >
-              <Sparkles className="w-4 h-4 text-amber-900" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-900" />
               <span>View Life Events &amp; Matters</span>
               <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
             </button>
@@ -101,55 +101,55 @@ export function PersonalizedGuidanceTab({
         </div>
 
         {/* Quick Snapshot Strip */}
-        <div className="mt-4 pt-3.5 border-t border-blue-500/20 grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <div className="bg-blue-950/60 border border-blue-500/30 rounded-lg p-2.5">
-            <div className="flex items-center space-x-1.5 text-[11px] text-blue-300 font-medium">
+        <div className="mt-3 pt-2.5 border-t border-blue-500/20 grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="bg-blue-950/60 border border-blue-500/30 rounded-lg p-2">
+            <div className="flex items-center space-x-1.5 text-[10px] text-blue-300 font-medium">
               <GraduationCap className="w-3.5 h-3.5" />
               <span>Recommended Study</span>
             </div>
-            <div className="text-[13px] sm:text-[14px] font-bold text-white mt-1 truncate">
+            <div className="text-[11px] sm:text-[11.5px] font-bold text-white mt-0.5 break-words leading-tight">
               {guidance.education.recommendedStream.split('(')[0].trim()}
             </div>
-            <div className="text-[10.5px] text-blue-300/80 mt-0.5">
+            <div className="text-[9.5px] text-blue-300/80 mt-0.5">
               Exam Success: {guidance.education.examSuccessProbability}%
             </div>
           </div>
 
-          <div className="bg-blue-950/60 border border-blue-500/30 rounded-lg p-2.5">
-            <div className="flex items-center space-x-1.5 text-[11px] text-blue-300 font-medium">
+          <div className="bg-blue-950/60 border border-blue-500/30 rounded-lg p-2">
+            <div className="flex items-center space-x-1.5 text-[10px] text-blue-300 font-medium">
               <Briefcase className="w-3.5 h-3.5" />
               <span>Career Archetype</span>
             </div>
-            <div className="text-[13px] sm:text-[14px] font-bold text-white mt-1 truncate">
+            <div className="text-[11px] sm:text-[11.5px] font-bold text-white mt-0.5 break-words leading-tight">
               {guidance.occupation.careerArchetype}
             </div>
-            <div className="text-[10.5px] text-blue-300/80 mt-0.5">
+            <div className="text-[9.5px] text-blue-300/80 mt-0.5">
               {guidance.occupation.independentVsJobRatio.business}% Business / {guidance.occupation.independentVsJobRatio.salariedJob}% Job
             </div>
           </div>
 
-          <div className="bg-blue-950/60 border border-blue-500/30 rounded-lg p-2.5">
-            <div className="flex items-center space-x-1.5 text-[11px] text-blue-300 font-medium">
+          <div className="bg-blue-950/60 border border-blue-500/30 rounded-lg p-2">
+            <div className="flex items-center space-x-1.5 text-[10px] text-blue-300 font-medium">
               <Globe className="w-3.5 h-3.5" />
               <span>Settlement Verdict</span>
             </div>
-            <div className="text-[13px] sm:text-[14px] font-bold text-white mt-1 truncate">
+            <div className="text-[11px] sm:text-[11.5px] font-bold text-white mt-0.5 break-words leading-tight">
               {guidance.foreignVsMotherland.settlementVerdict.replace(' Favored', '')}
             </div>
-            <div className="text-[10.5px] text-blue-300/80 mt-0.5">
+            <div className="text-[9.5px] text-blue-300/80 mt-0.5">
               Abroad Prob: {guidance.foreignVsMotherland.foreignStayProbability}%
             </div>
           </div>
 
-          <div className="bg-blue-950/60 border border-blue-500/30 rounded-lg p-2.5">
-            <div className="flex items-center space-x-1.5 text-[11px] text-blue-300 font-medium">
+          <div className="bg-blue-950/60 border border-blue-500/30 rounded-lg p-2">
+            <div className="flex items-center space-x-1.5 text-[10px] text-blue-300 font-medium">
               <IndianRupee className="w-3.5 h-3.5" />
               <span>Wealth Multiplier</span>
             </div>
-            <div className="text-[13px] sm:text-[14px] font-bold text-white mt-1 truncate">
+            <div className="text-[11px] sm:text-[11.5px] font-bold text-white mt-0.5 break-words leading-tight">
               {guidance.maxWealth.dhanaYogaMultiplier}x Dhana Yoga
             </div>
-            <div className="text-[10.5px] text-blue-300/80 mt-0.5">
+            <div className="text-[9.5px] text-blue-300/80 mt-0.5">
               Peak: Ages {guidance.maxWealth.peakWealthAgeRange}
             </div>
           </div>

@@ -82,20 +82,20 @@ export function PersonalizedGuidanceSection({
         <div className="space-y-0.5">
           <div className="flex items-center space-x-2">
             <span className="p-1 rounded-md bg-amber-100 text-amber-900 border border-amber-300">
-              <Compass className="w-4 h-4" />
+              <Compass className="w-3.5 h-3.5" />
             </span>
-            <h3 className="font-vedic font-black text-stone-950 text-[16px] sm:text-[17px] tracking-tight">
+            <h3 className="font-vedic font-black text-stone-950 text-[13.5px] sm:text-[14px] tracking-tight break-words">
               Personalized Guidance for the Person &amp; Strategic Calculators
             </h3>
           </div>
-          <p className="text-[12px] text-stone-600 leading-snug">
+          <p className="text-[11px] text-stone-600 leading-snug break-words">
             Vedic life roadmap tailored to your natal lagna, karmic houses (2nd, 4th, 5th, 9th, 10th, 11th, 12th) and planetary strengths.
           </p>
         </div>
 
         {/* Tab switcher badge */}
-        <div className="flex items-center space-x-1.5 text-[11px] font-bold text-amber-950 bg-amber-100/70 border border-amber-300 px-2.5 py-1 rounded-md shrink-0">
-          <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+        <div className="flex items-center space-x-1.5 text-[10px] font-bold text-amber-950 bg-amber-100/70 border border-amber-300 px-2 py-0.5 rounded-md shrink-0">
+          <Sparkles className="w-3 h-3 text-amber-700" />
           <span>Actionable Guidance Suite</span>
         </div>
       </div>
@@ -286,6 +286,51 @@ export function PersonalizedGuidanceSection({
                 </p>
               </div>
             ))}
+          </div>
+
+          {/* Specific Business Sectors (Edible Oil, Iron/Metal, Furniture, Property) */}
+          <div className="mt-4 pt-3 border-t border-amber-200/70 space-y-2.5">
+            <div className="flex items-center space-x-2">
+              <span className="p-1 rounded bg-amber-100 text-amber-900 border border-amber-300">
+                <Briefcase className="w-3.5 h-3.5" />
+              </span>
+              <h5 className="font-vedic font-black text-stone-950 text-[13.5px]">
+                Business Sector Suitability: Edible Oil, Iron/Metal, Furniture &amp; Property
+              </h5>
+            </div>
+            <p className="text-[11px] text-stone-600">
+              Vedic evaluation of specific commercial enterprises and commodities based on planetary house ownership and elemental strengths.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+              {guidance.occupation.businessSectors.map((sec, idx) => (
+                <div
+                  key={idx}
+                  className="bg-[#FCFAF7] p-2.5 rounded-md border border-stone-200 space-y-1.5"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-stone-950 text-[12.5px]">{sec.sector}</span>
+                    <span className="font-bold font-vedic text-amber-900 text-[11.5px] bg-amber-100 px-1.5 py-0.2 rounded border border-amber-300">
+                      {sec.suitabilityScore}% Match
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-stone-500 font-semibold flex items-center space-x-1.5">
+                    <span>Ruling Planets: {sec.rulingPlanets.join(', ')}</span>
+                    <span>•</span>
+                    <span className="text-amber-800 font-bold">{sec.sanskritTitle}</span>
+                  </div>
+                  <p className="text-[11px] text-stone-700 font-medium leading-snug">
+                    {sec.verdict}
+                  </p>
+                  <p className="text-[10.5px] text-stone-600 leading-snug">
+                    {sec.rationale}
+                  </p>
+                  <div className="text-[10px] text-amber-900 bg-amber-50 p-1.5 rounded border border-amber-200/80">
+                    <span className="font-bold">Launch Timing:</span> {sec.optimalLaunchTiming}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -807,6 +852,49 @@ export function PersonalizedGuidanceSection({
                 </ul>
                 <div className="pt-1 border-t border-stone-200/60 text-[11px] text-stone-700">
                   <strong className="text-amber-900">Soul Calling (Atmakaraka {guidance.atmakarakaMission.planet}):</strong> {guidance.atmakarakaMission.dharmicCalling}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Partnerships, Loans & Financial Guarantees Guidance */}
+          <div className="space-y-2 pt-3 border-t border-stone-200/80">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-1.5 text-amber-900 font-bold text-[13px]">
+                <IndianRupee className="w-4 h-4 text-amber-800" />
+                <span>Partnerships, Loans &amp; Financial Risk Guidance</span>
+              </div>
+              <span className={`text-[10.5px] font-bold px-2 py-0.5 rounded border ${
+                guidance.financialRiskGuidance.debtRiskLevel.includes('Low') ? 'bg-emerald-100 text-emerald-950 border-emerald-300' : 'bg-amber-100 text-amber-950 border-amber-300'
+              }`}>
+                Debt Risk: {guidance.financialRiskGuidance.debtRiskLevel}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11.5px]">
+              <div className="bg-[#FAF8F5] p-2.5 rounded border border-stone-200 space-y-1.5">
+                <span className="font-bold text-stone-900 block">🏦 Loan &amp; Commercial Credit Advice:</span>
+                <p className="text-stone-700 leading-snug">
+                  {guidance.financialRiskGuidance.loanAndDebtGuidance}
+                </p>
+                <div className="bg-rose-50 p-2 rounded border border-rose-200 text-rose-950 text-[11px] font-medium space-y-0.5">
+                  <span className="font-bold block">⚠️ Guarantor &amp; Surety Warning:</span>
+                  <p>{guidance.financialRiskGuidance.guarantorWarning}</p>
+                </div>
+              </div>
+
+              <div className="bg-[#FAF8F5] p-2.5 rounded border border-stone-200 space-y-1.5">
+                <span className="font-bold text-stone-900 block">🤝 Partnership Verdict &amp; Risk Guardrails:</span>
+                <p className="text-stone-700 leading-snug">
+                  {guidance.financialRiskGuidance.partnershipVerdict}
+                </p>
+                <div className="space-y-1 pt-1">
+                  <span className="font-bold text-stone-800 block text-[10.5px]">Optimal Financial &amp; Legal Actions:</span>
+                  <ul className="list-disc list-inside text-stone-600 text-[11px] space-y-0.5">
+                    {guidance.financialRiskGuidance.optimalFinancialActions.map((act, i) => (
+                      <li key={i}>{act}</li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             </div>
