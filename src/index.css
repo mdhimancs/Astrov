@@ -309,16 +309,40 @@ main [class*="bg-stone-900"] span.text-amber-200 {
   background: #B45309;
 }
 
-/* User-requested specific UI style adjustments - standardize header buttons */
-header button {
+/* User-requested specific UI style adjustments - standardize top header buttons except dropdown items */
+header button:not(.category-dropdown-item) {
   height: 37.8131px;
   font-size: 11px;
 }
-header button > div > span {
+header button:not(.category-dropdown-item) > div > span {
   font-size: 12px;
 }
-div#root:nth-of-type(1) > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) {
-  height: 30.1124px;
+/* Ensure all category and header dropdown menus are free-floating and never restricted in height */
+header nav [data-dropdown-menu],
+header nav .category-dropdown-menu {
+  height: auto !important;
+  max-height: 85vh !important;
+  overflow-y: auto !important;
+}
+header .category-dropdown-menu button,
+header [data-dropdown-menu] button,
+header button.category-dropdown-item {
+  height: auto !important;
+  min-height: 34px !important;
+  font-size: 12px !important;
+  cursor: pointer !important;
+}
+
+/* User-requested specific UI style adjustments via Focus Mode */
+div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > input#ephemeris-city-search:nth-of-type(1),
+input#ephemeris-city-search {
+  width: 215.992px !important;
+  height: 21.8343px !important;
+  font-size: 11px !important;
+}
+
+div#root:nth-of-type(1) > div:nth-of-type(1) > main:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1) > svg:nth-of-type(1) {
+  height: 6.9914000000000005px !important;
 }
 
 /* =========================================================================

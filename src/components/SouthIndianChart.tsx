@@ -77,8 +77,8 @@ export function SouthIndianChart({
         </div>
       )}
 
-      {/* 4x4 Grid representation */}
-      <div className="relative w-full max-w-[360px] aspect-square select-none mx-auto grid grid-cols-4 grid-rows-4 border-2 border-amber-800/80 bg-[#FAF7F2] rounded overflow-hidden">
+      {/* 4x4 Grid representation (Increased by 20%) */}
+      <div className="relative w-full max-w-[432px] aspect-square select-none mx-auto grid grid-cols-4 grid-rows-4 border-2 border-amber-800/80 bg-[#FAF7F2] rounded overflow-hidden">
         {SOUTH_INDIAN_GRID_CELLS.map((cell) => {
           const house = rasiToHouseMap.get(cell.rasiNumber);
           const isLagna = house?.houseNumber === 1;

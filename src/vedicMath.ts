@@ -1,4 +1,4 @@
-import { BirthDetails, PlanetPosition, HouseInfo, VedicRasiName, GrahaName, TransitPrediction, PlanetaryMovementDetail, MonthWiseTransitPrediction, YearlyPrediction, TransitDosAndDonts, PlanetaryImpactRecord, BirthTimeHousePrediction, BhriguLalKitabSummary, NatalYoga, VimshottariDashaInfo, AntardashaInfo, DashaMonthlyPlanetaryGuidance, AshtakavargaPoints, TajikaSuite, TajikaSaham, TajikaYoga, ChandraEmotionalSignificance, NatalCalculationResult, DashaStrengthRating, DashaStrengthInfo, PratyantardashaInfo, DashaPartInfo } from './types';
+import { BirthDetails, PlanetPosition, HouseInfo, VedicRasiName, GrahaName, TransitPrediction, PlanetaryMovementDetail, MonthWiseTransitPrediction, WeeklyPrediction, YearlyPrediction, TransitDosAndDonts, PlanetaryImpactRecord, BirthTimeHousePrediction, BhriguLalKitabSummary, NatalYoga, VimshottariDashaInfo, AntardashaInfo, DashaMonthlyPlanetaryGuidance, AshtakavargaPoints, TajikaSuite, TajikaSaham, TajikaYoga, ChandraEmotionalSignificance, NatalCalculationResult, DashaStrengthRating, DashaStrengthInfo, PratyantardashaInfo, DashaPartInfo } from './types';
 import { VEDIC_RASIS, NAKSHATRAS, BHAVA_DETAILS } from './data';
 import { ALL_MONTH_WISE_PREDICTIONS } from './monthlyTransitData';
 export { ALL_MONTH_WISE_PREDICTIONS };
@@ -1352,6 +1352,97 @@ export function generateMonthWiseTransitPredictions(
     }
     return month;
   });
+}
+
+// Generate Weekly Predictions for a given monthKey
+export function generateWeeklyPredictions(
+  monthKey: string,
+  natalMoonRasi: number,
+  natalLagnaRasi: number,
+  sadeSatiActive: boolean
+): WeeklyPrediction[] {
+  const [yearStr, monthStr] = monthKey.split('-');
+  const year = parseInt(yearStr || '2026', 10);
+  const month = parseInt(monthStr || '1', 10);
+
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  const mName = monthNames[month - 1] || 'Month';
+
+  const weeks: WeeklyPrediction[] = [
+    {
+      weekKey: `${monthKey}-W1`,
+      weekTitle: `Week 1: Early ${mName} - New Beginnings & Planning`,
+      startDate: `${year}-${monthStr}-01`,
+      endDate: `${year}-${monthStr}-07`,
+      tagline: `Auspicious initiation cycle governed by waxing lunar quarter and stellar alignment.`,
+      overallRating: 4,
+      lunarPhase: `Shukla Paksha (Waxing Moon)`,
+      auspiciousDays: `Monday, Thursday`,
+      cautionDays: `Tuesday (Impulse control)`,
+      careerFocus: `Excellent period for pitching new projects, aligning with superiors, and restructuring long-term goals.`,
+      wealthFocus: `Favorable cash flow alignment; ideal for reviewing budget allocation and tax planning.`,
+      relationshipsFocus: `Harmony in partnership; warm family discussions and constructive bonding.`,
+      healthFocus: `High vitality levels; great week to adopt a sustained morning exercise routine.`,
+      weeklyRemedy: `Offer water and red flowers to the rising Sun daily; chant Surya Gayatri mantra 108 times.`,
+    },
+    {
+      weekKey: `${monthKey}-W2`,
+      weekTitle: `Week 2: Mid-Month Execution & Momentum`,
+      startDate: `${year}-${monthStr}-08`,
+      endDate: `${year}-${monthStr}-14`,
+      tagline: `Peak operational efficiency supported by favorable planetary aspects in houses of enterprise.`,
+      overallRating: 5,
+      lunarPhase: `Full Moon / Purnima Approach`,
+      auspiciousDays: `Wednesday, Friday`,
+      cautionDays: `Saturday (Patience required)`,
+      careerFocus: `Breakthrough momentum in negotiations, client meetings, and intellectual collaboration.`,
+      wealthFocus: `Investments made now yield steady compounding results; favorable returns from past ventures.`,
+      relationshipsFocus: `Deep emotional resonance and romantic harmony; excellent time for family gatherings.`,
+      healthFocus: `Balanced emotional equilibrium; ensure adequate hydration and consistent sleep hygiene.`,
+      weeklyRemedy: `Light a sesame oil lamp near a Peepal tree on Saturday evening; feed stray cows with green fodder.`,
+    },
+    {
+      weekKey: `${monthKey}-W3`,
+      weekTitle: `Week 3: Consolidation & Strategic Review`,
+      startDate: `${year}-${monthStr}-15`,
+      endDate: `${year}-${monthStr}-21`,
+      tagline: `Waning lunar phase prompts careful auditing, completion of pending tasks, and risk management.`,
+      overallRating: 3,
+      lunarPhase: `Krishna Paksha (Waning Moon)`,
+      auspiciousDays: `Tuesday, Sunday`,
+      cautionDays: `Thursday (Avoid major speculative risks)`,
+      careerFocus: `Focus on closing existing loops and resolving bureaucratic bottlenecks before initiating new contracts.`,
+      wealthFocus: `Exercise prudence in discretionary spending; avoid lending money without written surety.`,
+      relationshipsFocus: `Listen actively to family members' perspectives; practice patience during minor misunderstandings.`,
+      healthFocus: `Rest and recuperate; pay attention to joint mobility and relaxation.`,
+      weeklyRemedy: `Recite or listen to Vishnu Sahasranama on Thursday; practice 10 minutes of silent meditation daily.`,
+    },
+    {
+      weekKey: `${monthKey}-W4`,
+      weekTitle: `Week 4: Completion & Preparation for Next Cycle`,
+      startDate: `${year}-${monthStr}-22`,
+      endDate: `${year}-${monthStr}-${month === 2 ? 28 : 30}`,
+      tagline: `Introspective closure period with strong spiritual insights and karmic alignment.`,
+      overallRating: 4,
+      lunarPhase: `New Moon / Amavasya Approach`,
+      auspiciousDays: `Monday, Friday`,
+      cautionDays: `Wednesday (Double-check paperwork)`,
+      careerFocus: `Summarize monthly deliverables, prepare progress reports, and set clear milestones for the upcoming cycle.`,
+      wealthFocus: `Stable financial footing; clear all pending monthly utility bills and credit liabilities.`,
+      relationshipsFocus: `Calm domestic environment; supportive support from spouse and close confidants.`,
+      healthFocus: `Rejuvenate through herbal teas, restorative sleep, and quiet journaling.`,
+      weeklyRemedy: `Offer white sweets and milk at a Shiva temple on Monday; practice charity (anna daan) to the needy.`,
+    },
+  ];
+
+  if (sadeSatiActive) {
+    weeks[2].cautionDays += ' (Sade Sati mindfulness)';
+  }
+
+  return weeks;
 }
 
 // Categorized Do's and Don'ts across all 4 key life domains based on current Gochar

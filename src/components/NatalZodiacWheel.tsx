@@ -38,12 +38,12 @@ export const NatalZodiacWheel: React.FC<NatalZodiacWheelProps> = ({
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetPosition | null>(null);
   const [hoveredSignIndex, setHoveredSignIndex] = useState<number | null>(null);
 
-  const size = 520;
+  const size = 750;
   const center = size / 2;
-  const outerRadius = 230;
-  const signRingInner = 185;
-  const houseRingInner = 145;
-  const innerHubRadius = 55;
+  const outerRadius = 332;
+  const signRingInner = 266;
+  const houseRingInner = 209;
+  const innerHubRadius = 80;
 
   const toRad = (deg: number) => (deg * Math.PI) / 180;
 
@@ -72,8 +72,8 @@ export const NatalZodiacWheel: React.FC<NatalZodiacWheelProps> = ({
       const totalInSign = sameSignList.length;
 
       // Base radius in the planetary band (between innerHub and houseRingInner)
-      const minR = innerHubRadius + 22;
-      const maxR = houseRingInner - 18;
+      const minR = innerHubRadius + 26;
+      const maxR = houseRingInner - 22;
       let r = (minR + maxR) / 2;
       if (totalInSign > 1) {
         const step = (maxR - minR) / (totalInSign + 1);
@@ -97,7 +97,7 @@ export const NatalZodiacWheel: React.FC<NatalZodiacWheelProps> = ({
   const lagnaDegree = (lagnaRasi - 1) * 30;
 
   return (
-    <div className="flex flex-col items-center w-full max-w-4xl p-4 sm:p-6 bg-white/95 rounded-2xl shadow-sm border border-stone-200">
+    <div className="flex flex-col items-center w-full max-w-5xl p-4 sm:p-6 bg-white/95 rounded-2xl shadow-sm border border-stone-200">
       {/* Header bar with controls */}
       <div className="flex flex-col sm:flex-row items-center justify-between w-full mb-4 gap-2 border-b border-stone-100 pb-3">
         <div className="flex items-center space-x-2">
@@ -267,17 +267,17 @@ export const NatalZodiacWheel: React.FC<NatalZodiacWheelProps> = ({
                     y={midPos.y - 2}
                     textAnchor="middle"
                     dominantBaseline="central"
-                    fontSize="13"
+                    fontSize="15"
                     className="font-bold fill-stone-800"
                   >
                     {ZODIAC_SYMBOLS[i]} {rasiData.sanskritName}
                   </text>
                   <text
                     x={midPos.x}
-                    y={midPos.y + 11}
+                    y={midPos.y + 13}
                     textAnchor="middle"
                     dominantBaseline="central"
-                    fontSize="9.5"
+                    fontSize="11"
                     className="font-semibold fill-stone-500"
                   >
                     {rasiData.englishName.slice(0, 3)} • {i * 30}°
@@ -299,7 +299,7 @@ export const NatalZodiacWheel: React.FC<NatalZodiacWheelProps> = ({
                   <circle
                     cx={housePos.x}
                     cy={housePos.y}
-                    r="9.5"
+                    r="11.5"
                     fill={houseNumber === 1 ? '#d97706' : '#f1f5f9'}
                     stroke={houseNumber === 1 ? '#b45309' : '#cbd5e1'}
                     strokeWidth="1"
@@ -309,7 +309,7 @@ export const NatalZodiacWheel: React.FC<NatalZodiacWheelProps> = ({
                     y={housePos.y + 1}
                     textAnchor="middle"
                     dominantBaseline="central"
-                    fontSize="9"
+                    fontSize="10.5"
                     fontWeight="bold"
                     fill={houseNumber === 1 ? '#ffffff' : '#475569'}
                   >
@@ -368,10 +368,10 @@ export const NatalZodiacWheel: React.FC<NatalZodiacWheelProps> = ({
             {/* Sacred Vedic OM in Center */}
             <text
               x={center}
-              y={center - 4}
+              y={center - 5}
               textAnchor="middle"
               dominantBaseline="central"
-              fontSize="24"
+              fontSize="28"
               fontWeight="bold"
               fill="#78350f"
               className="font-vedic"
@@ -380,10 +380,10 @@ export const NatalZodiacWheel: React.FC<NatalZodiacWheelProps> = ({
             </text>
             <text
               x={center}
-              y={center + 16}
+              y={center + 18}
               textAnchor="middle"
               dominantBaseline="central"
-              fontSize="9"
+              fontSize="10.5"
               fontWeight="bold"
               fill="#92400e"
               className="uppercase tracking-wider"
@@ -419,7 +419,7 @@ export const NatalZodiacWheel: React.FC<NatalZodiacWheelProps> = ({
                   <circle
                     cx={coords.x}
                     cy={coords.y}
-                    r={isSelected ? 14 : 11}
+                    r={isSelected ? 16 : 13}
                     fill={style.bg}
                     stroke={isSelected ? '#ffffff' : style.border}
                     strokeWidth={isSelected ? 2.5 : 1.5}
@@ -433,7 +433,7 @@ export const NatalZodiacWheel: React.FC<NatalZodiacWheelProps> = ({
                     y={coords.y + 0.5}
                     textAnchor="middle"
                     dominantBaseline="central"
-                    fontSize={isSelected ? '9.5' : '8.5'}
+                    fontSize={isSelected ? '11' : '10'}
                     fontWeight="bold"
                     fill={style.text}
                     className="pointer-events-none"

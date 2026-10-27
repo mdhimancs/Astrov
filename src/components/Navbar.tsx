@@ -85,7 +85,66 @@ export function Navbar({
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [activeCategoryDropdown, setActiveCategoryDropdown] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const dropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const categories = [
+    {
+      id: 'charts',
+      label: 'Charts & Wheels',
+      icon: Compass,
+      tabs: [
+        { id: 'birth-predictions', label: 'Birth Charts', icon: Compass },
+        { id: 'celestial-wheel', label: '360° Wheel', icon: Globe },
+        { id: 'divisional-charts', label: 'Divisional', icon: Brain },
+        { id: 'natal-chart', label: 'Natal Zodiac Wheel', icon: Circle },
+      ],
+    },
+    {
+      id: 'predictive',
+      label: 'Predictive & Transits',
+      icon: Calendar,
+      tabs: [
+        { id: 'monthly-predictions', label: 'Monthly & Yearly', icon: Calendar },
+        { id: 'vimshottari-dasha', label: 'Dasha', icon: Layers },
+        { id: 'critical-transits', label: 'Milestones', icon: Award },
+        { id: 'sadesati', label: 'Sade Sati', icon: Shield },
+        { id: 'transits', label: 'Live', icon: Orbit },
+      ],
+    },
+    {
+      id: 'ephemeris',
+      label: 'Ephemeris & Systems',
+      icon: Orbit,
+      tabs: [
+        { id: 'astronomical-ephemeris', label: 'Ephemeris & Nakshatras', icon: Orbit },
+        { id: 'astrology-systems', label: 'Systems & Cosmology', icon: BookOpen },
+        { id: 'real-planets', label: 'Real Planets & Nakshatra', icon: Sparkles },
+        { id: 'panchang', label: 'Panchang', icon: Clock },
+      ],
+    },
+    {
+      id: 'guidance',
+      label: 'Guidance & Family',
+      icon: Users,
+      tabs: [
+        { id: 'life-events', label: 'Life Events & Matters', icon: Flame },
+        { id: 'personalized-guidance', label: 'Personalized Guidance', icon: GraduationCap },
+        { id: 'family-lineage', label: 'Family Members & Lineage', icon: Users },
+        { id: 'compatibility', label: 'Matching & Remedies', icon: HeartHandshake },
+      ],
+    },
+    {
+      id: 'tools',
+      label: 'Tools',
+      icon: Calculator,
+      tabs: [
+        { id: 'numerology', label: 'Numerology', icon: Calculator },
+      ],
+    },
+  ];
 
   // Form State
   const [formName, setFormName] = useState('');
@@ -101,16 +160,36 @@ export function Navbar({
     tz: 5.5,
   });
 
-  // Close dropdown on click outside
+  // Close dropdowns on click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsProfileDropdownOpen(false);
       }
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        setActiveCategoryDropdown(null);
+      }
     }
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current);
+    };
   }, []);
+
+  const handleCategoryMouseEnter = (catId: string) => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+      dropdownTimeoutRef.current = null;
+    }
+    setActiveCategoryDropdown(catId);
+  };
+
+  const handleCategoryMouseLeave = () => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setActiveCategoryDropdown(null);
+    }, 280);
+  };
 
   const handleOpenAddModal = () => {
     setModalMode('add');
@@ -460,65 +539,89 @@ export function Navbar({
           </div>
         )}
 
-        {/* Desktop Tabs - 2 rows of 9 tabs */}
-        <nav className="hidden lg:block pb-1 pt-0.5 space-y-0.5">
-          <div className="grid grid-cols-9 gap-1">
-            {tabs.slice(0, 9).map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <div
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`group relative rounded-md px-2 py-[3px] sm:py-[4px] min-h-[25px] sm:min-h-[26px] transition-all duration-150 cursor-pointer flex items-center justify-between gap-0.5 shadow-none border ${
-                    isActive
-                      ? 'bg-amber-50/80 border-amber-300 border-b-2 border-b-amber-600 text-amber-950 font-bold shadow-3xs'
-                      : 'bg-white border-stone-200/60 border-b-2 border-b-stone-200 text-stone-700 hover:border-amber-300 hover:border-b-amber-400 hover:bg-[#FAF8F5]'
+        {/* Desktop & Tablet Category Navigation with Sub-Button Dropdowns */}
+        <nav ref={navRef} className="hidden md:flex items-center justify-center gap-1 sm:gap-1.5 pb-1 pt-0.5">
+          {categories.map((cat) => {
+            const CatIcon = cat.icon;
+            const isCatActive = cat.tabs.some((t) => t.id === activeTab);
+            const isDropdownOpen = activeCategoryDropdown === cat.id;
+
+            return (
+              <div
+                key={cat.id}
+                className="relative"
+                onMouseEnter={() => handleCategoryMouseEnter(cat.id)}
+                onMouseLeave={handleCategoryMouseLeave}
+              >
+                <button
+                  type="button"
+                  data-category-btn="true"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current);
+                    setActiveCategoryDropdown(isDropdownOpen ? null : cat.id);
+                  }}
+                  className={`group rounded-md px-2.5 sm:px-3 py-1 text-[11.5px] font-bold transition-all duration-150 cursor-pointer flex items-center space-x-1.5 border select-none ${
+                    isCatActive
+                      ? 'bg-amber-100/90 border-amber-400 text-amber-950 shadow-3xs ring-1 ring-amber-300'
+                      : 'bg-white border-stone-200 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'
                   }`}
+                  style={{ height: '30px' }}
                 >
-                  <span className="font-ui font-semibold text-[10.5px] leading-tight truncate">
-                    {tab.label}
-                  </span>
-                  <Icon
-                    className={`w-3 h-3 shrink-0 ${
-                      isActive ? 'text-amber-800' : 'text-stone-400 group-hover:text-amber-600'
-                    }`}
-                  />
-                </div>
-              );
-            })}
-          </div>
-          <div className="grid grid-cols-9 gap-1">
-            {tabs.slice(9).map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <div
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`group relative rounded-md px-2 py-[3px] sm:py-[4px] min-h-[25px] sm:min-h-[26px] transition-all duration-150 cursor-pointer flex items-center justify-between gap-0.5 shadow-none border ${
-                    isActive
-                      ? 'bg-amber-50/80 border-amber-300 border-b-2 border-b-amber-600 text-amber-950 font-bold shadow-3xs'
-                      : 'bg-white border-stone-200/60 border-b-2 border-b-stone-200 text-stone-700 hover:border-amber-300 hover:border-b-amber-400 hover:bg-[#FAF8F5]'
-                  }`}
-                >
-                  <span className="font-ui font-semibold text-[10.5px] leading-tight truncate">
-                    {tab.label}
-                  </span>
-                  <Icon
-                    className={`w-3 h-3 shrink-0 ${
-                      isActive ? 'text-amber-800' : 'text-stone-400 group-hover:text-amber-600'
-                    }`}
-                  />
-                </div>
-              );
-            })}
-          </div>
+                  <CatIcon className={`w-3.5 h-3.5 ${isCatActive ? 'text-amber-800' : 'text-stone-500'}`} />
+                  <span>{cat.label}</span>
+                  <ChevronDown className={`w-3 h-3 text-stone-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Sub-Buttons Dropdown Menu */}
+                {isDropdownOpen && (
+                  <div
+                    data-dropdown-menu="true"
+                    onMouseDown={(e) => e.stopPropagation()}
+                    className="category-dropdown-menu absolute left-0 mt-1 w-64 bg-white rounded-lg shadow-2xl border border-amber-300 py-1.5 z-[100] animate-in fade-in duration-100 ring-1 ring-black/5"
+                    style={{ height: 'auto', minHeight: 'fit-content' }}
+                  >
+                    <div className="space-y-0.5 px-1">
+                      {cat.tabs.map((subTab) => {
+                        const SubIcon = subTab.icon;
+                        const isSubActive = activeTab === subTab.id;
+                        return (
+                          <button
+                            type="button"
+                            key={subTab.id}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current);
+                              setActiveTab(subTab.id);
+                              setActiveCategoryDropdown(null);
+                            }}
+                            className={`category-dropdown-item w-full px-2.5 py-1.5 rounded-md text-left transition-colors flex items-center justify-between gap-2 cursor-pointer ${
+                              isSubActive
+                                ? 'bg-amber-100 text-amber-950 font-bold border border-amber-300 shadow-3xs'
+                                : 'hover:bg-[#FAF8F5] text-stone-800 hover:text-amber-950'
+                            }`}
+                            style={{ height: 'auto', minHeight: '34px' }}
+                          >
+                            <div className="flex items-center space-x-2 truncate">
+                              <SubIcon className={`w-3.5 h-3.5 shrink-0 ${isSubActive ? 'text-amber-800' : 'text-stone-400'}`} />
+                              <span className="text-[12px] truncate">{subTab.label}</span>
+                            </div>
+                            {isSubActive && <Check className="w-3.5 h-3.5 text-amber-700 shrink-0 font-bold" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
       </div>
 
-      {/* Mobile / Tablet Scroll Navigation - Reduced Vertical Height by 10% */}
-      <div className="lg:hidden border-t border-[#F5F0E8] bg-[#FDFBF7]">
+      {/* Mobile Scroll Navigation - Reduced Vertical Height */}
+      <div className="md:hidden border-t border-[#F5F0E8] bg-[#FDFBF7]">
         <div className="w-full max-w-6xl mx-auto flex overflow-x-auto px-2 sm:px-3 py-0.5 space-x-1 scrollbar-none">
           {tabs.map((tab) => {
             const Icon = tab.icon;

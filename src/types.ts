@@ -169,6 +169,23 @@ export interface MonthWiseTransitPrediction {
   remedyOfMonth: string;
 }
 
+export interface WeeklyPrediction {
+  weekKey: string; // e.g. '2026-W43'
+  weekTitle: string; // e.g. 'Week 43: Oct 19 - Oct 25, 2026'
+  startDate: string;
+  endDate: string;
+  tagline: string;
+  overallRating: number; // 1 to 5
+  lunarPhase: string;
+  auspiciousDays: string;
+  cautionDays: string;
+  careerFocus: string;
+  wealthFocus: string;
+  relationshipsFocus: string;
+  healthFocus: string;
+  weeklyRemedy: string;
+}
+
 export interface YearlyPrediction {
   year: number; // e.g. 2025, 2026, 2027, 2028
   themeTitle: string;

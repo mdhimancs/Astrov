@@ -97,8 +97,8 @@ export function NorthIndianChart({
         </div>
       )}
 
-      {/* SVG Container: Perfectly centered and proportioned */}
-      <div className="relative w-full max-w-[360px] aspect-square select-none mx-auto">
+      {/* SVG Container: Perfectly centered and proportioned (Increased by 20%) */}
+      <div className="relative w-full max-w-[432px] aspect-square select-none mx-auto">
         <svg
           viewBox={`0 0 ${size} ${size}`}
           className="w-full h-full drop-shadow-xs transition-all"

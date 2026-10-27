@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Calendar,
   Sparkles,
@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { ProfileSelector } from './ProfileSelector';
 import { MonthWisePredictions } from './MonthWisePredictions';
+import { WeeklyPredictions } from './WeeklyPredictions';
 import { YearlyPredictions } from './YearlyPredictions';
 import { UnifiedPlanetaryImpactTable } from './UnifiedPlanetaryImpactTable';
 import { VedicReadingsObservations } from './VedicReadingsObservations';
@@ -20,6 +21,7 @@ import {
   checkSadeSati,
   calculateDetailedPlanetaryMovements,
   generateMonthWiseTransitPredictions,
+  generateWeeklyPredictions,
   calculateYearlyPredictions,
   generateCategorizedDosAndDonts,
   calculateUnifiedPlanetaryTable,
@@ -104,27 +106,8 @@ export function MonthWisePredictionsTab({
   });
   const [selectedYear, setSelectedYear] = useState<number>(() => new Date().getFullYear());
   const [readingScope, setReadingScope] = useState<
-    'monthly' | 'yearly' | 'observations' | 'impacts' | 'all'
-  >('monthly');
-
-  // Astrological State
-  const [natalLagnaRasi, setNatalLagnaRasi] = useState<number>(5);
-  const [natalMoonRasi, setNatalMoonRasi] = useState<number>(5);
-  const [natalNakshatra, setNatalNakshatra] = useState<string>('Magha');
-  const [natalPlanets, setNatalPlanets] = useState<PlanetPosition[]>([]);
-
-  const [transitPlanets, setTransitPlanets] = useState<PlanetPosition[]>([]);
-  const [detailedMovements, setDetailedMovements] = useState<PlanetaryMovementDetail[]>([]);
-  const [monthlyPredictions, setMonthlyPredictions] = useState<MonthWiseTransitPrediction[]>(() => 
-    generateMonthWiseTransitPredictions(5, 5, false)
-  );
-  const [yearlyPredictions, setYearlyPredictions] = useState<YearlyPrediction[]>(() =>
-    calculateYearlyPredictions(5, 5, '1990-05-18', false, [])
-  );
-  const [dosAndDonts, setDosAndDonts] = useState<TransitDosAndDonts[]>([]);
-  const [unifiedImpactRecords, setUnifiedImpactRecords] = useState<PlanetaryImpactRecord[]>(() => 
-    calculateUnifiedPlanetaryTable(5, 5, [])
-  );
+    'weekly' | 'monthly' | 'yearly' | 'observations' | 'impacts' | 'all'
+  >('weekly');
 
   const [sadeSati, setSadeSati] = useState<{
     inSadeSati: boolean;
@@ -135,6 +118,21 @@ export function MonthWisePredictionsTab({
     phase: 'None',
     description: 'Saturn transit is supportive.',
   });
+
+  const [natalLagnaRasi, setNatalLagnaRasi] = useState<number>(1);
+  const [natalMoonRasi, setNatalMoonRasi] = useState<number>(1);
+  const [natalNakshatra, setNatalNakshatra] = useState<string>('Ashwini');
+  const [natalPlanets, setNatalPlanets] = useState<PlanetPosition[]>([]);
+  const [transitPlanets, setTransitPlanets] = useState<PlanetPosition[]>([]);
+  const [detailedMovements, setDetailedMovements] = useState<PlanetaryMovementDetail[]>([]);
+  const [monthlyPredictions, setMonthlyPredictions] = useState<MonthWiseTransitPrediction[]>([]);
+  const [yearlyPredictions, setYearlyPredictions] = useState<YearlyPrediction[]>([]);
+  const [dosAndDonts, setDosAndDonts] = useState<TransitDosAndDonts | null>(null);
+  const [unifiedImpactRecords, setUnifiedImpactRecords] = useState<PlanetaryImpactRecord[]>([]);
+
+  const weeklyPredictions = useMemo(() => {
+    return generateWeeklyPredictions(selectedMonthKey, natalMoonRasi, natalLagnaRasi, sadeSati.inSadeSati);
+  }, [selectedMonthKey, natalMoonRasi, natalLagnaRasi, sadeSati.inSadeSati]);
 
   // Compute Transits & Month-wise Predictions
   const computeTransitsAndMonthly = useCallback((
@@ -258,10 +256,15 @@ export function MonthWisePredictionsTab({
         </div>
       </div>
 
-      {/* MONTHLY & YEARLY READINGS — COMPACT 1-ROW DECK OF CARDS SELECTOR (10% smaller) */}
+      {/* READINGS SELECTOR DECK */}
       <div className="bg-white/85 backdrop-blur-sm rounded-lg border border-stone-200/90 px-2 py-1 shadow-3xs">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1">
           {[
+            {
+              id: 'weekly',
+              title: 'Weekly Forecast',
+              icon: Sparkles,
+            },
             {
               id: 'monthly',
               title: 'Monthly Reading',
@@ -317,6 +320,15 @@ export function MonthWisePredictionsTab({
           })}
         </div>
       </div>
+
+      {/* CARD 0: WEEKLY PREDICTIONS COMPONENT */}
+      {(readingScope === 'weekly' || readingScope === 'all') && (
+        <WeeklyPredictions
+          weeklyPredictions={weeklyPredictions}
+          userName={name}
+          selectedMonthKey={selectedMonthKey}
+        />
+      )}
 
       {/* CARD 1: MONTH-WISE PREDICTIONS COMPONENT */}
       {(readingScope === 'monthly' || readingScope === 'all') && (
