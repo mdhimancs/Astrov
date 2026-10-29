@@ -195,6 +195,7 @@ const MAJOR_HINDU_FESTIVALS: HinduFestivalItem[] = [
   { month: 10, day: 19, hindiName: 'दुर्गा महाष्टमी / कन्या पूजन', english: 'Durga Maha Ashtami & Kanya Pujan', vikramMasa: 'आश्विन (Ashwin)', tithiLabel: 'आश्विन शुक्ल अष्टमी', category: 'Major Parva', significance: 'Worship of Maa Mahagauri and Kanya Pujan for divine grace and prosperity.', istTiming: '08:00 AM – 12:30 PM IST' },
   { month: 10, day: 20, hindiName: 'विजयादशमी (दशहरा)', english: 'Vijayadashami (Dussehra)', vikramMasa: 'आश्विन (Ashwin)', tithiLabel: 'आश्विन शुक्ल दशमी', category: 'Major Parva', significance: 'Triumph of Dharma over Adharma; Swayam-Siddha Abujh Muhurta for Shastra Puja and new initiatives.', istTiming: '10:00 AM – 06:30 PM IST' },
   { month: 10, day: 29, hindiName: 'करवा चौथ (संकष्टी चतुर्थी)', english: 'Karwa Chauth', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक कृष्ण चतुर्थी', category: 'Vrat & Ekadashi', significance: 'Sacred nirjala fast and Moon Arghya observed for spouse’s longevity and marital bliss.', istTiming: '05:30 PM – 08:15 PM IST' },
+  { month: 11, day: 2, hindiName: 'अहोई अष्टमी व्रत', english: 'Ahoi Ashtami Vrat', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक कृष्ण अष्टमी', category: 'Vrat & Ekadashi', significance: 'Sacred nirjala fast and Ahoi Bhagavati Puja observed by mothers for their children’s longevity, health, and prosperity with evening star/moon sight.', istTiming: '05:30 AM – 07:15 PM IST' },
   // November (Kartika / Margashirsha)
   { month: 11, day: 6, hindiName: 'धनतेरस (धन्वंतरि जयंती)', english: 'Dhanteras (Dhantrayodashi)', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक कृष्ण त्रयोदशी', category: 'Major Parva', significance: 'Worship of Lord Dhanvantari, Maa Lakshmi, and Kubera; auspicious for gold, silver, and vessel purchases.', istTiming: '05:30 PM – 08:00 PM IST' },
   { month: 11, day: 8, hindiName: 'दीपावली महापर्व (महालक्ष्मी पूजन)', english: 'Diwali (Deepavali & Lakshmi Puja)', vikramMasa: 'कार्तिक (Kartika)', tithiLabel: 'कार्तिक अमावस्या', category: 'Major Parva', significance: 'Festival of lights; Pradosh & Nishita Kaal Maha Lakshmi-Ganesha Puja for wealth and illumination.', istTiming: '05:45 PM – 08:30 PM IST' },
@@ -289,8 +290,22 @@ function computeDailyPanchang(date: Date): DailyPanchangCell {
   const ayanaHindi = isUttarayana ? 'उत्तरायण' : 'दक्षिणायन';
   const ayanaEng = isUttarayana ? 'Uttarayana' : 'Dakshinayana';
 
-  // Match curated festival if present
-  const festival = MAJOR_HINDU_FESTIVALS.find((f) => f.month === month && f.day === day) || null;
+  // Match curated festival or dynamic Tithi festival
+  const festival =
+    MAJOR_HINDU_FESTIVALS.find((f) => f.month === month && f.day === day) ||
+    (hinduMasa.num === 8 && !isShukla && tithiNum === 8
+      ? {
+          month,
+          day,
+          hindiName: 'अहोई अष्टमी व्रत',
+          englishName: 'Ahoi Ashtami Vrat',
+          vikramMasa: 'कार्तिक (Kartika)',
+          tithiLabel: 'कार्तिक कृष्ण अष्टमी',
+          category: 'Vrat & Ekadashi' as const,
+          significance: 'Sacred nirjala fast and Ahoi Bhagavati Puja observed by mothers for their children’s longevity, health, and prosperity with evening star/moon sight.',
+          istTiming: '05:30 AM – 07:15 PM IST',
+        }
+      : null);
 
   // Automatic Vrat / Parva badge based on Tithi
   let specialVratBadge: string | null = null;
@@ -304,6 +319,8 @@ function computeDailyPanchang(date: Date): DailyPanchangCell {
     specialVratBadge = 'प्रदोष व्रत (Pradosh)';
   } else if (tithiNum === 4 && !isShukla) {
     specialVratBadge = 'संकष्टी चतुर्थी';
+  } else if (tithiNum === 8 && !isShukla && hinduMasa.num === 8) {
+    specialVratBadge = 'अहोई अष्टमी व्रत (Ahoi Ashtami)';
   }
 
   return {

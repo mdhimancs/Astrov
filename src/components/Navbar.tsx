@@ -27,6 +27,7 @@ import {
   Users,
   Calculator,
   Circle,
+  HelpCircle,
 } from 'lucide-react';
 import { UserProfile } from '../types';
 import { PlaceOfBirthInput, PlaceValue } from './PlaceOfBirthInput';
@@ -121,6 +122,7 @@ export function Navbar({
       tabs: [
         { id: 'astronomical-ephemeris', label: 'Ephemeris & Nakshatras', icon: Orbit },
         { id: 'astrology-systems', label: 'Systems & Cosmology', icon: BookOpen },
+        { id: 'common-queries', label: 'Common Astrological Queries', icon: HelpCircle },
         { id: 'real-planets', label: 'Real Planets & Nakshatra', icon: Sparkles },
         { id: 'panchang', label: 'Panchang', icon: Clock },
       ],

@@ -19,6 +19,7 @@ import { RealPlanetPositionsTab } from './RealPlanetPositionsTab';
 import { CelestialSkyMapWheel } from './CelestialSkyMapWheel';
 import { NatalZodiacWheel } from './NatalZodiacWheel';
 import { NorthIndianLifeAspectsTab } from './NorthIndianLifeAspectsTab';
+import { CommonAstrologicalQueriesTab } from './CommonAstrologicalQueriesTab';
 import { calculatePlanetaryPositions } from '../vedicMath';
 import { UserProfile } from '../types';
 import { VEDIC_RASIS } from '../data';
@@ -167,6 +168,10 @@ export function ContentRenderer({
           onProfileChange={handleProfileChange}
         />
       );
+    case 'common-queries':
+    case 'queries':
+    case 'faq':
+      return <CommonAstrologicalQueriesTab />;
     case 'divisional-charts':
       return (
         <DivisionalChartsTab

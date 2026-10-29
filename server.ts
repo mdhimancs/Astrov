@@ -201,6 +201,80 @@ Keep the tone inspiring, professional, and evocative.`;
     }
   });
 
+  // API endpoint for AI-Powered Common Astrological Queries (Vedic Research & Concepts)
+  app.post("/api/astrology/common-queries", async (req, res) => {
+    try {
+      const { question, category } = req.body;
+      const ai = getAI();
+
+      if (!question) {
+        return res.status(400).json({ error: "Question is required" });
+      }
+
+      if (!ai) {
+        // Fallback research-based answer if no API key
+        return res.json({
+          question,
+          category: category || "Vedic Concepts",
+          answer: `According to classical Vedic astrology (Brihat Parashara Hora Shastra & Phaladeepika), "${question}" is understood through the synthesis of Graha Balas (planetary strength), Bhava Lordships, and Dasha-Gochar interactions.\n\nKey Principles:\n- **Dasha Authority**: The running Mahadasha and Antardasha lords act as the primary drivers that activate specific houses in your chart.\n- **Gochar Trigger**: Transits (Gochar) of major planets like Jupiter (Guru) and Saturn (Shani) trigger the concrete timing of events.\n- **Dharma & Karma**: Astrological placements represent past samskaras (Karmic blueprints) that can be harmonized through conscious righteous action and prescribed remedies (Upayas).`,
+          researchCitations: ["Brihat Parashara Hora Shastra", "Phaladeepika (Mantreswara)", "Dr. B.V. Raman - How to Judge a Horoscope"],
+          keyTakeaways: [
+            "Mahadasha sets the overall theme, while transits provide the timing catalyst.",
+            "Planetary strength depends on Rasi, House placement, and Ashtakavarga points.",
+            "Remedies (Upayas) work by balancing subtle planetary vibrations."
+          ]
+        });
+      }
+
+      const prompt = `You are an elite Vedic astrology scholar and researcher thoroughly versed in classical texts (Brihat Parashara Hora Shastra, Phaladeepika, Saravali, Jaimini Upadesa Sutras, Bhrigu Samhita, B.V. Raman, K.N. Rao).
+
+User Query on Vedic Astrology:
+"${question}"
+Category Context: ${category || "Vedic Concepts & Principles"}
+
+Provide a concise, research-based, authoritative, and practical explanation.
+Follow this exact JSON structure:
+{
+  "question": "${question.replace(/"/g, '\\"')}",
+  "category": "${category || 'Vedic Concepts'}",
+  "answer": "3-4 concise, research-grounded paragraphs explaining the concept clearly with high technical accuracy and zero fluff.",
+  "researchCitations": ["Name of Classical Text / Master Astrologer Citation 1", "Citation 2", "Citation 3"],
+  "keyTakeaways": [
+    "3-4 short, punchy takeaway bullet points distilling the core insight for practical life application"
+  ]
+}`;
+
+      const response = await callWithRetry(() => ai.models.generateContent({
+        model: "gemini-3.8-flash",
+        contents: prompt,
+        config: {
+          systemInstruction: "You are a master Vedic astrology scholar providing precise, research-backed, authentic answers anchored in classical texts. Return clean, valid JSON strictly matching the requested schema.",
+          responseMimeType: "application/json",
+          temperature: 0.3,
+        }
+      }));
+
+      const responseText = response.text || "{}";
+      let parsed: any = {};
+      try {
+        parsed = JSON.parse(responseText);
+      } catch (pErr) {
+        parsed = {
+          question,
+          category: category || "Vedic Concepts",
+          answer: responseText,
+          researchCitations: ["Brihat Parashara Hora Shastra", "Phaladeepika"],
+          keyTakeaways: ["Vedic astrology synthesizes Dasha, Transit, and Natal Chart strength."]
+        };
+      }
+
+      res.json(parsed);
+    } catch (err: any) {
+      console.error("Common queries AI error:", err);
+      res.status(500).json({ error: err.message || "Failed to generate answer" });
+    }
+  });
+
   // API endpoint for AI-Driven Dasha Interpretation (Spiritual & Practical Summary of Mahadasha + Antardasha)
   app.post("/api/astrology/dasha-interpretation", async (req, res) => {
     try {
