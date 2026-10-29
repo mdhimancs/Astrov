@@ -21,6 +21,12 @@ import {
   CheckCircle2,
   Calendar,
   Layers,
+  Heart,
+  ShieldAlert,
+  Building2,
+  Flame,
+  AlertTriangle,
+  Lock,
 } from 'lucide-react';
 import { PlanetPosition, HouseInfo } from '../types';
 import {
@@ -42,12 +48,19 @@ export function PersonalizedGuidanceSection({
   userName = 'Seeker',
 }: PersonalizedGuidanceSectionProps) {
   const [activeGuidanceTab, setActiveGuidanceTab] = useState<
-    'education' | 'occupation' | 'foreign_stay' | 'career_transition' | 'wealth_calculator' | 'vastu_partners'
-  >('education');
+    | 'education'
+    | 'occupation'
+    | 'business_start'
+    | 'career_transition'
+    | 'love_and_affairs'
+    | 'foreign_stay'
+    | 'wealth_calculator'
+    | 'vastu_partners'
+  >('business_start');
 
   // Selected Career Pillar sub-tab
   const [selectedCareerPillar, setSelectedCareerPillar] = useState<
-    'jobChange' | 'transfer' | 'promotion' | 'favourFromSeniors'
+    'jobChange' | 'transfer' | 'promotion' | 'favourFromSeniors' | 'difficulties'
   >('jobChange');
 
   // Interactive Wealth Calculator State (strictly INR)
@@ -89,7 +102,7 @@ export function PersonalizedGuidanceSection({
             </h3>
           </div>
           <p className="text-[11px] text-stone-600 leading-snug break-words">
-            Vedic life roadmap tailored to your natal lagna, karmic houses (2nd, 4th, 5th, 9th, 10th, 11th, 12th) and planetary strengths.
+            Vedic life roadmap tailored to your natal lagna, karmic houses (2nd, 4th, 5th, 7th, 9th, 10th, 11th, 12th) and planetary strengths.
           </p>
         </div>
 
@@ -101,12 +114,14 @@ export function PersonalizedGuidanceSection({
       </div>
 
       {/* Primary Sub-Navigation Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1.5">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-1.5">
         {[
-          { id: 'education', label: 'Choice of Education', icon: GraduationCap },
-          { id: 'occupation', label: 'Choice of Occupation', icon: Briefcase },
-          { id: 'foreign_stay', label: 'Foreign vs Motherland', icon: Globe },
+          { id: 'business_start', label: 'Business Start & Inception', icon: Building2 },
           { id: 'career_transition', label: 'Job Change & Promotion', icon: TrendingUp },
+          { id: 'love_and_affairs', label: 'Love Life & Marital Affairs', icon: Heart },
+          { id: 'occupation', label: 'Choice of Occupation', icon: Briefcase },
+          { id: 'education', label: 'Choice of Education', icon: GraduationCap },
+          { id: 'foreign_stay', label: 'Foreign vs Motherland', icon: Globe },
           { id: 'wealth_calculator', label: 'Max Wealth Calculator', icon: Calculator },
           { id: 'vastu_partners', label: 'Vastu & Co-Founders', icon: Users },
         ].map((tab) => {
@@ -437,12 +452,12 @@ export function PersonalizedGuidanceSection({
             </div>
           </div>
 
-          {/* 4 Pillars Probability Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {/* 5 Pillars Probability Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
             {[
               {
                 id: 'jobChange' as const,
-                title: 'Job Change / New Job',
+                title: 'Job Change / Switch',
                 sanskrit: 'कर्म परिवर्तन',
                 score: guidance.careerTransition.jobChangeProbability,
                 icon: ArrowRightLeft,
@@ -479,6 +494,16 @@ export function PersonalizedGuidanceSection({
                 color: 'text-blue-800',
                 border: 'border-blue-200',
                 bg: 'bg-blue-50/60',
+              },
+              {
+                id: 'difficulties' as const,
+                title: 'Workplace Difficulties',
+                sanskrit: 'कर्म बाधा',
+                score: guidance.careerTransition.workplaceDifficultiesScore,
+                icon: ShieldAlert,
+                color: 'text-rose-800',
+                border: 'border-rose-200',
+                bg: 'bg-rose-50/60',
               },
             ].map((pillar) => {
               const Icon = pillar.icon;
@@ -617,8 +642,304 @@ export function PersonalizedGuidanceSection({
             </div>
           </div>
 
+          {/* Workplace Difficulties & Politics Defense Card */}
+          <div className="bg-rose-50/40 p-2.5 sm:p-3 rounded-lg border border-rose-200/80 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-1.5 text-rose-950 font-bold text-[12px]">
+                <ShieldAlert className="w-3.5 h-3.5 text-rose-700" />
+                <span>Workplace Politics, Boss Conflicts &amp; Layoff Defense Protocols</span>
+              </div>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-900 border border-rose-300">
+                Vulnerability Risk: {guidance.careerTransition.workplaceDifficultiesScore}%
+              </span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px]">
+              <div className="bg-white p-2.5 rounded border border-rose-200/60 space-y-1">
+                <span className="font-bold text-rose-950 block">⚡ Vulnerability Windows &amp; Trigger Periods:</span>
+                <ul className="list-disc list-inside text-stone-700 space-y-0.5">
+                  {guidance.careerTransition.troublesomeDashaPeriods.map((tp, idx) => (
+                    <li key={idx}>{tp}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-white p-2.5 rounded border border-rose-200/60 space-y-1">
+                <span className="font-bold text-stone-900 block">🛡️ Neutralizing Remedies &amp; Defensive Actions:</span>
+                <ul className="list-disc list-inside text-stone-700 space-y-0.5">
+                  {guidance.careerTransition.remediesForWorkplacePolitics.map((rem, idx) => (
+                    <li key={idx}>{rem}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-amber-50/70 p-2.5 rounded border border-amber-200 text-[11.5px] text-stone-800">
             <strong className="text-amber-950">Strategic Counsel:</strong> {guidance.careerTransition.jobSwitchTiming}. Schedule major negotiations and resignation notices on Shukla Paksha Wednesdays or Thursdays.
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* TAB: BUSINESS START & ENTERPRISE INCEPTION */}
+      {/* ======================================================== */}
+      {activeGuidanceTab === 'business_start' && (
+        <div className="space-y-3.5 bg-white p-3.5 rounded-lg border border-amber-200/80 shadow-3xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200/80 pb-2.5">
+            <div>
+              <div className="flex items-center space-x-1.5">
+                <Building2 className="w-4 h-4 text-amber-800" />
+                <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 font-vedic">
+                  Vedic Business Inception &amp; Startup Blueprint
+                </span>
+              </div>
+              <h4 className="font-vedic font-bold text-stone-950 text-[15px]">
+                Nutan Vyapar Arambha (Starting a New Business)
+              </h4>
+            </div>
+            <div className="flex items-center space-x-2 text-[11px] font-bold">
+              <span className="bg-emerald-100 text-emerald-950 px-2.5 py-0.5 rounded border border-emerald-300">
+                Inception Readiness: {guidance.businessStartGuidance.startupViabilityScore}%
+              </span>
+              <span className={`px-2 py-0.5 rounded border ${
+                guidance.businessStartGuidance.debtRiskScore < 50
+                  ? 'bg-sky-100 text-sky-950 border-sky-300'
+                  : 'bg-amber-100 text-amber-950 border-amber-300'
+              }`}>
+                Debt Risk: {guidance.businessStartGuidance.debtRiskScore < 50 ? 'Low' : 'Caution Advised'}
+              </span>
+            </div>
+          </div>
+
+          {/* Quick Metrics Strip */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
+            <div className="bg-[#FAF8F5] p-2.5 rounded-md border border-stone-200/80 space-y-1">
+              <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide block">
+                Sole Owner vs Partnership:
+              </span>
+              <div className="flex items-center justify-between text-[11px] font-bold">
+                <span className="text-stone-800">Sole Ownership: {guidance.businessStartGuidance.soleVsPartnerSplit.sole}%</span>
+                <span className="text-amber-900">Partnership: {guidance.businessStartGuidance.soleVsPartnerSplit.partnership}%</span>
+              </div>
+              <div className="w-full h-1.5 bg-stone-200 rounded-full overflow-hidden flex">
+                <div style={{ width: `${guidance.businessStartGuidance.soleVsPartnerSplit.sole}%` }} className="bg-amber-700 h-full" />
+                <div style={{ width: `${guidance.businessStartGuidance.soleVsPartnerSplit.partnership}%` }} className="bg-emerald-600 h-full" />
+              </div>
+            </div>
+
+            <div className="bg-[#FAF8F5] p-2.5 rounded-md border border-stone-200/80 space-y-1">
+              <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide block">
+                Loans &amp; Debt Leverage Verdict:
+              </span>
+              <p className="text-stone-800 font-medium text-[11px] leading-snug">
+                {guidance.businessStartGuidance.debtVsBootstrapVerdict}
+              </p>
+            </div>
+
+            <div className="bg-[#FAF8F5] p-2.5 rounded-md border border-stone-200/80 space-y-1">
+              <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide block">
+                Optimal Launch Window:
+              </span>
+              <p className="text-stone-800 font-medium text-[11px] leading-snug">
+                {guidance.businessStartGuidance.optimalLaunchWindow}
+              </p>
+            </div>
+          </div>
+
+          {/* Ranked Business Sectors for Seeker */}
+          <div className="space-y-2">
+            <span className="text-[11.5px] font-bold text-stone-900 block">
+              Recommended Business Sectors by Planetary Harmony (7th, 10th &amp; 11th Bhavas):
+            </span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {guidance.businessStartGuidance.recommendedSectors.map((sec, idx) => (
+                <div key={idx} className="bg-[#FAF8F5] p-2.5 rounded-md border border-stone-200/80 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-stone-950 text-[12px]">{sec.sector}</span>
+                    <span className="text-[10.5px] font-black bg-amber-100 text-amber-950 px-2 py-0.5 rounded border border-amber-300 font-vedic">
+                      {sec.score}% Alignment
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-stone-600 leading-snug">
+                    {sec.why}
+                  </p>
+                  <div className="text-[10.5px] text-amber-900 font-medium pt-0.5 border-t border-stone-200/50">
+                    <strong>Launch Tip:</strong> {sec.launchTip}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Auspicious Muhurta Checklist & Inception Rules */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 pt-1">
+            <div className="bg-amber-50/50 p-2.5 rounded-md border border-amber-200 space-y-1.5">
+              <span className="text-[11px] font-bold text-amber-950 flex items-center space-x-1">
+                <Calendar className="w-3.5 h-3.5 text-amber-800" />
+                <span>Auspicious Business Registration Muhurta Rules:</span>
+              </span>
+              <ul className="space-y-1 text-[11px] text-stone-700">
+                {guidance.businessStartGuidance.auspiciousMuhurtaChecklist.map((m, i) => (
+                  <li key={i} className="flex items-start space-x-1.5">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600 mt-0.5 shrink-0" />
+                    <span>{m}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-stone-50 p-2.5 rounded-md border border-stone-200 space-y-1.5">
+              <span className="text-[11px] font-bold text-stone-900 flex items-center space-x-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-stone-700" />
+                <span>Enterprise Inception Ground Rules:</span>
+              </span>
+              <ul className="space-y-1 text-[11px] text-stone-700">
+                {guidance.businessStartGuidance.strategicInceptionRules.map((rule, i) => (
+                  <li key={i} className="flex items-start space-x-1.5">
+                    <span className="text-amber-800 font-bold shrink-0">•</span>
+                    <span>{rule}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* TAB: LOVE LIFE & MARITAL DYNAMICS (EXTRA-MARITAL RADAR) */}
+      {/* ======================================================== */}
+      {activeGuidanceTab === 'love_and_affairs' && (
+        <div className="space-y-3.5 bg-white p-3.5 rounded-lg border border-amber-200/80 shadow-3xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200/80 pb-2.5">
+            <div>
+              <div className="flex items-center space-x-1.5">
+                <Heart className="w-4 h-4 text-rose-700" />
+                <span className="text-[10px] font-black uppercase tracking-wider text-rose-800 font-vedic">
+                  Vedic Love Life, Courtship &amp; Marital Fidelity Radar
+                </span>
+              </div>
+              <h4 className="font-vedic font-bold text-stone-950 text-[15px]">
+                Prema Bhava (Love, Romance &amp; Extra-Marital Afflictions)
+              </h4>
+            </div>
+            <div className="flex items-center space-x-2 text-[11px] font-bold">
+              <span className="bg-rose-100 text-rose-950 px-2.5 py-0.5 rounded border border-rose-300">
+                Romantic Vitality: {guidance.loveAndMaritalDynamics.loveRomanceScore}%
+              </span>
+              <span className={`px-2 py-0.5 rounded border ${
+                guidance.loveAndMaritalDynamics.extraMaritalRiskTier.includes('Low')
+                  ? 'bg-emerald-100 text-emerald-950 border-emerald-300'
+                  : guidance.loveAndMaritalDynamics.extraMaritalRiskTier.includes('Guarded')
+                  ? 'bg-amber-100 text-amber-950 border-amber-300'
+                  : 'bg-rose-100 text-rose-950 border-rose-300'
+              }`}>
+                Affair Risk: {guidance.loveAndMaritalDynamics.extraMaritalRiskTier}
+              </span>
+            </div>
+          </div>
+
+          {/* Love Marriage vs Arranged Marriage & Courtship Ratio */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+            <div className="bg-[#FAF8F5] p-2.5 rounded-md border border-stone-200/80 space-y-1.5">
+              <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide block">
+                Marriage Nature: Love vs Family Supported
+              </span>
+              <div className="flex items-center justify-between font-bold">
+                <span className="text-rose-900">Love Marriage: {guidance.loveAndMaritalDynamics.loveVsArrangedProbability.loveMarriage}%</span>
+                <span className="text-amber-900">Arranged / Family: {guidance.loveAndMaritalDynamics.loveVsArrangedProbability.arrangedMarriage}%</span>
+              </div>
+              <div className="w-full h-1.5 bg-stone-200 rounded-full overflow-hidden flex">
+                <div style={{ width: `${guidance.loveAndMaritalDynamics.loveVsArrangedProbability.loveMarriage}%` }} className="bg-rose-600 h-full" />
+                <div style={{ width: `${guidance.loveAndMaritalDynamics.loveVsArrangedProbability.arrangedMarriage}%` }} className="bg-amber-600 h-full" />
+              </div>
+              <p className="text-[10.5px] text-stone-600 pt-0.5">
+                Calculated through the 5th (romance) and 7th (legal union) Bhava lords, Venus-Moon connections, and Rahu&apos;s unconventional influence.
+              </p>
+            </div>
+
+            <div className="bg-[#FAF8F5] p-2.5 rounded-md border border-stone-200/80 space-y-1">
+              <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wide block">
+                Prime Romantic Courtship &amp; Soul Connection Windows:
+              </span>
+              <ul className="space-y-0.5 text-stone-700 text-[10.5px]">
+                {guidance.loveAndMaritalDynamics.romanticTimingWindows.map((win, idx) => (
+                  <li key={idx} className="flex items-start space-x-1">
+                    <span className="text-rose-700 font-bold shrink-0">•</span>
+                    <span>{win}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Extra-Marital Temptation Radar & Classical Astrological Factors */}
+          <div className="bg-rose-50/30 p-3 rounded-lg border border-rose-200/80 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-1.5 text-rose-950 font-bold text-[12.5px]">
+                <ShieldAlert className="w-4 h-4 text-rose-700" />
+                <span>Extra-Marital Afflictions &amp; Temptation Sensitivity Radar</span>
+              </div>
+              <span className="text-[10px] font-bold bg-white text-rose-900 border border-rose-300 px-2 py-0.5 rounded">
+                Parashari Vivaha Shuchi
+              </span>
+            </div>
+
+            <p className="text-[11.5px] text-stone-700 leading-snug">
+              In classical Parashari Jyotish, external romantic attraction manifests when sensory desire (Venus) is energized by unconventional taboo breakers (Rahu) or unbridled physical passion (Mars) affecting the 5th, 7th, or 12th houses. When Jupiter aspects Venus or the 7th Bhava, &apos;Brihaspati Kavach&apos; confers moral restraint and protects marital vows.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] pt-1">
+              <div className="bg-white p-2.5 rounded border border-rose-200/60 space-y-1">
+                <span className="font-bold text-rose-950 block">⚡ Vulnerability Trigger Dashas &amp; Transits:</span>
+                <ul className="list-disc list-inside text-stone-700 space-y-0.5">
+                  {guidance.loveAndMaritalDynamics.affairTriggerPeriods.map((trig, idx) => (
+                    <li key={idx}>{trig}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-white p-2.5 rounded border border-rose-200/60 space-y-1">
+                <span className="font-bold text-stone-900 block">🛡️ Fidelity Safeguards &amp; Healthy Boundaries:</span>
+                <ul className="list-disc list-inside text-stone-700 space-y-0.5">
+                  {guidance.loveAndMaritalDynamics.fidelitySafeguards.map((safe, idx) => (
+                    <li key={idx}>{safe}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Remedies for Marital Sanctity & Emotional Harmony */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px]">
+            <div className="bg-amber-50/50 p-2.5 rounded border border-amber-200 space-y-1">
+              <span className="font-bold text-amber-950 block flex items-center space-x-1">
+                <Sparkles className="w-3.5 h-3.5 text-amber-800" />
+                <span>Sacred Vedic Remedies for Marital Sanctity:</span>
+              </span>
+              <ul className="space-y-0.5 text-stone-700">
+                {guidance.loveAndMaritalDynamics.relationshipSanctityRemedies.map((rem, idx) => (
+                  <li key={idx} className="flex items-start space-x-1.5">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600 mt-0.5 shrink-0" />
+                    <span>{rem}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-stone-50 p-2.5 rounded border border-stone-200 space-y-1">
+              <span className="font-bold text-stone-900 block flex items-center space-x-1">
+                <Heart className="w-3.5 h-3.5 text-rose-700" />
+                <span>Emotional Compatibility Insights:</span>
+              </span>
+              <ul className="space-y-0.5 text-stone-700">
+                {guidance.loveAndMaritalDynamics.emotionalCompatibilityInsights.map((ins, idx) => (
+                  <li key={idx} className="flex items-start space-x-1.5">
+                    <span className="text-amber-800 font-bold shrink-0">•</span>
+                    <span>{ins}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       )}

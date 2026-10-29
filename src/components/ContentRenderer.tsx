@@ -18,6 +18,7 @@ import { NumerologyTab } from './NumerologyTab';
 import { RealPlanetPositionsTab } from './RealPlanetPositionsTab';
 import { CelestialSkyMapWheel } from './CelestialSkyMapWheel';
 import { NatalZodiacWheel } from './NatalZodiacWheel';
+import { NorthIndianLifeAspectsTab } from './NorthIndianLifeAspectsTab';
 import { calculatePlanetaryPositions } from '../vedicMath';
 import { UserProfile } from '../types';
 import { VEDIC_RASIS } from '../data';
@@ -87,6 +88,22 @@ export function ContentRenderer({
           onNavigateToBirthTime={() => setActiveTab('birth-predictions')}
         />
       );
+    case 'north-indian-life':
+    case 'sarva-bhavas':
+    case 'all-life-aspects':
+      return (
+        <NorthIndianLifeAspectsTab
+          activeProfile={currentProfile}
+          profiles={profiles}
+          natalPlanets={natalCalc.planets}
+          natalHouses={natalHouses}
+          lagnaRasi={natalCalc.lagnaRasi}
+          onNavigateToGuidance={() => setActiveTab('personalized-guidance')}
+          onNavigateToMonthly={() => setActiveTab('monthly-predictions')}
+          onNavigateToDasha={() => setActiveTab('vimshottari-dasha')}
+          onNavigateToBirthCharts={() => setActiveTab('birth-predictions')}
+        />
+      );
     case 'life-events':
       return (
         <LifeEventsMattersTab
@@ -98,6 +115,7 @@ export function ContentRenderer({
           onNavigateToGuidance={() => setActiveTab('personalized-guidance')}
           onNavigateToMonthly={() => setActiveTab('monthly-predictions')}
           onNavigateToDasha={() => setActiveTab('vimshottari-dasha')}
+          onNavigateToNorthIndianLife={() => setActiveTab('north-indian-life')}
         />
       );
     case 'personalized-guidance':

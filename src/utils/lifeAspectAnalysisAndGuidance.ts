@@ -85,6 +85,7 @@ export interface CareerTransitionAnalysis {
   transferLikelihood: number;
   jobChangeProbability: number;
   favourFromSeniorsScore: number;
+  workplaceDifficultiesScore: number;
   expectedSalaryHikeMultiplier: string;
   transitionWindows: CareerTransitionWindow[];
   pillars: {
@@ -92,7 +93,33 @@ export interface CareerTransitionAnalysis {
     transfer: CareerPillarDetail;
     promotion: CareerPillarDetail;
     favourFromSeniors: CareerPillarDetail;
+    difficulties: CareerPillarDetail;
   };
+  troublesomeDashaPeriods: string[];
+  remediesForWorkplacePolitics: string[];
+}
+
+export interface BusinessStartGuidance {
+  startupViabilityScore: number;
+  optimalLaunchWindow: string;
+  soleVsPartnerSplit: { sole: number; partnership: number };
+  debtVsBootstrapVerdict: string;
+  debtRiskScore: number;
+  recommendedSectors: { sector: string; score: number; why: string; launchTip: string }[];
+  auspiciousMuhurtaChecklist: string[];
+  strategicInceptionRules: string[];
+}
+
+export interface LoveAndMaritalDynamics {
+  loveRomanceScore: number;
+  loveVsArrangedProbability: { loveMarriage: number; arrangedMarriage: number };
+  extraMaritalVulnerabilityScore: number;
+  extraMaritalRiskTier: 'Low / Negligible (10-25%)' | 'Guarded / Moderate (26-49%)' | 'Elevated / Sensitive (50-75%)' | 'High Karmic Alert (76-95%)';
+  romanticTimingWindows: string[];
+  affairTriggerPeriods: string[];
+  fidelitySafeguards: string[];
+  relationshipSanctityRemedies: string[];
+  emotionalCompatibilityInsights: string[];
 }
 
 export interface MaxWealthProjection {
@@ -138,6 +165,8 @@ export interface LifeGuidanceProfile {
     rationale: string;
   };
   careerTransition: CareerTransitionAnalysis;
+  businessStartGuidance: BusinessStartGuidance;
+  loveAndMaritalDynamics: LoveAndMaritalDynamics;
   maxWealth: MaxWealthProjection;
   vastuAndDirections: {
     auspiciousFacing: string;
@@ -851,11 +880,136 @@ export function computeLifeAspectProbabilities(
     ],
   };
 
+  // 17. WORKPLACE DIFFICULTIES, POLITICS & OBSTACLES
+  let difficultiesScore = 32;
+  if ([6, 8, 12].includes(satHouse)) difficultiesScore += 16;
+  if ([6, 8, 12].includes(rahuHouse)) difficultiesScore += 18;
+  if ([6, 8].includes(marsHouse)) difficultiesScore += 14;
+  if (sunHouse === 6 || sunHouse === 8) difficultiesScore += 12; // Superior frictions
+  if ([1, 5, 9, 10, 11].includes(jupHouse)) difficultiesScore -= 18; // Devaguru shields
+  if ([10, 11].includes(sunHouse)) difficultiesScore -= 10;
+  difficultiesScore = Math.max(15, Math.min(88, difficultiesScore));
+
+  const difficultiesTier: AspectProbabilityTier =
+    difficultiesScore >= 65 ? 'High (70-84%)' : difficultiesScore >= 45 ? 'Moderate (50-69%)' : difficultiesScore >= 30 ? 'Guarded / Challenging (35-49%)' : 'Low (15-34%)';
+
+  const workplaceDifficultiesItem: AspectProbabilityItem = {
+    id: 'workplace_difficulties',
+    title: 'Workplace Difficulties, Politics & Layoff Vulnerability',
+    sanskritTitle: 'कर्म बाधा, षडयंत्र व सेवा क्लेश (Karma Badha)',
+    category: 'karmic_risks',
+    probability: difficultiesScore,
+    probabilityTier: difficultiesTier,
+    verdict:
+      difficultiesScore >= 50
+        ? 'Heightened vulnerability to office politics, unmerited scrutiny, or corporate reorganizations during Rahu/Saturn transits. Proactive written documentation and emotional neutrality are vital.'
+        : 'High immunity against workplace sabotage. Strong Jupiter/Sun presence provides institutional protection and swiftly dissolves baseless corporate controversies.',
+    governingHouses: [6, 8, 10, 12],
+    keyPlanets: ['Shani', 'Rahu', 'Surya', 'Mangal', 'Guru'],
+    yogasDetected: [
+      difficultiesScore >= 50 ? 'Karma-Shatru Peeda Yoga (Office Rivalry)' : 'Shatru-Hanta Corporate Armor',
+      rahuHouse === 6 || satHouse === 6 ? 'Shada-Bhava Shani Protection' : 'Brihaspati Kavach Shield',
+      'Dashamsha Rogadhipati Balance',
+    ],
+    timingWindow: 'Critical friction periods: Saturn transit over natal 10th or 8th house, Rahu-Mars antardashas, and Sun-Saturn mutual aspects.',
+    detailedAnalysis: `The 6th House (Shatru Bhava) governs corporate rivals and toxic office politics, while the 8th House triggers sudden organizational restructurings, demotions, or severance. In your horoscope, Rahu in House ${rahuHouse} and Shani in House ${satHouse} ${difficultiesScore >= 50 ? 'require cautious management of workplace alliances—avoid taking sides in boardroom disputes and maintain formal email paper trails for all deliverables' : 'grant strong innate resilience, ensuring that external corporate friction does not impede your long-term ascension'}.`,
+    protectiveMeasures: 'Chant Aditya Hridaya Stotram on Sundays. Offer water to Surya in a copper vessel with red sandalwood. Light a mustard oil lamp under a Peepal tree on Saturdays to neutralize Shani peeda.',
+    metrics: [
+      { label: 'Political Vulnerability Risk', value: `${difficultiesScore}%`, score: difficultiesScore },
+      { label: 'Institutional Shield (Guru-Surya)', value: `${100 - difficultiesScore}%`, score: 100 - difficultiesScore },
+      { label: 'Severance / Layoff Resilience', value: `${Math.max(25, 100 - difficultiesScore + 8)}%`, score: Math.max(25, 100 - difficultiesScore + 8) },
+    ],
+  };
+
+  // 18. BUSINESS START & ENTERPRISE INCEPTION
+  let startViabilityScore = 55;
+  if ([7, 10, 11, 2, 3].includes(mercHouse)) startViabilityScore += 16;
+  if ([1, 10, 11].includes(sunHouse)) startViabilityScore += 12;
+  if ([7, 11].includes(jupHouse)) startViabilityScore += 12;
+  if ([3, 10].includes(marsHouse)) startViabilityScore += 10; // 3rd house enterprise / courage
+  if (rahuHouse === 11 || rahuHouse === 10) startViabilityScore += 8;
+  startViabilityScore = Math.max(30, Math.min(96, startViabilityScore));
+
+  const startTier: AspectProbabilityTier =
+    startViabilityScore >= 80 ? 'Very High (85-98%)' : startViabilityScore >= 68 ? 'High (70-84%)' : 'Moderate (50-69%)';
+
+  const businessStartItem: AspectProbabilityItem = {
+    id: 'business_start_inception',
+    title: 'Business Start & Enterprise Inception Viability',
+    sanskritTitle: 'नूतन व्यापार आरम्भ व प्रतिष्ठान योग (Nutan Vyapar)',
+    category: 'career_wealth',
+    probability: startViabilityScore,
+    probabilityTier: startTier,
+    verdict:
+      startViabilityScore >= 72
+        ? 'Exceptional entrepreneurial readiness: The cosmic forces strongly favor launching a proprietary enterprise or scaling a commercial venture now.'
+        : 'Phased startup inception recommended: Validate customer demand and retain minimum 12 months working capital buffer before leaving salaried positions.',
+    governingHouses: [7, 3, 10, 11, 2],
+    keyPlanets: ['Budha', 'Surya', 'Guru', 'Mangal'],
+    yogasDetected: [
+      'Nutan Udyoga Siddhi Yoga (Venture Success)',
+      [10, 11].includes(mercHouse) ? 'Budhaditya Commercial Mastery' : 'Sahasa-Karaka Enterprise Yoga',
+      'Lakshmi Dhana Vriddhi Combination',
+    ],
+    timingWindow: 'Optimal venture launch windows: Mercury or Sun sub-dashas, on Shukla Paksha Wednesdays or Thursdays. Avoid starting during Rahu-Ketu nodal transitions.',
+    detailedAnalysis: `Starting a business requires the confluence of 3rd House (daring risk-taking & marketing), 7th House (public commerce & trading contracts), 10th House (executive administration), and 11th House (realized profits). With Mercury in House ${mercHouse} and Mars in House ${marsHouse}, your chart possesses acute market timing, operational stamina, and product discernment.`,
+    protectiveMeasures: 'Incorporate entities on auspicious tithis (Dwitiya, Panchami, Dashami, Ekadashi) during Shukla Paksha. Perform Ganapati Homa before launching commercial websites or opening offices.',
+    metrics: [
+      { label: 'Startup Inception Readiness', value: `${startViabilityScore}%`, score: startViabilityScore },
+      { label: 'Commercial Profit Margin', value: `${Math.min(96, startViabilityScore + 4)}%`, score: Math.min(96, startViabilityScore + 4) },
+      { label: 'Risk Absorption Capacity', value: `${[3, 6, 10].includes(marsHouse) ? 90 : 72}%`, score: [3, 6, 10].includes(marsHouse) ? 90 : 72 },
+    ],
+  };
+
+  // 19. LOVE LIFE, ROMANCE & COURTSHIP DYNAMICS
+  let loveScore = 58;
+  if ([5, 1, 7, 9, 11].includes(venHouse)) loveScore += 18; // Venus Karaka of love
+  if ([5, 1, 7, 11].includes(moonHouse)) loveScore += 14; // Moon emotional connection
+  if ([5, 7, 11].includes(marsHouse)) loveScore += 10; // Mars romantic passion
+  if ([5, 9].includes(jupHouse)) loveScore += 12; // Jupiter dharmic love
+  if (satHouse === 5) loveScore -= 10; // Saturn gives cautious, serious, or delayed romantic courtship
+  loveScore = Math.max(30, Math.min(96, loveScore));
+
+  const loveTier: AspectProbabilityTier =
+    loveScore >= 80 ? 'Very High (85-98%)' : loveScore >= 68 ? 'High (70-84%)' : 'Moderate (50-69%)';
+
+  const loveMarriageProb = Math.min(92, Math.max(25, [5, 7].includes(venHouse) || [5, 7].includes(marsHouse) || rahuHouse === 5 || rahuHouse === 7 ? 78 : 45));
+
+  const loveLifeRomanceItem: AspectProbabilityItem = {
+    id: 'love_life_romance',
+    title: 'Love Life, Romance & Courtship Dynamics',
+    sanskritTitle: 'प्रेम सम्बन्ध, आकर्षण व अनुराग योग (Prema Yoga)',
+    category: 'family_relationships',
+    probability: loveScore,
+    probabilityTier: loveTier,
+    verdict:
+      loveScore >= 70
+        ? `Passionate Prema-Yoga active: High magnetic romantic attraction, profound soul-level courtship, and high likelihood of love marriage (Love Marriage: ${loveMarriageProb}%, Arranged/Family Supported: ${100 - loveMarriageProb}%).`
+        : `Grounded & deeply devoted romantic style: Values authentic emotional stability, intellectual respect, and enduring loyalty over fleeting infatuation.`,
+    governingHouses: [5, 7, 11, 1],
+    keyPlanets: ['Shukra', 'Chandra', 'Mangal', 'Guru'],
+    yogasDetected: [
+      'Prema Yoga (Romantic Harmony)',
+      [5, 7].includes(venHouse) ? 'Shukra-Saptama Passionate Grace' : 'Hridaya-Sambandha Emotional Bond',
+      'Purva Punya Romantic Grace',
+    ],
+    timingWindow: 'Prime romantic courtship windows: During Venus, Moon, or 5th lord antardashas, and when Jupiter transits the 5th or 7th house.',
+    detailedAnalysis: `The 5th House (Purva Punya) dictates romantic infatuation, dating chemistry, and expressive love, while the 7th House establishes sacred commitment. With Shukra in House ${venHouse} and Chandra in House ${moonHouse}, your heart seeks romantic reciprocity that stimulates both artistic sensibility and emotional sanctuary. ${satHouse === 5 ? 'A mature courtship timeline ensures that real emotional bonds outlast initial romance.' : 'Deep passion and affectionate warmth elevate your personal relationships.'}`,
+    protectiveMeasures: 'Wear rose quartz or silver on Fridays. Recite the Kamadeva Gayatri or Radha-Krishna Stotram to attract pure, loyal love and resolve courtship misunderstandings.',
+    metrics: [
+      { label: 'Romantic Chemistry Index', value: `${loveScore}%`, score: loveScore },
+      { label: 'Love Marriage Probability', value: `${loveMarriageProb}%`, score: loveMarriageProb },
+      { label: 'Emotional Devotion & Depth', value: `${isPlanetInGoodHouse('Chandra') ? 92 : 75}%`, score: isPlanetInGoodHouse('Chandra') ? 92 : 75 },
+    ],
+  };
+
   return [
     businessItem,
+    businessStartItem,
     purchaseItem,
     saleItem,
     affairItem,
+    loveLifeRomanceItem,
     kidsItem,
     marriageItem,
     govtJobItem,
@@ -863,6 +1017,7 @@ export function computeLifeAspectProbabilities(
     transferItem,
     promotionItem,
     favourSeniorsItem,
+    workplaceDifficultiesItem,
     legalItem,
     windfallItem,
     foreignItem,
@@ -1047,6 +1202,43 @@ export function computePersonalizedLifeGuidance(
   const jobChangeProb = [5, 9, 3, 10].includes(mercHouse) || [5, 9, 10].includes(rahuHouse) ? 84 : 64;
   const favourFromSeniorsScore = [9, 10, 1].includes(jupHouse) || [10, 1].includes(sunHouse) ? 86 : 68;
 
+  let difficultiesScore = 32;
+  if ([6, 8, 12].includes(satHouse)) difficultiesScore += 16;
+  if ([6, 8, 12].includes(rahuHouse)) difficultiesScore += 18;
+  if ([6, 8].includes(marsHouse)) difficultiesScore += 14;
+  if (sunHouse === 6 || sunHouse === 8) difficultiesScore += 12;
+  if ([1, 5, 9, 10, 11].includes(jupHouse)) difficultiesScore -= 18;
+  if ([10, 11].includes(sunHouse)) difficultiesScore -= 10;
+  difficultiesScore = Math.max(15, Math.min(88, difficultiesScore));
+
+  let startViabilityScore = 55;
+  if ([7, 10, 11, 2, 3].includes(mercHouse)) startViabilityScore += 16;
+  if ([1, 10, 11].includes(sunHouse)) startViabilityScore += 12;
+  if ([7, 11].includes(jupHouse)) startViabilityScore += 12;
+  if ([3, 10].includes(marsHouse)) startViabilityScore += 10;
+  if (rahuHouse === 11 || rahuHouse === 10) startViabilityScore += 8;
+  startViabilityScore = Math.max(30, Math.min(96, startViabilityScore));
+
+  let loveScore = 58;
+  if ([5, 1, 7, 9, 11].includes(venHouse)) loveScore += 18;
+  if ([5, 1, 7, 11].includes(moonHouse)) loveScore += 14;
+  if ([5, 7, 11].includes(marsHouse)) loveScore += 10;
+  if ([5, 9].includes(jupHouse)) loveScore += 12;
+  if (satHouse === 5) loveScore -= 10;
+  loveScore = Math.max(30, Math.min(96, loveScore));
+
+  const loveMarriageProb = Math.min(92, Math.max(25, [5, 7].includes(venHouse) || [5, 7].includes(marsHouse) || rahuHouse === 5 || rahuHouse === 7 ? 78 : 45));
+
+  let affairRisk = 22;
+  if (rahuHouse === 7 || rahuHouse === 12) affairRisk += 26;
+  if (Math.abs(venHouse - marsHouse) === 0 || Math.abs(venHouse - marsHouse) === 6) affairRisk += 18;
+  if (rahuHouse === venHouse) affairRisk += 16;
+  if ([6, 8, 12].includes(satHouse)) affairRisk += 10;
+  if ([1, 3, 5, 7, 9, 11].includes(jupHouse) && Math.abs(jupHouse - 7) <= 2) affairRisk -= 18;
+  if ([1, 4, 5, 7, 9, 10, 11].includes(jupHouse)) affairRisk -= 12;
+  if (satHouse === 7) affairRisk -= 8;
+  affairRisk = Math.max(12, Math.min(84, affairRisk));
+
   const transitionWindows: CareerTransitionWindow[] = [
     {
       window: 'Next 3 to 6 Months',
@@ -1147,6 +1339,24 @@ export function computePersonalizedLifeGuidance(
       timingWindow: 'Grace period: Jupiter transit across 9th/10th houses and during Guru antardashas.',
       strategicAdvice: 'Maintain honest reporting, show respect to senior leaders, and seek executive sponsorship.',
     },
+    difficulties: {
+      id: 'difficulties',
+      title: 'Workplace Difficulties & Politics',
+      sanskritTitle: 'कर्म बाधा, षडयंत्र व सेवा क्लेश (Karma Badha)',
+      probability: difficultiesScore,
+      verdict: difficultiesScore >= 50
+        ? 'Heightened exposure to office politics or managerial scrutiny during Rahu/Saturn cycles. Maintain formal documentation.'
+        : 'Formidable corporate armor: Strong Jupiter and Sun placements dissolve opposition and shield against workplace politics.',
+      governingHouses: [6, 8, 10, 12],
+      keyPlanets: ['Shani', 'Rahu', 'Surya', 'Mangal', 'Guru'],
+      yogasDetected: [
+        'Karma-Shatru Peeda Yoga',
+        'Shada-Bhava Shani Protection',
+        'Brihaspati Kavach Shield',
+      ],
+      timingWindow: 'Watch out during Saturn transits over 10th/8th house or Rahu-Mars antardashas.',
+      strategicAdvice: 'Maintain impeccable email trails, do not engage in watercooler gossip, and perform Surya Arghya on Sundays.',
+    },
   };
 
   // 5. MAX WEALTH CALCULATOR
@@ -1215,7 +1425,6 @@ export function computePersonalizedLifeGuidance(
   ];
 
   // 8. ATMAKARAKA MISSION
-  // Planet with highest degree in traditional Jamini, or prime soul indicator (Sun/Jupiter)
   const defaultPlanet: PlanetPosition = natalPlanets[0] || {
     name: 'Surya',
     englishName: 'Sun',
@@ -1259,6 +1468,106 @@ export function computePersonalizedLifeGuidance(
     ],
   };
 
+  // 9. BUSINESS START GUIDANCE
+  const businessStartGuidance: BusinessStartGuidance = {
+    startupViabilityScore: startViabilityScore,
+    optimalLaunchWindow: 'Age 30–35 or during Mercury/Jupiter sub-dashas; Shukla Paksha Wednesdays & Thursdays.',
+    soleVsPartnerSplit: {
+      sole: pScore >= 75 ? 40 : 70,
+      partnership: pScore >= 75 ? 60 : 30,
+    },
+    debtVsBootstrapVerdict: debtScore >= 50
+      ? 'Bootstrap / Equity Funded Preferred: High debt increases 6th-house burden. Take asset-backed working capital only.'
+      : 'Leveraged Expansion Safe: Healthy credit standing; bank business loans and term credit can accelerate inventory and operations.',
+    debtRiskScore: debtScore,
+    recommendedSectors: [
+      {
+        sector: 'Property & Real Estate Development',
+        score: propScore,
+        why: 'Mars (Bhoomi Karaka) and 4th house synergy yield high compounding returns in land, plotting, and construction.',
+        launchTip: 'Launch on Tuesdays in Shukla Paksha; verify all title deeds with experienced legal counsel.',
+      },
+      {
+        sector: 'Iron, Steel & Heavy Metals',
+        score: ironScore,
+        why: 'Saturn and Mars govern raw industrial ores, steel fabrication, and hardware machinery.',
+        launchTip: 'Register entity on a Saturday in Shukla Paksha under Anuradha or Pushya nakshatra.',
+      },
+      {
+        sector: 'Furniture, Timber & Interior Decor',
+        score: furnScore,
+        why: 'Venus (luxury/design) and Saturn (wood/timber) combine for custom modular furniture and home decor.',
+        launchTip: 'Incorporate on Fridays in Shukla Paksha; curate high-margin bespoke architectural offerings.',
+      },
+      {
+        sector: 'Edible Oil & Food Commodities (FMCG)',
+        score: oilScore,
+        why: 'Moon rules liquid nourishment and mass consumer markets, delivering rapid inventory turnover.',
+        launchTip: 'Launch on Mondays under Rohini or Shravana nakshatra with tight supply-chain credit terms.',
+      },
+    ],
+    auspiciousMuhurtaChecklist: [
+      'Choose Shukla Paksha (Waxing Moon phase) between Dwitiya (2nd) and Trayodashi (13th) tithis',
+      'Avoid Rikta Tithis (4th, 9th, 14th) and Amavasya (New Moon)',
+      'Prefer Wednesdays (Budha - commerce), Thursdays (Guru - expansion), or Fridays (Shukra - wealth)',
+      'Ascendant at incorporation must have strong 10th and 11th houses with benefic planetary aspects',
+      'Perform Ganesha Sankalpa and Lakshmi Puja before cutting ribbon or accepting first payment',
+    ],
+    strategicInceptionRules: [
+      'Separate personal treasury from enterprise cash accounts immediately upon registration',
+      'Insist on written shareholder agreements with vesting and dispute arbitration clauses',
+      'Never allocate more than 35% of total capital into initial speculative marketing without validated product-market fit',
+    ],
+  };
+
+  // 10. LOVE LIFE & MARITAL DYNAMICS
+  const affairTierString: 'Low / Negligible (10-25%)' | 'Guarded / Moderate (26-49%)' | 'Elevated / Sensitive (50-75%)' | 'High Karmic Alert (76-95%)' =
+    affairRisk >= 75
+      ? 'High Karmic Alert (76-95%)'
+      : affairRisk >= 50
+      ? 'Elevated / Sensitive (50-75%)'
+      : affairRisk >= 30
+      ? 'Guarded / Moderate (26-49%)'
+      : 'Low / Negligible (10-25%)';
+
+  const loveAndMaritalDynamics: LoveAndMaritalDynamics = {
+    loveRomanceScore: loveScore,
+    loveVsArrangedProbability: {
+      loveMarriage: loveMarriageProb,
+      arrangedMarriage: 100 - loveMarriageProb,
+    },
+    extraMaritalVulnerabilityScore: affairRisk,
+    extraMaritalRiskTier: affairTierString,
+    romanticTimingWindows: [
+      'Peak Courtship Window: Age 24–28 during Venus or 5th house lord antardasha',
+      'Matrimonial Manifestation: Age 28–32 with Jupiter aspecting 7th house or natal Lagna',
+      'Secondary Harmony Window: Age 35–38 deepening emotional intimacy and shared purpose',
+    ],
+    affairTriggerPeriods: [
+      'Rahu-Venus or Venus-Rahu Mahadasha/Antardasha (sensory desire illusion)',
+      'Venus-Mars conjunction transit through 6th, 8th, or 12th houses (impulsive passion spikes)',
+      'Saturn transit over natal 7th house (marital dryness/distance sparking external emotional search)',
+      'Moon transit through 8th house from natal Moon (Chandrashtama emotional vulnerability)',
+    ],
+    fidelitySafeguards: [
+      'Establish unwavering professional boundaries—avoid private late-night dinners or ambiguous confidences with colleagues',
+      'Transparent financial and mobile phone disclosures with spouse to maintain complete mutual trust',
+      'Cultivate shared spiritual practices (temple visits, joint charitable giving) to anchor the union in Dharma',
+      'Invoke Jupiter’s moral grace whenever emotional disconnection arises, prioritizing long-term lineage honor',
+    ],
+    relationshipSanctityRemedies: [
+      'Offer fragrant white flowers (Jasmine, Mogra) to Lord Shiva and Goddess Parvati on Mondays',
+      'Wear a natural Gauri-Shankar Rudraksha to unify cosmic masculine and feminine energies in marriage',
+      'Recite Patni/Pati Sanjeevani Mantra or Vishnu Sahasranama together once a month',
+      'Keep bedroom decor in soothing cream, ivory, or pastel tones; avoid mirrors directly reflecting the bed',
+    ],
+    emotionalCompatibilityInsights: [
+      'Seeker thrives when partner offers both intellectual stimulating conversation and deep emotional safety',
+      'Need for mutual appreciation—criticism in public causes profound withdrawal',
+      'Physical affection and shared travel replenish romantic vitality rapidly',
+    ],
+  };
+
   return {
     education: {
       recommendedStream: streamOptions[0].stream,
@@ -1292,10 +1601,23 @@ export function computePersonalizedLifeGuidance(
       transferLikelihood,
       jobChangeProbability: jobChangeProb,
       favourFromSeniorsScore,
+      workplaceDifficultiesScore: difficultiesScore,
       expectedSalaryHikeMultiplier: '28% to 45% uplift on lateral move',
       transitionWindows,
       pillars: careerPillars,
+      troublesomeDashaPeriods: [
+        'Rahu-Ketu transit across 6th/12th or 4th/10th nodal axis',
+        'Saturn Kantaka Shani (4th) or Ashtam Shani (8th) transit relative to natal Moon/Lagna',
+        'Antardashas of 6th or 8th house lords activating latent workplace rivalry',
+      ],
+      remediesForWorkplacePolitics: [
+        'Aditya Hridaya Stotram daily at sunrise to invoke solar protection and defeat office rivals',
+        'Hanuman Chalisa recitation 7 times on Tuesdays and Saturdays',
+        'Maintain a disciplined brass Sun emblem or crystal pyramid on your office desk facing East',
+      ],
     },
+    businessStartGuidance,
+    loveAndMaritalDynamics,
     maxWealth,
     vastuAndDirections: {
       auspiciousFacing,

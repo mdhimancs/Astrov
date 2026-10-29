@@ -30,6 +30,9 @@ import { HouseCardDeck } from './HouseCardDeck';
 import { BhriguLalKitabSection } from './BhriguLalKitabSection';
 import { PlanetaryAspectsAndAlerts } from './PlanetaryAspectsAndAlerts';
 import { ShadbalaD3Chart } from './ShadbalaD3Chart';
+import { NorthIndianLifeAspectsTab } from './NorthIndianLifeAspectsTab';
+import { DailyMoonTransitGuidance } from './DailyMoonTransitGuidance';
+import { CurrentVimshottariEventTimingView } from './CurrentVimshottariEventTimingView';
 import {
   calculatePlanetaryPositions,
   buildHouseStructure,
@@ -129,6 +132,9 @@ export function BirthTimePredictionsTab({
     | 'bhava-deck'
     | 'bhrigu-samhita'
     | 'lal-kitab'
+    | 'sarva-bhavas'
+    | 'daily-moon'
+    | 'dasha-timing'
   >('kundali');
 
   // AI Birth Reading state
@@ -347,11 +353,26 @@ export function BirthTimePredictionsTab({
 
       {/* BIRTH CHARTS & READINGS — COMPACT DECK OF CARDS SELECTOR */}
       <div className="bg-white/90 backdrop-blur-sm rounded-lg border border-stone-200/90 px-2 py-1 shadow-3xs">
-        <div className="flex flex-wrap sm:grid sm:grid-cols-4 lg:grid-cols-7 gap-1 overflow-x-auto scrollbar-none py-0.5">
+        <div className="flex flex-wrap sm:grid sm:grid-cols-5 lg:grid-cols-10 gap-1 overflow-x-auto scrollbar-none py-0.5">
           {[
             {
               id: 'kundali',
               title: 'Janam Kundali (D1)',
+              icon: Compass,
+            },
+            {
+              id: 'daily-moon',
+              title: 'Daily Moon Guidance',
+              icon: Moon,
+            },
+            {
+              id: 'dasha-timing',
+              title: 'Dasha Event Timing',
+              icon: Clock,
+            },
+            {
+              id: 'sarva-bhavas',
+              title: '12 Bhavas (North Indian)',
               icon: Compass,
             },
             {
@@ -705,6 +726,24 @@ export function BirthTimePredictionsTab({
               </div>
             )}
           </div>
+
+          {/* Daily Moon Transit & Emotional Mental Guidance Section */}
+          <DailyMoonTransitGuidance
+            activeProfile={currentProfile}
+            natalPlanets={natalPlanets}
+            natalLagnaRasi={natalLagnaRasi}
+            onNavigateToDasha={onNavigateToDasha}
+          />
+
+          {/* Current Vimshottari Dasha Major & Sub-Periods Event Timing View */}
+          <CurrentVimshottariEventTimingView
+            activeProfile={currentProfile}
+            natalPlanets={natalPlanets}
+            natalHouses={natalHouses}
+            lagnaRasi={natalLagnaRasi}
+            onNavigateToFullDasha={onNavigateToDasha}
+            onNavigateToMonthWise={onNavigateToMonthWise}
+          />
 
           {/* Planetary Aspects & Upcoming Ingress / Station Alerts System */}
           <PlanetaryAspectsAndAlerts planets={natalPlanets} activeProfile={currentProfile} />
@@ -1268,6 +1307,41 @@ export function BirthTimePredictionsTab({
           natalPlanets={natalPlanets}
           selectedHouseNumber={selectedHouseNumber}
           onSelectHouseNumber={handleSelectHouseNumber}
+        />
+      )}
+
+      {/* TAB 5: ALL 12 BHAVAS (NORTH INDIAN COMPREHENSIVE SUITE) */}
+      {activeBirthSectionTab === 'sarva-bhavas' && (
+        <NorthIndianLifeAspectsTab
+          activeProfile={currentProfile}
+          profiles={profiles}
+          natalPlanets={natalPlanets}
+          natalHouses={natalHouses}
+          lagnaRasi={natalLagnaRasi}
+          onNavigateToMonthly={onNavigateToMonthWise}
+          onNavigateToDasha={onNavigateToDasha}
+        />
+      )}
+
+      {/* TAB 6: DAILY MOON TRANSIT & EMOTIONAL GUIDANCE */}
+      {activeBirthSectionTab === 'daily-moon' && (
+        <DailyMoonTransitGuidance
+          activeProfile={currentProfile}
+          natalPlanets={natalPlanets}
+          natalLagnaRasi={natalLagnaRasi}
+          onNavigateToDasha={onNavigateToDasha}
+        />
+      )}
+
+      {/* TAB 7: VIMSHOTTARI DASHA CURRENT MAJOR & SUB-PERIOD EVENT TIMING */}
+      {activeBirthSectionTab === 'dasha-timing' && (
+        <CurrentVimshottariEventTimingView
+          activeProfile={currentProfile}
+          natalPlanets={natalPlanets}
+          natalHouses={natalHouses}
+          lagnaRasi={natalLagnaRasi}
+          onNavigateToFullDasha={onNavigateToDasha}
+          onNavigateToMonthWise={onNavigateToMonthWise}
         />
       )}
     </div>

@@ -20,6 +20,7 @@ import { NorthIndianChart } from './NorthIndianChart';
 import { SouthIndianChart } from './SouthIndianChart';
 import { CelestialSkyMapWheel } from './CelestialSkyMapWheel';
 import { MoonPhasesImpact } from './MoonPhasesImpact';
+import { DailyMoonTransitGuidance } from './DailyMoonTransitGuidance';
 import { TransitNatalInteractionChart } from './TransitNatalInteractionChart';
 import { calculatePlanetaryPositions, buildHouseStructure, AyanamshaSystem } from '../vedicMath';
 import { HouseInfo, PlanetPosition, UserProfile } from '../types';
@@ -523,6 +524,13 @@ export function TransitsLiveTab({
               )}
             </div>
           )}
+
+          {/* Daily Moon Transit & Emotional Mental Guidance Component */}
+          <DailyMoonTransitGuidance
+            activeProfile={activeProfile}
+            natalPlanets={natalPlanets}
+            natalLagnaRasi={natalLagnaRasi}
+          />
 
           {/* Moon Phases Impact Analysis Component */}
           <MoonPhasesImpact

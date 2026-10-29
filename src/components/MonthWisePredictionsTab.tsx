@@ -354,6 +354,9 @@ export function MonthWisePredictionsTab({
           natalMoonRasi={natalMoonRasi}
           natalNakshatra={natalNakshatra}
           natalPlanets={natalPlanets}
+          monthlyPredictions={monthlyPredictions}
+          selectedMonthKey={selectedMonthKey}
+          onSelectMonthKey={handleMonthChange}
         />
       )}
 

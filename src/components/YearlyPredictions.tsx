@@ -21,9 +21,15 @@ import {
   Star,
   Home,
   Baby,
+  XCircle,
+  ArrowRight,
+  Sun,
+  Moon,
+  Clock,
 } from 'lucide-react';
-import { YearlyPrediction, PlanetPosition } from '../types';
+import { YearlyPrediction, PlanetPosition, MonthWiseTransitPrediction } from '../types';
 import { VEDIC_RASIS } from '../data';
+import { ALL_MONTH_WISE_PREDICTIONS } from '../monthlyTransitData';
 
 interface YearlyPredictionsProps {
   yearlyPredictions: YearlyPrediction[];
@@ -37,6 +43,9 @@ interface YearlyPredictionsProps {
   natalMoonRasi?: number;
   natalNakshatra?: string;
   natalPlanets?: PlanetPosition[];
+  monthlyPredictions?: MonthWiseTransitPrediction[];
+  selectedMonthKey?: string;
+  onSelectMonthKey?: (monthKey: string) => void;
 }
 
 interface AiYearlyLifePathResponse {
@@ -63,12 +72,48 @@ export function YearlyPredictions({
   natalMoonRasi = 5,
   natalNakshatra = 'Magha',
   natalPlanets = [],
+  monthlyPredictions = [],
+  selectedMonthKey,
+  onSelectMonthKey,
 }: YearlyPredictionsProps) {
-  const [activeSubView, setActiveSubView] = useState<'all' | 'lifepath' | 'pillars'>('all');
+  const [activeSubView, setActiveSubView] = useState<'all' | 'lifepath' | 'monthly' | 'pillars'>('all');
   const [isScrollBounded, setIsScrollBounded] = useState(true);
   const [aiLifePath, setAiLifePath] = useState<AiYearlyLifePathResponse | null>(null);
   const [isLoadingAiLifePath, setIsLoadingAiLifePath] = useState(false);
   const [aiLifePathError, setAiLifePathError] = useState<string | null>(null);
+
+  // Current Actual Month & Year for Defaulting
+  const now = new Date();
+  const currentActualYear = now.getFullYear();
+  const currentActualMonthKey = `${currentActualYear}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const currentMonthName = now.toLocaleString('en-US', { month: 'short' });
+  const currentMonthYearLabel = `${currentMonthName} ${currentActualYear}`;
+
+  const [internalSelectedMonthKey, setInternalSelectedMonthKey] = useState<string>(() => {
+    if (selectedMonthKey && selectedMonthKey.startsWith(`${selectedYear}-`)) {
+      return selectedMonthKey;
+    }
+    if (selectedYear === currentActualYear) {
+      return currentActualMonthKey;
+    }
+    return `${selectedYear}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  });
+
+  useEffect(() => {
+    if (selectedMonthKey && selectedMonthKey.startsWith(`${selectedYear}-`)) {
+      setInternalSelectedMonthKey(selectedMonthKey);
+    } else if (selectedYear === currentActualYear) {
+      setInternalSelectedMonthKey(currentActualMonthKey);
+    } else {
+      const curMonthNum = String(now.getMonth() + 1).padStart(2, '0');
+      setInternalSelectedMonthKey(`${selectedYear}-${curMonthNum}`);
+    }
+  }, [selectedYear, selectedMonthKey, currentActualYear, currentActualMonthKey]);
+
+  const handleMonthSelect = (mKey: string) => {
+    setInternalSelectedMonthKey(mKey);
+    onSelectMonthKey?.(mKey);
+  };
 
   const scrollRef = useRef<HTMLDivElement>(null);
   
@@ -270,12 +315,6 @@ export function YearlyPredictions({
     };
   });
 
-  // Current Actual Month & Year for Reference Indicators
-  const now = new Date();
-  const currentActualYear = now.getFullYear();
-  const currentMonthName = now.toLocaleString('en-US', { month: 'short' });
-  const currentMonthYearLabel = `${currentMonthName} ${currentActualYear}`;
-
   // Find data point for current actual year and score for primary active aspect
   const currentYearDataPoint = chartData.find((d) => d.year === currentActualYear);
   const primaryAspectKey = activeAspects[0] || 'Overall';
@@ -337,6 +376,94 @@ export function YearlyPredictions({
   const lifePath = currentYearPred.lifePathSynthesis;
   const lagnaName = VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName || 'Mithuna';
   const moonName = VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName || 'Simha';
+
+  const MONTH_NAMES = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  const SOLAR_INGRESSES = [
+    { sign: 'Makara (Capricorn)', day: 14, theme: 'Makar Sankranti & Solar Ambition' },
+    { sign: 'Kumbha (Aquarius)', day: 13, theme: 'Aquarius Social Innovation' },
+    { sign: 'Meena (Pisces)', day: 14, theme: 'Intuitive Wisdom & Spiritual Ingress' },
+    { sign: 'Mesha (Aries)', day: 14, theme: 'Exalted Solar Radiance & Spring Renewal' },
+    { sign: 'Vrishabha (Taurus)', day: 15, theme: 'Wealth Stabilization & Venusian Harmony' },
+    { sign: 'Mithuna (Gemini)', day: 15, theme: 'Intellectual Expansion & Commercial Trade' },
+    { sign: 'Karka (Cancer)', day: 16, theme: 'Karka Sankranti & Domestic Sanctuary' },
+    { sign: 'Simha (Leo)', day: 17, theme: 'Royal Solar Splendor & Executive Authority' },
+    { sign: 'Kanya (Virgo)', day: 17, theme: 'Analytical Precision & Practical Mastery' },
+    { sign: 'Tula (Libra)', day: 17, theme: 'Equinox Balance & Diplomatic Harmony' },
+    { sign: 'Vrischika (Scorpio)', day: 16, theme: 'Transformative Insight & Occult Research' },
+    { sign: 'Dhanu (Sagittarius)', day: 16, theme: 'Philosophical Elevation & Dharmic Vision' },
+  ];
+
+  const yearMonths: MonthWiseTransitPrediction[] = useMemo(() => {
+    const list: MonthWiseTransitPrediction[] = [];
+    const source = monthlyPredictions && monthlyPredictions.length > 0 ? monthlyPredictions : ALL_MONTH_WISE_PREDICTIONS;
+    for (let m = 1; m <= 12; m++) {
+      const mm = String(m).padStart(2, '0');
+      const key = `${currentYearPred.year}-${mm}`;
+      const found = source.find((item) => item.monthKey === key);
+      if (found) {
+        list.push(found);
+      } else {
+        const mName = `${MONTH_NAMES[m - 1]} ${currentYearPred.year}`;
+        const ingress = SOLAR_INGRESSES[m - 1];
+        const rating = [1, 4, 7, 10, 11].includes(m) ? 5 : [2, 5, 9].includes(m) ? 4 : 3;
+        list.push({
+          monthKey: key,
+          monthName: mName,
+          tagline: `${ingress.theme} — ${currentYearPred.themeTitle}`,
+          overallRating: rating,
+          planetaryMovements: [
+            {
+              planet: 'Surya' as any,
+              event: `Surya enters ${ingress.sign} on ${MONTH_NAMES[m - 1].slice(0, 3)} ${ingress.day}`,
+              date: `${MONTH_NAMES[m - 1].slice(0, 3)} ${ingress.day}, ${currentYearPred.year}`,
+              impactSummary: `Activates executive authority and solar vitality in ${ingress.sign}.`,
+            },
+            {
+              planet: 'Guru' as any,
+              event: `Devaguru Gochar aspecting Kendra & Trikona houses in ${currentYearPred.year}`,
+              date: `All Month`,
+              impactSummary: `Bestows divine grace over professional rise, wisdom, and financial growth.`,
+            },
+            {
+              planet: 'Shani' as any,
+              event: `Shani disciplined transit progression in ${currentYearPred.year}`,
+              date: `All Month`,
+              impactSummary: `Rewards systematic execution, patient endurance, and ethical conduct.`,
+            },
+          ],
+          careerWealthForecast: `In ${mName}, professional milestones align with Muntha in House ${currentYearPred.munthaHouse}. Focus on strategic deliverables, client retention, and disciplined budgeting.`,
+          loveFamilyForecast: `Warm domestic equilibrium and supportive family discussions throughout ${mName}. Fosters mutual understanding and harmony.`,
+          healthVitalityForecast: `Maintain regular hydration, balanced nutrition, and circadian sleep schedules during ${MONTH_NAMES[m - 1]}.`,
+          spiritualForecast: `Auspicious monthly lunar tithis favor mantra japa, morning Surya Namaskar, and charitable seva.`,
+          dos: [
+            `Prioritize core annual goals and align with Varsheshwara ${currentYearPred.varsheshwara}.`,
+            `Review monthly financial accounts and maintain disciplined savings.`,
+            `Dedicate 15 minutes daily to quiet contemplation and pranayama.`,
+          ],
+          donts: [
+            `Avoid impulsive financial commitments or hasty verbal promises.`,
+            `Do not ignore physical fatigue during high-workload weeks.`,
+          ],
+          favorableDays: `${MONTH_NAMES[m - 1].slice(0, 3)} 3, 8, 14, 19, 24, 29`,
+          cautionDays: `${MONTH_NAMES[m - 1].slice(0, 3)} ${ingress.day} (Sankranti day), 27`,
+          remedyOfMonth: `Honor Lord Surya and Varsheshwara ${currentYearPred.varsheshwara}: offer morning Arghya in copper vessel and practice charitable donation on Thursdays.`,
+        });
+      }
+    }
+    return list;
+  }, [currentYearPred, monthlyPredictions]);
+
+  const activeMonthData = useMemo(() => {
+    return (
+      yearMonths.find((m) => m.monthKey === internalSelectedMonthKey) ||
+      yearMonths.find((m) => m.monthKey === currentActualMonthKey) ||
+      yearMonths[0]
+    );
+  }, [yearMonths, internalSelectedMonthKey, currentActualMonthKey]);
 
   // Reset AI synthesis when year or user changes
   useEffect(() => {
@@ -418,6 +545,7 @@ export function YearlyPredictions({
             {[
               { id: 'all', label: 'Complete Forecast' },
               { id: 'lifepath', label: 'Life-Path & Birth Chart' },
+              { id: 'monthly', label: 'Monthly Breakdown' },
               { id: 'pillars', label: '9 Pillars & Quarters' },
             ].map((mode) => {
               const isActive = activeSubView === mode.id;
@@ -635,6 +763,230 @@ export function YearlyPredictions({
             </ResponsiveContainer>
           </div>
         </div>
+
+        {/* =====================================================================
+            YEARLY MONTH-BY-MONTH GOCHAR & TRANSIT PREDICTIONS (CURRENT MONTH DEFAULT)
+            ===================================================================== */}
+        {(activeSubView === 'all' || activeSubView === 'monthly') && (
+          <div className="bg-gradient-to-br from-[#FAF8F5] via-white to-amber-50/40 rounded-lg border border-amber-300/90 p-2.5 space-y-2.5 shadow-3xs">
+            {/* Section Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-200/80 pb-2">
+              <div className="space-y-0.5">
+                <div className="flex items-center space-x-1.5">
+                  <Calendar className="w-4 h-4 text-amber-800" />
+                  <h4 className="font-vedic font-black text-stone-950 text-[14px] uppercase tracking-wider">
+                    {currentYearPred.year} Month-by-Month Gochar &amp; Transit Predictions
+                  </h4>
+                </div>
+                <p className="text-[12px] text-stone-600 font-medium">
+                  Comprehensive 12-month Gochar stream • Planetary ingresses, auspicious windows, career &amp; love pulses, and Vedic remedies
+                </p>
+              </div>
+
+              {/* Current Active Month Indicator */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className="px-2.5 py-1 rounded-md bg-amber-100/90 text-amber-950 border border-amber-300 text-[11px] font-bold flex items-center space-x-1.5 shadow-3xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
+                  <span>Selected: <strong>{activeMonthData.monthName}</strong></span>
+                  {activeMonthData.monthKey === currentActualMonthKey && (
+                    <span className="ml-1 px-1.5 py-0.2 rounded bg-amber-700 text-white text-[9px] font-black uppercase tracking-wider">
+                      Current Month
+                    </span>
+                  )}
+                </span>
+              </div>
+            </div>
+
+            {/* Horizontal Month Jump Navigator Strip (12 Months of selected year) */}
+            <div className="overflow-x-auto pb-1 scrollbar-thin">
+              <div className="flex items-center gap-1 min-w-max">
+                {yearMonths.map((m) => {
+                  const isSelected = m.monthKey === activeMonthData.monthKey;
+                  const isTodayMonth = m.monthKey === currentActualMonthKey;
+                  return (
+                    <button
+                      key={m.monthKey}
+                      type="button"
+                      onClick={() => handleMonthSelect(m.monthKey)}
+                      className={`px-2.5 py-1 rounded text-center transition-all cursor-pointer border text-[11px] font-bold ${
+                        isSelected
+                          ? 'bg-amber-100/95 border-amber-500 ring-1 ring-amber-300 text-amber-950 shadow-2xs font-black'
+                          : isTodayMonth
+                          ? 'bg-amber-50/70 border-amber-300 text-amber-900 hover:bg-amber-100/60'
+                          : 'bg-white border-stone-200 text-stone-700 hover:border-amber-300 hover:bg-[#FAF8F5]'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-1 justify-center">
+                        <span>{m.monthName.split(' ')[0]}</span>
+                        {isTodayMonth && (
+                          <span className="px-1 py-0.2 rounded bg-amber-600 text-white text-[8px] font-black tracking-tight">
+                            NOW
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[9.5px] font-normal text-amber-700">
+                        {'★'.repeat(m.overallRating)}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Active Month Detailed Dossier Card */}
+            <div className="bg-white rounded-md border border-amber-200/90 p-2.5 space-y-2.5 shadow-2xs">
+              {/* Month Header Banner */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-stone-100 pb-2">
+                <div className="space-y-0.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-vedic font-black text-stone-950 text-[15px] tracking-tight">
+                      {activeMonthData.monthName} — {activeMonthData.tagline}
+                    </span>
+                    <span className="text-amber-500 text-[13px] font-bold">
+                      {'★'.repeat(activeMonthData.overallRating)}
+                    </span>
+                    {activeMonthData.monthKey === currentActualMonthKey && (
+                      <span className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-950 border border-amber-300 text-[10px] font-black uppercase tracking-wider">
+                        Active Current Month
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[12px] text-stone-600">
+                    Gochar configuration aligned with Varsheshwara {currentYearPred.varsheshwara} and Muntha in House {currentYearPred.munthaHouse}
+                  </p>
+                </div>
+
+                {/* Favorable vs Caution Days Badges */}
+                <div className="flex flex-wrap items-center gap-1.5 shrink-0 text-[11px]">
+                  <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-950 border border-emerald-200 font-bold">
+                    Auspicious: {activeMonthData.favorableDays}
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-rose-50 text-rose-950 border border-rose-200 font-bold">
+                    Caution: {activeMonthData.cautionDays}
+                  </span>
+                </div>
+              </div>
+
+              {/* Planetary Movements & Ingresses during this month */}
+              {activeMonthData.planetaryMovements && activeMonthData.planetaryMovements.length > 0 && (
+                <div className="space-y-1">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-amber-900 flex items-center space-x-1.5">
+                    <Sun className="w-3.5 h-3.5 text-amber-700" />
+                    <span>Key Planetary Movements &amp; Celestial Ingresses ({activeMonthData.monthName})</span>
+                  </span>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-1.5">
+                    {activeMonthData.planetaryMovements.map((pm, pidx) => (
+                      <div
+                        key={pidx}
+                        className="bg-[#FAF8F5] rounded p-2 border border-stone-200/80 space-y-0.5 text-[11px]"
+                      >
+                        <div className="flex items-center justify-between text-stone-900 font-bold">
+                          <span className="text-amber-950 font-black">{pm.planet}</span>
+                          <span className="text-[10px] text-stone-500 font-semibold">{pm.date}</span>
+                        </div>
+                        <div className="font-bold text-stone-800 text-[11.5px] leading-tight">
+                          {pm.event}
+                        </div>
+                        <p className="text-[11px] text-stone-600 leading-snug">
+                          {pm.impactSummary}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 4 Life Domain Pulses for the Month */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                <div className="bg-[#FAF8F5] rounded p-2 border border-stone-200/80 space-y-0.5">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-amber-900 flex items-center space-x-1">
+                    <Briefcase className="w-3 h-3 text-amber-700" />
+                    <span>Career &amp; Wealth Pulse</span>
+                  </span>
+                  <p className="text-[12px] text-stone-800 leading-snug">
+                    {activeMonthData.careerWealthForecast}
+                  </p>
+                </div>
+
+                <div className="bg-[#FAF8F5] rounded p-2 border border-stone-200/80 space-y-0.5">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-rose-900 flex items-center space-x-1">
+                    <Heart className="w-3 h-3 text-rose-700" />
+                    <span>Love &amp; Family Harmony</span>
+                  </span>
+                  <p className="text-[12px] text-stone-800 leading-snug">
+                    {activeMonthData.loveFamilyForecast}
+                  </p>
+                </div>
+
+                <div className="bg-[#FAF8F5] rounded p-2 border border-stone-200/80 space-y-0.5">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-sky-900 flex items-center space-x-1">
+                    <Activity className="w-3 h-3 text-sky-700" />
+                    <span>Health &amp; Vitality</span>
+                  </span>
+                  <p className="text-[12px] text-stone-800 leading-snug">
+                    {activeMonthData.healthVitalityForecast}
+                  </p>
+                </div>
+
+                <div className="bg-[#FAF8F5] rounded p-2 border border-stone-200/80 space-y-0.5">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-purple-900 flex items-center space-x-1">
+                    <Brain className="w-3 h-3 text-purple-700" />
+                    <span>Spiritual &amp; Festivals</span>
+                  </span>
+                  <p className="text-[12px] text-stone-800 leading-snug">
+                    {activeMonthData.spiritualForecast}
+                  </p>
+                </div>
+              </div>
+
+              {/* Do's, Don'ts and Monthly Vedic Remedy */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1 border-t border-stone-100 text-[11.5px]">
+                {/* Do's */}
+                <div className="bg-emerald-50/40 rounded p-2 border border-emerald-200/70 space-y-1">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-emerald-950 flex items-center space-x-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>Monthly Do&apos;s (Karya Siddhi)</span>
+                  </span>
+                  <ul className="space-y-0.5 text-stone-800">
+                    {activeMonthData.dos.map((d, didx) => (
+                      <li key={didx} className="flex items-start space-x-1 leading-snug">
+                        <span className="text-emerald-700 font-bold">•</span>
+                        <span>{d}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Don'ts */}
+                <div className="bg-rose-50/40 rounded p-2 border border-rose-200/70 space-y-1">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-rose-950 flex items-center space-x-1">
+                    <XCircle className="w-3.5 h-3.5 text-rose-700" />
+                    <span>Monthly Don&apos;ts (Varjya)</span>
+                  </span>
+                  <ul className="space-y-0.5 text-stone-800">
+                    {activeMonthData.donts.map((d, didx) => (
+                      <li key={didx} className="flex items-start space-x-1 leading-snug">
+                        <span className="text-rose-700 font-bold">•</span>
+                        <span>{d}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Monthly Vedic Remedy */}
+                <div className="bg-amber-50/60 rounded p-2 border border-amber-300/80 space-y-1">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-amber-950 flex items-center space-x-1">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+                    <span>Sacred Monthly Upay ({activeMonthData.monthName})</span>
+                  </span>
+                  <p className="text-[12px] text-stone-900 leading-snug font-medium">
+                    {activeMonthData.remedyOfMonth}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* =====================================================================
             NEW YEARLY LIFE-PATH FORECAST MODULE (TRANSITS × BIRTH CHART DATA)
@@ -1092,6 +1444,122 @@ export function YearlyPredictions({
                       <span className="text-stone-700">
                         {lifePath.domainForecasts?.children?.remedy ?? 'Recite Santana Gopala Mantra or Brihaspati Kavacham on Thursdays; donate educational items to needy students.'}
                       </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* =====================================================================
+                  MONTHLY LIFE-PATH MILESTONES & TRANSIT TIMING (CURRENT MONTH DEFAULT)
+                  ===================================================================== */}
+              <div className="bg-white rounded-md p-2.5 border border-amber-300/80 space-y-2 shadow-2xs">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-amber-200/70 pb-1.5">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center space-x-1.5">
+                      <Compass className="w-4 h-4 text-amber-800" />
+                      <span className="font-vedic font-black text-stone-950 text-[13.5px] uppercase tracking-wider">
+                        {currentYearPred.year} Monthly Life-Path Trajectory &amp; Milestone Timing
+                      </span>
+                    </div>
+                    <p className="text-[11.5px] text-stone-600 font-medium">
+                      How monthly transits activate your Age {currentYearPred.ageInYear} Sudarshana House {lifePath.progressedHouse} ({lifePath.progressedRasi}) • Showing current month by default
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-950 border border-amber-300 text-[10.5px] font-bold flex items-center space-x-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
+                      <span>Selected: <strong>{activeMonthData.monthName}</strong></span>
+                      {activeMonthData.monthKey === currentActualMonthKey && (
+                        <span className="ml-1 px-1 py-0.2 rounded bg-amber-700 text-white text-[8.5px] font-black uppercase">
+                          Current Month
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Month Selector Pills inside Life-Path */}
+                <div className="overflow-x-auto pb-1 scrollbar-thin">
+                  <div className="flex items-center gap-1 min-w-max">
+                    {yearMonths.map((m) => {
+                      const isSelected = m.monthKey === activeMonthData.monthKey;
+                      const isCurrent = m.monthKey === currentActualMonthKey;
+                      return (
+                        <button
+                          key={m.monthKey}
+                          type="button"
+                          onClick={() => handleMonthSelect(m.monthKey)}
+                          className={`px-2 py-0.5 rounded text-center transition-all cursor-pointer border text-[10.5px] font-bold ${
+                            isSelected
+                              ? 'bg-amber-100/90 border-amber-500 ring-1 ring-amber-300 text-amber-950 font-black shadow-2xs'
+                              : isCurrent
+                              ? 'bg-amber-50/70 border-amber-300 text-amber-900'
+                              : 'bg-white border-stone-200 text-stone-600 hover:bg-[#FAF8F5]'
+                          }`}
+                        >
+                          <span>{m.monthName.split(' ')[0]}</span>
+                          {isCurrent && <span className="ml-0.5 text-[8.5px] text-amber-700 font-black">•NOW</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Monthly Life-Path Card */}
+                <div className="bg-[#FAF8F5] rounded p-2 border border-amber-200/80 space-y-1.5">
+                  <div className="flex flex-wrap items-center justify-between gap-1">
+                    <div className="flex items-center space-x-1.5">
+                      <Flame className="w-3.5 h-3.5 text-amber-700" />
+                      <span className="font-vedic font-bold text-stone-950 text-[13px]">
+                        {activeMonthData.monthName} Life-Path Pulse: {activeMonthData.tagline}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded bg-amber-200 text-amber-950">
+                      Rating: {activeMonthData.overallRating}/5
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[12px]">
+                    <div className="bg-white rounded p-2 border border-stone-200/80 space-y-0.5">
+                      <span className="text-[10.5px] font-black uppercase tracking-wider text-amber-900 block flex items-center space-x-1">
+                        <Briefcase className="w-3 h-3 text-amber-700" />
+                        <span>Career &amp; Vocation Milestone</span>
+                      </span>
+                      <p className="text-stone-800 leading-snug">
+                        {activeMonthData.careerWealthForecast}
+                      </p>
+                    </div>
+
+                    <div className="bg-white rounded p-2 border border-stone-200/80 space-y-0.5">
+                      <span className="text-[10.5px] font-black uppercase tracking-wider text-rose-900 block flex items-center space-x-1">
+                        <Heart className="w-3 h-3 text-rose-700" />
+                        <span>Relationships &amp; Karma</span>
+                      </span>
+                      <p className="text-stone-800 leading-snug">
+                        {activeMonthData.loveFamilyForecast}
+                      </p>
+                    </div>
+
+                    <div className="bg-white rounded p-2 border border-stone-200/80 space-y-0.5">
+                      <span className="text-[10.5px] font-black uppercase tracking-wider text-purple-900 block flex items-center space-x-1">
+                        <Brain className="w-3 h-3 text-purple-700" />
+                        <span>Inner Clarity &amp; Spirit</span>
+                      </span>
+                      <p className="text-stone-800 leading-snug">
+                        {activeMonthData.spiritualForecast}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pt-1 border-t border-amber-200/60 text-[11px]">
+                    <div>
+                      <strong className="text-amber-950 font-bold">Favorable Alignment Days in {activeMonthData.monthName.split(' ')[0]}:</strong>{' '}
+                      <span className="text-stone-700">{activeMonthData.favorableDays}</span>
+                    </div>
+                    <div>
+                      <strong className="text-amber-950 font-bold">Monthly Life-Path Upay:</strong>{' '}
+                      <span className="text-stone-800 font-medium">{activeMonthData.remedyOfMonth}</span>
                     </div>
                   </div>
                 </div>

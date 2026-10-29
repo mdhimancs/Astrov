@@ -35,6 +35,7 @@ import {
 } from '../vedicMath';
 import { VEDIC_RASIS, NAKSHATRAS } from '../data';
 import { ProfileSelector } from './ProfileSelector';
+import { CurrentVimshottariEventTimingView } from './CurrentVimshottariEventTimingView';
 import { PlaceValue } from './PlaceOfBirthInput';
 import { GrahaName, UserProfile } from '../types';
 import {
@@ -426,7 +427,14 @@ export function VimshottariDashaTab({
         </div>
       </div>
 
-
+      {/* Active Major & Sub-Periods Event Timing View */}
+      <CurrentVimshottariEventTimingView
+        activeProfile={currentProfile}
+        natalPlanets={natalCalc.planets}
+        natalHouses={[]}
+        lagnaRasi={natalLagnaRasi}
+        onNavigateToMonthWise={onNavigateToMonthWise}
+      />
 
       {/* INTERACTIVE TIMELINE SLIDER */}
       <div className="bg-white rounded-lg border border-stone-200 p-3 space-y-2 shadow-3xs">

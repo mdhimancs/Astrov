@@ -130,6 +130,7 @@ export function Navbar({
       label: 'Guidance & Family',
       icon: Users,
       tabs: [
+        { id: 'north-indian-life', label: 'All Life Aspects (North Indian)', icon: Compass },
         { id: 'life-events', label: 'Life Events & Matters', icon: Flame },
         { id: 'personalized-guidance', label: 'Personalized Guidance', icon: GraduationCap },
         { id: 'family-lineage', label: 'Family Members & Lineage', icon: Users },
@@ -303,6 +304,7 @@ export function Navbar({
     { id: 'astrology-systems', label: 'Systems & Cosmology', icon: BookOpen },
     { id: 'panchang', label: 'Panchang', icon: Clock },
     { id: 'monthly-predictions', label: 'Monthly & Yearly', icon: Calendar },
+    { id: 'north-indian-life', label: 'All Life Aspects (North Indian)', icon: Compass },
     { id: 'life-events', label: 'Life Events & Matters', icon: Flame },
     { id: 'vimshottari-dasha', label: 'Dasha', icon: Layers },
     { id: 'critical-transits', label: 'Milestones', icon: Award },

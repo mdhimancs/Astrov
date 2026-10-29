@@ -50,27 +50,37 @@ export function LifeAspectProbabilitySection({
 
   const filteredItems = useMemo(() => {
     if (selectedCategory === 'all') return aspectItems;
-    if (selectedCategory === 'business_career') {
+    if (selectedCategory === 'career_jobs') {
       return aspectItems.filter((i) =>
         [
-          'business',
           'job_change_new_job',
-          'career_transfer',
           'job_promotion',
+          'career_transfer',
+          'workplace_difficulties',
           'favour_from_seniors',
           'governance_private_job',
+        ].includes(i.id)
+      );
+    }
+    if (selectedCategory === 'business_enterprise') {
+      return aspectItems.filter((i) =>
+        [
+          'business_start_inception',
+          'business',
           'sudden_windfall',
           'name_and_fame',
         ].includes(i.id)
       );
     }
-    if (selectedCategory === 'home_property') {
+    if (selectedCategory === 'love_relationships') {
       return aspectItems.filter((i) =>
-        ['home', 'property_purchase', 'property_sale', 'luxury_vehicles'].includes(i.id)
+        ['love_life_romance', 'marriage_time', 'extra_marital_affairs'].includes(i.id)
       );
     }
-    if (selectedCategory === 'relationships') {
-      return aspectItems.filter((i) => ['extra_marital_affairs', 'marriage_time'].includes(i.id));
+    if (selectedCategory === 'home_property') {
+      return aspectItems.filter((i) =>
+        ['property_purchase', 'property_sale', 'home', 'luxury_vehicles'].includes(i.id)
+      );
     }
     if (selectedCategory === 'progeny') {
       return aspectItems.filter((i) => ['kids_progeny'].includes(i.id));
@@ -79,7 +89,9 @@ export function LifeAspectProbabilitySection({
       return aspectItems.filter((i) => ['foreign_settlement', 'health_vitality'].includes(i.id));
     }
     if (selectedCategory === 'legal_karmic') {
-      return aspectItems.filter((i) => ['legal_disputes', 'extra_marital_affairs'].includes(i.id));
+      return aspectItems.filter((i) =>
+        ['workplace_difficulties', 'legal_disputes', 'extra_marital_affairs'].includes(i.id)
+      );
     }
     return aspectItems;
   }, [aspectItems, selectedCategory]);
@@ -87,6 +99,7 @@ export function LifeAspectProbabilitySection({
   const getIconForItem = (id: string) => {
     switch (id) {
       case 'business':
+      case 'business_start_inception':
         return Briefcase;
       case 'job_change_new_job':
         return ArrowRightLeft;
@@ -94,6 +107,8 @@ export function LifeAspectProbabilitySection({
         return Navigation;
       case 'job_promotion':
         return TrendingUp;
+      case 'workplace_difficulties':
+        return ShieldAlert;
       case 'favour_from_seniors':
         return Users;
       case 'property_purchase':
@@ -102,6 +117,7 @@ export function LifeAspectProbabilitySection({
         return Building2;
       case 'home':
         return Home;
+      case 'love_life_romance':
       case 'extra_marital_affairs':
         return Heart;
       case 'kids_progeny':
@@ -172,18 +188,19 @@ export function LifeAspectProbabilitySection({
       <div className="flex flex-wrap items-center gap-1.5">
         {[
           { id: 'all', label: `All ${aspectItems.length} Aspects` },
-          { id: 'business_career', label: 'Business & Career' },
-          { id: 'home_property', label: 'Home & Vehicles' },
-          { id: 'relationships', label: 'Marriage & Fidelity' },
-          { id: 'progeny', label: 'Kids & Progeny' },
+          { id: 'career_jobs', label: 'Job Change, Promotion & Difficulties' },
+          { id: 'business_enterprise', label: 'Business Start & Enterprise' },
+          { id: 'love_relationships', label: 'Love Life, Marriage & Affairs' },
+          { id: 'home_property', label: 'Home, Land & Vehicles' },
+          { id: 'progeny', label: 'Kids & Lineage' },
           { id: 'foreign_vitality', label: 'Foreign & Longevity' },
-          { id: 'legal_karmic', label: 'Legal & Karmic Risks' },
+          { id: 'legal_karmic', label: 'Legal, Politics & Karmic Risks' },
         ].map((tab) => (
           <button
             key={tab.id}
             type="button"
             onClick={() => setSelectedCategory(tab.id)}
-            className={`px-3.5 py-1.5 rounded-md text-[13.5px] font-bold w-fit whitespace-nowrap transition-all cursor-pointer border ${
+            className={`px-3 py-1.5 rounded-md text-[11px] font-bold w-fit whitespace-nowrap transition-all cursor-pointer border break-words ${
               selectedCategory === tab.id
                 ? 'bg-amber-800 text-white border-amber-900 shadow-2xs'
                 : 'bg-white text-stone-700 border-stone-200/80 hover:bg-[#FAF8F5] hover:border-amber-300'

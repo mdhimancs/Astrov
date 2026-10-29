@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Sparkles,
   Flame,
@@ -18,9 +18,11 @@ import {
   Baby,
   Building2,
   Globe,
+  Scale,
 } from 'lucide-react';
 import { UserProfile, PlanetPosition, HouseInfo } from '../types';
 import { LifeAspectProbabilitySection } from './LifeAspectProbabilitySection';
+import { NorthIndianLifeAspectsTab } from './NorthIndianLifeAspectsTab';
 import { computeLifeAspectProbabilities } from '../utils/lifeAspectAnalysisAndGuidance';
 import { VEDIC_RASIS } from '../data';
 
@@ -33,6 +35,7 @@ interface LifeEventsMattersTabProps {
   onNavigateToGuidance?: () => void;
   onNavigateToMonthly?: () => void;
   onNavigateToDasha?: () => void;
+  onNavigateToNorthIndianLife?: () => void;
 }
 
 export function LifeEventsMattersTab({
@@ -44,7 +47,9 @@ export function LifeEventsMattersTab({
   onNavigateToGuidance,
   onNavigateToMonthly,
   onNavigateToDasha,
+  onNavigateToNorthIndianLife,
 }: LifeEventsMattersTabProps) {
+  const [viewMode, setViewMode] = useState<'north_indian_all' | 'event_probabilities'>('north_indian_all');
   const seekerName = activeProfile?.name || 'Seeker';
   const ascendantSign = VEDIC_RASIS[lagnaRasi - 1]?.sanskritName || 'Mesha';
 
@@ -179,13 +184,70 @@ export function LifeEventsMattersTab({
         </div>
       </div>
 
-      {/* Main Probability Section Component */}
-      <LifeAspectProbabilitySection
-        natalPlanets={natalPlanets}
-        natalHouses={natalHouses}
-        lagnaRasi={lagnaRasi}
-        userName={seekerName}
-      />
+      {/* View Switcher: North Indian 12-Bhava Spectrum vs Karmic Event Probabilities */}
+      <div className="flex flex-wrap items-center justify-between gap-2 bg-[#E8DEC8] p-1.5 rounded-lg border border-amber-900/10">
+        <div className="flex flex-wrap items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setViewMode('north_indian_all')}
+            className={`px-3 py-1.5 rounded-md font-bold text-[11px] transition-all flex items-center space-x-1.5 cursor-pointer ${
+              viewMode === 'north_indian_all'
+                ? 'bg-amber-800 text-amber-50 shadow-xs'
+                : 'text-stone-700 hover:bg-amber-100 hover:text-stone-900'
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span>North Indian 12-Bhava Life Spectrum (All Aspects)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setViewMode('event_probabilities')}
+            className={`px-3 py-1.5 rounded-md font-bold text-[11px] transition-all flex items-center space-x-1.5 cursor-pointer ${
+              viewMode === 'event_probabilities'
+                ? 'bg-amber-800 text-amber-50 shadow-xs'
+                : 'text-stone-700 hover:bg-amber-100 hover:text-stone-900'
+            }`}
+          >
+            <Flame className="w-3.5 h-3.5" />
+            <span>Karmic Life Probabilities (Job, Marriage, Assets, Windfall)</span>
+          </button>
+        </div>
+
+        {onNavigateToNorthIndianLife && (
+          <button
+            type="button"
+            onClick={onNavigateToNorthIndianLife}
+            className="text-[11px] font-semibold text-amber-900 hover:underline flex items-center space-x-1 px-2 cursor-pointer"
+          >
+            <span>Full Dedicated Tab</span>
+            <ChevronRight className="w-3 h-3" />
+          </button>
+        )}
+      </div>
+
+      {viewMode === 'north_indian_all' ? (
+        <NorthIndianLifeAspectsTab
+          activeProfile={activeProfile}
+          profiles={profiles}
+          natalPlanets={natalPlanets}
+          natalHouses={natalHouses}
+          lagnaRasi={lagnaRasi}
+          onNavigateToGuidance={onNavigateToGuidance}
+          onNavigateToMonthly={onNavigateToMonthly}
+          onNavigateToDasha={onNavigateToDasha}
+        />
+      ) : (
+        <>
+          {/* Main Probability Section Component */}
+          <LifeAspectProbabilitySection
+            natalPlanets={natalPlanets}
+            natalHouses={natalHouses}
+            lagnaRasi={lagnaRasi}
+            userName={seekerName}
+          />
+        </>
+      )}
 
       {/* Classical Principles Card */}
       <div className="bg-white rounded-xl border border-stone-200/90 p-4 shadow-3xs space-y-2.5">
