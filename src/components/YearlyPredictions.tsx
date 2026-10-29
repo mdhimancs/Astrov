@@ -76,7 +76,8 @@ export function YearlyPredictions({
   selectedMonthKey,
   onSelectMonthKey,
 }: YearlyPredictionsProps) {
-  const [activeSubView, setActiveSubView] = useState<'all' | 'lifepath' | 'monthly' | 'pillars'>('all');
+  const [activeSubView, setActiveSubView] = useState<'all' | '1month' | 'lifepath' | 'monthly' | 'pillars'>('all');
+  const [graphViewMode, setGraphViewMode] = useState<'monthly' | 'annual'>('monthly');
   const [isScrollBounded, setIsScrollBounded] = useState(true);
   const [aiLifePath, setAiLifePath] = useState<AiYearlyLifePathResponse | null>(null);
   const [isLoadingAiLifePath, setIsLoadingAiLifePath] = useState(false);
@@ -335,16 +336,21 @@ export function YearlyPredictions({
     return filtered;
   }, [chartData, graphPeriod, currentActualYear]);
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
+      const isMonthly = !!data.monthShort;
       return (
         <div className="bg-white p-2.5 rounded-lg border border-amber-300 shadow-xl text-[11px] max-w-xs z-50">
           <div className="flex items-center justify-between border-b border-stone-100 pb-1 mb-1">
-            <span className="font-bold text-stone-900 text-[12px]">{`Age ${data.age} (Year ${data.year})`}</span>
+            <span className="font-bold text-stone-900 text-[12px]">
+              {isMonthly ? `${data.monthName}` : `Age ${data.age} (Year ${data.year})`}
+            </span>
             <span className="font-bold text-amber-800">{`Overall: ${data.Overall}/5`}</span>
           </div>
-          <p className="text-amber-900 font-semibold mb-1.5 text-[10.5px] leading-tight">{data.theme}</p>
+          <p className="text-amber-900 font-semibold mb-1.5 text-[10.5px] leading-tight">
+            {isMonthly ? data.tagline : data.theme}
+          </p>
           
           <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 mb-1.5 text-[10.5px]">
             {payload.map((entry: any, index: number) => (
@@ -357,9 +363,16 @@ export function YearlyPredictions({
             ))}
           </div>
 
-          <div className="border-t border-amber-100 pt-1 text-stone-600 text-[10px] leading-tight">
-            <strong className="text-stone-900">Planetary Driver:</strong> {data.trigger}
-          </div>
+          {!isMonthly && (
+            <div className="border-t border-amber-100 pt-1 text-stone-600 text-[10px] leading-tight">
+              <strong className="text-stone-900">Planetary Driver:</strong> {data.trigger}
+            </div>
+          )}
+          {isMonthly && (
+            <div className="border-t border-amber-100 pt-1 text-amber-800 text-[9.5px] font-semibold italic">
+              Click node to inspect {data.monthShort} Gochar details
+            </div>
+          )}
         </div>
       );
     }
@@ -465,6 +478,58 @@ export function YearlyPredictions({
     );
   }, [yearMonths, internalSelectedMonthKey, currentActualMonthKey]);
 
+  const MONTH_SHORT_NAMES = useMemo(() => [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ], []);
+
+  const monthlyChartData = useMemo(() => {
+    return yearMonths.map((m, idx) => {
+      const monthNum = idx + 1;
+      const shortName = MONTH_SHORT_NAMES[idx] || `M${monthNum}`;
+      const rating = m.overallRating || 3.8;
+
+      const health = Math.max(1.5, Math.min(5.0, Math.round((rating + Math.sin((monthNum / 12) * Math.PI * 2) * 0.3) * 10) / 10));
+      const job = Math.max(1.0, Math.min(5.0, Math.round((rating + ([1, 4, 7, 10, 11].includes(monthNum) ? 0.4 : -0.2)) * 10) / 10));
+      const wealth = Math.max(1.2, Math.min(5.0, Math.round((rating + ([2, 5, 9, 11].includes(monthNum) ? 0.5 : -0.2)) * 10) / 10));
+      const relations = Math.max(1.5, Math.min(5.0, Math.round((rating + ([3, 7, 10].includes(monthNum) ? 0.3 : -0.2)) * 10) / 10));
+      const edu = Math.max(1.8, Math.min(5.0, Math.round((rating + ([1, 5, 9].includes(monthNum) ? 0.4 : 0)) * 10) / 10));
+      const mental = Math.max(1.5, Math.min(5.0, Math.round((rating + Math.cos((monthNum / 12) * Math.PI * 2) * 0.3) * 10) / 10));
+      const nameFame = Math.max(1.5, Math.min(5.0, Math.round((rating + ([1, 10, 11].includes(monthNum) ? 0.5 : -0.1)) * 10) / 10));
+      const property = Math.max(1.2, Math.min(5.0, Math.round((rating + ([4, 11].includes(monthNum) ? 0.4 : -0.2)) * 10) / 10));
+      const children = Math.max(1.5, Math.min(5.0, Math.round((rating + ([5, 9, 11].includes(monthNum) ? 0.4 : -0.1)) * 10) / 10));
+      const overall = Math.round(((health + job + wealth + relations + edu + mental + nameFame + property + children) / 9) * 10) / 10;
+
+      return {
+        monthKey: m.monthKey,
+        monthName: m.monthName,
+        monthShort: shortName,
+        tagline: m.tagline,
+        Health: health,
+        Job: job,
+        Wealth: wealth,
+        Relations: relations,
+        Education: edu,
+        Mental: mental,
+        NameFame: nameFame,
+        Property: property,
+        Children: children,
+        Overall: overall,
+      };
+    });
+  }, [yearMonths, MONTH_SHORT_NAMES]);
+
+  const activeMonthDataPoint = useMemo(() => {
+    return (
+      monthlyChartData.find((d) => d.monthKey === activeMonthData.monthKey) ||
+      monthlyChartData[0]
+    );
+  }, [monthlyChartData, activeMonthData]);
+
+  const selectedMonthScore = activeMonthDataPoint
+    ? ((activeMonthDataPoint as any)[primaryAspectKey] as number) || activeMonthDataPoint.Overall
+    : 4.0;
+
   // Reset AI synthesis when year or user changes
   useEffect(() => {
     setAiLifePath(null);
@@ -544,6 +609,7 @@ export function YearlyPredictions({
           <div className="flex flex-wrap items-center gap-1">
             {[
               { id: 'all', label: 'Complete Forecast' },
+              { id: '1month', label: `1-Month Focus (${activeMonthData.monthName.split(' ')[0]})` },
               { id: 'lifepath', label: 'Life-Path & Birth Chart' },
               { id: 'monthly', label: 'Monthly Breakdown' },
               { id: 'pillars', label: '9 Pillars & Quarters' },
@@ -631,77 +697,222 @@ export function YearlyPredictions({
           </div>
         </div>
 
-        {/* Annual Trends Graph */}
-        <div className="h-72 sm:h-80 mt-3 bg-white rounded-lg border border-amber-200/90 p-2.5 shadow-2xs flex flex-col justify-between">
-          <div className="flex flex-wrap items-center justify-between gap-1.5 mb-1.5">
-            {/* Aspect Selection Buttons */}
-            <div className="flex flex-wrap items-center gap-1">
-              <span className="text-[11px] font-bold text-stone-600 mr-0.5">Aspects:</span>
-              {aspectOptions.map((aspect) => {
-                const isSelected = activeAspects.includes(aspect.key);
-                return (
-                  <button
-                    key={aspect.key}
-                    type="button"
-                    onClick={() => toggleAspect(aspect.key)}
-                    className={`text-[11px] font-bold px-2 py-0.5 rounded transition-all cursor-pointer border ${
-                      isSelected
-                        ? 'border-amber-400 text-amber-950 shadow-2xs'
-                        : 'border-stone-200 text-stone-500 hover:text-stone-800 bg-white'
-                    }`}
-                    style={{
-                      backgroundColor: isSelected ? `${aspect.color}25` : 'transparent',
-                      borderColor: isSelected ? aspect.color : undefined,
-                    }}
-                  >
-                    {aspect.label}
-                  </button>
-                );
-              })}
-              {activeAspects.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => setActiveAspects(['Overall'])}
-                  className="text-[10px] font-semibold text-amber-800 hover:text-amber-950 underline px-1 py-0.5 cursor-pointer ml-1"
-                >
-                  Reset to Overall
-                </button>
+        {/* 1-Month Focus & Monthly Gochar Pulse Card inside 2026 Annual Horoscope */}
+        <div className="bg-gradient-to-r from-amber-50/90 via-[#FAF8F5] to-amber-100/60 rounded-md border border-amber-300/80 p-2.5 space-y-2 shadow-2xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-amber-200/80 pb-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Calendar className="w-4 h-4 text-amber-800" />
+              <span className="font-vedic font-black text-amber-950 text-[13px] uppercase tracking-wide">
+                1-Month Focus ({activeMonthData.monthName}): Gochar Pulse &amp; Guidance
+              </span>
+              {activeMonthData.monthKey === currentActualMonthKey && (
+                <span className="px-1.5 py-0.2 rounded bg-amber-700 text-white text-[9px] font-black uppercase tracking-wider">
+                  Current Month: {currentMonthYearLabel}
+                </span>
               )}
             </div>
 
-            {/* Current Month/Year Indicator & Period Frequency Selector */}
-            <div className="flex items-center space-x-2">
-              <div className="hidden sm:flex items-center space-x-1.5 text-[10px] font-bold text-amber-900 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
-                <span>Now: {currentMonthYearLabel}</span>
-              </div>
-
-              <div className="flex items-center space-x-1">
-                <span className="text-[11px] font-bold text-stone-600 mr-0.5">Interval:</span>
-                {[1, 5, 10].map((period) => (
+            {/* Quick 1-Month Selector Pills (Jan – Dec) */}
+            <div className="flex items-center gap-1 overflow-x-auto max-w-full pb-0.5">
+              <span className="text-[10px] font-bold text-stone-500 mr-0.5 shrink-0">1-Month:</span>
+              {yearMonths.map((m) => {
+                const isSelected = m.monthKey === activeMonthData.monthKey;
+                const isTodayMonth = m.monthKey === currentActualMonthKey;
+                return (
                   <button
-                    key={period}
+                    key={m.monthKey}
                     type="button"
-                    onClick={() => setGraphPeriod(period as 1 | 5 | 10)}
-                    className={`text-[11px] font-bold px-2 py-0.5 rounded transition-all cursor-pointer border ${
-                      graphPeriod === period
-                        ? 'bg-amber-100 border-amber-400 text-amber-950 font-black shadow-2xs'
-                        : 'bg-white border-stone-200 text-stone-600 hover:bg-[#FAF8F5]'
+                    onClick={() => handleMonthSelect(m.monthKey)}
+                    className={`px-2 py-0.5 rounded text-[10.5px] font-bold transition-all cursor-pointer border ${
+                      isSelected
+                        ? 'bg-amber-700 text-white border-amber-800 shadow-2xs font-black'
+                        : isTodayMonth
+                        ? 'bg-amber-100 text-amber-950 border-amber-300 font-black'
+                        : 'bg-white text-stone-700 border-stone-200 hover:border-amber-300 hover:bg-[#FAF8F5]'
                     }`}
                   >
-                    {period} {period === 1 ? 'Year' : 'Years'}
+                    {m.monthName.split(' ')[0]}
                   </button>
-                ))}
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Active 1-Month Snapshot Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 text-[11.5px]">
+            {/* Month Tagline & Rating */}
+            <div className="bg-white/90 rounded p-2 border border-amber-200 space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="font-vedic font-black text-amber-950 text-[12px]">
+                  {activeMonthData.monthName}
+                </span>
+                <span className="text-amber-500 font-bold text-[11px]">
+                  {'★'.repeat(activeMonthData.overallRating)}
+                </span>
               </div>
+              <p className="text-[11px] text-stone-700 font-medium leading-snug">
+                {activeMonthData.tagline}
+              </p>
+              <div className="text-[10px] text-stone-500 pt-0.5 border-t border-stone-100 flex items-center justify-between">
+                <span>Auspicious: {activeMonthData.favorableDays}</span>
+              </div>
+            </div>
+
+            {/* Career & Wealth Pulse */}
+            <div className="bg-white/90 rounded p-2 border border-amber-200 space-y-1">
+              <span className="text-[10.5px] font-black uppercase text-amber-900 flex items-center space-x-1">
+                <Briefcase className="w-3 h-3 text-amber-700" />
+                <span>Career &amp; Wealth</span>
+              </span>
+              <p className="text-[11px] text-stone-800 leading-snug line-clamp-3">
+                {activeMonthData.careerWealthForecast}
+              </p>
+            </div>
+
+            {/* Love & Family Pulse */}
+            <div className="bg-white/90 rounded p-2 border border-amber-200 space-y-1">
+              <span className="text-[10.5px] font-black uppercase text-rose-900 flex items-center space-x-1">
+                <Heart className="w-3 h-3 text-rose-700" />
+                <span>Love &amp; Family Harmony</span>
+              </span>
+              <p className="text-[11px] text-stone-800 leading-snug line-clamp-3">
+                {activeMonthData.loveFamilyForecast}
+              </p>
+            </div>
+
+            {/* Monthly Upay & Action */}
+            <div className="bg-amber-100/50 rounded p-2 border border-amber-300 space-y-1 flex flex-col justify-between">
+              <div>
+                <span className="text-[10.5px] font-black uppercase text-amber-950 flex items-center space-x-1">
+                  <Sparkles className="w-3 h-3 text-amber-800" />
+                  <span>Monthly Upay &amp; Action</span>
+                </span>
+                <p className="text-[11px] text-stone-900 font-medium leading-snug line-clamp-2 mt-0.5">
+                  {activeMonthData.remedyOfMonth}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveSubView('1month')}
+                className="w-full text-center text-[10.5px] font-bold text-amber-900 bg-amber-200/80 hover:bg-amber-300/80 py-1 rounded border border-amber-400 transition-all cursor-pointer mt-1"
+              >
+                Focus View: {activeMonthData.monthName} Analysis →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic Trends Graph (Responds to Selected Month & Year) */}
+        <div className="h-72 sm:h-80 mt-3 bg-white rounded-lg border border-amber-200/90 p-2.5 shadow-2xs flex flex-col justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-1.5 mb-1.5">
+            {/* Graph View Mode Switcher + Aspect Selection Buttons */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              {/* Graph View Mode Switcher */}
+              <div className="flex items-center gap-0.5 bg-stone-100 p-0.5 rounded border border-stone-200">
+                <button
+                  type="button"
+                  onClick={() => setGraphViewMode('monthly')}
+                  className={`text-[10.5px] font-bold px-2 py-0.5 rounded cursor-pointer transition-all ${
+                    graphViewMode === 'monthly'
+                      ? 'bg-amber-700 text-white font-black shadow-2xs'
+                      : 'text-stone-700 hover:text-stone-900'
+                  }`}
+                >
+                  📊 12-Month Gochar ({currentYearPred.year})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setGraphViewMode('annual')}
+                  className={`text-[10.5px] font-bold px-2 py-0.5 rounded cursor-pointer transition-all ${
+                    graphViewMode === 'annual'
+                      ? 'bg-amber-700 text-white font-black shadow-2xs'
+                      : 'text-stone-700 hover:text-stone-900'
+                  }`}
+                >
+                  📈 Annual Trend (Years)
+                </button>
+              </div>
+
+              {/* Aspect Selection Buttons */}
+              <div className="flex flex-wrap items-center gap-1">
+                <span className="text-[10.5px] font-bold text-stone-600 ml-1">Aspects:</span>
+                {aspectOptions.map((aspect) => {
+                  const isSelected = activeAspects.includes(aspect.key);
+                  return (
+                    <button
+                      key={aspect.key}
+                      type="button"
+                      onClick={() => toggleAspect(aspect.key)}
+                      className={`text-[10.5px] font-bold px-1.5 py-0.5 rounded transition-all cursor-pointer border ${
+                        isSelected
+                          ? 'border-amber-400 text-amber-950 shadow-2xs'
+                          : 'border-stone-200 text-stone-500 hover:text-stone-800 bg-white'
+                      }`}
+                      style={{
+                        backgroundColor: isSelected ? `${aspect.color}25` : 'transparent',
+                        borderColor: isSelected ? aspect.color : undefined,
+                      }}
+                    >
+                      {aspect.label}
+                    </button>
+                  );
+                })}
+                {activeAspects.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveAspects(['Overall'])}
+                    className="text-[10px] font-semibold text-amber-800 hover:text-amber-950 underline px-1 py-0.5 cursor-pointer ml-0.5"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Selected Month Indicator & Interval Control */}
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 text-[10.5px] font-bold text-amber-950 bg-amber-100/90 px-2 py-0.5 rounded border border-amber-300">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
+                <span>Selected Month: <strong>{activeMonthData.monthName}</strong></span>
+              </div>
+
+              {graphViewMode === 'annual' && (
+                <div className="flex items-center space-x-1">
+                  <span className="text-[11px] font-bold text-stone-600">Interval:</span>
+                  {[1, 5, 10].map((period) => (
+                    <button
+                      key={period}
+                      type="button"
+                      onClick={() => setGraphPeriod(period as 1 | 5 | 10)}
+                      className={`text-[10.5px] font-bold px-1.5 py-0.5 rounded transition-all cursor-pointer border ${
+                        graphPeriod === period
+                          ? 'bg-amber-100 border-amber-400 text-amber-950 font-black shadow-2xs'
+                          : 'bg-white border-stone-200 text-stone-600 hover:bg-[#FAF8F5]'
+                      }`}
+                    >
+                      {period}Y
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
           <div className="flex-1 w-full min-h-[200px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={visibleChartData} margin={{ top: 12, right: 10, left: -20, bottom: 0 }}>
+              <LineChart
+                data={graphViewMode === 'monthly' ? monthlyChartData : visibleChartData}
+                margin={{ top: 12, right: 10, left: -20, bottom: 0 }}
+                onClick={(e: any) => {
+                  if (graphViewMode === 'monthly' && e && e.activePayload && e.activePayload[0]) {
+                    const mKey = e.activePayload[0].payload.monthKey;
+                    if (mKey) handleMonthSelect(mKey);
+                  }
+                }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#F5F5F4" />
                 <XAxis 
-                  dataKey="year" 
+                  dataKey={graphViewMode === 'monthly' ? 'monthShort' : 'year'} 
                   tick={{ fontSize: 10, fill: '#57534E', fontWeight: 600 }}
                   interval="preserveStartEnd"
                 />
@@ -714,14 +925,16 @@ export function YearlyPredictions({
                 <Tooltip content={<CustomTooltip />} />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '2px' }} iconSize={8} />
 
-                {/* VERTICAL REFERENCE LINE AT CURRENT MONTH / YEAR */}
+                {/* VERTICAL REFERENCE LINE AT SELECTED MONTH / YEAR */}
                 <ReferenceLine
-                  x={currentActualYear}
+                  x={graphViewMode === 'monthly' ? activeMonthDataPoint.monthShort : selectedYear}
                   stroke="#D97706"
-                  strokeWidth={2}
+                  strokeWidth={2.5}
                   strokeDasharray="4 4"
                   label={{
-                    value: `CURRENT: ${currentMonthYearLabel}`,
+                    value: graphViewMode === 'monthly'
+                      ? `SELECTED: ${activeMonthDataPoint.monthShort}`
+                      : `SELECTED YEAR: ${selectedYear}`,
                     fill: '#92400E',
                     fontSize: 9.5,
                     fontWeight: 'bold',
@@ -729,14 +942,14 @@ export function YearlyPredictions({
                   }}
                 />
 
-                {/* HORIZONTAL REFERENCE LINE AT CURRENT SCORE LEVEL */}
+                {/* HORIZONTAL REFERENCE LINE AT SELECTED MONTH SCORE LEVEL */}
                 <ReferenceLine
-                  y={currentYearScore}
+                  y={selectedMonthScore}
                   stroke="#D97706"
                   strokeWidth={1.5}
                   strokeDasharray="4 4"
                   label={{
-                    value: `Current Level (${currentYearScore.toFixed(1)}/5)`,
+                    value: `${activeMonthDataPoint.monthShort} (${selectedMonthScore.toFixed(1)}/5)`,
                     fill: '#92400E',
                     fontSize: 9,
                     fontWeight: 'bold',
@@ -753,8 +966,8 @@ export function YearlyPredictions({
                       name={aspect.label}
                       stroke={aspect.color} 
                       strokeWidth={aspect.key === 'Overall' ? 3 : 2}
-                      dot={graphPeriod !== 1 ? { r: 2.5, fill: aspect.color } : false}
-                      activeDot={{ r: 5 }}
+                      dot={{ r: 3.5, fill: aspect.color }}
+                      activeDot={{ r: 6 }}
                       connectNulls={true}
                     />
                   )
@@ -767,7 +980,7 @@ export function YearlyPredictions({
         {/* =====================================================================
             YEARLY MONTH-BY-MONTH GOCHAR & TRANSIT PREDICTIONS (CURRENT MONTH DEFAULT)
             ===================================================================== */}
-        {(activeSubView === 'all' || activeSubView === 'monthly') && (
+        {(activeSubView === 'all' || activeSubView === 'monthly' || activeSubView === '1month') && (
           <div className="bg-gradient-to-br from-[#FAF8F5] via-white to-amber-50/40 rounded-lg border border-amber-300/90 p-2.5 space-y-2.5 shadow-3xs">
             {/* Section Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-200/80 pb-2">
