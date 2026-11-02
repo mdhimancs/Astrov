@@ -98,6 +98,7 @@ export function Navbar({
       icon: Compass,
       tabs: [
         { id: 'birth-predictions', label: 'Birth Charts', icon: Compass },
+        { id: 'planetary-effects', label: 'Planetary Effects', icon: Flame },
         { id: 'celestial-wheel', label: '360° Wheel', icon: Globe },
         { id: 'divisional-charts', label: 'Divisional', icon: Brain },
         { id: 'natal-chart', label: 'Natal Zodiac Wheel', icon: Circle },

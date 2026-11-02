@@ -20,6 +20,7 @@ import { CelestialSkyMapWheel } from './CelestialSkyMapWheel';
 import { NatalZodiacWheel } from './NatalZodiacWheel';
 import { NorthIndianLifeAspectsTab } from './NorthIndianLifeAspectsTab';
 import { CommonAstrologicalQueriesTab } from './CommonAstrologicalQueriesTab';
+import { PlanetaryEffectsTab } from './PlanetaryEffectsTab';
 import { calculatePlanetaryPositions } from '../vedicMath';
 import { UserProfile } from '../types';
 import { VEDIC_RASIS } from '../data';
@@ -60,6 +61,21 @@ export function ContentRenderer({
           onUpdateProfiles={handleUpdateProfiles}
           onNavigateToMonthWise={() => setActiveTab('monthly-predictions')}
           onNavigateToDasha={() => setActiveTab('vimshottari-dasha')}
+        />
+      );
+    case 'planetary-effects':
+    case 'graha-effects':
+    case 'planets':
+      return (
+        <PlanetaryEffectsTab
+          activeProfile={currentProfile}
+          profiles={profiles}
+          natalPlanets={natalCalc?.planets || []}
+          natalHouses={natalHouses || []}
+          lagnaRasi={natalCalc?.lagnaRasi || 1}
+          onNavigateToBirthCharts={() => setActiveTab('birth-predictions')}
+          onNavigateToDasha={() => setActiveTab('vimshottari-dasha')}
+          onNavigateToUpay={() => setActiveTab('upay-remedies')}
         />
       );
     case 'celestial-wheel':

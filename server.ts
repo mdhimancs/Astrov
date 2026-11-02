@@ -609,6 +609,139 @@ Return a structured JSON object matching the schema.`;
     }
   });
 
+  // API endpoint for Planetary Effects Deep Analysis in Kundali
+  app.post("/api/astrology/planetary-effects", async (req, res) => {
+    try {
+      const {
+        name,
+        birthDate,
+        birthTime,
+        birthPlace,
+        lagnaRasi,
+        moonRasi,
+        planetName,
+        houseNumber,
+        rasiName,
+        isRetrograde,
+        nakshatra,
+        dignity,
+        userQuery,
+      } = req.body;
+
+      const ai = getAI();
+
+      if (!ai) {
+        return res.json({
+          headline: `${planetName} in House ${houseNumber} (${rasiName}) Analysis for ${name || "Seeker"}`,
+          summary: `With ${lagnaRasi} Lagna, ${planetName} placed in House ${houseNumber} (${rasiName}, ${nakshatra} Nakshatra${isRetrograde ? ', Retrograde' : ''}) exerts a profound influence on your life path. As a ${dignity || 'influential'} placement, it directly governs key aspects of your Kundali.`,
+          lifeDomainEffects: [
+            {
+              domain: "Personality & Mental Outlook",
+              effect: `${planetName} in House ${houseNumber} shapes your core psychological orientation, conferring distinctive traits aligned with ${rasiName}.`,
+            },
+            {
+              domain: "Career, Status & Wealth",
+              effect: `House ${houseNumber} activation by ${planetName} drives financial opportunities and professional milestones, especially during its Vimshottari Dasha or major Gochar transits.`,
+            },
+            {
+              domain: "Relationships & Family",
+              effect: `Influences family bonds and interpersonal harmony, advising balanced communication and emotional grounding.`,
+            },
+          ],
+          specialStrengths: [
+            `Strong alignment in ${rasiName} sign`,
+            `Key activation of ${nakshatra} Nakshatra energies`,
+            `Direct Parashari aspect on House ${(houseNumber + 6) % 12 || 12}`,
+          ],
+          potentialChallenges: [
+            `Sensitivity during retrograde or afflicted transits`,
+            `Needs conscious energy balancing in House ${houseNumber} affairs`,
+          ],
+          remedies: [
+            `Recite the Beej Mantra of ${planetName} 108 times on its dedicated weekday.`,
+            `Perform charity and seva associated with ${planetName}'s karakatva.`,
+            `Chant Gayatri Mantra daily during Brahma Muhurta.`,
+          ],
+          researchCitations: [
+            `Brihat Parashara Hora Shastra — Chapter on Graha Phala`,
+            `Phaladeepika — Mantreswara’s Analysis of Bhava Transits`,
+          ],
+        });
+      }
+
+      const prompt = `You are a world-class Parashari and Jaimini Vedic Astrologer.
+Analyze the specific effect of ${planetName} in Kundali for the seeker:
+
+Seeker Profile:
+- Name: ${name || "Seeker"}
+- Birth Details: ${birthDate} at ${birthTime} in ${birthPlace}
+- Lagna Rasi: ${lagnaRasi}
+- Janma Rashi (Moon Sign): ${moonRasi}
+
+Planetary Placement under Examination:
+- Planet: ${planetName}
+- House Placement: House ${houseNumber}
+- Sign (Rasi): ${rasiName}
+- Nakshatra: ${nakshatra}
+- Motion: ${isRetrograde ? "Retrograde (Vakra)" : "Direct"}
+- Dignity: ${dignity || "Standard"}
+${userQuery ? `- Specific Seeker Question: "${userQuery}"` : ""}
+
+Provide an in-depth, authentic Vedic analysis formatted as JSON.`;
+
+      const response = await callWithRetry(() =>
+        ai.models.generateContent({
+          model: "gemini-3-flash-preview",
+          contents: prompt,
+          config: {
+            systemInstruction:
+              "You are an expert Vedic astrologer rooted in Parashara Hora Shastra, Phaladeepika, Saravali, and Jaimini Sutras. Deliver accurate, inspiring, and actionable planetary insights.",
+            temperature: 0.6,
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                headline: { type: Type.STRING },
+                summary: { type: Type.STRING },
+                lifeDomainEffects: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      domain: { type: Type.STRING },
+                      effect: { type: Type.STRING },
+                    },
+                    required: ["domain", "effect"],
+                  },
+                },
+                specialStrengths: { type: Type.ARRAY, items: { type: Type.STRING } },
+                potentialChallenges: { type: Type.ARRAY, items: { type: Type.STRING } },
+                remedies: { type: Type.ARRAY, items: { type: Type.STRING } },
+                researchCitations: { type: Type.ARRAY, items: { type: Type.STRING } },
+              },
+              required: [
+                "headline",
+                "summary",
+                "lifeDomainEffects",
+                "specialStrengths",
+                "potentialChallenges",
+                "remedies",
+                "researchCitations",
+              ],
+            },
+          },
+        })
+      );
+
+      const rawText = response.text || "{}";
+      const parsed = JSON.parse(rawText);
+      res.json(parsed);
+    } catch (err: any) {
+      console.error("Planetary effects AI error:", err);
+      res.status(500).json({ error: err.message || "Failed to generate planetary effects analysis" });
+    }
+  });
+
   // API endpoint for Free-Form Geocoding Location Search
   app.get("/api/astrology/geocode", async (req, res) => {
     try {
