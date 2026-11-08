@@ -90,8 +90,10 @@ export function YearlyPredictions({
   const currentMonthName = now.toLocaleString('en-US', { month: 'short' });
   const currentMonthYearLabel = `${currentMonthName} ${currentActualYear}`;
 
+  const [monthScopeMode, setMonthScopeMode] = useState<'rolling25' | 'year'>('rolling25');
+
   const [internalSelectedMonthKey, setInternalSelectedMonthKey] = useState<string>(() => {
-    if (selectedMonthKey && selectedMonthKey.startsWith(`${selectedYear}-`)) {
+    if (selectedMonthKey) {
       return selectedMonthKey;
     }
     if (selectedYear === currentActualYear) {
@@ -101,15 +103,10 @@ export function YearlyPredictions({
   });
 
   useEffect(() => {
-    if (selectedMonthKey && selectedMonthKey.startsWith(`${selectedYear}-`)) {
+    if (selectedMonthKey) {
       setInternalSelectedMonthKey(selectedMonthKey);
-    } else if (selectedYear === currentActualYear) {
-      setInternalSelectedMonthKey(currentActualMonthKey);
-    } else {
-      const curMonthNum = String(now.getMonth() + 1).padStart(2, '0');
-      setInternalSelectedMonthKey(`${selectedYear}-${curMonthNum}`);
     }
-  }, [selectedYear, selectedMonthKey, currentActualYear, currentActualMonthKey]);
+  }, [selectedMonthKey]);
 
   const handleMonthSelect = (mKey: string) => {
     setInternalSelectedMonthKey(mKey);
@@ -411,6 +408,9 @@ export function YearlyPredictions({
   ];
 
   const yearMonths: MonthWiseTransitPrediction[] = useMemo(() => {
+    if (monthScopeMode === 'rolling25' && monthlyPredictions && monthlyPredictions.length > 0) {
+      return monthlyPredictions;
+    }
     const list: MonthWiseTransitPrediction[] = [];
     const source = monthlyPredictions && monthlyPredictions.length > 0 ? monthlyPredictions : ALL_MONTH_WISE_PREDICTIONS;
     for (let m = 1; m <= 12; m++) {
@@ -468,7 +468,7 @@ export function YearlyPredictions({
       }
     }
     return list;
-  }, [currentYearPred, monthlyPredictions]);
+  }, [monthScopeMode, currentYearPred, monthlyPredictions]);
 
   const activeMonthData = useMemo(() => {
     return (
@@ -478,15 +478,13 @@ export function YearlyPredictions({
     );
   }, [yearMonths, internalSelectedMonthKey, currentActualMonthKey]);
 
-  const MONTH_SHORT_NAMES = useMemo(() => [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-  ], []);
-
   const monthlyChartData = useMemo(() => {
     return yearMonths.map((m, idx) => {
       const monthNum = idx + 1;
-      const shortName = MONTH_SHORT_NAMES[idx] || `M${monthNum}`;
+      const parts = m.monthName.split(' ');
+      const mNameShort = parts[0]?.slice(0, 3) || `M${monthNum}`;
+      const yrShort = parts[1] ? `'${parts[1].slice(2)}` : '';
+      const shortName = monthScopeMode === 'rolling25' ? `${mNameShort} ${yrShort}` : mNameShort;
       const rating = m.overallRating || 3.8;
 
       const health = Math.max(1.5, Math.min(5.0, Math.round((rating + Math.sin((monthNum / 12) * Math.PI * 2) * 0.3) * 10) / 10));
@@ -517,7 +515,7 @@ export function YearlyPredictions({
         Overall: overall,
       };
     });
-  }, [yearMonths, MONTH_SHORT_NAMES]);
+  }, [yearMonths, monthScopeMode]);
 
   const activeMonthDataPoint = useMemo(() => {
     return (
@@ -712,18 +710,29 @@ export function YearlyPredictions({
               )}
             </div>
 
-            {/* Quick 1-Month Selector Pills (Jan – Dec) */}
-            <div className="flex items-center gap-1 overflow-x-auto max-w-full pb-0.5">
-              <span className="text-[10px] font-bold text-stone-500 mr-0.5 shrink-0">1-Month:</span>
+            {/* Quick 1-Month Selector Pills */}
+            <div className="flex items-center gap-1 overflow-x-auto max-w-full pb-0.5 scrollbar-thin">
+              <div className="flex items-center space-x-1 shrink-0 mr-1">
+                <span className="text-[10px] font-bold text-stone-500">Timeline:</span>
+                <button
+                  type="button"
+                  onClick={() => setMonthScopeMode(monthScopeMode === 'rolling25' ? 'year' : 'rolling25')}
+                  className="text-[9.5px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded border bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100 cursor-pointer"
+                >
+                  {monthScopeMode === 'rolling25' ? '25-Month Window' : `Year ${currentYearPred.year}`}
+                </button>
+              </div>
               {yearMonths.map((m) => {
                 const isSelected = m.monthKey === activeMonthData.monthKey;
                 const isTodayMonth = m.monthKey === currentActualMonthKey;
+                const parts = m.monthName.split(' ');
+                const label = monthScopeMode === 'rolling25' ? `${parts[0]?.slice(0, 3)} '${parts[1]?.slice(2)}` : parts[0];
                 return (
                   <button
                     key={m.monthKey}
                     type="button"
                     onClick={() => handleMonthSelect(m.monthKey)}
-                    className={`px-2 py-0.5 rounded text-[10.5px] font-bold transition-all cursor-pointer border ${
+                    className={`px-2 py-0.5 rounded text-[10.5px] font-bold transition-all cursor-pointer border shrink-0 ${
                       isSelected
                         ? 'bg-amber-700 text-white border-amber-800 shadow-2xs font-black'
                         : isTodayMonth
@@ -731,7 +740,7 @@ export function YearlyPredictions({
                         : 'bg-white text-stone-700 border-stone-200 hover:border-amber-300 hover:bg-[#FAF8F5]'
                     }`}
                   >
-                    {m.monthName.split(' ')[0]}
+                    {label}
                   </button>
                 );
               })}
@@ -808,17 +817,34 @@ export function YearlyPredictions({
             {/* Graph View Mode Switcher + Aspect Selection Buttons */}
             <div className="flex flex-wrap items-center gap-1.5">
               {/* Graph View Mode Switcher */}
-              <div className="flex items-center gap-0.5 bg-stone-100 p-0.5 rounded border border-stone-200">
+              <div className="flex flex-wrap items-center gap-0.5 bg-stone-100 p-0.5 rounded border border-stone-200">
                 <button
                   type="button"
-                  onClick={() => setGraphViewMode('monthly')}
+                  onClick={() => {
+                    setGraphViewMode('monthly');
+                    setMonthScopeMode('rolling25');
+                  }}
                   className={`text-[10.5px] font-bold px-2 py-0.5 rounded cursor-pointer transition-all ${
-                    graphViewMode === 'monthly'
+                    graphViewMode === 'monthly' && monthScopeMode === 'rolling25'
                       ? 'bg-amber-700 text-white font-black shadow-2xs'
                       : 'text-stone-700 hover:text-stone-900'
                   }`}
                 >
-                  📊 12-Month Gochar ({currentYearPred.year})
+                  🔄 25-Month Rolling Curve
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setGraphViewMode('monthly');
+                    setMonthScopeMode('year');
+                  }}
+                  className={`text-[10.5px] font-bold px-2 py-0.5 rounded cursor-pointer transition-all ${
+                    graphViewMode === 'monthly' && monthScopeMode === 'year'
+                      ? 'bg-amber-700 text-white font-black shadow-2xs'
+                      : 'text-stone-700 hover:text-stone-900'
+                  }`}
+                >
+                  📊 12-Month ({currentYearPred.year})
                 </button>
                 <button
                   type="button"
@@ -988,16 +1014,26 @@ export function YearlyPredictions({
                 <div className="flex items-center space-x-1.5">
                   <Calendar className="w-4 h-4 text-amber-800" />
                   <h4 className="font-vedic font-black text-stone-950 text-[14px] uppercase tracking-wider">
-                    {currentYearPred.year} Month-by-Month Gochar &amp; Transit Predictions
+                    {monthScopeMode === 'rolling25' ? '25-Month Rolling Transit Stream' : `${currentYearPred.year} Month-by-Month Gochar & Transit Predictions`}
                   </h4>
                 </div>
                 <p className="text-[12px] text-stone-600 font-medium">
-                  Comprehensive 12-month Gochar stream • Planetary ingresses, auspicious windows, career &amp; love pulses, and Vedic remedies
+                  {monthScopeMode === 'rolling25'
+                    ? `Showing 12 Months Back ◀ Selected Focus (${activeMonthData.monthName}) ▶ 12 Months Forward`
+                    : `Comprehensive 12-month Gochar stream for ${currentYearPred.year} • Planetary ingresses and Vedic remedies`}
                 </p>
               </div>
 
-              {/* Current Active Month Indicator */}
-              <div className="flex items-center gap-1.5 shrink-0">
+              {/* Controls & Active Month Indicator */}
+              <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setMonthScopeMode(monthScopeMode === 'rolling25' ? 'year' : 'rolling25')}
+                  className="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded border bg-amber-50 text-amber-950 border-amber-300 hover:bg-amber-100 cursor-pointer shadow-3xs"
+                >
+                  {monthScopeMode === 'rolling25' ? '🔄 25-Month Window' : `📅 Year ${currentYearPred.year}`}
+                </button>
+
                 <span className="px-2.5 py-1 rounded-md bg-amber-100/90 text-amber-950 border border-amber-300 text-[11px] font-bold flex items-center space-x-1.5 shadow-3xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
                   <span>Selected: <strong>{activeMonthData.monthName}</strong></span>
@@ -1010,12 +1046,14 @@ export function YearlyPredictions({
               </div>
             </div>
 
-            {/* Horizontal Month Jump Navigator Strip (12 Months of selected year) */}
+            {/* Horizontal Month Jump Navigator Strip */}
             <div className="overflow-x-auto pb-1 scrollbar-thin">
               <div className="flex items-center gap-1 min-w-max">
                 {yearMonths.map((m) => {
                   const isSelected = m.monthKey === activeMonthData.monthKey;
                   const isTodayMonth = m.monthKey === currentActualMonthKey;
+                  const parts = m.monthName.split(' ');
+                  const monthDisplay = monthScopeMode === 'rolling25' ? `${parts[0]} '${parts[1]?.slice(2)}` : parts[0];
                   return (
                     <button
                       key={m.monthKey}
@@ -1030,7 +1068,7 @@ export function YearlyPredictions({
                       }`}
                     >
                       <div className="flex items-center space-x-1 justify-center">
-                        <span>{m.monthName.split(' ')[0]}</span>
+                        <span>{monthDisplay}</span>
                         {isTodayMonth && (
                           <span className="px-1 py-0.2 rounded bg-amber-600 text-white text-[8px] font-black tracking-tight">
                             NOW
@@ -1698,6 +1736,8 @@ export function YearlyPredictions({
                     {yearMonths.map((m) => {
                       const isSelected = m.monthKey === activeMonthData.monthKey;
                       const isCurrent = m.monthKey === currentActualMonthKey;
+                      const parts = m.monthName.split(' ');
+                      const mLabel = monthScopeMode === 'rolling25' ? `${parts[0]} '${parts[1]?.slice(2)}` : parts[0];
                       return (
                         <button
                           key={m.monthKey}
@@ -1711,7 +1751,7 @@ export function YearlyPredictions({
                               : 'bg-white border-stone-200 text-stone-600 hover:bg-[#FAF8F5]'
                           }`}
                         >
-                          <span>{m.monthName.split(' ')[0]}</span>
+                          <span>{mLabel}</span>
                           {isCurrent && <span className="ml-0.5 text-[8.5px] text-amber-700 font-black">•NOW</span>}
                         </button>
                       );

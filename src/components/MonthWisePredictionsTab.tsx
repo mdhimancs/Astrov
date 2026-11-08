@@ -170,7 +170,12 @@ export function MonthWisePredictionsTab({
 
     const sadeSatiResult = checkSadeSati(natalMoon.rasiNumber, transitSaturn.rasiNumber);
     const detailedMovs = calculateDetailedPlanetaryMovements(natalCalc.lagnaRasi, natalMoon.rasiNumber, transitCalc.planets);
-    const mPredictions = generateMonthWiseTransitPredictions(natalMoon.rasiNumber, natalCalc.lagnaRasi, sadeSatiResult.inSadeSati);
+    const mPredictions = generateMonthWiseTransitPredictions(
+      natalMoon.rasiNumber,
+      natalCalc.lagnaRasi,
+      sadeSatiResult.inSadeSati,
+      targetMonth
+    );
     const yPredictions = calculateYearlyPredictions(
       natalCalc.lagnaRasi,
       natalMoon.rasiNumber,

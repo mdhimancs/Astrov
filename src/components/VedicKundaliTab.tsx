@@ -148,7 +148,12 @@ export function VedicKundaliTab() {
     const tHouses = buildHouseStructure(transitCalc.lagnaRasi, transitCalc.planets);
 
     const detailedMovs = calculateDetailedPlanetaryMovements(natalCalc.lagnaRasi, natalMoon.rasiNumber, transitCalc.planets);
-    const mPredictions = generateMonthWiseTransitPredictions(natalMoon.rasiNumber, natalCalc.lagnaRasi, sadeSatiResult.inSadeSati);
+    const mPredictions = generateMonthWiseTransitPredictions(
+      natalMoon.rasiNumber,
+      natalCalc.lagnaRasi,
+      sadeSatiResult.inSadeSati,
+      targetMonth
+    );
     const dAndDonts = generateCategorizedDosAndDonts(transitCalc.planets, sadeSatiResult.inSadeSati);
     const uRecords = calculateUnifiedPlanetaryTable(natalCalc.lagnaRasi, natalMoon.rasiNumber, transitCalc.planets, targetMonth);
 

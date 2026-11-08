@@ -1336,22 +1336,136 @@ export function calculateDetailedPlanetaryMovements(
     });
 }
 
-// Generate Month-Wise Transit Predictions (Timeline from July 2025 through December 2027)
-export function generateMonthWiseTransitPredictions(
+// Helper to synthesize an authentic, mathematically grounded Vedic Gochar prediction for any month
+export function generateSingleMonthGocharPrediction(
+  monthKey: string,
   natalMoonRasi: number,
   natalLagnaRasi: number,
   sadeSatiActive: boolean
+): MonthWiseTransitPrediction {
+  const [yearStr, monthStr] = monthKey.split('-');
+  const y = parseInt(yearStr, 10);
+  const m = parseInt(monthStr, 10);
+
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  const monthShorts = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const mName = `${monthNames[m - 1]} ${y}`;
+  const mShort = monthShorts[m - 1];
+
+  const solarIngresses = [
+    { sign: 'Makara (Capricorn)', day: 14, name: 'Makara Sankranti', theme: 'Makara Solar Ingress & Uttarayana Dawn' },
+    { sign: 'Kumbha (Aquarius)', day: 13, name: 'Kumbha Sankranti', theme: 'Maha Shivaratri Awakening & Kumbha Transits' },
+    { sign: 'Meena (Pisces)', day: 14, name: 'Meena Sankranti', theme: 'Phalguna Purnima & Chaitra Navratri Transition' },
+    { sign: 'Mesha (Aries)', day: 14, name: 'Mesha Sankranti', theme: 'Exalted Surya in Mesha & Solar New Year Momentum' },
+    { sign: 'Vrishabha (Taurus)', day: 15, name: 'Vrishabha Sankranti', theme: 'Akshaya Tritiya Abundance & Material Stability' },
+    { sign: 'Mithuna (Gemini)', day: 15, name: 'Mithuna Sankranti', theme: 'Mithuna Intellect, Commerce & Nirjala Ekadashi' },
+    { sign: 'Karka (Cancer)', day: 16, name: 'Karka Sankranti', theme: 'Guru Purnima Grace & Dakshinayana Solar Ingress' },
+    { sign: 'Simha (Leo)', day: 17, name: 'Simha Sankranti', theme: 'Surya in Own Swakshetra Simha & Janmashtami Auspice' },
+    { sign: 'Kanya (Virgo)', day: 17, name: 'Kanya Sankranti', theme: 'Ganesh Utsav & Pitru Paksha Ancestral Remembrance' },
+    { sign: 'Tula (Libra)', day: 17, name: 'Tula Sankranti', theme: 'Sharad Navratri Divine Shakti & Vijayadashami Triumph' },
+    { sign: 'Vrishchika (Scorpio)', day: 16, name: 'Vrishchika Sankranti', theme: 'Diwali Deepavali Prosperity & Dev Deepawali Grace' },
+    { sign: 'Dhanu (Sagittarius)', day: 16, name: 'Dhanu Sankranti', theme: 'Gita Jayanti Wisdom & Dharmic Expansion' },
+  ];
+  const ingress = solarIngresses[m - 1] || solarIngresses[0];
+
+  // Calculate planetary positions for the 15th of this month
+  const midDate = new Date(y, m - 1, 15, 12, 0, 0);
+  const transitCalc = calculatePlanetaryPositions(midDate, 28.6139, 77.2090);
+  const guru = transitCalc.planets.find((p) => p.name === 'Guru') || transitCalc.planets[5];
+  const shani = transitCalc.planets.find((p) => p.name === 'Shani') || transitCalc.planets[7];
+  const mangal = transitCalc.planets.find((p) => p.name === 'Mangal') || transitCalc.planets[3];
+
+  const guruHouseFromMoon = ((guru.house - natalMoonRasi + 12) % 12) + 1;
+  const rating = [1, 2, 5, 7, 9, 11].includes(guruHouseFromMoon) ? 5 : [3, 4, 10].includes(guruHouseFromMoon) ? 4 : 3;
+
+  return {
+    monthKey,
+    monthName: mName,
+    tagline: `${ingress.theme} — Parashari Gochar Transit Alignment`,
+    overallRating: rating,
+    planetaryMovements: [
+      {
+        planet: 'Surya' as GrahaName,
+        event: `Surya enters ${ingress.sign} on ${mShort} ${ingress.day} (${ingress.name})`,
+        date: `${mShort} ${ingress.day}, ${y}`,
+        impactSummary: `Activates executive authority, vitality, and solar focus in ${ingress.sign}.`,
+      },
+      {
+        planet: 'Guru' as GrahaName,
+        event: `Guru transits ${guru.rasiName} (${guru.degree}°${guru.minute}')`,
+        date: 'All Month',
+        impactSummary: `Devaguru Gochar in House ${guruHouseFromMoon} from Janma Rasi confers wisdom, expansive ideation, and moral fortitude.`,
+      },
+      {
+        planet: 'Shani' as GrahaName,
+        event: `Shani transits ${shani.rasiName} (${shani.degree}°${shani.minute}')`,
+        date: 'All Month',
+        impactSummary: `Karmic Lord Shani inspects discipline, duty, and endurance with steady structural results.`,
+      },
+      {
+        planet: 'Mangal' as GrahaName,
+        event: `Mangal active in ${mangal.rasiName}`,
+        date: 'All Month',
+        impactSummary: `Drives energetic enterprise, technical vigor, and tactical problem resolution.`,
+      },
+    ],
+    careerWealthForecast: `During ${mName}, professional milestones and monetary flow receive steady support through Surya's ingress into ${ingress.sign} and Jupiter's transit through ${guru.rasiName}. Excellent for consolidation, strategic planning, client acquisition, and structured financial investments.`,
+    loveFamilyForecast: `Warm domestic equilibrium and supportive family bonds prevail. Fosters sincere communication, affectionate understanding with spouse, and familial harmony during key monthly lunar tithis.`,
+    healthVitalityForecast: `Vibrant physical energy with steady Ayurvedic balance. Maintain balanced hydration, seasonal diet aligned with ${mName}, and consistent morning pranayama.`,
+    spiritualForecast: `Auspicious tithis and ${ingress.name} illuminate spiritual discernment. Favorable for morning Surya Arghya, Gayatri mantra recitation, and charitable seva.`,
+    dos: [
+      `Honor ${ingress.name} and align key decisions with waxing Shukla Paksha.`,
+      `Review monthly financial portfolios and maintain disciplined savings.`,
+      `Dedicate 15 minutes daily to quiet contemplation and Gayatri Japa.`,
+    ],
+    donts: [
+      `Avoid impulsive contractual commitments or hasty verbal friction.`,
+      `Do not neglect rest or physical hydration during high-workload cycles.`,
+    ],
+    favorableDays: `${mShort} 3, 7, 11, 15, 20, 25`,
+    cautionDays: `${mShort} 8, ${ingress.day} (${ingress.name}), 23${sadeSatiActive ? ' (Sade Sati awareness)' : ''}`,
+    remedyOfMonth: `Offer fresh water with kumkum to rising Lord Surya at dawn; chant Om Namo Bhagavate Vasudevaya 108 times on Thursdays.`,
+  };
+}
+
+// Generate Month-Wise Transit Predictions
+// Returns 25 months total: exactly 12 months prior, the selected month itself, and 12 months forward
+export function generateMonthWiseTransitPredictions(
+  natalMoonRasi: number,
+  natalLagnaRasi: number,
+  sadeSatiActive: boolean,
+  centerMonthKey?: string
 ): MonthWiseTransitPrediction[] {
-  return ALL_MONTH_WISE_PREDICTIONS.map((month) => {
-    // If Sade Sati is active, append conscious awareness to caution days
-    if (sadeSatiActive && !month.cautionDays.includes('Sade Sati')) {
-      return {
-        ...month,
-        cautionDays: `${month.cautionDays} (Sade Sati awareness)`,
-      };
+  const now = new Date();
+  const currentActualMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const effectiveCenter = centerMonthKey && /^\d{4}-\d{2}$/.test(centerMonthKey) ? centerMonthKey : currentActualMonthKey;
+  const [cYear, cMonth] = effectiveCenter.split('-').map(Number);
+
+  const predictions: MonthWiseTransitPrediction[] = [];
+
+  for (let offset = -12; offset <= 12; offset++) {
+    const d = new Date(cYear, cMonth - 1 + offset, 1);
+    const y = d.getFullYear();
+    const m = d.getMonth() + 1;
+    const mm = String(m).padStart(2, '0');
+    const key = `${y}-${mm}`;
+
+    const existing = ALL_MONTH_WISE_PREDICTIONS.find((p) => p.monthKey === key);
+    if (existing) {
+      let item = { ...existing };
+      if (sadeSatiActive && !item.cautionDays.includes('Sade Sati')) {
+        item.cautionDays = `${item.cautionDays} (Sade Sati awareness)`;
+      }
+      predictions.push(item);
+    } else {
+      predictions.push(generateSingleMonthGocharPrediction(key, natalMoonRasi, natalLagnaRasi, sadeSatiActive));
     }
-    return month;
-  });
+  }
+
+  return predictions;
 }
 
 // Generate Weekly Predictions for a given monthKey
