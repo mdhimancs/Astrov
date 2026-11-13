@@ -169,6 +169,20 @@ export interface MonthWiseTransitPrediction {
   remedyOfMonth: string;
 }
 
+export interface MonthAspectGocharScores {
+  health: number;
+  job: number;
+  wealth: number;
+  relations: number;
+  education: number;
+  overall: number;
+  healthDriver: string;
+  jobDriver: string;
+  wealthDriver: string;
+  relationsDriver: string;
+  educationDriver: string;
+}
+
 export interface WeeklyPrediction {
   weekKey: string; // e.g. '2026-W43'
   weekTitle: string; // e.g. 'Week 43: Oct 19 - Oct 25, 2026'

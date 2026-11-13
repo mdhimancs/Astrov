@@ -30,6 +30,7 @@ import {
 import { YearlyPrediction, PlanetPosition, MonthWiseTransitPrediction } from '../types';
 import { VEDIC_RASIS } from '../data';
 import { ALL_MONTH_WISE_PREDICTIONS } from '../monthlyTransitData';
+import { calculateMonthGocharAspectScores } from '../vedicMath';
 
 interface YearlyPredictionsProps {
   yearlyPredictions: YearlyPrediction[];
@@ -366,8 +367,16 @@ export function YearlyPredictions({
             </div>
           )}
           {isMonthly && (
-            <div className="border-t border-amber-100 pt-1 text-amber-800 text-[9.5px] font-semibold italic">
-              Click node to inspect {data.monthShort} Gochar details
+            <div className="border-t border-amber-100 pt-1 text-stone-700 text-[10px] space-y-0.5">
+              <div>
+                <strong className="text-amber-950">Planetary Driver:</strong>{' '}
+                <span className="text-stone-700">
+                  {data.jobDriver ? data.jobDriver.split(';')[0] : data.tagline}
+                </span>
+              </div>
+              <div className="text-amber-800 text-[9px] font-semibold italic">
+                Click node to select {data.monthShort} Gochar details
+              </div>
             </div>
           )}
         </div>
@@ -485,37 +494,33 @@ export function YearlyPredictions({
       const mNameShort = parts[0]?.slice(0, 3) || `M${monthNum}`;
       const yrShort = parts[1] ? `'${parts[1].slice(2)}` : '';
       const shortName = monthScopeMode === 'rolling25' ? `${mNameShort} ${yrShort}` : mNameShort;
-      const rating = m.overallRating || 3.8;
 
-      const health = Math.max(1.5, Math.min(5.0, Math.round((rating + Math.sin((monthNum / 12) * Math.PI * 2) * 0.3) * 10) / 10));
-      const job = Math.max(1.0, Math.min(5.0, Math.round((rating + ([1, 4, 7, 10, 11].includes(monthNum) ? 0.4 : -0.2)) * 10) / 10));
-      const wealth = Math.max(1.2, Math.min(5.0, Math.round((rating + ([2, 5, 9, 11].includes(monthNum) ? 0.5 : -0.2)) * 10) / 10));
-      const relations = Math.max(1.5, Math.min(5.0, Math.round((rating + ([3, 7, 10].includes(monthNum) ? 0.3 : -0.2)) * 10) / 10));
-      const edu = Math.max(1.8, Math.min(5.0, Math.round((rating + ([1, 5, 9].includes(monthNum) ? 0.4 : 0)) * 10) / 10));
-      const mental = Math.max(1.5, Math.min(5.0, Math.round((rating + Math.cos((monthNum / 12) * Math.PI * 2) * 0.3) * 10) / 10));
-      const nameFame = Math.max(1.5, Math.min(5.0, Math.round((rating + ([1, 10, 11].includes(monthNum) ? 0.5 : -0.1)) * 10) / 10));
-      const property = Math.max(1.2, Math.min(5.0, Math.round((rating + ([4, 11].includes(monthNum) ? 0.4 : -0.2)) * 10) / 10));
-      const children = Math.max(1.5, Math.min(5.0, Math.round((rating + ([5, 9, 11].includes(monthNum) ? 0.4 : -0.1)) * 10) / 10));
-      const overall = Math.round(((health + job + wealth + relations + edu + mental + nameFame + property + children) / 9) * 10) / 10;
+      // Authentic, validated Parashari Gochar planetary transit calculation
+      const aspectEffects = calculateMonthGocharAspectScores(
+        natalLagnaRasi,
+        natalMoonRasi,
+        m.monthKey
+      );
 
       return {
         monthKey: m.monthKey,
         monthName: m.monthName,
         monthShort: shortName,
         tagline: m.tagline,
-        Health: health,
-        Job: job,
-        Wealth: wealth,
-        Relations: relations,
-        Education: edu,
-        Mental: mental,
-        NameFame: nameFame,
-        Property: property,
-        Children: children,
-        Overall: overall,
+        Health: aspectEffects.health,
+        Job: aspectEffects.job,
+        Wealth: aspectEffects.wealth,
+        Relations: aspectEffects.relations,
+        Education: aspectEffects.education,
+        Overall: aspectEffects.overall,
+        healthDriver: aspectEffects.healthDriver,
+        jobDriver: aspectEffects.jobDriver,
+        wealthDriver: aspectEffects.wealthDriver,
+        relationsDriver: aspectEffects.relationsDriver,
+        educationDriver: aspectEffects.educationDriver,
       };
     });
-  }, [yearMonths, monthScopeMode]);
+  }, [yearMonths, monthScopeMode, natalLagnaRasi, natalMoonRasi]);
 
   const activeMonthDataPoint = useMemo(() => {
     return (
@@ -1002,6 +1007,119 @@ export function YearlyPredictions({
             </ResponsiveContainer>
           </div>
         </div>
+
+        {/* VALIDATED ASTROLOGICAL GOCHAR EFFECTS BREAKDOWN PANEL */}
+        {graphViewMode === 'monthly' && (
+          <div className="bg-white rounded-lg border border-amber-300/80 p-3 shadow-2xs space-y-2 mt-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-amber-200/70 pb-2">
+              <div className="flex items-center space-x-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+                <div>
+                  <h4 className="font-vedic font-black text-stone-950 text-[13.5px] uppercase tracking-wider">
+                    Validated Transit Effects: {activeMonthData.monthName}
+                  </h4>
+                  <p className="text-[11px] text-stone-600 font-medium">
+                    Brihat Parashara Gochar rules from Janma Moon ({VEDIC_RASIS[natalMoonRasi - 1]?.sanskritName}) &amp; Lagna ({VEDIC_RASIS[natalLagnaRasi - 1]?.sanskritName})
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2 shrink-0">
+                <span className="text-[11px] font-bold text-amber-950 bg-amber-100/90 border border-amber-300 px-2 py-0.5 rounded flex items-center space-x-1">
+                  <span>Overall Gochar Index:</span>
+                  <strong className="text-amber-900 font-black">{activeMonthDataPoint.Overall?.toFixed(1)}/5.0</strong>
+                </span>
+              </div>
+            </div>
+
+            {/* Grid of Validated Pillars */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 pt-1 text-[11px]">
+              {[
+                {
+                  key: 'Job',
+                  label: 'Career & Work',
+                  score: activeMonthDataPoint.Job,
+                  color: '#059669',
+                  bg: 'bg-emerald-50/70',
+                  border: 'border-emerald-200',
+                  driver: (activeMonthDataPoint as any).jobDriver || 'Workplace stability supported by Shani & Surya Gochar.',
+                  icon: Briefcase,
+                },
+                {
+                  key: 'Wealth',
+                  label: 'Wealth & Finance',
+                  score: activeMonthDataPoint.Wealth,
+                  color: '#CA8A04',
+                  bg: 'bg-yellow-50/70',
+                  border: 'border-yellow-200',
+                  driver: (activeMonthDataPoint as any).wealthDriver || 'Dhana yoga flow and liquid reserve management.',
+                  icon: TrendingUp,
+                },
+                {
+                  key: 'Health',
+                  label: 'Health & Vitality',
+                  score: activeMonthDataPoint.Health,
+                  color: '#0284C7',
+                  bg: 'bg-sky-50/70',
+                  border: 'border-sky-200',
+                  driver: (activeMonthDataPoint as any).healthDriver || 'Solar Prana vitality and seasonal Ayurvedic balance.',
+                  icon: Activity,
+                },
+                {
+                  key: 'Relations',
+                  label: 'Love & Family',
+                  score: activeMonthDataPoint.Relations,
+                  color: '#E11D48',
+                  bg: 'bg-rose-50/70',
+                  border: 'border-rose-200',
+                  driver: (activeMonthDataPoint as any).relationsDriver || 'Shukra-Kalatra harmony and mutual domestic respect.',
+                  icon: Heart,
+                },
+                {
+                  key: 'Education',
+                  label: 'Intellect & Study',
+                  score: activeMonthDataPoint.Education,
+                  color: '#6366F1',
+                  bg: 'bg-indigo-50/70',
+                  border: 'border-indigo-200',
+                  driver: (activeMonthDataPoint as any).educationDriver || 'Budha-Buddhi acumen, exam retention, and cognitive agility.',
+                  icon: GraduationCap,
+                },
+              ].map((item) => {
+                const isAspectActive = activeAspects.includes(item.key);
+                return (
+                  <div
+                    key={item.key}
+                    onClick={() => toggleAspect(item.key)}
+                    className={`rounded-md p-2 border transition-all cursor-pointer ${item.bg} ${item.border} ${
+                      isAspectActive ? 'ring-2 ring-amber-400 shadow-2xs' : 'hover:border-amber-400 opacity-90'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-bold flex items-center space-x-1" style={{ color: item.color }}>
+                        <item.icon className="w-3.5 h-3.5" />
+                        <span>{item.label}</span>
+                      </span>
+                      <span
+                        className="px-1.5 py-0.2 rounded font-black text-[10px] text-white"
+                        style={{ backgroundColor: item.color }}
+                      >
+                        {item.score?.toFixed(1)}/5
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-stone-700 leading-snug line-clamp-3">
+                      {item.driver}
+                    </p>
+                    <div className="mt-1 pt-1 border-t border-stone-200/50 flex items-center justify-between text-[9px] text-stone-500">
+                      <span>Click to toggle graph line</span>
+                      <span className="font-bold">{isAspectActive ? '● ON' : '○ OFF'}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* =====================================================================
             YEARLY MONTH-BY-MONTH GOCHAR & TRANSIT PREDICTIONS (CURRENT MONTH DEFAULT)

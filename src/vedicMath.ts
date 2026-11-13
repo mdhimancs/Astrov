@@ -1,4 +1,4 @@
-import { BirthDetails, PlanetPosition, HouseInfo, VedicRasiName, GrahaName, TransitPrediction, PlanetaryMovementDetail, MonthWiseTransitPrediction, WeeklyPrediction, YearlyPrediction, TransitDosAndDonts, PlanetaryImpactRecord, BirthTimeHousePrediction, BhriguLalKitabSummary, NatalYoga, VimshottariDashaInfo, AntardashaInfo, DashaMonthlyPlanetaryGuidance, AshtakavargaPoints, TajikaSuite, TajikaSaham, TajikaYoga, ChandraEmotionalSignificance, NatalCalculationResult, DashaStrengthRating, DashaStrengthInfo, PratyantardashaInfo, DashaPartInfo } from './types';
+import { BirthDetails, PlanetPosition, HouseInfo, VedicRasiName, GrahaName, TransitPrediction, PlanetaryMovementDetail, MonthWiseTransitPrediction, MonthAspectGocharScores, WeeklyPrediction, YearlyPrediction, TransitDosAndDonts, PlanetaryImpactRecord, BirthTimeHousePrediction, BhriguLalKitabSummary, NatalYoga, VimshottariDashaInfo, AntardashaInfo, DashaMonthlyPlanetaryGuidance, AshtakavargaPoints, TajikaSuite, TajikaSaham, TajikaYoga, ChandraEmotionalSignificance, NatalCalculationResult, DashaStrengthRating, DashaStrengthInfo, PratyantardashaInfo, DashaPartInfo } from './types';
 import { VEDIC_RASIS, NAKSHATRAS, BHAVA_DETAILS } from './data';
 import { ALL_MONTH_WISE_PREDICTIONS } from './monthlyTransitData';
 export { ALL_MONTH_WISE_PREDICTIONS };
@@ -1466,6 +1466,201 @@ export function generateMonthWiseTransitPredictions(
   }
 
   return predictions;
+}
+
+// Calculate validated, genuine Vedic Gochar scores and drivers for all life pillars for any month
+export function calculateMonthGocharAspectScores(
+  natalLagnaRasi: number,
+  natalMoonRasi: number,
+  monthKey: string
+): MonthAspectGocharScores {
+  const [yStr, mStr] = monthKey.split('-');
+  const y = parseInt(yStr || '2026', 10);
+  const m = parseInt(mStr || '1', 10);
+  const midDate = new Date(y, m - 1, 15, 12, 0, 0);
+
+  const calc = calculatePlanetaryPositions(midDate, 28.6139, 77.2090);
+  const planets = calc.planets;
+
+  const surya = planets.find((p) => p.name === 'Surya') || planets[0];
+  const shani = planets.find((p) => p.name === 'Shani') || planets[7];
+  const guru = planets.find((p) => p.name === 'Guru') || planets[5];
+  const mangal = planets.find((p) => p.name === 'Mangal') || planets[3];
+  const budha = planets.find((p) => p.name === 'Budha') || planets[4];
+  const shukra = planets.find((p) => p.name === 'Shukra') || planets[6];
+  const rahu = planets.find((p) => p.name === 'Rahu') || planets[8];
+
+  const getHouse = (p: PlanetPosition, refRasi: number) => ((p.rasiNumber - refRasi + 12) % 12) + 1;
+
+  const suryaFromMoon = getHouse(surya, natalMoonRasi);
+  const shaniFromMoon = getHouse(shani, natalMoonRasi);
+  const guruFromMoon = getHouse(guru, natalMoonRasi);
+  const mangalFromMoon = getHouse(mangal, natalMoonRasi);
+  const budhaFromMoon = getHouse(budha, natalMoonRasi);
+  const shukraFromMoon = getHouse(shukra, natalMoonRasi);
+  const rahuFromMoon = getHouse(rahu, natalMoonRasi);
+
+  // 1. JOB / CAREER
+  let jobScore = 3.2;
+  const jobDrivers: string[] = [];
+  if ([3, 6, 11].includes(shaniFromMoon)) {
+    jobScore += 1.0;
+    jobDrivers.push(`Saturn in House ${shaniFromMoon} from Moon: Auspicious Upachaya victory over obstacles and rivals.`);
+  } else if ([12, 1, 2].includes(shaniFromMoon)) {
+    jobScore -= 0.7;
+    jobDrivers.push(`Saturn in House ${shaniFromMoon} (Sade Sati): Heavy karmic workload, patience and precision needed.`);
+  } else if (shaniFromMoon === 8) {
+    jobScore -= 0.6;
+    jobDrivers.push(`Saturn in House 8 (Ashtama Shani): Demands caution against sudden workplace restructuring.`);
+  }
+
+  if ([3, 6, 10, 11].includes(suryaFromMoon)) {
+    jobScore += 0.7;
+    jobDrivers.push(`Sun in House ${suryaFromMoon}: High executive authority, management recognition, and leadership surge.`);
+  } else if ([8, 12].includes(suryaFromMoon) || surya.rasiNumber === 7) {
+    jobScore -= 0.5;
+    jobDrivers.push(`Sun in House ${suryaFromMoon}${surya.rasiNumber === 7 ? ' (Debilitated)' : ''}: Guard against ego friction with authorities.`);
+  }
+
+  if ([2, 5, 7, 9, 11].includes(guruFromMoon)) {
+    jobScore += 0.6;
+    jobDrivers.push(`Jupiter in House ${guruFromMoon}: Strategic expansion, mentor elevation, and fruitful new initiatives.`);
+  } else if ([6, 8, 12].includes(guruFromMoon)) {
+    jobScore -= 0.3;
+  }
+
+  if ([3, 6, 10, 11].includes(mangalFromMoon)) {
+    jobScore += 0.4;
+  }
+  jobScore = Math.max(1.5, Math.min(5.0, Math.round(jobScore * 10) / 10));
+
+  // 2. WEALTH / FINANCE
+  let wealthScore = 3.1;
+  const wealthDrivers: string[] = [];
+  if ([2, 5, 9, 11].includes(guruFromMoon)) {
+    wealthScore += 1.1;
+    wealthDrivers.push(`Devaguru in House ${guruFromMoon}: Prime Dhana Yoga alignment activating monetary growth and gains.`);
+  } else if ([6, 8, 12].includes(guruFromMoon)) {
+    wealthScore -= 0.6;
+    wealthDrivers.push(`Guru in House ${guruFromMoon}: Unplanned expenditures; practice conservative financial reserves.`);
+  }
+
+  if (shaniFromMoon === 11) {
+    wealthScore += 0.8;
+    wealthDrivers.push(`Saturn in 11th House of Gains (Labha): Solid compounding returns and asset stability.`);
+  } else if (shaniFromMoon === 12) {
+    wealthScore -= 0.5;
+    wealthDrivers.push(`Saturn in 12th House: Higher overhead, debt retirement, and capital commitments.`);
+  }
+
+  if ([1, 2, 3, 4, 5, 8, 9, 11, 12].includes(shukraFromMoon)) {
+    wealthScore += 0.5;
+    if (shukra.rasiNumber === 12) {
+      wealthScore += 0.4;
+      wealthDrivers.push(`Exalted Venus in Pisces: Luxury acquisitions, bonus inflow, and refined investments.`);
+    }
+  } else if (shukraFromMoon === 6) {
+    wealthScore -= 0.4;
+  }
+
+  if (rahuFromMoon === 11) {
+    wealthScore += 0.4;
+  }
+  wealthScore = Math.max(1.5, Math.min(5.0, Math.round(wealthScore * 10) / 10));
+
+  // 3. HEALTH / VITALITY
+  let healthScore = 3.3;
+  const healthDrivers: string[] = [];
+  if ([3, 6, 10, 11].includes(suryaFromMoon)) {
+    healthScore += 0.9;
+    healthDrivers.push(`Sun in House ${suryaFromMoon}: High solar Prana, robust vitality, and strong cardiovascular stamina.`);
+  } else if ([8, 12].includes(suryaFromMoon) || surya.rasiNumber === 7) {
+    healthScore -= 0.8;
+    healthDrivers.push(surya.rasiNumber === 7 ? `Sun debilitated in Libra: Lower immunity; maintain strict circadian sleep & hydration.` : `Sun in House ${suryaFromMoon}: Guard against eye strain, low stamina, and seasonal fatigue.`);
+  }
+
+  if ([1, 8].includes(shaniFromMoon)) {
+    healthScore -= 0.6;
+    healthDrivers.push(`Saturn in House ${shaniFromMoon}: Vata stiffness in joints, chronic fatigue; incorporate warm herbal oil massage.`);
+  } else if ([3, 6, 11].includes(shaniFromMoon)) {
+    healthScore += 0.5;
+  }
+
+  if ([3, 6].includes(mangalFromMoon)) {
+    healthScore += 0.5;
+  } else if ([8, 12].includes(mangalFromMoon)) {
+    healthScore -= 0.4;
+    healthDrivers.push(`Mars in House ${mangalFromMoon}: Moderate internal Pitta heat, avoid overly spicy foods.`);
+  }
+
+  if ([5, 7, 9].includes(guruFromMoon)) {
+    healthScore += 0.5;
+    healthDrivers.push(`Jupiter auspicious aspect: Acts as a protective divine health shield.`);
+  }
+  healthScore = Math.max(1.5, Math.min(5.0, Math.round(healthScore * 10) / 10));
+
+  // 4. RELATIONS / FAMILY / MARRIAGE
+  let relationsScore = 3.2;
+  const relationsDrivers: string[] = [];
+  if ([1, 2, 3, 4, 5, 8, 9, 11, 12].includes(shukraFromMoon)) {
+    relationsScore += 0.8;
+    relationsDrivers.push(`Venus in House ${shukraFromMoon}: Warm affection, emotional understanding, and marital happiness.`);
+  } else if ([6, 7].includes(shukraFromMoon) || shukra.rasiNumber === 6) {
+    relationsScore -= 0.6;
+    relationsDrivers.push(`Venus in House ${shukraFromMoon}: Maintain gentle dialogue and diplomatic tact with partner.`);
+  }
+
+  if ([2, 5, 7, 9, 11].includes(guruFromMoon)) {
+    relationsScore += 0.7;
+    relationsDrivers.push(`Jupiter in House ${guruFromMoon}: Blessings from elders, joyous family gatherings, and mutual respect.`);
+  }
+
+  if ([7, 8].includes(mangalFromMoon)) {
+    relationsScore -= 0.6;
+    relationsDrivers.push(`Mars in House ${mangalFromMoon}: Guard against fiery temperamental arguments.`);
+  }
+  relationsScore = Math.max(1.5, Math.min(5.0, Math.round(relationsScore * 10) / 10));
+
+  // 5. EDUCATION / INTELLECT
+  let educationScore = 3.3;
+  const educationDrivers: string[] = [];
+  if ([2, 4, 6, 8, 10, 11].includes(budhaFromMoon)) {
+    educationScore += 0.8;
+    if (budha.rasiNumber === 6) {
+      educationScore += 0.5;
+      educationDrivers.push(`Exalted Mercury in Virgo (Bhadra Yoga): Peak analytical acuity, mathematical retention, and exam mastery.`);
+    } else {
+      educationDrivers.push(`Mercury in House ${budhaFromMoon}: Crisp cognitive focus, learning efficiency, and presentation eloquence.`);
+    }
+  } else if (budhaFromMoon === 12 || budha.rasiNumber === 12) {
+    educationScore -= 0.6;
+    educationDrivers.push(`Mercury in House ${budhaFromMoon}: Restless mental focus; use structured notes and revision.`);
+  }
+
+  if ([1, 5, 9, 11].includes(guruFromMoon)) {
+    educationScore += 0.7;
+    educationDrivers.push(`Jupiter in House ${guruFromMoon}: Expands higher wisdom, dharmic comprehension, and exam fortune.`);
+  }
+  educationScore = Math.max(1.5, Math.min(5.0, Math.round(educationScore * 10) / 10));
+
+  // 6. OVERALL
+  const overall = Math.round(
+    ((jobScore * 0.25) + (wealthScore * 0.25) + (healthScore * 0.2) + (relationsScore * 0.15) + (educationScore * 0.15)) * 10
+  ) / 10;
+
+  return {
+    job: jobScore,
+    wealth: wealthScore,
+    health: healthScore,
+    relations: relationsScore,
+    education: educationScore,
+    overall,
+    jobDriver: jobDrivers.join('; ') || 'Standard Parashari workplace transit stability.',
+    wealthDriver: wealthDrivers.join('; ') || 'Equilibrium in income and domestic expenditure.',
+    healthDriver: healthDrivers.join('; ') || 'Stable seasonal Ayurvedic constitution.',
+    relationsDriver: relationsDrivers.join('; ') || 'Harmonious domestic and partnership bonding.',
+    educationDriver: educationDrivers.join('; ') || 'Steady intellectual curiosity and study progress.',
+  };
 }
 
 // Generate Weekly Predictions for a given monthKey
